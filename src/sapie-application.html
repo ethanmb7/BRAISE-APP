@@ -1,0 +1,2002 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAPIE — L'application</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232F5FE3'/%3E%3Cpath d='M6 11 Q6 7 10 7 H22 Q26 7 26 11 V17 Q26 21 22 21 H13 L8 25 V21 H10 Q6 21 6 17 Z' fill='white'/%3E%3Cpath d='M16 10.5 L17.3 13.7 L20.8 13.7 L18 15.9 L19 19.3 L16 17.1 L13 19.3 L14 15.9 L11.2 13.7 L14.7 13.7 Z' fill='%23FF6F59'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#2F5FE3; --blue-2:#1E48C4; --blue-ink:#13214f; --blue-pale:#EAF1FF;
+    --paper:#FFFFFF; --sun:#FFC24B; --sun-ink:#5c3a00; --coral:#FF6F59; --coral-2:#C23F2E; --mint:#2FBE9F; --mint-text:#146E5A; --violet:#8B6BE0;
+    --ink:#16213A; --ink-soft:rgba(22,33,58,0.72); --line:rgba(22,33,58,0.1);
+  }
+  .device.dark{
+    --blue-pale:#0f1830; --paper:#1a2444; --ink:#EAF1FF; --ink-soft:rgba(234,241,255,0.72); --line:rgba(234,241,255,0.12);
+  }
+  .device.dark .status-bar{ color: var(--ink); }
+  .device.dark .search-bar input{ color: var(--ink); }
+  .device.dark .search-bar input::placeholder{ color: var(--ink-soft); }
+  .device.dark .peer-input-row input{ color: var(--ink); }
+  .device.dark .quiz-opt, .device.dark .lquiz-opt{ background: rgba(234,241,255,0.06); }
+  .device.dyslexia-mode, .device.dyslexia-mode *{ letter-spacing: 0.035em !important; word-spacing: 0.18em !important; line-height: 1.7 !important; font-style: normal !important; }
+  .device.dyslexia-mode h1, .device.dyslexia-mode h2, .device.dyslexia-mode h3, .device.dyslexia-mode .story-text, .device.dyslexia-mode .quiz-q2 { font-family: 'IBM Plex Sans', sans-serif !important; font-weight: 600 !important; }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  }
+  html,body{ height:100%; }
+  body{ margin:0; background: #dfe4ee; color: var(--ink); font-family:'IBM Plex Sans', sans-serif; -webkit-font-smoothing:antialiased; display:flex; align-items:center; justify-content:center; min-height:100vh; padding: 20px; }
+  h1,h2,h3{ font-family:'Baloo 2', sans-serif; font-weight:700; margin:0; line-height:1.1; }
+  a{ text-decoration:none; color:inherit; }
+  button{ font-family:inherit; border:none; cursor:pointer; background:none; -webkit-appearance:none; }
+  :focus-visible{ outline: 2px solid var(--coral); outline-offset:2px; }
+
+  /* ===== Device frame ===== */
+  .device{
+    width: 390px; max-width: 100%; height: 844px; max-height: 92vh;
+    background: #000; border-radius: 52px; padding: 12px;
+    box-shadow: 0 40px 80px -20px rgba(19,33,79,0.45), 0 0 0 2px rgba(255,255,255,0.06) inset;
+    position: relative;
+  }
+  .screen{
+    width:100%; height:100%; background: var(--blue-pale); border-radius: 40px; overflow:hidden; position:relative; display:flex; flex-direction:column;
+  }
+  .notch{ position:absolute; top:0; left:50%; transform:translateX(-50%); width:120px; height:26px; background:#000; border-radius:0 0 16px 16px; z-index:50; }
+
+  .status-bar{ height:46px; flex-shrink:0; display:flex; align-items:center; justify-content:space-between; padding: 0 26px; font-family:'IBM Plex Sans',sans-serif; font-size:0.8rem; font-weight:600; color: var(--ink); background:transparent; z-index:20; }
+  .status-icons{ display:flex; align-items:center; gap:5px; }
+
+  .app-content{ flex:1; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  .app-content::-webkit-scrollbar{ display:none; }
+
+  .topbar{ display:flex; align-items:center; gap:12px; padding: 6px 20px 14px; position:sticky; top:0; background: var(--blue-pale); z-index:10; }
+  .topbar h1{ font-size:1.25rem; }
+  .topbar-back{ width:34px; height:34px; border-radius:50%; background: var(--paper); display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0; }
+
+  .tabbar{ flex-shrink:0; display:flex; justify-content:space-around; align-items:center; padding: 10px 10px calc(10px + env(safe-area-inset-bottom,0px)); background: rgba(255,255,255,0.92); backdrop-filter: blur(10px); border-top:1px solid var(--line); }
+  .tab-btn{ display:flex; flex-direction:column; align-items:center; gap:3px; font-size:0.66rem; color: var(--ink-soft); font-weight:500; padding: 4px 14px; }
+  .tab-btn .ic{ font-size:1.35rem; line-height:1; }
+  .tab-ic-wrap{ position:relative; display:inline-block; }
+  .tab-dot{ position:absolute; top:-2px; right:-6px; width:8px; height:8px; border-radius:50%; background: var(--coral); display:none; }
+  .tab-dot.show{ display:block; }
+  .tab-btn.is-active{ color: var(--blue); }
+
+  /* ===== Path (Duolingo-style home) ===== */
+  .path-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .path-subject{ font-family:'Baloo 2',sans-serif; font-size:1.05rem; }
+  .path-sub{ color: var(--ink-soft); font-size:0.78rem; margin-top:2px; }
+  .path-wrap{ padding: 20px 0 10px; position:relative; }
+  .path-line{ position:absolute; left:50%; top:20px; bottom:20px; width:3px; background: var(--line); transform:translateX(-50%); z-index:0; }
+  .path-node{ position:relative; z-index:1; display:flex; justify-content:center; margin-bottom: 34px; }
+  .path-node:last-child{ margin-bottom:0; }
+  .path-node.off-l{ transform: translateX(-52px); }
+  .path-node.off-r{ transform: translateX(52px); }
+  .node-btn{ width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-weight:700; position:relative; box-shadow: 0 6px 0 rgba(0,0,0,0.08); }
+  .node-btn.done{ background: var(--mint); color:var(--paper); }
+  .node-btn.current{ background: var(--blue); color:var(--paper); animation: nodePulse 1.8s ease-in-out infinite; }
+  .node-btn.locked{ background: var(--paper); color: var(--ink-soft); border:2px dashed var(--line); box-shadow:none; }
+  @keyframes nodePulse{ 0%,100%{ box-shadow:0 6px 0 rgba(30,72,196,0.25), 0 0 0 0 rgba(47,95,227,0.35);} 50%{ box-shadow:0 6px 0 rgba(30,72,196,0.25), 0 0 0 10px rgba(47,95,227,0);} }
+  .node-label{ position:absolute; top:70px; left:50%; transform:translateX(-50%); width:120px; text-align:center; font-size:0.72rem; color: var(--ink-soft); font-weight:500; }
+  .node-braise{ position:absolute; top:-38px; left:50%; transform:translateX(-50%); width:40px; height:40px; }
+  .path-start-btn{ position:absolute; top:74px; left:50%; transform:translateX(-50%); background: var(--sun); color: var(--sun-ink); border-radius:999px; padding:8px 16px; font-size:0.76rem; font-weight:700; white-space:nowrap; }
+
+  /* ===== Révisions (flashcards) ===== */
+  .rev-filters{ display:flex; gap:8px; margin-bottom:18px; overflow-x:auto; }
+  .rev-filter{ padding:8px 14px; border-radius:999px; background: var(--paper); font-size:0.78rem; font-weight:600; color: var(--ink-soft); white-space:nowrap; }
+  .rev-filter.is-on{ background: var(--blue); color: var(--paper); }
+  .flash-stack{ position:relative; height: 260px; margin-bottom:20px; }
+  .flash-stack::before, .flash-stack::after{ content:""; position:absolute; inset:6px 10px 0; background: var(--paper); border-radius:20px; box-shadow: 0 6px 16px -12px rgba(22,33,58,0.25); }
+  .flash-stack::before{ transform: scale(0.96) translateY(10px); opacity:0.7; z-index:0; }
+  .flash-stack::after{ transform: scale(0.92) translateY(18px); opacity:0.4; z-index:-1; }
+  .flashcard{ position:absolute; inset:0; background: var(--paper); border-radius:20px; padding:26px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; box-shadow: 0 10px 26px -16px rgba(22,33,58,0.3); cursor:pointer; }
+  .flashcard .ftag{ font-family:'IBM Plex Mono',monospace; font-size:0.66rem; text-transform:uppercase; color: var(--ink-soft); margin-bottom:12px; }
+  .flashcard .fq{ font-family:'Baloo 2',sans-serif; font-size:1.15rem; line-height:1.35; }
+  .flashcard .fhint{ margin-top:16px; font-size:0.74rem; color: var(--ink-soft); }
+  .flashcard.flipped{ background: var(--blue-pale); }
+  .flashcard{ cursor: grab; touch-action: pan-y; user-select: none; }
+  .flashcard.dragging{ cursor: grabbing; transition: none !important; }
+  .flashcard.snap-back{ transition: transform 0.25s ease; }
+  .flashcard.fly-out{ transition: transform 0.35s ease, opacity 0.35s ease; }
+  .swipe-tag{ position:absolute; top:16px; padding:6px 14px; border-radius:999px; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:0.82rem; border:3px solid; opacity:0; transform: scale(0.8) rotate(-8deg); transition: opacity 0.1s ease; z-index:10; }
+  .swipe-tag.know{ right:16px; color: var(--mint-text); border-color: var(--mint); background: rgba(47,190,159,0.14); }
+  .swipe-tag.again{ left:16px; color: var(--sun-ink); border-color: var(--sun); background: rgba(255,194,75,0.18); transform: scale(0.8) rotate(8deg); }
+  .confidence-row{ display:flex; flex-direction:column; gap:10px; margin-top:20px; width:100%; }
+  .flashcard.flipped .confidence-row{ display:none; }
+  .conf-btn{ background: var(--blue-pale); border:2px solid var(--line); border-radius:12px; padding:11px; font-size:0.86rem; font-weight:600; color: var(--ink); }
+  .conf-btn:hover{ border-color: var(--blue); }
+  .confidence-note{ font-size:0.76rem; color: var(--ink-soft); margin-top:10px; }
+  .flashcard .fa{ display:none; font-size:0.95rem; color: var(--ink); line-height:1.5; }
+  .flashcard.flipped .fq{ display:none; }
+  .flashcard.flipped .fa{ display:block; }
+  .rev-actions{ display:flex; gap:10px; }
+  .rev-btn{ flex:1; border-radius:999px; padding:13px; font-weight:700; font-size:0.86rem; }
+  .rev-btn.again{ background: rgba(232,86,68,0.12); color: var(--coral-2); }
+  .rev-btn.know{ background: rgba(47,190,159,0.14); color:var(--mint-text); }
+  .rev-progress{ text-align:center; font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color: var(--ink-soft); margin-bottom:14px; }
+
+  /* ===== Accueil = conversation avec Braise ===== */
+  .feed{ display:flex; flex-direction:column; gap:18px; padding-top: 4px; }
+  .feed-row{ display:flex; gap:10px; align-items:flex-end; }
+  .feed-avatar{ width:30px; height:30px; border-radius:50%; background: var(--paper); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .feed-avatar svg{ width:22px; height:22px; }
+  .feed-avatar.ghost{ visibility:hidden; }
+  .feed-bubble{ background: var(--paper); border-radius:16px; border-bottom-left-radius:4px; padding:12px 15px; font-size:0.88rem; line-height:1.45; max-width: 82%; opacity:0; transform:translateY(6px); animation: feedIn 0.35s ease forwards; }
+  @keyframes feedIn{ to{ opacity:1; transform:none; } }
+  .feed-card{ background: linear-gradient(120deg, var(--blue), var(--blue-2)); color:var(--paper); border-radius:16px; border-bottom-left-radius:4px; padding:16px; max-width:86%; opacity:0; transform:translateY(6px); animation: feedIn 0.35s ease forwards; }
+  .feed-card .fc-tag{ font-family:'IBM Plex Mono',monospace; font-size:0.62rem; text-transform:uppercase; opacity:0.8; }
+  .feed-card h3{ font-size:1rem; margin:6px 0 8px; color:var(--paper); }
+  .feed-card .fc-bar{ height:5px; background: rgba(255,255,255,0.25); border-radius:999px; overflow:hidden; margin-bottom:6px; }
+  .feed-card .fc-bar span{ display:block; height:100%; background: var(--sun); width:62%; }
+  .feed-card .fc-pct{ font-size:0.68rem; opacity:0.85; font-family:'IBM Plex Mono',monospace; margin-bottom:12px; }
+  .feed-card button{ background: var(--sun); color: var(--sun-ink); border-radius:999px; padding:9px 16px; font-weight:700; font-size:0.8rem; width:100%; }
+  .feed-mini-row{ display:flex; gap:8px; max-width:86%; }
+  .feed-mini{ background: var(--paper); border-radius:14px; padding:10px 12px; flex:1; display:flex; align-items:center; gap:8px; opacity:0; transform:translateY(6px); animation: feedIn 0.35s ease forwards; }
+  .feed-mini-ic{ width:26px; height:26px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .feed-mini-ic svg{ width:13px; height:13px; }
+  .feed-mini-title{ font-family:'Baloo 2',sans-serif; font-size:0.76rem; }
+  .feed-mini-tag{ font-family:'IBM Plex Mono',monospace; font-size:0.56rem; color: var(--ink-soft); text-transform:uppercase; }
+  .feed-weak{ background: var(--paper); border-radius:16px; border-bottom-left-radius:4px; padding:12px 15px; max-width:86%; border-left:3px solid var(--coral); opacity:0; transform:translateY(6px); animation: feedIn 0.35s ease forwards; }
+  .feed-weak b{ display:block; font-family:'Baloo 2',sans-serif; font-size:0.84rem; margin-bottom:2px; }
+  .feed-weak span{ font-size:0.74rem; color: var(--ink-soft); }
+  .feed-weak button{ margin-top:8px; background: var(--blue-pale); color: var(--blue-2); border-radius:999px; padding:7px 13px; font-size:0.74rem; font-weight:600; }
+  .feed-time{ font-family:'IBM Plex Mono',monospace; font-size:0.62rem; color: var(--ink-soft); text-align:center; margin: 4px 0; opacity:0.7; }
+  .feed-bubble.accent-coral{ border-left: 3px solid var(--coral); }
+  .feed-bubble.accent-mint{ border-left: 3px solid var(--mint); }
+  .home-hero{ background: linear-gradient(135deg, var(--blue), var(--blue-2)); border-radius: 20px; padding: 16px 18px; margin-bottom:16px; color: var(--paper); display:flex; align-items:center; gap:12px; }
+  .home-hero svg{ width:38px; height:38px; flex-shrink:0; }
+  .home-hero .htxt{ flex:1; min-width:0; }
+  .home-hero .htxt b{ display:block; font-family:'Baloo 2',sans-serif; font-size:0.98rem; }
+  .home-hero .htxt span{ font-size:0.78rem; opacity:0.85; }
+
+  /* ===== Nouvel accueil : anneau + action unique ===== */
+  .home-top2{ display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; }
+  .home-top2 .greet b{ display:block; font-family:'Baloo 2',sans-serif; font-size:1.15rem; }
+  .home-top2 .greet span{ font-size:0.8rem; color: var(--ink-soft); }
+  .ring-wrap{ display:flex; flex-direction:column; align-items:center; margin-bottom:26px; }
+  .ring-svg{ width:168px; height:168px; }
+  .ring-center{ position:relative; margin-bottom:2px; }
+  .ring-label{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .ring-label b{ font-family:'Baloo 2',sans-serif; font-size:1.7rem; color: var(--ink); }
+  .ring-label span{ font-size:0.68rem; color: var(--ink-soft); text-align:center; max-width:80px; line-height:1.2; }
+  .ring-chips{ display:flex; gap:10px; margin-top:14px; }
+  .ring-chip{ display:flex; align-items:center; gap:5px; background: var(--paper); border-radius:999px; padding:6px 12px; font-family:'IBM Plex Mono',monospace; font-size:0.74rem; font-weight:600; box-shadow:0 3px 10px -6px rgba(22,33,58,0.2); }
+  .ring-chip.c-streak{ color: var(--coral-2); }
+  .ring-chip.c-xp{ color: var(--blue-2); }
+  .ring-chip.bump{ transform: scale(1.14); transition: transform 0.25s ease; }
+
+  .primary-cta{ background: linear-gradient(120deg, var(--blue), var(--blue-2)); color:var(--paper); border-radius:22px; padding:22px; margin-bottom:22px; box-shadow: 0 16px 32px -18px rgba(47,95,227,0.55); }
+  .primary-cta .pc-tag{ font-family:'IBM Plex Mono',monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.06em; opacity:0.85; }
+  .primary-cta h2{ font-size:1.25rem; margin: 8px 0 4px; }
+  .primary-cta p{ font-size:0.82rem; opacity:0.85; margin: 0 0 16px; line-height:1.4; }
+  .primary-cta button{ background: var(--sun); color: var(--sun-ink); border-radius:999px; padding:13px; font-weight:700; font-size:0.9rem; width:100%; }
+
+  .quick-row{ display:flex; gap:10px; overflow-x:auto; padding-bottom:6px; margin: -2px -2px 22px; }
+  .quick-chip{ flex-shrink:0; background: var(--paper); border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:9px; min-width: 150px; }
+  .quick-chip .qc-ic{ width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .quick-chip .qc-ic svg{ width:14px; height:14px; }
+  .quick-chip .qc-tag{ font-family:'IBM Plex Mono',monospace; font-size:0.6rem; text-transform:uppercase; color: var(--ink-soft); }
+  .quick-chip .qc-title{ font-family:'Baloo 2',sans-serif; font-size:0.8rem; }
+
+  .nudge{ display:flex; align-items:center; gap:12px; background: rgba(255,111,89,0.1); border: 1px solid rgba(255,111,89,0.25); border-radius:16px; padding:13px 15px; }
+  .nudge svg{ width:30px; height:30px; flex-shrink:0; }
+  .nudge b{ display:block; font-family:'Baloo 2',sans-serif; font-size:0.85rem; }
+  .nudge span{ font-size:0.76rem; color: var(--ink-soft); }
+  .nudge button{ background: var(--paper); color: var(--coral-2); border-radius:999px; padding:8px 13px; font-size:0.76rem; font-weight:700; flex-shrink:0; }
+
+  /* ===== Gel de série (Duolingo) ===== */
+  .freeze-chip{ display:flex; align-items:center; gap:5px; background: var(--paper); border-radius:999px; padding:6px 12px; font-family:'IBM Plex Mono',monospace; font-size:0.74rem; font-weight:600; color: var(--blue-2); border: 1px solid transparent; }
+  .freeze-chip.is-armed{ background: rgba(47,95,227,0.1); border-color: var(--blue); }
+  .freeze-tip{ font-size:0.72rem; color: var(--ink-soft); text-align:center; margin: -14px 0 22px; }
+
+  /* ===== Mode Test (Révisions) ===== */
+  .rev-modes{ display:flex; gap:8px; margin-bottom:14px; background: var(--paper); border-radius:999px; padding:4px; }
+  .rev-mode-btn{ flex:1; text-align:center; padding:8px; border-radius:999px; font-size:0.8rem; font-weight:600; color: var(--ink-soft); }
+  .rev-mode-btn.is-on{ background: var(--blue); color: var(--paper); }
+
+  /* ===== Téléchargement hors-ligne ===== */
+  .dl-btn{ width:30px; height:30px; border-radius:50%; background: var(--blue-pale); display:flex; align-items:center; justify-content:center; font-size:0.8rem; flex-shrink:0; color: var(--blue-2); }
+  .dl-btn.is-done{ background: rgba(47,190,159,0.16); color:var(--mint-text); }
+
+  /* ===== 3 formats dans la leçon ===== */
+  .lesson-modes{ display:flex; gap:6px; margin-bottom:18px; background: var(--paper); border-radius:999px; padding:4px; }
+  .lesson-mode-btn{ flex:1; text-align:center; padding:8px 4px; border-radius:999px; font-size:0.72rem; font-weight:600; color: var(--ink-soft); }
+  .lesson-mode-btn.is-on{ background: var(--blue); color: var(--paper); }
+  .lesson-panel{ display:none; }
+  .lesson-panel.is-on{ display:block; }
+
+  /* Écouter */
+  .audio-player{ background: var(--paper); border-radius:20px; padding:24px; text-align:center; }
+  .audio-play{ width:64px; height:64px; border-radius:50%; background: var(--blue); color:var(--paper); font-size:1.4rem; display:flex; align-items:center; justify-content:center; margin: 0 auto 16px; }
+  .audio-wave{ display:flex; align-items:flex-end; justify-content:center; gap:3px; height:36px; margin-bottom:14px; }
+  .audio-wave span{ width:4px; background: var(--blue); border-radius:2px; height:8px; opacity:0.4; }
+  .audio-wave.is-playing span{ animation: wave 0.9s ease-in-out infinite; opacity:1; }
+  .audio-wave span:nth-child(2n){ animation-delay:0.15s; }
+  .audio-wave span:nth-child(3n){ animation-delay:0.3s; }
+  @keyframes wave{ 0%,100%{ height:8px; } 50%{ height:32px; } }
+  .audio-meta{ font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color: var(--ink-soft); margin-bottom:16px; }
+  .audio-transcript{ text-align:left; font-size:0.86rem; line-height:1.6; color: var(--ink); background: var(--blue-pale); border-radius:14px; padding:14px 16px; }
+
+  /* Échanger : chat de pairs */
+  .peer-chat{ display:flex; flex-direction:column; gap:10px; margin-bottom:14px; }
+  .peer-msg{ display:flex; gap:8px; align-items:flex-end; }
+  .peer-avatar{ width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--paper); font-family:'Baloo 2',sans-serif; font-size:0.7rem; font-weight:700; flex-shrink:0; }
+  .peer-bubble{ background: var(--paper); border-radius:14px; border-bottom-left-radius:4px; padding:9px 13px; font-size:0.84rem; max-width:75%; }
+  .peer-msg.me{ flex-direction:row-reverse; }
+  .peer-msg.me .peer-bubble{ background: var(--blue); color:var(--paper); border-bottom-left-radius:14px; border-bottom-right-radius:4px; }
+  .peer-input-row{ display:flex; gap:8px; }
+  .peer-input-row input{ flex:1; background: var(--paper); border:none; border-radius:999px; padding:11px 16px; font-family:'IBM Plex Sans',sans-serif; font-size:0.85rem; }
+  .peer-input-row input:focus{ outline:none; }
+  .peer-send{ background: var(--blue); color:var(--paper); width:40px; height:40px; border-radius:50%; flex-shrink:0; font-size:1rem; }
+  .peer-live{ display:inline-flex; align-items:center; gap:5px; font-family:'IBM Plex Mono',monospace; font-size:0.66rem; color: var(--coral-2); margin-bottom:12px; }
+  .peer-live .dotlive{ width:6px; height:6px; border-radius:50%; background: var(--coral); animation: blink 1.4s ease infinite; }
+  @keyframes blink{ 0%,100%{ opacity:1; } 50%{ opacity:0.3; } }
+  .ai-note{ background: rgba(47,95,227,0.08); border:1px solid rgba(47,95,227,0.2); color: var(--blue-2); font-size:0.78rem; padding:10px 13px; border-radius:12px; margin-bottom:14px; line-height:1.4; }
+  .typing-dots{ display:inline-flex; gap:3px; padding:4px 0; }
+  .typing-dots span{ width:6px; height:6px; border-radius:50%; background: var(--ink-soft); animation: typingBounce 1s ease-in-out infinite; }
+  .typing-dots span:nth-child(2){ animation-delay:0.15s; }
+  .typing-dots span:nth-child(3){ animation-delay:0.3s; }
+  @keyframes typingBounce{ 0%,60%,100%{ transform:translateY(0); opacity:0.5; } 30%{ transform:translateY(-4px); opacity:1; } }
+
+  /* ===== Réglages ===== */
+  .settings-group{ background: var(--paper); border-radius:16px; margin-bottom:16px; overflow:hidden; }
+  .settings-label{ font-family:'IBM Plex Mono',monospace; font-size:0.66rem; text-transform:uppercase; color: var(--ink-soft); padding:12px 16px 4px; }
+  .settings-row{ display:flex; justify-content:space-between; align-items:center; padding:13px 16px; font-size:0.88rem; border-top:1px solid var(--line); }
+  .settings-row:first-of-type{ border-top:none; }
+  .settings-val{ color: var(--ink-soft); font-size:0.84rem; }
+  .switch{ position:relative; display:inline-block; width:42px; height:24px; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .slider{ position:absolute; inset:0; background: var(--line); border-radius:999px; transition: 0.2s; cursor:pointer; }
+  .slider::before{ content:""; position:absolute; width:18px; height:18px; left:3px; top:3px; background:var(--paper); border-radius:50%; transition:0.2s; }
+  .switch input:checked + .slider{ background: var(--blue); }
+  .switch input:checked + .slider::before{ transform: translateX(18px); }
+
+  /* ===== Matières v2 : recherche + anneaux miniatures ===== */
+  .search-bar{ display:flex; align-items:center; gap:8px; background: var(--paper); border-radius:14px; padding:11px 14px; margin-bottom:16px; }
+  .search-bar input{ border:none; background:transparent; font-family:'IBM Plex Sans',sans-serif; font-size:0.86rem; flex:1; color: var(--ink); }
+  .search-bar input:focus{ outline:none; }
+  .subject-card2{ background: var(--paper); border-radius:16px; padding:14px 15px; display:flex; align-items:center; gap:13px; }
+  .mini-ring{ width:46px; height:46px; flex-shrink:0; position:relative; }
+  .mini-ring svg{ width:100%; height:100%; }
+  .mini-ring-pct{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:0.6rem; font-weight:700; color: var(--ink); }
+  .subject-body2{ flex:1; min-width:0; }
+  .subject-body2 h4{ font-family:'Baloo 2',sans-serif; font-size:0.92rem; margin:0 0 3px; }
+  .subject-body2 .next-up{ font-size:0.72rem; color: var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .subject-chevron{ color: var(--ink-soft); font-size:1.1rem; flex-shrink:0; }
+
+  .view{ display:none; padding: 4px 20px 30px; }
+  .view.is-active{ display:block; animation: fadeUp 0.26s ease; }
+  @keyframes fadeUp{ from{ opacity:0; transform: translateY(6px);} to{ opacity:1; transform:none;} }
+
+  /* ===== Onboarding (full-screen within device) ===== */
+  .ob-step{ display:none; flex-direction:column; height:100%; padding: 30px 24px 24px; }
+  .ob-step.is-active{ display:flex; animation: fadeUp 0.3s ease; }
+  .dots{ display:flex; gap:6px; justify-content:center; margin-bottom: 20px; }
+  .dots span{ width:6px; height:6px; border-radius:50%; background: var(--line); }
+  .dots span.on{ background: var(--blue); width:16px; border-radius:4px; }
+  .ob-welcome{ background: radial-gradient(130% 130% at 20% -10%, #1c3a9c, var(--blue-ink) 60%); color: var(--paper); justify-content:center; align-items:center; text-align:center; }
+  .ob-welcome svg.logo{ width:52px; height:52px; margin-bottom: 16px; }
+  .ob-welcome h1{ font-size: 1.6rem; max-width:15ch; }
+  .ob-welcome p{ color: rgba(234,241,255,0.82); margin-top:12px; max-width:26ch; line-height:1.5; font-size:0.9rem; }
+  .flame-hero{ width:74px; height:74px; margin: 18px 0; }
+  .btn-block{ background: var(--sun); color: var(--sun-ink); border-radius:999px; padding:15px; font-weight:700; font-size:0.95rem; width:100%; margin-top: auto; }
+  .btn-block.blue{ background: var(--blue); color: var(--paper); }
+  .btn-block:disabled{ opacity:0.4; }
+  .ob-step h2{ font-size:1.35rem; margin-bottom:6px; }
+  .ob-step .sub{ color: var(--ink-soft); font-size:0.88rem; margin-bottom: 22px; line-height:1.5; }
+  .chip-grid{ display:flex; flex-direction:column; gap:10px; margin-bottom: auto; }
+  .chip{ background: var(--paper); border:2px solid transparent; border-radius:16px; padding:15px 16px; font-size:0.95rem; font-weight:600; text-align:left; display:flex; justify-content:space-between; align-items:center; }
+  .chip.is-selected{ border-color: var(--blue); background: rgba(47,95,227,0.06); }
+  .chip .chk{ width:20px; height:20px; border-radius:6px; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:0.75rem; }
+  .chip.is-selected .chk{ background: var(--blue); border-color:var(--blue); color:var(--paper); }
+  .subject-chips{ display:flex; flex-wrap:wrap; gap:9px; margin-bottom: auto; }
+  .schip{ padding:10px 15px; border-radius:999px; background: var(--paper); font-size:0.86rem; font-weight:600; border:2px solid transparent; }
+  .schip.is-selected{ border-color: var(--blue); background: rgba(47,95,227,0.08); }
+  .level-group-label{ font-family:'IBM Plex Mono',monospace; font-size:0.68rem; text-transform:uppercase; color: var(--ink-soft); margin-bottom:8px; }
+
+  /* ===== Sélecteur de niveau (bottom sheet) ===== */
+  .level-sheet-backdrop{ position:absolute; inset:0; background:rgba(15,20,40,0.45); z-index:90; }
+  .level-sheet{ position:absolute; left:0; right:0; bottom:0; background: var(--paper); border-radius:24px 24px 0 0; padding:10px 20px 26px; z-index:91; max-height:70%; overflow-y:auto; }
+  .level-sheet-handle{ width:36px; height:4px; background: var(--line); border-radius:999px; margin: 6px auto 16px; }
+  .level-list{ display:grid; grid-template-columns: repeat(2,1fr); gap:8px; margin-bottom:16px; }
+  .level-item{ background: var(--blue-pale); border:2px solid transparent; border-radius:12px; padding:12px; font-size:0.88rem; font-weight:600; text-align:left; }
+  .level-item.is-selected{ border-color: var(--blue); background: rgba(47,95,227,0.1); color: var(--blue-2); }
+  .curriculum-tag{ cursor:pointer; }
+  .meet-braise{ text-align:center; align-items:center; }
+  .meet-braise svg{ width:100px; height:100px; margin: 6px auto 18px; }
+  .meet-braise h2{ font-size:1.3rem; }
+  .meet-braise p{ color: var(--ink-soft); margin-top:8px; line-height:1.55; font-size:0.9rem; }
+  .stage-preview{ display:flex; justify-content:center; gap:9px; margin: 18px 0 auto; }
+  .stage-preview .s{ width:34px; height:34px; border-radius:10px; background: var(--paper); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; opacity:0.4; font-size:0.9rem; }
+  .stage-preview .s.first{ opacity:1; background: var(--blue-pale); border-color: var(--blue); }
+  .stage-preview svg{ width:20px; height:20px; }
+  .consent-row{ display:flex; align-items:flex-start; gap:9px; font-size:0.72rem; color: var(--ink-soft); line-height:1.4; margin-top:16px; text-align:left; }
+  .consent-row input{ margin-top:2px; flex-shrink:0; }
+  .consent-row a{ color: var(--blue-2); text-decoration:underline; }
+
+  /* ===== Home ===== */
+  .setup-banner{ background: rgba(255,194,75,0.28); border:1px solid rgba(255,194,75,0.5); color: var(--sun-ink); font-size:0.78rem; padding:9px 14px; border-radius:12px; margin-bottom:16px; }
+  .home-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .greeting p{ margin:3px 0 0; color: var(--ink-soft); font-size:0.86rem; }
+  .stat-pills{ display:flex; align-items:center; gap:8px; }
+  .pill{ display:flex; align-items:center; gap:5px; background: var(--paper); border-radius:999px; padding:6px 11px; font-family:'IBM Plex Mono',monospace; font-size:0.74rem; font-weight:500; box-shadow:0 3px 10px -6px rgba(22,33,58,0.25); transition: transform 0.25s ease; }
+  .pill.streak{ color: var(--coral-2); }
+  .pill.xp{ color: var(--blue-2); }
+  .pill.bump{ transform: scale(1.14); }
+  .avatar{ width:36px; height:36px; border-radius:50%; background: var(--paper); display:flex; align-items:center; justify-content:center; }
+  .avatar svg{ width:26px; height:26px; }
+
+  .resume-card{ background: linear-gradient(120deg, var(--blue), var(--blue-2)); color:var(--paper); border-radius:20px; padding:20px; margin-bottom:20px; box-shadow: 0 14px 28px -16px rgba(47,95,227,0.55); }
+  .resume-tag{ font-family:'IBM Plex Mono',monospace; font-size:0.66rem; text-transform:uppercase; letter-spacing:0.06em; opacity:0.85; display:flex; align-items:center; gap:7px; }
+  .resume-tag .time{ background: rgba(255,255,255,0.18); padding:2px 7px; border-radius:999px; }
+  .resume-card h2{ font-size:1.2rem; margin:7px 0 10px; }
+  .resume-teaser{ background: rgba(255,255,255,0.14); border-radius: 11px; padding: 10px 13px; font-size: 0.8rem; line-height:1.45; margin-bottom: 12px; }
+  .resume-teaser b{ display:block; font-family:'IBM Plex Mono',monospace; font-size:0.6rem; text-transform:uppercase; opacity:0.75; margin-bottom:3px; }
+  .resume-bar{ height:6px; background: rgba(255,255,255,0.25); border-radius:999px; overflow:hidden; }
+  .resume-bar span{ display:block; height:100%; width:62%; background: var(--sun); border-radius:999px; transition: width 0.6s ease; }
+  .resume-pct{ font-size:0.72rem; margin:5px 0 14px; opacity:0.85; font-family:'IBM Plex Mono',monospace; }
+  .resume-btn{ background: var(--sun); color: var(--sun-ink); border-radius:999px; padding:12px; font-weight:700; font-size:0.88rem; width:100%; }
+
+  .section-title{ font-size:0.76rem; color: var(--ink-soft); font-weight:600; text-transform:uppercase; letter-spacing:0.04em; margin: 4px 0 10px; }
+
+  .suggest-row{ display:flex; flex-direction:column; gap:8px; margin-bottom:20px; }
+  .suggest-card{ background: var(--paper); border-radius:14px; padding:11px 13px; display:flex; align-items:center; gap:10px; }
+  .suggest-ic{ width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .suggest-ic svg{ width:15px; height:15px; }
+  .suggest-tag{ font-family:'IBM Plex Mono',monospace; font-size:0.6rem; text-transform:uppercase; color: var(--ink-soft); }
+  .suggest-title{ font-family:'Baloo 2',sans-serif; font-size:0.85rem; margin-top:1px; }
+
+  .stats-week{ display:grid; grid-template-columns: repeat(3,1fr); gap:8px; margin-bottom:20px; }
+  .stat-chip{ background: var(--paper); border-radius:12px; padding:11px 4px; text-align:center; }
+  .stat-chip b{ display:block; font-family:'Baloo 2',sans-serif; font-size:1.05rem; }
+  .stat-chip span{ font-size:0.62rem; color: var(--ink-soft); }
+
+  .weak-list, .hw-list{ display:flex; flex-direction:column; gap:8px; margin-bottom:20px; }
+  .weak-item{ background: var(--paper); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px; border-left: 3px solid var(--coral); }
+  .weak-item .wtext{ flex:1; }
+  .weak-item b{ display:block; font-family:'Baloo 2',sans-serif; font-size:0.84rem; }
+  .weak-item span{ font-size:0.72rem; color: var(--ink-soft); }
+  .weak-item button{ background: var(--blue-pale); color: var(--blue-2); border-radius:999px; padding:7px 12px; font-size:0.74rem; font-weight:600; flex-shrink:0; }
+  .hw-item{ background: var(--paper); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:10px; }
+  .hw-due{ font-family:'IBM Plex Mono',monospace; font-size:0.62rem; background: rgba(255,194,75,0.28); color: var(--sun-ink); padding:3px 8px; border-radius:999px; flex-shrink:0; }
+  .hw-item b{ display:block; font-family:'Baloo 2',sans-serif; font-size:0.84rem; }
+  .hw-item span{ font-size:0.72rem; color: var(--ink-soft); }
+
+  .week{ display:flex; gap:6px; margin-bottom:20px; }
+  .week .day{ flex:1; text-align:center; }
+  .week .lbl{ font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color: var(--ink-soft); margin-bottom:5px; display:block; }
+  .week .dot{ width:26px; height:26px; border-radius:50%; margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:0.72rem; background: var(--paper); border:2px solid var(--line); }
+  .week .dot.done{ background: var(--coral); border-color: var(--coral); color:var(--paper); }
+  .week .dot.today{ border-color: var(--blue); color: var(--blue); font-weight:700; }
+
+  .curriculum-tag{ display:inline-flex; align-items:center; gap:5px; background: var(--paper); border-radius:999px; padding:5px 11px; font-size:0.72rem; color: var(--ink-soft); margin-bottom: 12px; }
+  .curriculum-tag b{ color: var(--ink); font-weight:600; }
+  .subjects{ display:flex; flex-direction:column; gap:10px; margin-bottom:20px; }
+  .subject-card{ background: var(--paper); border-radius:14px; padding:13px 15px; display:flex; align-items:center; gap:12px; }
+  .subject-ic{ width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .subject-ic svg{ width:17px; height:17px; }
+  .subject-body{ flex:1; min-width:0; }
+  .subject-body h4{ font-family:'Baloo 2',sans-serif; font-size:0.9rem; margin:0 0 6px; }
+  .subject-bar{ height:5px; background: var(--blue-pale); border-radius:999px; overflow:hidden; }
+  .subject-bar span{ display:block; height:100%; border-radius:999px; }
+  .subject-count{ font-family:'IBM Plex Mono',monospace; font-size:0.66rem; color: var(--ink-soft); flex-shrink:0; }
+
+  .badges{ display:flex; gap:12px; overflow-x:auto; padding-bottom:4px; margin: 0 -20px 4px; padding-left:20px; padding-right:20px; }
+  .badge{ flex-shrink:0; width:78px; text-align:center; }
+  .badge .ring{ width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.15rem; margin:0 auto 6px; }
+  .badge.locked .ring{ background: var(--paper); border:2px dashed var(--line); filter: grayscale(1); opacity:0.55; }
+  .badge span{ font-size:0.64rem; color: var(--ink-soft); display:block; }
+  .badge .cond{ font-size:0.58rem; opacity:0.75; margin-top:1px; }
+
+  /* ===== Subject / Lesson ===== */
+  .chapters{ display:flex; flex-direction:column; gap:9px; }
+  .chapter{ background: var(--paper); border-radius:14px; padding:13px 15px; display:flex; align-items:center; gap:12px; }
+  .chapter.is-locked{ opacity:0.5; }
+  .cnum{ width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.76rem; font-weight:700; flex-shrink:0; }
+  .chapter.done .cnum{ background: var(--mint); color:var(--paper); }
+  .chapter.current .cnum{ background: var(--blue); color:var(--paper); }
+  .chapter.is-locked .cnum{ background: var(--blue-pale); color: var(--ink-soft); }
+  .ctext b{ display:block; font-family:'Baloo 2',sans-serif; font-size:0.86rem; }
+  .ctext span{ font-size:0.72rem; color: var(--ink-soft); }
+  .chapter.reinforce{ border: 2px dashed var(--coral); background: rgba(255,111,89,0.05); }
+  .chapter.skip{ border: 2px solid var(--mint); }
+  .chap-tag{ display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:0.6rem; text-transform:uppercase; padding:2px 7px; border-radius:999px; margin-top:3px; }
+  .chap-tag.reinf{ background: rgba(255,111,89,0.16); color: var(--coral-2); }
+  .chap-tag.skip{ background: rgba(47,190,159,0.16); color:var(--mint-text); }
+  .chap-mastery{ font-family:'IBM Plex Mono',monospace; font-size:0.68rem; color: var(--ink-soft); flex-shrink:0; }
+
+  .lesson-progress{ height:5px; background: var(--line); border-radius:999px; overflow:hidden; margin-bottom:20px; }
+  .lesson-progress span{ display:block; height:100%; background: var(--blue); border-radius:999px; transition: width 0.4s ease; }
+  .chat-wrap{ display:flex; flex-direction:column; gap:12px; min-height: 180px; }
+  .lbubble{ max-width:82%; padding:11px 15px; border-radius:16px; font-size:0.88rem; line-height:1.4; opacity:0; transform: translateY(6px); animation: pop 0.4s ease forwards; }
+  .lbubble.in{ background: var(--paper); align-self:flex-start; border-bottom-left-radius:4px; }
+  .lbubble.me{ background: var(--blue); color:var(--paper); align-self:flex-end; border-bottom-right-radius:4px; }
+  @keyframes pop{ to{ opacity:1; transform:none; } }
+  .lesson-next{ display:flex; justify-content:center; margin-top: 22px; }
+  .btn-next{ background: var(--blue); color: var(--paper); border-radius:999px; padding:12px 24px; font-weight:600; font-size:0.88rem; }
+  .lquiz{ background: var(--paper); border-radius:16px; padding:18px; }
+  .lquiz-q{ font-family:'Baloo 2',sans-serif; font-size:1rem; margin-bottom:13px; }
+  .lquiz-opts{ display:grid; gap:8px; }
+  .lquiz-opt{ text-align:left; background: var(--blue-pale); border:2px solid var(--line); border-radius:11px; padding:10px 13px; font-size:0.85rem; }
+  .lquiz-opt.correct{ background: rgba(47,190,159,0.16); border-color: var(--mint); }
+  .lquiz-opt.wrong{ background: rgba(232,86,68,0.1); border-color: var(--coral-2); }
+  .lquiz-fb{ margin-top:12px; font-size:0.84rem; font-weight:600; min-height:1.2em; }
+  .lquiz-fb.ok{ color:var(--mint-text); }
+  .lquiz-fb.ko{ color: var(--coral-2); }
+
+  /* ===== Exercices variés en fin de leçon ===== */
+  .ex-progress{ text-align:center; font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color: var(--ink-soft); margin-bottom:12px; }
+  .ex-vf-row{ display:flex; gap:10px; }
+  .ex-vf-row button{ flex:1; padding:13px; border-radius:12px; border:2px solid var(--line); background: var(--blue-pale); font-weight:700; font-size:0.9rem; }
+  .ex-vf-row button.correct{ background: rgba(47,190,159,0.16); border-color: var(--mint); }
+  .ex-vf-row button.wrong{ background: rgba(232,86,68,0.1); border-color: var(--coral-2); }
+  .ex-blank-input{ width:100%; border:2px solid var(--line); border-radius:12px; padding:12px 14px; font-size:0.92rem; font-family:'IBM Plex Sans',sans-serif; background: var(--blue-pale); color: var(--ink); margin-bottom:12px; }
+  .ex-blank-input:focus{ outline:none; border-color: var(--blue); }
+  .ex-blank-input.correct{ border-color: var(--mint); background: rgba(47,190,159,0.1); }
+  .ex-blank-input.wrong{ border-color: var(--coral-2); background: rgba(232,86,68,0.08); }
+  .ex-summary{ text-align:center; padding:10px 0; }
+  .ex-summary .score{ font-family:'Baloo 2',sans-serif; font-size:2rem; color: var(--blue); margin:10px 0; }
+  .ex-summary p{ color: var(--ink-soft); font-size:0.88rem; }
+
+  /* ===== Questionnaire plein écran (après le cours) ===== */
+  .quiz-stage{ display:none; }
+  .quiz-stage.is-active{ display:block; }
+  .quiz-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .quiz-dots{ display:flex; gap:6px; }
+  .quiz-dots span{ width:24px; height:5px; border-radius:999px; background: var(--line); }
+  .quiz-dots span.done{ background: var(--mint); }
+  .quiz-dots span.now{ background: var(--blue); }
+  .quiz-streak{ display:flex; align-items:center; gap:5px; font-family:'IBM Plex Mono',monospace; font-size:0.76rem; font-weight:600; color: var(--coral-2); opacity:0; transition: opacity 0.5s ease; }
+  .quiz-streak.show{ opacity:1; }
+  .quiz-card{ position:relative; background: var(--paper); border-radius:22px; padding:24px 22px; box-shadow: 0 12px 28px -16px rgba(22,33,58,0.2); animation: cardIn 0.35s ease; }
+  .xp-pop{ position:absolute; transform: translateX(-50%); font-family:'Baloo 2',sans-serif; font-weight:800; color: var(--mint-text); font-size:1.15rem; animation: xpFloat 0.9s ease forwards; pointer-events:none; z-index:5; }
+  @keyframes xpFloat{ 0%{ opacity:0; transform: translateX(-50%) translateY(0); } 30%{ opacity:1; } 100%{ opacity:0; transform: translateX(-50%) translateY(-30px); } }
+  @keyframes cardIn{ from{ opacity:0; transform: translateX(24px); } to{ opacity:1; transform:none; } }
+  .quiz-card.shake{ animation: cardSoften 0.5s ease; }
+  @keyframes cardSoften{ 0%{ opacity:0.7; } 100%{ opacity:1; } }
+  .quiz-tag2{ font-family:'IBM Plex Mono',monospace; font-size:0.68rem; text-transform:uppercase; color: var(--ink-soft); margin-bottom:8px; }
+  .quiz-q2{ font-family:'Baloo 2',sans-serif; font-size:1.15rem; margin-bottom:20px; line-height:1.35; }
+  .quiz-opt2{ display:block; width:100%; text-align:left; background: var(--blue-pale); border:2px solid transparent; border-radius:14px; padding:14px 16px; font-size:0.92rem; font-weight:500; margin-bottom:10px; transition: transform 0.12s ease; }
+  .quiz-opt2:active{ transform: scale(0.98); }
+  .quiz-opt2.correct{ background: linear-gradient(120deg, rgba(47,190,159,0.22), rgba(255,194,75,0.22)); border-color: var(--mint); font-weight:700; animation: correctPop 0.5s ease; }
+  .quiz-opt2.wrong{ background: var(--blue-pale); border-color: var(--line); opacity:0.5; }
+  .quiz-vf2{ display:flex; gap:10px; }
+  .quiz-vf2 button{ flex:1; padding:16px; border-radius:14px; border:2px solid var(--line); background: var(--blue-pale); font-weight:700; font-size:0.95rem; }
+  .quiz-vf2 button.correct{ background: linear-gradient(120deg, rgba(47,190,159,0.22), rgba(255,194,75,0.22)); border-color: var(--mint); animation: correctPop 0.5s ease; }
+  .quiz-vf2 button.wrong{ background: var(--blue-pale); border-color: var(--line); opacity:0.5; }
+  @keyframes correctPop{ 0%{ transform: scale(1); } 40%{ transform: scale(1.06); } 100%{ transform: scale(1); } }
+  .quiz-fb2{ margin-top:14px; font-weight:600; font-size:0.9rem; min-height:1.3em; display:flex; align-items:center; gap:6px; }
+  .quiz-fb2.ok{ color: var(--mint-text); }
+  .braise-explain{ display:none; margin-top:14px; background: var(--blue-pale); border-radius:16px; padding:14px 16px; gap:12px; align-items:flex-start; }
+  .braise-explain.show{ display:flex; animation: explainIn 0.4s ease; }
+  @keyframes explainIn{ from{ opacity:0; transform: translateY(-8px); } to{ opacity:1; transform:none; } }
+  .braise-explain svg{ width:34px; height:34px; flex-shrink:0; }
+  .braise-explain .bx-title{ font-family:'Baloo 2',sans-serif; font-size:0.86rem; margin-bottom:3px; }
+  .braise-explain .bx-text{ font-size:0.84rem; color: var(--ink-soft); line-height:1.45; }
+  .quiz-summary2{ text-align:center; padding:30px 10px; }
+  .quiz-summary2 .big-score{ font-family:'Baloo 2',sans-serif; font-size:2.6rem; color: var(--blue); margin:14px 0 6px; }
+  .quiz-summary2 .stars{ font-size:1.6rem; margin-bottom:6px; }
+
+  /* ===== Carte de partage ===== */
+  .share-card{ position:relative; width:100%; max-width:280px; aspect-ratio: 3/4; border-radius:26px; background: linear-gradient(160deg, var(--blue-ink) 0%, var(--blue-2) 55%, var(--blue) 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; overflow:hidden; box-shadow: 0 20px 40px -18px rgba(19,33,79,0.5); }
+  .share-card-glow{ position:absolute; width:220px; height:220px; border-radius:50%; background: radial-gradient(circle, rgba(255,194,75,0.35), transparent 70%); top:-40px; left:50%; transform:translateX(-50%); }
+  .share-streak{ font-family:'Baloo 2',sans-serif; font-weight:800; font-size:1.8rem; color:#fff; margin-top:10px; }
+  .share-sub{ font-size:0.82rem; color: rgba(255,255,255,0.85); margin-bottom:18px; }
+  .share-brand{ position:absolute; bottom:18px; font-family:'IBM Plex Mono',monospace; font-size:0.68rem; color: rgba(255,255,255,0.6); letter-spacing:0.03em; }
+
+  /* ===== Format "Voir" façon story/reel ===== */
+  .story-stage{ position:relative; border-radius:22px; min-height:360px; overflow:hidden; display:flex; flex-direction:column; box-shadow: 0 16px 32px -18px rgba(22,33,58,0.3); }
+  .story-progress-row{ position:absolute; top:12px; left:12px; right:12px; display:flex; gap:5px; z-index:5; }
+  .story-seg{ flex:1; height:4px; border-radius:999px; background: rgba(255,255,255,0.3); overflow:hidden; }
+  .story-seg span{ display:block; height:100%; width:0%; background:#fff; border-radius:999px; }
+  .story-seg.done span{ width:100%; }
+  .story-slide{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding: 46px 28px 30px; color:#fff; animation: storyIn 0.3s ease; }
+  @keyframes storyIn{ from{ opacity:0; transform: scale(0.97); } to{ opacity:1; transform:none; } }
+  .story-emoji{ font-size:2.6rem; margin-bottom:16px; }
+  .story-text{ font-family:'Baloo 2',sans-serif; font-weight:700; font-size:1.35rem; line-height:1.35; }
+  .story-tap-zone{ position:absolute; top:0; bottom:0; width:50%; z-index:4; }
+  .story-tap-zone.left{ left:0; } .story-tap-zone.right{ right:0; }
+  .story-hint{ position:absolute; bottom:14px; left:0; right:0; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:0.68rem; color: rgba(255,255,255,0.75); z-index:3; }
+  .story-cta{ background:#fff; color: var(--blue-2); border-radius:999px; padding:12px 24px; font-weight:700; font-size:0.9rem; margin-top:22px; z-index:6; position:relative; }
+
+  .complete-wrap{ text-align:center; position:relative; padding-top: 20px; }
+  .confetti{ position:absolute; inset:-20px -20px auto; height:140px; pointer-events:none; overflow:hidden; }
+  .confetti span{ position:absolute; top:-20px; font-size:1rem; animation: fall 1.8s ease-in forwards; }
+  @keyframes fall{ to{ transform: translateY(200px) rotate(180deg); opacity:0; } }
+  .complete-badge{ width:80px; height:80px; border-radius:50%; background: var(--paper); display:flex; align-items:center; justify-content:center; margin: 0 auto 14px; }
+  .complete-wrap h2{ font-size:1.3rem; }
+  .complete-wrap p{ color: var(--ink-soft); margin-top:6px; font-size:0.86rem; }
+  .complete-xp{ font-family:'Baloo 2',sans-serif; font-size:1.8rem; color: var(--blue); margin: 14px 0 4px; }
+  .complete-stats{ display:flex; justify-content:center; gap:12px; margin: 14px 0 22px; }
+  .complete-stat{ background: var(--paper); border-radius:12px; padding:10px 14px; font-size:0.74rem; color: var(--ink-soft); }
+  .complete-stat b{ display:block; font-family:'Baloo 2',sans-serif; font-size:1rem; color: var(--ink); }
+  .btn-return{ background: var(--blue); color: var(--paper); border-radius:999px; padding:13px 24px; font-weight:600; font-size:0.88rem; width:100%; }
+
+  .profile-head{ display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+  .profile-head svg{ width:64px; height:64px; }
+  .profile-head h2{ font-size:1.1rem; }
+  .profile-head p{ color: var(--ink-soft); font-size:0.78rem; margin-top:3px; }
+  .profile-stats{ display:grid; grid-template-columns: repeat(3,1fr); gap:8px; margin-bottom:22px; }
+  .pstat{ background: var(--paper); border-radius:12px; padding:12px 4px; text-align:center; }
+  .pstat b{ display:block; font-family:'Baloo 2',sans-serif; font-size:1.05rem; }
+  .pstat span{ font-size:0.62rem; color: var(--ink-soft); }
+
+  @media (max-width: 420px){
+    .device{ border-radius:0; padding:0; width:100%; height:100%; max-height:100vh; }
+    .screen{ border-radius:0; }
+    body{ padding:0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="device">
+  <div class="screen">
+    <div class="notch"></div>
+
+    <!-- ================= ONBOARDING ================= -->
+    <div id="onboarding" style="height:100%; display:none;">
+      <div class="status-bar"><span>9:41</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+
+      <div class="ob-step ob-welcome is-active" id="ob0" style="height:calc(100% - 46px);">
+        <svg class="logo" viewBox="0 0 32 32"><path d="M6 11 Q6 7 10 7 H22 Q26 7 26 11 V17 Q26 21 22 21 H13 L8 25 V21 H10 Q6 21 6 17 Z" fill="#FFFFFF"/><path d="M16 10.5 L17.3 13.7 L20.8 13.7 L18 15.9 L19 19.3 L16 17.1 L13 19.3 L14 15.9 L11.2 13.7 L14.7 13.7 Z" fill="#FF6F59"/></svg>
+        <h1>Bienvenue sur SAPIE</h1>
+        <svg class="flame-hero" viewBox="0 0 100 100"><path d="M50 12 C68 34 76 52 76 66 C76 84 64 94 50 94 C36 94 24 84 24 66 C24 52 32 34 50 12 Z" fill="#FFC24B"/><circle cx="42" cy="64" r="4" fill="#16213A"/><circle cx="58" cy="64" r="4" fill="#16213A"/></svg>
+        <p>Apprends comme si un pote t'expliquait. 3 questions rapides avant de commencer.</p>
+        <button class="btn-block" style="margin-top:26px;" onclick="obGoTo(1)">Commencer</button>
+        <button style="margin-top:14px; background:none; color:rgba(234,241,255,0.75); font-size:0.82rem; text-decoration:underline;" onclick="skipToApp()">J'ai déjà un compte</button>
+      </div>
+
+      <div class="ob-step" id="ob1" style="height:calc(100% - 46px);">
+        <div class="dots"><span class="on"></span><span></span><span></span></div>
+        <h2>Tu es en quelle classe ?</h2>
+        <div class="sub">On te montrera directement toutes les matières de ton niveau.</div>
+        <div style="overflow-y:auto; flex:1; margin-bottom:14px;">
+          <div class="level-group-label">Collège</div>
+          <div class="chip-grid" id="grade-chips" style="margin-bottom:16px;">
+            <button class="chip" data-v="sixieme" data-label="6ᵉ" onclick="obPickGrade(this)">6ᵉ<span class="chk"></span></button>
+            <button class="chip" data-v="cinquieme" data-label="5ᵉ" onclick="obPickGrade(this)">5ᵉ<span class="chk"></span></button>
+            <button class="chip" data-v="quatrieme" data-label="4ᵉ" onclick="obPickGrade(this)">4ᵉ<span class="chk"></span></button>
+            <button class="chip" data-v="troisieme" data-label="3ᵉ" onclick="obPickGrade(this)">3ᵉ<span class="chk"></span></button>
+          </div>
+          <div class="level-group-label">Lycée</div>
+          <div class="chip-grid" id="grade-chips2">
+            <button class="chip" data-v="seconde" data-label="Seconde" onclick="obPickGrade(this)">Seconde<span class="chk"></span></button>
+            <button class="chip" data-v="premiere" data-label="Première" onclick="obPickGrade(this)">Première<span class="chk"></span></button>
+            <button class="chip" data-v="terminale" data-label="Terminale" onclick="obPickGrade(this)">Terminale<span class="chk"></span></button>
+          </div>
+        </div>
+        <button class="btn-block blue" id="ob-btn1" disabled onclick="obGoTo(2)">Continuer</button>
+      </div>
+
+      <div class="ob-step" id="ob2" style="height:calc(100% - 46px);">
+        <div style="display:flex; align-items:center; margin-bottom:6px;">
+          <button class="topbar-back" onclick="obGoTo(1)" aria-label="Retour" style="background:var(--blue-pale);">‹</button>
+        </div>
+        <div class="dots"><span class="on"></span><span class="on"></span><span></span></div>
+        <h2>Tu apprends mieux comment ?</h2>
+        <div class="sub">SAPIE adaptera tes leçons pour commencer dans ce format-là.</div>
+        <div class="chip-grid" id="format-chips">
+          <button class="chip" data-v="voir" onclick="obPickFormat(this)">🎬 En vidéo, avec des images<span class="chk"></span></button>
+          <button class="chip" data-v="ecouter" onclick="obPickFormat(this)">🎧 En écoutant une histoire<span class="chk"></span></button>
+          <button class="chip" data-v="echanger" onclick="obPickFormat(this)">💬 En en discutant avec d'autres<span class="chk"></span></button>
+        </div>
+        <button class="btn-block blue" id="ob-btn-format" disabled onclick="obGoTo(3)">Continuer</button>
+      </div>
+
+      <div class="ob-step meet-braise" id="ob3" style="height:calc(100% - 46px);">
+        <div style="display:flex; align-items:center; margin-bottom:6px; width:100%;">
+          <button class="topbar-back" onclick="obGoTo(2)" aria-label="Retour" style="background:var(--blue-pale);">‹</button>
+        </div>
+        <div class="dots"><span class="on"></span><span class="on"></span><span class="on"></span></div>
+        <svg aria-hidden="true" viewBox="0 0 100 100"><path d="M50 12 C68 34 76 52 76 66 C76 84 64 94 50 94 C36 94 24 84 24 66 C24 52 32 34 50 12 Z" fill="#FFC24B"/><circle cx="42" cy="64" r="4" fill="#16213A"/><circle cx="58" cy="64" r="4" fill="#16213A"/></svg>
+        <h2>Voici Braise.</h2>
+        <p>Elle grandit à chaque leçon terminée. Là, elle n'est qu'une étincelle.</p>
+        <div class="stage-preview">
+          <div class="s first"><svg aria-hidden="true" viewBox="0 0 100 100"><path d="M50 12 C68 34 76 52 76 66 C76 84 64 94 50 94 C36 94 24 84 24 66 C24 52 32 34 50 12 Z" fill="#FFC24B"/></svg></div>
+          <div class="s">🔒</div><div class="s">🔒</div><div class="s">🔒</div>
+        </div>
+        <label class="consent-row">
+          <input type="checkbox" id="consent-check" onchange="document.getElementById('ob-btn-final').disabled = !this.checked">
+          <span>J'ai lu et j'accepte les <a href="#" onclick="event.stopPropagation()">conditions d'utilisation</a> et la <a href="#" onclick="event.stopPropagation()">politique de confidentialité</a>. Si j'ai moins de 15 ans, un parent a donné son accord.</span>
+        </label>
+        <button class="btn-block" id="ob-btn-final" disabled style="margin-top:10px;" onclick="enterApp()">C'est parti</button>
+      </div>
+    </div>
+
+    <!-- ================= APP ================= -->
+    <div id="app-shell" style="height:100%; display:flex; flex-direction:column;">
+      <div class="status-bar"><span>9:41</span><div class="status-icons"><span>📶</span><span>🔋</span></div></div>
+
+      <div class="app-content" id="app-content">
+
+        <div class="view is-active" id="view-home">
+          <div class="topbar" style="padding-top:2px;"><h1>Accueil</h1></div>
+          <div style="padding:0 0 20px;">
+            <div class="setup-banner" id="setup-banner" style="display:none;">Ton compte est prêt ! Aperçu après quelques semaines d'usage.</div>
+
+            <div class="home-top2">
+              <div class="greet"><b>Salut 👋</b><span>Voici où tu en es aujourd'hui</span></div>
+              <button class="avatar" onclick="showTab('profile')" aria-label="Profil"><svg aria-hidden="true" viewBox="0 0 100 100"><ellipse cx="50" cy="58" rx="30" ry="27" fill="#FFC24B"/><ellipse cx="24" cy="66" rx="7" ry="10" fill="#FF6F59"/><ellipse cx="76" cy="66" rx="7" ry="10" fill="#FF6F59"/><ellipse cx="38" cy="88" rx="7" ry="9" fill="#E85644"/><ellipse cx="62" cy="88" rx="7" ry="9" fill="#E85644"/><path d="M42 22 C46 14 54 14 58 22 C54 26 46 26 42 22 Z" fill="#FFC24B"/><circle cx="40" cy="54" r="4.5" fill="#16213A"/><circle cx="60" cy="54" r="4.5" fill="#16213A"/><path d="M42 66 Q50 71 58 66" stroke="#16213A" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></button>
+            </div>
+
+            <div class="ring-wrap">
+              <div class="ring-center">
+                <svg class="ring-svg" viewBox="0 0 160 160">
+                  <circle cx="80" cy="80" r="68" fill="none" stroke="#ffffff" stroke-width="14"/>
+                  <circle id="ring-circle" cx="80" cy="80" r="68" fill="none" stroke="#2F5FE3" stroke-width="14" stroke-linecap="round"
+                    stroke-dasharray="427" stroke-dashoffset="145" transform="rotate(-90 80 80)" style="transition: stroke-dashoffset 0.6s ease;"/>
+                </svg>
+                <div class="ring-label"><b id="ring-pct">66%</b><span>de ton objectif cette semaine</span></div>
+              </div>
+              <div class="ring-chips">
+                <div class="ring-chip c-streak" id="pill-streak">🔥 12 jours</div>
+                <div class="ring-chip c-xp" id="pill-xp">⭐ 340 XP</div>
+                <button class="freeze-chip" id="freeze-chip" onclick="toggleFreeze()">🧊 Gel</button>
+              </div>
+            </div>
+            <div class="freeze-tip" id="freeze-tip">Active le gel pour protéger ta série si tu rates un jour.</div>
+
+            <div class="primary-cta" id="primary-cta">
+              <div class="pc-tag" id="pc-tag">Reprendre · Histoire-Géo · 5 min</div>
+              <h2 id="pc-title">La Révolution française</h2>
+              <p id="pc-desc">Comment une crise financière du royaume a déclenché l'un des événements les plus marquants de l'Histoire de France.</p>
+              <button id="pc-btn" onclick="startLesson('histoire',4)">Continuer le chapitre 3 →</button>
+            </div>
+
+            <div class="quick-row" id="quick-row">
+              <div class="quick-chip" onclick="startLesson('maths',6)">
+                <div class="qc-ic" style="background:rgba(47,190,159,0.18)"><svg aria-hidden="true" viewBox="0 0 100 100"><path d="M50 14 C64 32 70 46 70 56 C70 70 61 78 50 78 C39 78 30 70 30 56 C30 46 36 32 50 14 Z" fill="#2FBE9F"/></svg></div>
+                <div><div class="qc-tag">Maths · 5 min</div><div class="qc-title">Géométrie</div></div>
+              </div>
+              <div class="quick-chip" onclick="openSubject('svt')">
+                <div class="qc-ic" style="background:rgba(255,194,75,0.28)"><svg aria-hidden="true" viewBox="0 0 100 100"><path d="M50 14 C64 32 70 46 70 56 C70 70 61 78 50 78 C39 78 30 70 30 56 C30 46 36 32 50 14 Z" fill="#FFC24B"/></svg></div>
+                <div><div class="qc-tag">SVT · Quiz</div><div class="qc-title">Chapitre 1</div></div>
+              </div>
+              <div class="quick-chip" onclick="showTab('revisions')">
+                <div class="qc-ic" style="background:rgba(139,107,224,0.18)"><svg aria-hidden="true" viewBox="0 0 100 100"><path d="M50 14 C64 32 70 46 70 56 C70 70 61 78 50 78 C39 78 30 70 30 56 C30 46 36 32 50 14 Z" fill="#8B6BE0"/></svg></div>
+                <div><div class="qc-tag">Révisions</div><div class="qc-title">Fiches rapides</div></div>
+              </div>
+            </div>
+
+            <div class="nudge" id="home-nudge">
+              <svg aria-hidden="true" viewBox="0 0 100 100"><ellipse cx="50" cy="58" rx="30" ry="27" fill="#FFC24B"/><ellipse cx="24" cy="66" rx="7" ry="10" fill="#FF6F59"/><ellipse cx="76" cy="66" rx="7" ry="10" fill="#FF6F59"/><ellipse cx="38" cy="88" rx="7" ry="9" fill="#E85644"/><ellipse cx="62" cy="88" rx="7" ry="9" fill="#E85644"/><path d="M42 22 C46 14 54 14 58 22 C54 26 46 26 42 22 Z" fill="#FFC24B"/><circle cx="40" cy="54" r="4.5" fill="#16213A"/><circle cx="60" cy="54" r="4.5" fill="#16213A"/><path d="M42 66 Q50 71 58 66" stroke="#16213A" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+              <div style="flex:1;"><b>Les fractions avancées coincent un peu</b><span>2 erreurs sur les 3 derniers quiz</span></div>
+              <button onclick="startLesson('maths',7)">Revoir</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="view" id="view-matieres">
+          <div class="topbar"><h1>Matières</h1></div>
+          <div style="padding:0 0 10px;">
+            <div class="curriculum-tag" id="curriculum-tag" onclick="openLevelPicker()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openLevelPicker();}">📘 Programme officiel de <b>3ᵉ</b></div>
+
+            <div class="search-bar">
+              <span>🔍</span>
+              <input type="text" id="matiere-search" placeholder="Chercher une matière..." aria-label="Chercher une matière" oninput="filterMatieres(this.value)">
+            </div>
+
+            <div class="subjects" id="subjects-wrap"></div>
+          </div>
+        </div>
+
+        <div class="view" id="view-revisions">
+          <div class="topbar"><h1>Révisions</h1></div>
+          <div style="padding:0 0 10px;">
+            <div class="ai-note" id="rev-recommend" style="margin-bottom:14px;">🎯 On a mis en avant les fiches de <b>Maths</b> — c'est là que ça coince le plus en ce moment.</div>
+            <div class="rev-modes">
+              <button class="rev-mode-btn is-on" id="mode-cards" onclick="setRevMode('cards')">🗂️ Cartes</button>
+              <button class="rev-mode-btn" id="mode-test" onclick="setRevMode('test')">✏️ Test rapide</button>
+            </div>
+            <div class="rev-filters">
+              <button class="rev-filter" onclick="setRevFilter(this,'histoire')">Histoire-Géo</button>
+              <button class="rev-filter is-on" onclick="setRevFilter(this,'maths')">Maths</button>
+              <button class="rev-filter" onclick="setRevFilter(this,'svt')">SVT</button>
+              <button class="rev-filter" onclick="setRevFilter(this,'francais')">Français</button>
+              <button class="rev-filter" onclick="setRevFilter(this,'anglais')">Anglais</button>
+              <button class="rev-filter" onclick="setRevFilter(this,'physique-chimie')">Physique-Chimie</button>
+            </div>
+
+            <div id="rev-cards-mode">
+              <div class="rev-progress" id="rev-progress">Fiche 1 / 3</div>
+              <div class="flash-stack">
+                <div class="flashcard" id="flashcard">
+                  <span class="swipe-tag know" id="swipe-know">✓ Je sais</span>
+                  <span class="swipe-tag again" id="swipe-again">↻ À revoir</span>
+                  <div class="ftag" id="fc-tag">Histoire-Géo</div>
+                  <div class="fq" id="fc-q">En quelle année a éclaté la Révolution française ?</div>
+                  <div class="confidence-row" id="confidence-row">
+                    <button class="conf-btn" onclick="event.stopPropagation(); revealWithConfidence(true)">🤔 Je pense savoir</button>
+                    <button class="conf-btn" onclick="event.stopPropagation(); revealWithConfidence(false)">😅 Je sèche</button>
+                  </div>
+                  <div class="fa" id="fc-a">1789 — la prise de la Bastille marque le début des événements.</div>
+                  <div class="fhint" id="fc-hint"></div>
+                </div>
+              </div>
+              <div class="rev-actions">
+                <button class="rev-btn again" onclick="nextCard(false)">↻ À revoir</button>
+                <button class="rev-btn know" onclick="nextCard(true)">✓ Je sais</button>
+              </div>
+            </div>
+
+            <div id="rev-test-mode" style="display:none;">
+              <div class="lquiz">
+                <div class="lquiz-q">En quelle année a éclaté la Révolution française ?</div>
+                <div class="lquiz-opts" id="test-opts">
+                  <button class="lquiz-opt" data-ok="false">1815</button>
+                  <button class="lquiz-opt" data-ok="true">1789</button>
+                  <button class="lquiz-opt" data-ok="false">1900</button>
+                </div>
+                <div class="lquiz-fb" id="test-fb"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="view" id="view-progres">
+          <div class="topbar"><h1>Progrès</h1></div>
+          <div style="padding:0 0 10px;">
+            <div class="section-title">Cette semaine</div>
+            <div class="stats-week">
+              <div class="stat-chip"><b>6</b><span>leçons</span></div>
+              <div class="stat-chip"><b>52 min</b><span>temps</span></div>
+              <div class="stat-chip"><b>14/16</b><span>quiz</span></div>
+            </div>
+
+            <div class="section-title">À faire en priorité</div>
+            <div class="weak-list">
+              <div class="hw-item"><span class="hw-due">Ven. 18</span><div><b>Quiz : Révolution française</b><span>Devoir assigné par ton prof d'Histoire-Géo</span></div></div>
+              <div class="weak-item"><div class="wtext"><b>Fractions avancées</b><span>Maths · 2 erreurs sur les 3 derniers quiz</span></div><button onclick="startLesson('maths',7)">Revoir</button></div>
+              <div class="weak-item"><div class="wtext"><b>Les dates clés</b><span>Histoire-Géo · confondues 2 fois</span></div><button onclick="openSubject('histoire')">Revoir</button></div>
+            </div>
+
+            <div class="section-title">Ta série</div>
+            <div class="week">
+              <div class="day"><span class="lbl">L</span><div class="dot done">✓</div></div>
+              <div class="day"><span class="lbl">M</span><div class="dot done">✓</div></div>
+              <div class="day"><span class="lbl">M</span><div class="dot done">✓</div></div>
+              <div class="day"><span class="lbl">J</span><div class="dot done">✓</div></div>
+              <div class="day"><span class="lbl">V</span><div class="dot today" id="day-today">•</div></div>
+              <div class="day"><span class="lbl">S</span><div class="dot"></div></div>
+              <div class="day"><span class="lbl">D</span><div class="dot"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="view" id="view-subject">
+          <div class="topbar"><button class="topbar-back" onclick="showTab('home')" aria-label="Retour à l'accueil">‹</button><h1 id="subj-title">Histoire-Géo</h1></div>
+          <div class="chapters" id="subj-chapters"></div>
+        </div>
+
+        <div class="view" id="view-lesson">
+          <div class="topbar"><button class="topbar-back" onclick="showTab('home')" aria-label="Retour à l'accueil">‹</button><h1 id="lesson-title" style="font-size:1.05rem;">La Révolution française</h1></div>
+          <div class="lesson-progress"><span id="lesson-progress-fill" style="width:20%"></span></div>
+
+          <div class="lesson-modes">
+            <button class="lesson-mode-btn is-on" id="lmode-voir" onclick="setLessonMode('voir')">🎬 Voir</button>
+            <button class="lesson-mode-btn" id="lmode-ecouter" onclick="setLessonMode('ecouter')">🎧 Écouter</button>
+            <button class="lesson-mode-btn" id="lmode-echanger" onclick="setLessonMode('echanger')">💬 Échanger</button>
+          </div>
+
+          <div class="lesson-panel is-on" id="panel-voir">
+            <div class="story-stage" id="story-stage">
+              <div class="story-progress-row" id="story-progress-row"></div>
+              <div class="story-tap-zone left" onclick="storyPrev()" aria-label="Précédent"></div>
+              <div class="story-tap-zone right" onclick="storyNext()" aria-label="Suivant"></div>
+              <div id="story-slide-content"></div>
+              <div class="story-hint" id="story-hint">Touche à droite pour continuer →</div>
+            </div>
+          </div>
+
+          <div class="lesson-panel" id="panel-ecouter">
+            <div class="audio-player">
+              <button class="audio-play" id="audio-play-btn" onclick="toggleAudio()" aria-label="Lire l'audio">▶</button>
+              <div class="audio-wave" id="audio-wave">
+                <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+              <div class="audio-meta" id="audio-time">0:00 / 2:14 · Racontée par Braise</div>
+              <div class="audio-transcript">« En 1789, le royaume de France croule sous les dettes. Le peuple a faim, la noblesse vit dans le luxe, et le roi Louis XVI ne sait plus quoi faire pour renflouer les caisses. C'est cette tension qui va tout faire basculer... »</div>
+            </div>
+          </div>
+
+          <div class="lesson-panel" id="panel-echanger">
+            <div class="ai-note">🤖 Braise répond sur ce chapitre — pose n'importe quelle question, comme à un pote qui a compris avant toi.</div>
+            <div class="peer-chat" id="ai-chat">
+              <div class="peer-msg"><div class="peer-avatar" id="ai-avatar-1" style="background:var(--sun);">🧠</div><div class="peer-bubble" id="ai-opener">Vas-y, demande-moi ce que tu veux sur ce chapitre 👀</div></div>
+            </div>
+            <div class="peer-input-row">
+              <input type="text" id="peer-input" placeholder="Pose ta question..." aria-label="Poser une question à Braise" onkeydown="if(event.key==='Enter') sendPeerMsg()">
+              <button class="peer-send" onclick="sendPeerMsg()" aria-label="Envoyer le message">➤</button>
+            </div>
+          </div>
+
+          <div class="quiz-stage" id="quiz-stage">
+            <div class="ai-note" style="margin-bottom:14px;">🙂 Pas de note ici — c'est juste pour t'aider à retenir, à ton rythme.</div>
+            <div class="quiz-head">
+              <div class="quiz-dots" id="quiz-dots"></div>
+              <div class="quiz-streak" id="quiz-streak">🔥 <span id="quiz-streak-n">0</span> d'affilée</div>
+            </div>
+            <div id="quiz-body"></div>
+          </div>
+        </div>
+
+        <div class="view" id="view-complete">
+          <div class="complete-wrap">
+            <div class="confetti" id="confetti"></div>
+            <div class="complete-badge">
+              <svg aria-hidden="true" viewBox="0 0 100 100" style="width:52px;height:52px;"><ellipse cx="50" cy="58" rx="30" ry="27" fill="#FFC24B"/><ellipse cx="24" cy="66" rx="7" ry="10" fill="#FF6F59"/><ellipse cx="76" cy="66" rx="7" ry="10" fill="#FF6F59"/><ellipse cx="38" cy="88" rx="7" ry="9" fill="#E85644"/><ellipse cx="62" cy="88" rx="7" ry="9" fill="#E85644"/><path d="M42 22 C46 14 54 14 58 22 C54 26 46 26 42 22 Z" fill="#FFC24B"/><circle cx="40" cy="54" r="4.5" fill="#16213A"/><circle cx="60" cy="54" r="4.5" fill="#16213A"/><path d="M42 66 Q50 71 58 66" stroke="#16213A" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+            </div>
+            <h2>Leçon terminée !</h2>
+            <p id="complete-sub">Tu viens de finir "La Révolution française".</p>
+            <div class="complete-xp" id="complete-xp">+20 XP</div>
+            <div class="complete-stats">
+              <div class="complete-stat"><b id="complete-score">2/3</b>Exercices réussis</div>
+              <div class="complete-stat"><b>4/5</b>Chapitres</div>
+            </div>
+            <button class="btn-block" style="background:var(--sun); color:var(--sun-ink); margin-bottom:10px;" onclick="openShareCard()">📤 Partager ma série</button>
+            <button class="btn-return" onclick="returnHome()">Retour à l'accueil</button>
+          </div>
+        </div>
+
+        <div class="view" id="view-share">
+          <div class="topbar"><button class="topbar-back" onclick="goBackFromShare()" aria-label="Retour">‹</button><h1>Partager</h1></div>
+          <div style="display:flex; flex-direction:column; align-items:center; padding-top:10px;">
+            <div class="share-card" id="share-card">
+              <div class="share-card-glow"></div>
+              <svg aria-hidden="true" viewBox="0 0 100 100" style="width:64px;height:64px;"><ellipse cx="50" cy="58" rx="30" ry="27" fill="#FFC24B"/><ellipse cx="24" cy="66" rx="7" ry="10" fill="#FF6F59"/><ellipse cx="76" cy="66" rx="7" ry="10" fill="#FF6F59"/><ellipse cx="38" cy="88" rx="7" ry="9" fill="#E85644"/><ellipse cx="62" cy="88" rx="7" ry="9" fill="#E85644"/><path d="M42 22 C46 14 54 14 58 22 C54 26 46 26 42 22 Z" fill="#FFC24B"/><circle cx="40" cy="54" r="4.5" fill="#16213A"/><circle cx="60" cy="54" r="4.5" fill="#16213A"/><path d="M42 66 Q50 71 58 66" stroke="#16213A" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+              <div class="share-streak" id="share-streak">🔥 13 jours</div>
+              <div class="share-sub">de série sur SAPIE</div>
+              <div class="share-brand">SAPIE · apprendre entre potes</div>
+            </div>
+            <p style="text-align:center; font-size:0.82rem; color:var(--ink-soft); margin-top:18px; max-width:280px;">Fais une capture d'écran et envoie-la à qui tu veux — ou défie un pote de tenir plus longtemps que toi 👀</p>
+            <button class="btn-block blue" style="max-width:280px; margin-top:14px;" onclick="showTab('home')">Retour à l'accueil</button>
+          </div>
+        </div>
+
+        <div class="view" id="view-profile">
+          <div class="topbar"><h1>Profil</h1>
+            <button style="margin-left:auto; width:34px; height:34px; border-radius:50%; background:var(--paper); font-size:1rem;" onclick="showTab('settings')" aria-label="Réglages">⚙️</button>
+          </div>
+          <div class="primary-cta" style="display:flex; align-items:center; gap:14px; text-align:left;">
+            <svg aria-hidden="true" viewBox="0 0 100 100" style="width:56px;height:56px;flex-shrink:0;"><ellipse cx="50" cy="58" rx="30" ry="27" fill="#FFC24B"/><ellipse cx="24" cy="66" rx="7" ry="10" fill="#FF6F59"/><ellipse cx="76" cy="66" rx="7" ry="10" fill="#FF6F59"/><ellipse cx="38" cy="88" rx="7" ry="9" fill="#E85644"/><ellipse cx="62" cy="88" rx="7" ry="9" fill="#E85644"/><path d="M42 22 C46 14 54 14 58 22 C54 26 46 26 42 22 Z" fill="#FFC24B"/><circle cx="40" cy="54" r="4.5" fill="#16213A"/><circle cx="60" cy="54" r="4.5" fill="#16213A"/><path d="M42 66 Q50 71 58 66" stroke="#16213A" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+            <div style="flex:1;">
+              <div class="pc-tag">Braise · Curieuse</div>
+              <div style="height:6px; background:rgba(255,255,255,0.25); border-radius:999px; overflow:hidden; margin:8px 0 5px;"><span style="display:block; height:100%; width:85%; background:var(--sun); border-radius:999px;"></span></div>
+              <div style="font-size:0.72rem; opacity:0.85; font-family:'IBM Plex Mono',monospace;">Encore 60 XP avant "Éveillée"</div>
+            </div>
+          </div>
+          <div class="profile-stats">
+            <div class="pstat"><b>340</b><span>XP</span></div>
+            <div class="pstat"><b>12</b><span>Série</span></div>
+            <div class="pstat"><b>9</b><span>Chapitres</span></div>
+          </div>
+          <button class="btn-block" style="background:var(--sun); color:var(--sun-ink); margin-bottom:20px;" onclick="openShareCard('profile')">📤 Partager ma série</button>
+
+          <div class="section-title">Ton profil d'apprentissage</div>
+          <div class="settings-group" style="padding:14px 16px; margin-bottom:20px;">
+            <div id="profile-format" style="font-size:0.88rem; line-height:1.5;">🎬 <b>Visuel</b> — Tu préfères les images et les vidéos, on te propose ce format en premier.</div>
+            <div id="profile-format-note" style="font-size:0.72rem; color:var(--ink-soft); margin-top:8px;">Détecté à l'inscription — s'affine au fil de tes leçons.</div>
+          </div>
+
+          <div class="section-title">Tous tes badges</div>
+          <div class="badges">
+            <div class="badge"><div class="ring" style="background:rgba(255,111,89,0.18)">🔥</div><span>Série 7</span></div>
+            <div class="badge"><div class="ring" style="background:rgba(47,190,159,0.18)">🌱</div><span>1er pas</span></div>
+            <div class="badge"><div class="ring" style="background:rgba(255,194,75,0.28)">📚</div><span>3 mat.</span></div>
+            <div class="badge locked"><div class="ring">🏅</div><span>Série 30</span><span class="cond">-18j</span></div>
+            <div class="badge locked"><div class="ring">🚀</div><span>500 XP</span><span class="cond">-160</span></div>
+          </div>
+        </div>
+
+        <div class="view" id="view-settings">
+          <div class="topbar"><button class="topbar-back" onclick="showTab('profile')" aria-label="Retour au profil">‹</button><h1>Réglages</h1></div>
+          <div class="settings-group">
+            <div class="settings-label">Compte</div>
+            <div class="settings-row" onclick="openLevelPicker()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openLevelPicker();}" style="cursor:pointer;"><span>Niveau scolaire</span><span class="settings-val" id="settings-grade">3ᵉ ›</span></div>
+            <div class="settings-row"><span>Email</span><span class="settings-val">eleve@exemple.fr</span></div>
+          </div>
+          <div class="settings-group">
+            <div class="settings-label">Ton rythme</div>
+            <div class="settings-row" onclick="openPacePicker()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openPacePicker();}" style="cursor:pointer;"><span>Objectif hebdomadaire</span><span class="settings-val" id="settings-pace">Normal ›</span></div>
+          </div>
+          <div class="settings-group">
+            <div class="settings-label">Préférences</div>
+            <div class="settings-row"><span>Rappel quotidien</span><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></div>
+            <div class="settings-row"><span>Sons de l'app</span><label class="switch"><input type="checkbox" checked onchange="soundsEnabled = this.checked"><span class="slider"></span></label></div>
+            <div class="settings-row"><span>Mode sombre</span><label class="switch"><input type="checkbox" id="dark-toggle" onchange="toggleDarkMode(this)" aria-label="Activer le mode sombre"><span class="slider"></span></label></div>
+            <div class="settings-row"><span>Affichage adapté (dyslexie)</span><label class="switch"><input type="checkbox" id="dyslexia-toggle" onchange="toggleDyslexiaMode(this)" aria-label="Activer l'affichage adapté à la dyslexie"><span class="slider"></span></label></div>
+          </div>
+          <button class="btn-block" style="background:var(--blue-pale); color:var(--blue-2); margin-top:10px;" onclick="document.getElementById('app-shell').style.display='none'; document.getElementById('onboarding').style.display='block'; obGoTo(0);">Revoir l'inscription (démo)</button>
+          <button class="btn-block" style="background:rgba(232,86,68,0.12); color:var(--coral-2); margin-top:10px;">Se déconnecter</button>
+        </div>
+
+      </div>
+
+      <div class="tabbar">
+        <button class="tab-btn is-active" id="tab-home" onclick="showTab('home')"><span class="ic">🏠</span>Accueil</button>
+        <button class="tab-btn" id="tab-matieres" onclick="showTab('matieres')"><span class="ic">📚</span>Matières</button>
+        <button class="tab-btn" id="tab-revisions" onclick="showTab('revisions')"><span class="ic tab-ic-wrap">🗂️<span class="tab-dot show" id="dot-revisions"></span></span>Révisions</button>
+        <button class="tab-btn" id="tab-progres" onclick="showTab('progres')"><span class="ic tab-ic-wrap">📈<span class="tab-dot show" id="dot-progres"></span></span>Progrès</button>
+        <button class="tab-btn" id="tab-profile" onclick="showTab('profile')"><span class="ic">👤</span>Profil</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ===== Accessibilité clavier générique pour tous les div cliquables =====
+  function enhanceClickableDivs(root){
+    (root || document).querySelectorAll('div[onclick]').forEach(function(el){
+      if(el.hasAttribute('data-a11y-done')) return;
+      el.setAttribute('data-a11y-done', 'true');
+      if(!el.hasAttribute('role')) el.setAttribute('role', 'button');
+      if(!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
+      el.addEventListener('keydown', function(e){
+        if(e.key === 'Enter' || e.key === ' '){
+          e.preventDefault();
+          el.click();
+        }
+      });
+    });
+  }
+
+  var obState = { grade:null, gradeLabel:null };
+
+  // ===== Retour sonore léger (synthétisé, aucun fichier à charger) =====
+  var soundsEnabled = true;
+  var audioCtx = null;
+  function ensureAudioCtx(){
+    if(!audioCtx){ var AC = window.AudioContext || window.webkitAudioContext; if(AC) audioCtx = new AC(); }
+    if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+  function playTone(type){
+    if(!soundsEnabled) return;
+    var ctx = ensureAudioCtx();
+    if(!ctx) return;
+    var now = ctx.currentTime;
+    function tone(freq, start, dur, vol, wave){
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = wave || 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, now + start);
+      gain.gain.linearRampToValueAtTime(vol, now + start + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + start + dur);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(now + start); osc.stop(now + start + dur + 0.02);
+    }
+    if(type === 'correct'){ tone(523.25, 0, 0.12, 0.09); tone(783.99, 0.09, 0.18, 0.08); }
+    else if(type === 'incorrect'){ tone(300, 0, 0.16, 0.05, 'sine'); }
+    else if(type === 'tap'){ tone(600, 0, 0.05, 0.035); }
+    else if(type === 'swipe'){ tone(700, 0, 0.07, 0.04); }
+    else if(type === 'complete'){ tone(523.25, 0, 0.1, 0.08); tone(659.25, 0.1, 0.1, 0.08); tone(783.99, 0.2, 0.22, 0.09); }
+  }
+
+  var allLevels = [
+    {id:'sixieme', label:'6ᵉ', group:'Collège'},
+    {id:'cinquieme', label:'5ᵉ', group:'Collège'},
+    {id:'quatrieme', label:'4ᵉ', group:'Collège'},
+    {id:'troisieme', label:'3ᵉ', group:'Collège'},
+    {id:'seconde', label:'Seconde', group:'Lycée'},
+    {id:'premiere', label:'Première', group:'Lycée'},
+    {id:'terminale', label:'Terminale', group:'Lycée'}
+  ];
+  var currentLevel = 'troisieme';
+  var preferredFormat = 'voir';
+  var formatUsage = { voir:0, ecouter:0, echanger:0 };
+  var formatRefined = false;
+  var formatMeta = {
+    voir:{ label:'Visuel', icon:'🎬', desc:"Tu préfères les images et les vidéos — on te propose ce format en premier." },
+    ecouter:{ label:'Auditif', icon:'🎧', desc:"Tu préfères écouter une histoire racontée — on te propose ce format en premier." },
+    echanger:{ label:'Social', icon:'💬', desc:"Tu préfères échanger avec quelqu'un — on te propose ce format en premier." }
+  };
+
+  function levelLabel(id){
+    var l = allLevels.filter(function(x){ return x.id === id; })[0];
+    return l ? l.label : '3ᵉ';
+  }
+
+  function updateProfileFormat(){
+    var el = document.getElementById('profile-format');
+    var note = document.getElementById('profile-format-note');
+    if(!el) return;
+    var f = formatMeta[preferredFormat];
+    el.innerHTML = f.icon + ' <b>' + f.label + '</b> — ' + f.desc;
+    if(note) note.textContent = formatRefined
+      ? "Mis à jour d'après ce que tu utilises vraiment le plus — plus seulement ta réponse à l'inscription."
+      : "Détecté à l'inscription — s'affine au fil de tes leçons.";
+  }
+
+  function trackFormatUsage(){
+    var activeBtn = document.querySelector('.lesson-mode-btn.is-on');
+    if(!activeBtn) return;
+    var mode = activeBtn.id.replace('lmode-', '');
+    formatUsage[mode] = (formatUsage[mode] || 0) + 1;
+    var total = formatUsage.voir + formatUsage.ecouter + formatUsage.echanger;
+    if(total >= 3){
+      var best = Object.keys(formatUsage).reduce(function(a,b){ return formatUsage[a] >= formatUsage[b] ? a : b; });
+      if(best !== preferredFormat && formatUsage[best] >= 2){
+        preferredFormat = best;
+        formatRefined = true;
+        updateProfileFormat();
+      }
+    }
+  }
+
+  function setCurriculumTag(){
+    var lbl = levelLabel(currentLevel);
+    var tag = document.getElementById('curriculum-tag');
+    if(tag) tag.innerHTML = '📘 Programme officiel de <b>' + lbl + '</b> <span style="opacity:0.6;">· changer ›</span>';
+    var sv = document.getElementById('settings-grade');
+    if(sv) sv.textContent = lbl + ' ›';
+  }
+
+  function openLevelPicker(){
+    var html = '<div class="level-sheet-backdrop" onclick="closeLevelPicker()"></div><div class="level-sheet">' +
+      '<div class="level-sheet-handle"></div>' +
+      '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;"><h3>Choisir un niveau</h3><button onclick="closeLevelPicker()" aria-label="Fermer" style="width:30px;height:30px;border-radius:50%;background:var(--blue-pale);font-size:0.9rem;">✕</button></div>';
+    var groups = ['Collège','Lycée'];
+    groups.forEach(function(g){
+      html += '<div class="level-group-label">'+g+'</div><div class="level-list">';
+      allLevels.filter(function(l){ return l.group === g; }).forEach(function(l){
+        var sel = l.id === currentLevel ? ' is-selected' : '';
+        html += '<button class="level-item'+sel+'" onclick="selectLevel(\''+l.id+'\')">'+l.label+(l.id===currentLevel?' <span>✓</span>':'')+'</button>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+    var wrap = document.createElement('div');
+    wrap.id = 'level-picker';
+    wrap.innerHTML = html;
+    document.querySelector('.screen').appendChild(wrap);
+  }
+  function closeLevelPicker(){
+    var el = document.getElementById('level-picker');
+    if(el) el.remove();
+  }
+
+  var paceTargets = { leger:{label:'Léger', n:3, desc:'3 leçons par semaine'}, normal:{label:'Normal', n:5, desc:'5 leçons par semaine'}, intensif:{label:'Intensif', n:8, desc:'8 leçons par semaine'} };
+  var currentPace = 'normal';
+  var lessonsDoneThisWeek = 3;
+
+  function openPacePicker(){
+    var html = '<div class="level-sheet-backdrop" onclick="closePacePicker()"></div><div class="level-sheet">' +
+      '<div class="level-sheet-handle"></div>' +
+      '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;"><h3>Choisir ton rythme</h3><button onclick="closePacePicker()" aria-label="Fermer" style="width:30px;height:30px;border-radius:50%;background:var(--blue-pale);font-size:0.9rem;">✕</button></div>' +
+      '<p style="font-size:0.82rem; color:var(--ink-soft); margin-bottom:14px;">Tu peux en changer à tout moment — aucun rythme n\'est le \'bon\' rythme.</p>' +
+      '<div class="level-list" style="grid-template-columns:1fr;">';
+    Object.keys(paceTargets).forEach(function(key){
+      var t = paceTargets[key];
+      var sel = key === currentPace ? ' is-selected' : '';
+      html += '<button class="level-item'+sel+'" onclick="selectPace(\''+key+'\')">'+t.label+' — '+t.desc+(key===currentPace?' <span>✓</span>':'')+'</button>';
+    });
+    html += '</div></div>';
+    var wrap = document.createElement('div');
+    wrap.id = 'level-picker';
+    wrap.innerHTML = html;
+    document.querySelector('.screen').appendChild(wrap);
+  }
+  function closePacePicker(){
+    var el = document.getElementById('level-picker');
+    if(el) el.remove();
+  }
+  function selectPace(key){
+    currentPace = key;
+    document.getElementById('settings-pace').textContent = paceTargets[key].label + ' ›';
+    updateHomeRing();
+    closePacePicker();
+  }
+  function updateHomeRing(){
+    var target = paceTargets[currentPace].n;
+    var pct = Math.min(100, Math.round((lessonsDoneThisWeek / target) * 100));
+    var dash = 427 - Math.round(427 * pct/100);
+    var ringPct = document.getElementById('ring-pct');
+    var ringCircle = document.getElementById('ring-circle');
+    if(ringPct) ringPct.textContent = pct + '%';
+    if(ringCircle) ringCircle.setAttribute('stroke-dashoffset', dash);
+  }
+  function selectLevel(id){
+    currentLevel = id;
+    setCurriculumTag();
+    renderMatieres();
+    closeLevelPicker();
+  }
+  function obGoTo(n){
+    document.querySelectorAll('.ob-step').forEach(s => s.classList.remove('is-active'));
+    document.getElementById('ob'+n).classList.add('is-active');
+  }
+  function obPickGrade(btn){
+    document.querySelectorAll('#grade-chips .chip, #grade-chips2 .chip').forEach(c => c.classList.remove('is-selected'));
+    btn.classList.add('is-selected');
+    obState.grade = btn.dataset.v;
+    obState.gradeLabel = btn.dataset.label;
+    document.getElementById('ob-btn1').disabled = false;
+  }
+  function obPickFormat(btn){
+    document.querySelectorAll('#format-chips .chip').forEach(c => c.classList.remove('is-selected'));
+    btn.classList.add('is-selected');
+    obState.format = btn.dataset.v;
+    document.getElementById('ob-btn-format').disabled = false;
+  }
+
+  function skipToApp(){
+    currentLevel = 'troisieme';
+    preferredFormat = 'voir';
+    document.getElementById('onboarding').style.display = 'none';
+    document.getElementById('app-shell').style.display = 'flex';
+    setCurriculumTag();
+    updateProfileFormat();
+    var b = document.getElementById('setup-banner');
+    if(b) b.remove();
+  }
+
+  function enterApp(){
+    document.getElementById('onboarding').style.display = 'none';
+    document.getElementById('app-shell').style.display = 'flex';
+    currentLevel = obState.grade || 'troisieme';
+    preferredFormat = obState.format || 'voir';
+    setCurriculumTag();
+    updateProfileFormat();
+
+    var b = document.getElementById('setup-banner');
+    if(b){ b.textContent = 'Bienvenue ! Ta progression démarre maintenant — fais ta première leçon pour lancer ta série.'; b.style.display = 'block'; }
+
+    document.getElementById('pill-streak').textContent = '🔥 0 jour';
+    document.getElementById('pill-xp').textContent = '⭐ 0 XP';
+    document.getElementById('ring-pct').textContent = '0%';
+    document.getElementById('ring-circle').setAttribute('stroke-dashoffset', '427');
+
+    var nudge = document.getElementById('home-nudge');
+    if(nudge) nudge.style.display = 'none';
+
+    var levelList = subjectsByLevel[currentLevel] || subjectsByLevel.troisieme;
+    var withContent = levelList.filter(function(s){ return !!subjectData[s.k]; });
+    var pool = withContent.length ? withContent : levelList;
+    var first = pool[0];
+    var firstSubject = first.k;
+
+    document.getElementById('pc-tag').textContent = 'Ta toute première leçon · ' + first.l;
+    document.getElementById('pc-title').textContent = subjectData[firstSubject] ? subjectData[firstSubject].chapters[0].t : first.l + ' — Chapitre 1';
+    document.getElementById('pc-desc').textContent = "On commence doucement, avec les bases — Braise t'accompagne à chaque étape.";
+    document.getElementById('pc-btn').setAttribute('onclick', "startLesson('"+firstSubject+"',1)");
+    document.getElementById('pc-btn').textContent = 'Commencer →';
+
+    var remaining = pool.slice(1, 3);
+    var qcHtml = '';
+    remaining.forEach(function(s){
+      qcHtml += '<div class="quick-chip" onclick="startLesson(\''+s.k+'\',1)"><div class="qc-ic" style="background:'+s.c+'22"><svg aria-hidden="true" viewBox="0 0 100 100"><path d="M50 14 C64 32 70 46 70 56 C70 70 61 78 50 78 C39 78 30 70 30 56 C30 46 36 32 50 14 Z" fill="'+s.c+'"/></svg></div><div><div class="qc-tag">'+s.l+'</div><div class="qc-title">Chapitre 1</div></div></div>';
+    });
+    qcHtml += '<div class="quick-chip" onclick="showTab(\'revisions\')"><div class="qc-ic" style="background:rgba(139,107,224,0.18)"><svg aria-hidden="true" viewBox="0 0 100 100"><path d="M50 14 C64 32 70 46 70 56 C70 70 61 78 50 78 C39 78 30 70 30 56 C30 46 36 32 50 14 Z" fill="#8B6BE0"/></svg></div><div><div class="qc-tag">Révisions</div><div class="qc-title">Fiches rapides</div></div></div>';
+    document.getElementById('quick-row').innerHTML = qcHtml;
+    enhanceClickableDivs(document.getElementById('quick-row'));
+  }
+
+  var subjectsByLevel = {
+    sixieme: [
+      {k:'francais', l:'Français', c:'#8B6BE0'}, {k:'maths', l:'Mathématiques', c:'#2FBE9F'},
+      {k:'histoire', l:'Histoire-Géo-EMC', c:'#FF6F59'}, {k:'svt', l:'SVT', c:'#FFC24B'},
+      {k:'sciences-techno', l:'Sciences et Technologie', c:'#2596A8'}, {k:'anglais', l:'Anglais', c:'#2F5FE3'},
+      {k:'arts-plastiques', l:'Arts plastiques', c:'#D6588A'}, {k:'musique', l:'Éducation musicale', c:'#8B6BE0'},
+      {k:'eps', l:'EPS', c:'#2FBE9F'}
+    ],
+    cinquieme: [
+      {k:'francais', l:'Français', c:'#8B6BE0'}, {k:'maths', l:'Mathématiques', c:'#2FBE9F'},
+      {k:'histoire', l:'Histoire-Géo-EMC', c:'#FF6F59'}, {k:'svt', l:'SVT', c:'#FFC24B'},
+      {k:'physique-chimie', l:'Physique-Chimie', c:'#2596A8'}, {k:'techno', l:'Technologie', c:'#2596A8'},
+      {k:'anglais', l:'Anglais', c:'#2F5FE3'}, {k:'espagnol', l:'Espagnol (LV2)', c:'#D6588A'},
+      {k:'arts-plastiques', l:'Arts plastiques', c:'#D6588A'}, {k:'musique', l:'Éducation musicale', c:'#8B6BE0'},
+      {k:'eps', l:'EPS', c:'#2FBE9F'}
+    ],
+    quatrieme: [
+      {k:'francais', l:'Français', c:'#8B6BE0'}, {k:'maths', l:'Mathématiques', c:'#2FBE9F'},
+      {k:'histoire', l:'Histoire-Géo-EMC', c:'#FF6F59'}, {k:'svt', l:'SVT', c:'#FFC24B'},
+      {k:'physique-chimie', l:'Physique-Chimie', c:'#2596A8'}, {k:'techno', l:'Technologie', c:'#2596A8'},
+      {k:'anglais', l:'Anglais', c:'#2F5FE3'}, {k:'espagnol', l:'Espagnol (LV2)', c:'#D6588A'},
+      {k:'arts-plastiques', l:'Arts plastiques', c:'#D6588A'}, {k:'musique', l:'Éducation musicale', c:'#8B6BE0'},
+      {k:'eps', l:'EPS', c:'#2FBE9F'}
+    ],
+    troisieme: [
+      {k:'francais', l:'Français', c:'#8B6BE0'}, {k:'maths', l:'Mathématiques', c:'#2FBE9F'},
+      {k:'histoire', l:'Histoire-Géo-EMC', c:'#FF6F59'}, {k:'svt', l:'SVT', c:'#FFC24B'},
+      {k:'physique-chimie', l:'Physique-Chimie', c:'#2596A8'}, {k:'techno', l:'Technologie', c:'#2596A8'},
+      {k:'anglais', l:'Anglais', c:'#2F5FE3'}, {k:'espagnol', l:'Espagnol (LV2)', c:'#D6588A'},
+      {k:'arts-plastiques', l:'Arts plastiques', c:'#D6588A'}, {k:'musique', l:'Éducation musicale', c:'#8B6BE0'},
+      {k:'eps', l:'EPS', c:'#2FBE9F'}
+    ],
+    seconde: [
+      {k:'francais', l:'Français', c:'#8B6BE0'}, {k:'maths', l:'Mathématiques', c:'#2FBE9F'},
+      {k:'histoire', l:'Histoire-Géo', c:'#FF6F59'}, {k:'svt', l:'SVT', c:'#FFC24B'},
+      {k:'physique-chimie', l:'Physique-Chimie', c:'#2596A8'}, {k:'ses', l:'SES', c:'#D6588A'},
+      {k:'snt', l:'Sciences Numériques et Techno.', c:'#2596A8'}, {k:'anglais', l:'Anglais', c:'#2F5FE3'},
+      {k:'espagnol', l:'Espagnol (LV2)', c:'#D6588A'}, {k:'eps', l:'EPS', c:'#2FBE9F'}
+    ],
+    premiere: [
+      {k:'francais', l:'Français', c:'#8B6BE0', g:'Tronc commun'}, {k:'histoire', l:'Histoire-Géo', c:'#FF6F59', g:'Tronc commun'},
+      {k:'ens-scientifique', l:'Enseignement scientifique', c:'#2596A8', g:'Tronc commun'}, {k:'anglais', l:'Anglais', c:'#2F5FE3', g:'Tronc commun'},
+      {k:'espagnol', l:'Espagnol (LV2)', c:'#D6588A', g:'Tronc commun'}, {k:'eps', l:'EPS', c:'#2FBE9F', g:'Tronc commun'},
+      {k:'maths', l:'Mathématiques', c:'#2FBE9F', g:'Spécialités'}, {k:'physique-chimie', l:'Physique-Chimie', c:'#2596A8', g:'Spécialités'},
+      {k:'svt', l:'SVT', c:'#FFC24B', g:'Spécialités'}, {k:'ses', l:'SES', c:'#D6588A', g:'Spécialités'},
+      {k:'hggsp', l:'HGGSP', c:'#FF6F59', g:'Spécialités'}
+    ],
+    terminale: [
+      {k:'philo', l:'Philosophie', c:'#8B6BE0', g:'Tronc commun'}, {k:'histoire', l:'Histoire-Géo', c:'#FF6F59', g:'Tronc commun'},
+      {k:'ens-scientifique', l:'Enseignement scientifique', c:'#2596A8', g:'Tronc commun'}, {k:'anglais', l:'Anglais', c:'#2F5FE3', g:'Tronc commun'},
+      {k:'espagnol', l:'Espagnol (LV2)', c:'#D6588A', g:'Tronc commun'}, {k:'eps', l:'EPS', c:'#2FBE9F', g:'Tronc commun'},
+      {k:'maths', l:'Mathématiques', c:'#2FBE9F', g:'Spécialités (2 gardées)'}, {k:'physique-chimie', l:'Physique-Chimie', c:'#2596A8', g:'Spécialités (2 gardées)'},
+      {k:'svt', l:'SVT', c:'#FFC24B', g:'Spécialités (2 gardées)'}, {k:'ses', l:'SES', c:'#D6588A', g:'Spécialités (2 gardées)'},
+      {k:'hggsp', l:'HGGSP', c:'#FF6F59', g:'Spécialités (2 gardées)'}
+    ]
+  };
+
+  function renderMatieres(query){
+    var wrap = document.getElementById('subjects-wrap');
+    if(!wrap) return;
+    var list = subjectsByLevel[currentLevel] || subjectsByLevel.troisieme;
+    var q = (query || '').trim().toLowerCase();
+    if(q){ list = list.filter(function(s){ return s.l.toLowerCase().indexOf(q) > -1; }); }
+    var hasGroups = list.some(function(s){ return s.g; });
+    var html = '';
+    var lastGroup = null;
+    if(list.length === 0){
+      wrap.innerHTML = '<div class="setup-banner">Aucune matière ne correspond à "'+query+'".</div>';
+      return;
+    }
+    list.forEach(function(s){
+      if(hasGroups && s.g !== lastGroup){
+        html += '<div class="level-group-label" style="margin-top:'+(lastGroup?'6px':'0')+';">'+s.g+'</div>';
+        lastGroup = s.g;
+      }
+      var hasReal = !!subjectData[s.k];
+      var pct = hasReal ? Math.round((subjectData[s.k].chapters.filter(function(c){return c.s==='done'||c.s==='skip';}).length / subjectData[s.k].chapters.length) * 100) : 0;
+      var dash = 113 - Math.round(113 * pct/100);
+      var nextTxt = hasReal ? 'Prochain : ' + (subjectData[s.k].chapters.filter(function(c){return c.s==='current';})[0] || {t:'—'}).t : 'Contenu à venir';
+      html += '<div class="subject-card2" onclick="openSubject(\''+s.k+'\')">' +
+        '<div class="mini-ring"><svg aria-hidden="true" viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#EAF1FF" stroke-width="5"/><circle cx="22" cy="22" r="18" fill="none" stroke="'+s.c+'" stroke-width="5" stroke-linecap="round" stroke-dasharray="113" stroke-dashoffset="'+dash+'" transform="rotate(-90 22 22)"/></svg><span class="mini-ring-pct">'+pct+'%</span></div>' +
+        '<div class="subject-body2"><h4>'+s.l+'</h4><div class="next-up">'+nextTxt+'</div></div>' +
+        '<span class="subject-chevron">›</span></div>';
+    });
+    wrap.innerHTML = html;
+    enhanceClickableDivs(wrap);
+  }
+  function filterMatieres(query){ renderMatieres(query); }
+
+  var subjectData = {
+    histoire:{ label:'Histoire-Géo', color:'#FF6F59', bg:'rgba(255,111,89,0.18)', chapters:[
+      {t:'La monarchie en crise', s:'done', m:96}, {t:"Les États généraux", s:'done', m:90}, {t:'La prise de la Bastille', s:'done', m:85},
+      {t:'La Révolution française', s:'current', m:62},
+      {t:'Retour sur les dates clés', s:'reinforce'},
+      {t:"La fin de l'Ancien Régime", s:'locked'}
+    ]},
+    maths:{ label:'Mathématiques', color:'#2FBE9F', bg:'rgba(47,190,159,0.18)', chapters:[
+      {t:'Fractions', s:'done', m:100},{t:'Proportionnalité', s:'done', m:92},{t:'Équations', s:'done', m:88},{t:'Puissances', s:'done', m:95},{t:'Racines carrées', s:'done', m:90},
+      {t:'Géométrie', s:'current', m:40},
+      {t:'Retour sur les fractions avancées', s:'reinforce'},
+      {t:'Statistiques', s:'skip'},
+      {t:'Probabilités', s:'locked'},{t:'Fonctions', s:'locked'},{t:'Trigonométrie', s:'locked'}
+    ]},
+    svt:{ label:'SVT', color:'#FFC24B', bg:'rgba(255,194,75,0.28)', chapters:[
+      {t:'La cellule', s:'done', m:98},{t:'La reproduction', s:'current', m:35},
+      {t:'Le vocabulaire de base', s:'skip'},
+      {t:"L'évolution", s:'locked'},{t:'Le climat', s:'locked'},
+      {t:"L'écosystème", s:'locked'},{t:'Le corps humain', s:'locked'},{t:'La génétique', s:'locked'},{t:'La Terre', s:'locked'}
+    ]},
+    francais:{ label:'Français', color:'#8B6BE0', bg:'rgba(139,107,224,0.18)', chapters:[
+      {t:"Le récit d'enfance", s:'done', m:94},{t:'La poésie engagée', s:'done', m:88},
+      {t:"L'argumentation", s:'current', m:45},
+      {t:'Retour sur les figures de style', s:'reinforce'},
+      {t:'Le théâtre', s:'locked'},{t:'La nouvelle réaliste', s:'locked'}
+    ]},
+    anglais:{ label:'Anglais', color:'#2F5FE3', bg:'rgba(47,95,227,0.14)', chapters:[
+      {t:'Past simple', s:'done', m:96},{t:'Irregular verbs', s:'done', m:80},
+      {t:'Present Perfect', s:'current', m:38},
+      {t:'Retour sur les verbes irréguliers', s:'reinforce'},
+      {t:'Reported speech', s:'locked'},{t:'Modal verbs', s:'locked'}
+    ]},
+    'physique-chimie':{ label:'Physique-Chimie', color:'#2596A8', bg:'rgba(37,150,168,0.16)', chapters:[
+      {t:'La matière et ses états', s:'done', m:92},{t:'Mélanges et solutions', s:'done', m:85},
+      {t:'Les atomes', s:'current', m:30},
+      {t:"Retour sur la structure de l'atome", s:'reinforce'},
+      {t:'Les réactions chimiques', s:'locked'},{t:"Tension et intensité électrique", s:'locked'}
+    ]}
+  };
+
+  var lessonContent = {
+    histoire:{
+      opener:"Tu savais que la Révolution française a commencé par une histoire de dettes ? 👀",
+      audio:"En 1789, le royaume de France croule sous les dettes. Le peuple a faim, la noblesse vit dans le luxe, et le roi Louis XVI ne sait plus quoi faire pour renflouer les caisses. C'est cette tension qui va tout faire basculer...",
+      qa:[
+        {kw:['pourquoi','dette','argent'], a:"Le royaume avait dépensé énormément dans des guerres (dont celle d'indépendance américaine) sans faire payer la noblesse — du coup, les caisses étaient vides et il fallait trouver de l'argent quelque part."},
+        {kw:['roi','louis'], a:"Louis XVI n'était pas un tyran sanguinaire comme on l'imagine parfois — c'était plutôt quelqu'un d'indécis, dépassé par une crise qu'il n'avait pas causée seul."},
+        {kw:['bastille'], a:"La prise de la Bastille le 14 juillet 1789 est devenue un symbole, mais à l'époque il n'y avait presque plus personne dedans — c'est ce qu'elle représentait (le pouvoir royal) qui comptait."}
+      ],
+      fallback:["Bonne question ! En gros, retiens que tout part d'un déséquilibre entre ceux qui payaient et ceux qui décidaient.","C'est exactement le genre de détail qui aide à comprendre la suite — tu veux que je reformule autrement ?","Hmm, précise un peu ta question et je t'explique ça simplement 👍"]
+    },
+    maths:{
+      opener:"Tu savais qu'un architecte utilise de la géométrie littéralement tous les jours ? 📐",
+      audio:"Pour calculer l'aire d'un terrain qui n'est pas un simple rectangle, on le découpe en formes simples — triangles, rectangles — puis on additionne. C'est exactement comme ça que les architectes calculent l'espace disponible avant de construire...",
+      qa:[
+        {kw:['pourquoi','sert'], a:"Ça sert à calculer des surfaces réelles — un terrain, une pièce, un mur — sans avoir une formule magique toute faite pour chaque forme bizarre."},
+        {kw:['comment','exemple'], a:"Imagine un terrain en forme de L : tu le coupes en 2 rectangles, tu calcules l'aire de chacun, puis tu additionnes. C'est tout le principe."},
+        {kw:['formule'], a:"Il n'y a pas UNE formule magique — la technique, c'est de décomposer en formes simples (rectangle, triangle) dont tu connais déjà les formules."}
+      ],
+      fallback:["Bonne question, essaie de la reformuler avec un exemple concret et je t'aide à la résoudre.","On peut le voir avec un dessin si tu veux — décris-moi la forme dont tu parles.","C'est un point qui bloque souvent, t'inquiète, on va le démonter ensemble."]
+    },
+    svt:{
+      opener:"Tu savais que chaque cellule de ton corps contient les mêmes instructions génétiques ? 🧬",
+      audio:"La reproduction, c'est le mécanisme par lequel une cellule transmet son information génétique. Chez les êtres vivants, ça passe par la fusion d'un gamète mâle et d'un gamète femelle, qui forment ensemble une toute nouvelle cellule...",
+      qa:[
+        {kw:['gamete','cellule'], a:"Un gamète, c'est une cellule spécialisée (ovule ou spermatozoïde) qui ne contient que la moitié des instructions génétiques — c'est pour ça qu'il en faut deux pour former un nouvel être complet."},
+        {kw:['pourquoi'], a:"Parce que ça permet de mélanger les caractéristiques de deux individus — ce qui crée de la diversité, essentielle pour que les espèces s'adaptent avec le temps."},
+        {kw:['adn','genetique'], a:"L'ADN, c'est littéralement le mode d'emploi de ton corps — chaque cellule en a une copie complète, même si elle n'utilise qu'une petite partie selon son rôle."}
+      ],
+      fallback:["Bonne question ! Dis-moi si tu veux un exemple concret plutôt qu'une définition.","C'est un des trucs les plus intéressants du vivant, tu veux que je détaille une partie en particulier ?","Reformule un peu ta question et je t'explique ça simplement."]
+    },
+    francais:{
+      audio:"Convaincre, c'est utiliser la logique et des arguments solides pour faire changer d'avis. Persuader, c'est jouer sur les émotions du lecteur. Un bon texte argumentatif mélange souvent les deux techniques, en s'appuyant sur des connecteurs logiques comme donc, cependant ou en effet pour organiser son raisonnement."
+    },
+    anglais:{
+      audio:"The Present Perfect connects the past to the present — unlike the past simple, which describes something finished and isolated in time. We build it with have or has plus the past participle: I have finished, she has arrived. We often use it with words like since, for, already, just, or never."
+    },
+    'physique-chimie':{
+      audio:"Tout ce qui nous entoure est fait d'atomes, des briques minuscules invisibles à l'œil nu. Un atome a un noyau, composé de protons et de neutrons, entouré d'électrons qui tournent autour. Les atomes s'associent entre eux pour former des molécules — comme deux atomes d'hydrogène et un atome d'oxygène qui forment ensemble une molécule d'eau."
+    }
+  };
+
+  var exercisesData = {
+    histoire:[
+      {type:'qcm', q:'La Révolution française a éclaté en quelle année ?', opts:[{t:'1815',ok:false},{t:'1789',ok:true},{t:'1900',ok:false}], explain:"1789 — retiens juste la prise de la Bastille, le 14 juillet. Le reste vient tout seul après."},
+      {type:'vf', q:'Louis XVI a été renversé dès le premier jour de la Révolution.', ok:false, explain:"En fait non — la monarchie a mis plusieurs années à tomber complètement. La Révolution, c'est un long processus, pas un seul jour."},
+      {type:'trou', q:"La prise de la _____ , le 14 juillet 1789, est devenue le symbole de la Révolution.", answer:'bastille', explain:"La Bastille ! C'est devenue un symbole du pouvoir royal renversé, même si la prison était presque vide ce jour-là."}
+    ],
+    maths:[
+      {type:'qcm', q:'Pour calculer une aire complexe, la meilleure méthode est de :', opts:[{t:'Deviner au jugé',ok:false},{t:'La découper en formes simples',ok:true},{t:'Ignorer les coins',ok:false}], explain:"On découpe toujours en formes simples (rectangles, triangles) dont on connaît déjà les formules, puis on additionne."},
+      {type:'vf', q:'Un triangle et un rectangle ont toujours la même formule d\u2019aire.', ok:false, explain:"Non, chacun a sa propre formule — mais les deux servent justement à découper des formes plus compliquées."},
+      {type:'trou', q:"L'aire d'un rectangle se calcule en multipliant la longueur par la _____.", answer:'largeur', explain:"La largeur ! Longueur × largeur, la base de toutes les aires rectangulaires."}
+    ],
+    svt:[
+      {type:'qcm', q:'Un gamète contient :', opts:[{t:'Toutes les instructions génétiques',ok:false},{t:'La moitié des instructions génétiques',ok:true},{t:'Aucune information génétique',ok:false}], explain:"La moitié seulement — c'est pour ça qu'il en faut deux (un de chaque parent) pour former un être complet."},
+      {type:'vf', q:'La reproduction sexuée crée de la diversité génétique.', ok:true, explain:"Exactement — c'est même sa fonction principale : mélanger les caractéristiques de deux individus."},
+      {type:'trou', q:"Le support de l'information génétique dans chaque cellule s'appelle l'_____.", answer:'adn', explain:"L'ADN ! Le mode d'emploi complet de ton corps, présent dans chacune de tes cellules."}
+    ],
+    francais:[
+      {type:'qcm', q:'Convaincre repose surtout sur :', opts:[{t:'La logique et les arguments',ok:true},{t:'Les émotions',ok:false},{t:'Le hasard',ok:false}], explain:"Convaincre s'adresse à la raison — c'est persuader qui joue sur les émotions. Les deux se complètent souvent dans un même texte."},
+      {type:'vf', q:'Convaincre et persuader sont exactement la même chose.', ok:false, explain:"Non — convaincre mobilise la logique, persuader mobilise les émotions. Nuance importante à l'écrit comme à l'oral."},
+      {type:'trou', q:"Le mot \u00ab _____ \u00bb est un connecteur logique qui introduit une conséquence.", answer:'donc', explain:"\u00ab Donc \u00bb ! Comme \u00ab par conséquent \u00bb ou \u00ab ainsi \u00bb — ces mots structurent un raisonnement."}
+    ],
+    anglais:[
+      {type:'qcm', q:'How do you build the Present Perfect ?', opts:[{t:'have/has + past participle',ok:true},{t:'was/were + V-ing',ok:false},{t:'will + verb',ok:false}], explain:"Have/has + past participle: 'I have finished', 'she has arrived'. It links the past to now."},
+      {type:'vf', q:"\u2018I have finished my homework\u2019 uses the Present Perfect.", ok:true, explain:"Exactly — 'have' plus the past participle 'finished' is the Present Perfect structure."},
+      {type:'trou', q:"She has _____ (arrive) already.", answer:'arrived', explain:"'Arrived' — the past participle of 'arrive'. Regular verbs just add -ed."}
+    ],
+    'physique-chimie':[
+      {type:'qcm', q:'Un atome est composé de :', opts:[{t:'Un noyau et des électrons',ok:true},{t:'Seulement des électrons',ok:false},{t:'Seulement un noyau',ok:false}], explain:"Un noyau (protons + neutrons) entouré d'électrons qui tournent autour — comme un mini système solaire."},
+      {type:'vf', q:"L'eau (H\u2082O) est un atome.", ok:false, explain:"Non, c'est une molécule — formée de plusieurs atomes assemblés (2 d'hydrogène, 1 d'oxygène)."},
+      {type:'trou', q:"Une molécule d'eau est formée de 2 atomes d'hydrogène et 1 atome d'_____.", answer:'oxygène', explain:"L'oxygène ! H\u2082O — 2 hydrogènes, 1 oxygène, la molécule la plus connue de toutes."}
+    ]
+  };
+
+
+  function showTab(name){
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('is-active'));
+    document.getElementById('view-' + name).classList.add('is-active');
+    document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('is-active'));
+    if(name === 'home') document.getElementById('tab-home').classList.add('is-active');
+    if(name === 'matieres'){ document.getElementById('tab-matieres').classList.add('is-active'); renderMatieres(); }
+    if(name === 'revisions'){ document.getElementById('tab-revisions').classList.add('is-active'); var d1=document.getElementById('dot-revisions'); if(d1) d1.classList.remove('show'); }
+    if(name === 'progres'){ document.getElementById('tab-progres').classList.add('is-active'); var d2=document.getElementById('dot-progres'); if(d2) d2.classList.remove('show'); }
+    if(name === 'profile') document.getElementById('tab-profile').classList.add('is-active');
+    document.getElementById('app-content').scrollTop = 0;
+  }
+
+  var revCards = {
+    histoire: [
+      {q:"En quelle année a éclaté la Révolution française ?", a:"1789 — la prise de la Bastille marque le début des événements."},
+      {q:"Qu'est-ce que les États généraux ?", a:"Une assemblée réunissant les 3 ordres (clergé, noblesse, tiers état) convoquée par le roi."},
+      {q:"Pourquoi le royaume était-il en crise financière ?", a:"Les guerres coûteuses et un système d'impôts inégal avaient vidé les caisses de l'État."}
+    ],
+    maths: [
+      {q:"Comment additionne-t-on deux fractions de dénominateurs différents ?", a:"On les met d'abord au même dénominateur, puis on additionne les numérateurs."},
+      {q:"Qu'est-ce qu'une proportionnalité ?", a:"Une relation où une grandeur est toujours multipliée par le même nombre pour obtenir l'autre."},
+      {q:"Comment résoudre une équation du premier degré ?", a:"On isole l'inconnue en effectuant la même opération des deux côtés de l'égalité."}
+    ],
+    svt: [
+      {q:"Quelle est l'unité de base du vivant ?", a:"La cellule."},
+      {q:"Qu'est-ce que la reproduction sexuée ?", a:"Une reproduction impliquant la fusion d'un gamète mâle et d'un gamète femelle."},
+      {q:"Qui a théorisé l'évolution des espèces ?", a:"Charles Darwin, avec la sélection naturelle."}
+    ],
+    francais: [
+      {q:"Quelle est la différence entre convaincre et persuader ?", a:"Convaincre s'appuie sur la logique et la raison ; persuader joue sur les émotions."},
+      {q:"Qu'est-ce qu'un connecteur logique ?", a:"Un mot qui relie les idées d'un texte (donc, cependant, en effet...)."},
+      {q:"Cite un exemple de connecteur logique de conséquence.", a:"Donc, par conséquent, ainsi..."}
+    ],
+    anglais: [
+      {q:"How do you form the Present Perfect?", a:"Have/has + past participle (I have finished, she has arrived)."},
+      {q:"Name two words often used with the Present Perfect.", a:"Since, for, already, just, or never."},
+      {q:"What's the past participle of \u2018to arrive\u2019?", a:"Arrived — regular verbs simply add -ed."}
+    ],
+    'physique-chimie': [
+      {q:"De quoi est composé un atome ?", a:"D'un noyau (protons + neutrons) entouré d'électrons."},
+      {q:"Qu'est-ce qu'une molécule ?", a:"Un assemblage de plusieurs atomes liés entre eux, comme H\u2082O pour l'eau."},
+      {q:"Combien d'atomes compose une molécule d'eau ?", a:"3 atomes : 2 d'hydrogène et 1 d'oxygène."}
+    ]
+  };
+  var revSubject = 'maths', revQueue = [];
+
+  function buildRevQueue(){
+    revQueue = revCards[revSubject].map(function(_, i){ return i; });
+  }
+
+  function setRevFilter(btn, key){
+    document.querySelectorAll('.rev-filter').forEach(f => f.classList.remove('is-on'));
+    btn.classList.add('is-on');
+    revSubject = key;
+    buildRevQueue();
+    renderCard();
+  }
+  function renderCard(){
+    if(!revQueue.length) buildRevQueue();
+    var card = revCards[revSubject][revQueue[0]];
+    var labels = {histoire:'Histoire-Géo', maths:'Mathématiques', svt:'SVT', francais:'Français', anglais:'Anglais', 'physique-chimie':'Physique-Chimie'};
+    document.getElementById('fc-tag').textContent = labels[revSubject];
+    document.getElementById('fc-q').textContent = card.q;
+    document.getElementById('fc-a').textContent = card.a;
+    document.getElementById('fc-hint').textContent = '';
+    var fc = document.getElementById('flashcard');
+    fc.classList.remove('flipped', 'fly-out', 'dragging', 'snap-back');
+    fc.style.transform = '';
+    fc.style.opacity = '';
+    document.getElementById('swipe-know').style.opacity = 0;
+    document.getElementById('swipe-again').style.opacity = 0;
+    document.getElementById('rev-progress').textContent = 'Fiche à revoir bientôt : ' + Math.min(revQueue.length, revCards[revSubject].length);
+  }
+  function flipCard(){ document.getElementById('flashcard').classList.toggle('flipped'); playTone('tap'); }
+  function revealWithConfidence(thinksKnows){
+    var fc = document.getElementById('flashcard');
+    fc.classList.add('flipped');
+    playTone('tap');
+    var hint = document.getElementById('fc-hint');
+    hint.innerHTML = thinksKnows
+      ? '<div class="confidence-note">Tu pensais savoir — vérifie, puis dis-nous si c\'était juste 👇</div>'
+      : '<div class="confidence-note">Pas grave, regarde bien la réponse cette fois 👇</div>';
+  }
+  function nextCard(know){
+    var current = revQueue.shift();
+    if(know === false){
+      // Répétition espacée simplifiée : revient dans 2 cartes plutôt qu'en fin de file
+      var reinsertAt = Math.min(2, revQueue.length);
+      revQueue.splice(reinsertAt, 0, current);
+    } else {
+      // Sue : repart en fin de file, espacement plus large avant de la revoir
+      revQueue.push(current);
+    }
+    renderCard();
+  }
+  buildRevQueue();
+  renderCard();
+  enhanceClickableDivs();
+
+  // ===== Glisser la flashcard (swipe façon Tinder/Duolingo) =====
+  (function(){
+    var card = document.getElementById('flashcard');
+    var knowTag = document.getElementById('swipe-know');
+    var againTag = document.getElementById('swipe-again');
+    var startX = 0, deltaX = 0, dragging = false, moved = false;
+    var THRESHOLD = 90;
+
+    function onDown(e){
+      dragging = true; moved = false;
+      startX = (e.touches ? e.touches[0].clientX : e.clientX);
+      card.classList.add('dragging');
+    }
+    function onMove(e){
+      if(!dragging) return;
+      var x = (e.touches ? e.touches[0].clientX : e.clientX);
+      deltaX = x - startX;
+      if(Math.abs(deltaX) > 6) moved = true;
+      var rot = deltaX / 14;
+      card.style.transform = 'translateX(' + deltaX + 'px) rotate(' + rot + 'deg)';
+      var pct = Math.min(Math.abs(deltaX) / THRESHOLD, 1);
+      if(deltaX > 0){ knowTag.style.opacity = pct; againTag.style.opacity = 0; }
+      else if(deltaX < 0){ againTag.style.opacity = pct; knowTag.style.opacity = 0; }
+    }
+    function onUp(){
+      if(!dragging) return;
+      dragging = false;
+      card.classList.remove('dragging');
+      if(!moved){ deltaX = 0; return; } // simple tap → laisse le onclick retourner la carte
+      if(Math.abs(deltaX) > THRESHOLD){
+        var goingRight = deltaX > 0;
+        card.classList.add('fly-out');
+        card.style.transform = 'translateX(' + (goingRight ? 600 : -600) + 'px) rotate(' + (goingRight ? 30 : -30) + 'deg)';
+        card.style.opacity = '0';
+        setTimeout(function(){ nextCard(goingRight); }, 260);
+        playTone('swipe');
+      } else {
+        card.classList.add('snap-back');
+        card.style.transform = '';
+        knowTag.style.opacity = 0; againTag.style.opacity = 0;
+      }
+      deltaX = 0;
+    }
+
+    card.addEventListener('pointerdown', onDown);
+    card.addEventListener('pointermove', onMove);
+    card.addEventListener('pointerup', onUp);
+    card.addEventListener('pointercancel', onUp);
+    card.addEventListener('pointerleave', function(){ if(dragging) onUp(); });
+    card.addEventListener('click', function(e){ if(!moved){ flipCard(); } moved = false; });
+  })();
+
+  document.querySelectorAll('#test-opts .lquiz-opt').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var ok = this.dataset.ok === 'true';
+      document.querySelectorAll('#test-opts .lquiz-opt').forEach(function(o){
+        if(o.dataset.ok === 'true') o.classList.add('correct');
+        else if(o === btn) o.classList.add('wrong');
+        o.disabled = true;
+      });
+      var fb = document.getElementById('test-fb');
+      fb.textContent = ok ? 'Exact ! +5 XP 🎉' : 'Pas tout à fait — la bonne réponse est en vert.';
+      fb.className = 'lquiz-fb ' + (ok ? 'ok' : 'ko');
+    });
+  });
+
+  function openSubject(key){
+    var d = subjectData[key];
+    var meta = (subjectsByLevel[currentLevel] || []).filter(function(s){ return s.k === key; })[0];
+    var label = d ? d.label : (meta ? meta.l : key);
+    document.getElementById('subj-title').textContent = label;
+    var wrap = document.getElementById('subj-chapters');
+    wrap.innerHTML = '';
+
+    if(!d){
+      wrap.innerHTML = '<div class="setup-banner">Le contenu détaillé de cette matière arrive bientôt — voici un aperçu de la structure prévue.</div>';
+      for(var i=1;i<=5;i++){
+        wrap.insertAdjacentHTML('beforeend', '<div class="chapter is-locked"><div class="cnum">'+i+'</div><div class="ctext"><b>Chapitre '+i+'</b><span>Bientôt disponible</span></div></div>');
+      }
+      showTab('subject');
+      return;
+    }
+
+    d.chapters.forEach(function(c, i){
+      var cls, num, sub, tag = '';
+      if(c.s === 'reinforce'){
+        cls = 'chapter reinforce'; num = '↻';
+        sub = 'On a remarqué un blocage récent'; tag = '<div class="chap-tag reinf">Ajouté pour toi</div>';
+      } else if(c.s === 'skip'){
+        cls = 'chapter skip'; num = '✓';
+        sub = 'Validé par un test rapide'; tag = '<div class="chap-tag skip">Débloqué en avance</div>';
+      } else {
+        cls = c.s === 'done' ? 'chapter done' : (c.s === 'current' ? 'chapter current' : 'chapter is-locked');
+        num = c.s === 'done' ? '✓' : (i+1);
+        sub = c.s === 'done' ? 'Terminé' : (c.s === 'current' ? '5 min · en cours' : 'À débloquer');
+      }
+      var clickable = (c.s === 'locked');
+      var onclick = clickable ? '' : "onclick=\"startLesson('"+key+"',"+(i+1)+")\"";
+      var dl = clickable ? '' : '<button class="dl-btn" onclick="event.stopPropagation(); toggleDownload(this)" title="Télécharger pour le hors-ligne">⬇</button>';
+      var mastery = (typeof c.m === 'number') ? '<span class="chap-mastery">'+c.m+'%</span>' : '';
+      wrap.insertAdjacentHTML('beforeend', '<div class="'+cls+'" '+onclick+'><div class="cnum">'+num+'</div><div class="ctext"><b>'+c.t+'</b><span>'+sub+'</span>'+tag+'</div>'+mastery+dl+'</div>');
+    });
+    enhanceClickableDivs(wrap);
+    showTab('subject');
+  }
+
+  function toggleDownload(btn){
+    var done = btn.classList.toggle('is-done');
+    btn.textContent = done ? '✓' : '⬇';
+    btn.title = done ? 'Disponible hors-ligne' : 'Télécharger pour le hors-ligne';
+  }
+
+  function toggleDarkMode(checkbox){
+    document.querySelector('.device').classList.toggle('dark', checkbox.checked);
+  }
+  function toggleDyslexiaMode(checkbox){
+    document.querySelector('.device').classList.toggle('dyslexia-mode', checkbox.checked);
+  }
+
+  function toggleFreeze(){
+    var chip = document.getElementById('freeze-chip');
+    var tip = document.getElementById('freeze-tip');
+    var armed = chip.classList.toggle('is-armed');
+    tip.textContent = armed ? 'Gel actif — ta série est protégée si tu rates demain.' : 'Active le gel pour protéger ta série si tu rates un jour.';
+  }
+
+  function setRevMode(mode){
+    document.getElementById('mode-cards').classList.toggle('is-on', mode==='cards');
+    document.getElementById('mode-test').classList.toggle('is-on', mode==='test');
+    document.getElementById('rev-cards-mode').style.display = mode==='cards' ? 'block' : 'none';
+    document.getElementById('rev-test-mode').style.display = mode==='test' ? 'block' : 'none';
+  }
+
+  var lessonStep = 0;
+  var lessonProgress = 0;
+  var currentLessonSubject = 'histoire';
+  var BRAISE_ICON_SMALL = '<svg viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="50" cy="58" rx="30" ry="27" fill="#FFC24B"/><ellipse cx="24" cy="66" rx="7" ry="10" fill="#FF6F59"/><ellipse cx="76" cy="66" rx="7" ry="10" fill="#FF6F59"/><ellipse cx="38" cy="88" rx="7" ry="9" fill="#E85644"/><ellipse cx="62" cy="88" rx="7" ry="9" fill="#E85644"/><path d="M42 22 C46 14 54 14 58 22 C54 26 46 26 42 22 Z" fill="#FFC24B"/><circle cx="40" cy="54" r="4.5" fill="#16213A"/><circle cx="60" cy="54" r="4.5" fill="#16213A"/><path d="M42 66 Q50 71 58 66" stroke="#16213A" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>';
+  function bumpLessonProgress(pct){
+    if(pct > lessonProgress){
+      lessonProgress = pct;
+      document.getElementById('lesson-progress-fill').style.width = pct + '%';
+    }
+    if(lessonProgress >= 100){
+      var au = document.getElementById('audio-complete-btn');
+      if(au) au.style.display = 'block';
+    }
+  }
+  var storySlides = {
+    histoire:[
+      {bg:'linear-gradient(160deg,#2F5FE3,#1E48C4)', emoji:'👀', text:"Tu savais que la Révolution française a commencé par une histoire de dettes ?"},
+      {bg:'linear-gradient(160deg,#FF6F59,#E85644)', emoji:'💸', text:"Le royaume était ruiné par des années de guerres coûteuses, dont celle de l'indépendance américaine."},
+      {bg:'linear-gradient(160deg,#FFC24B,#E8A23D)', emoji:'🏰', text:"Le 14 juillet 1789, la prise de la Bastille devient le symbole du soulèvement populaire."}
+    ],
+    maths:[
+      {bg:'linear-gradient(160deg,#2F5FE3,#1E48C4)', emoji:'📐', text:"Un architecte utilise de la géométrie littéralement tous les jours pour construire."},
+      {bg:'linear-gradient(160deg,#2FBE9F,#1F9C82)', emoji:'✂️', text:"Pour calculer une aire complexe, on la découpe en formes simples qu'on connaît déjà."},
+      {bg:'linear-gradient(160deg,#FFC24B,#E8A23D)', emoji:'🏗️', text:"Rectangles et triangles suffisent à reconstituer presque n'importe quelle forme."}
+    ],
+    svt:[
+      {bg:'linear-gradient(160deg,#2F5FE3,#1E48C4)', emoji:'🧬', text:"Chaque cellule de ton corps contient les mêmes instructions génétiques."},
+      {bg:'linear-gradient(160deg,#8B6BE0,#6B4FC7)', emoji:'🔬', text:"Un gamète (ovule ou spermatozoïde) ne contient que la moitié de ces instructions."},
+      {bg:'linear-gradient(160deg,#FF6F59,#E85644)', emoji:'👶', text:"Deux moitiés, une de chaque parent, forment ensemble un nouvel être complet."}
+    ],
+    francais:[
+      {bg:'linear-gradient(160deg,#8B6BE0,#6B4FC7)', emoji:'💬', text:"Convaincre, c'est utiliser des arguments logiques. Persuader, c'est jouer sur les émotions."},
+      {bg:'linear-gradient(160deg,#2F5FE3,#1E48C4)', emoji:'✍️', text:"Un bon texte argumentatif mélange souvent les deux techniques pour toucher son lecteur."},
+      {bg:'linear-gradient(160deg,#FFC24B,#E8A23D)', emoji:'🎯', text:"Repérer les connecteurs logiques (donc, cependant, en effet) aide à suivre le raisonnement."}
+    ],
+    anglais:[
+      {bg:'linear-gradient(160deg,#2F5FE3,#1E48C4)', emoji:'⏰', text:"The Present Perfect connects the past to the present — unlike the past simple."},
+      {bg:'linear-gradient(160deg,#2596A8,#1D7A88)', emoji:'🔧', text:"Have/has + past participle: I have finished, she has arrived."},
+      {bg:'linear-gradient(160deg,#FF6F59,#E85644)', emoji:'🔑', text:"We often use it with since, for, already, just, or never."}
+    ],
+    'physique-chimie':[
+      {bg:'linear-gradient(160deg,#2596A8,#1D7A88)', emoji:'⚛️', text:"Tout ce qui t'entoure est fait d'atomes, des briques minuscules invisibles à l'œil nu."},
+      {bg:'linear-gradient(160deg,#2F5FE3,#1E48C4)', emoji:'🔵', text:"Un atome a un noyau (protons + neutrons) entouré d'électrons qui tournent autour."},
+      {bg:'linear-gradient(160deg,#FFC24B,#E8A23D)', emoji:'🔗', text:"Les atomes s'associent entre eux pour former des molécules, comme H\u2082O pour l'eau."}
+    ]
+  };
+  var storyIndex = 0;
+
+  function renderStoryProgress(){
+    var list = storySlides[currentLessonSubject] || storySlides.histoire;
+    var row = document.getElementById('story-progress-row');
+    row.innerHTML = list.map(function(_, i){
+      return '<div class="story-seg' + (i < storyIndex ? ' done' : '') + '" id="story-seg-' + i + '"><span style="width:' + (i === storyIndex ? '100%' : (i < storyIndex ? '100%' : '0%')) + '"></span></div>';
+    }).join('');
+  }
+
+  function renderStorySlide(){
+    var list = storySlides[currentLessonSubject] || storySlides.histoire;
+    var stage = document.getElementById('story-stage');
+    var content = document.getElementById('story-slide-content');
+    var hint = document.getElementById('story-hint');
+
+    if(storyIndex >= list.length){
+      stage.style.background = 'linear-gradient(160deg,#13214f,#0c1638)';
+      content.innerHTML = '<div class="story-slide"><div class="story-emoji">✅</div><div class="story-text">Tu as vu l\'essentiel du chapitre.</div><button class="story-cta" onclick="event.stopPropagation(); bumpLessonProgress(60); startExercises();">Faire les exercices</button></div>';
+      hint.style.display = 'none';
+      renderStoryProgress();
+      document.querySelectorAll('.story-seg').forEach(function(s){ s.classList.add('done'); s.querySelector('span').style.width='100%'; });
+      return;
+    }
+    hint.style.display = 'block';
+    var s = list[storyIndex];
+    stage.style.background = s.bg;
+    content.innerHTML = '<div class="story-slide"><div class="story-emoji">'+s.emoji+'</div><div class="story-text">'+s.text+'</div></div>';
+    hint.textContent = storyIndex === 0 ? 'Touche à droite pour continuer →' : 'Touche à droite pour continuer →';
+    renderStoryProgress();
+    bumpLessonProgress(15 + storyIndex * 15);
+  }
+
+  function storyNext(){ storyIndex++; renderStorySlide(); playTone('tap'); }
+  function storyPrev(){ if(storyIndex > 0){ storyIndex--; renderStorySlide(); } }
+
+  function startLesson(subjectKey, chapterNum){
+    lessonStep = 0;
+    lessonProgress = 0;
+    storyIndex = 0;
+    document.querySelector('.lesson-modes').style.display = 'flex';
+    document.getElementById('quiz-stage').classList.remove('is-active');
+    var d = subjectData[subjectKey] || subjectData.histoire;
+    var content = lessonContent[subjectKey] || lessonContent.histoire;
+    var chapterTitle = (d.chapters[chapterNum-1] || {}).t || 'Leçon';
+    document.getElementById('lesson-title').textContent = chapterTitle;
+    document.getElementById('lesson-progress-fill').style.width = '0%';
+
+    document.querySelector('#panel-ecouter .audio-transcript').textContent = '« ' + content.audio + ' »';
+    document.getElementById('audio-time').textContent = '0:00 / 2:14 · Racontée par Braise';
+    document.getElementById('audio-play-btn').outerHTML = '<button class="audio-play" id="audio-play-btn" onclick="toggleAudio()" aria-label="Lire l&#39;audio">▶</button>';
+    audioPlaying = false; audioSeconds = 0; clearInterval(audioTimer);
+
+    currentLessonSubject = subjectKey;
+    aiHistory = [];
+    document.getElementById('ai-chat').innerHTML =
+      '<div class="peer-msg"><div class="peer-avatar" style="background:var(--sun);">🧠</div><div class="peer-bubble">Vas-y, demande-moi ce que tu veux sur "'+chapterTitle+'" 👀</div></div>';
+
+    renderStorySlide();
+    setLessonMode(preferredFormat);
+    showTab('lesson');
+  }
+
+  var exIndex = 0, exScore = 0, exStreak = 0;
+
+  function startExercises(){
+    exIndex = 0; exScore = 0; exStreak = 0;
+    // Bascule du mode "cours" vers le mode "questionnaire" plein écran
+    document.querySelector('.lesson-modes').style.display = 'none';
+    document.querySelectorAll('.lesson-panel').forEach(function(p){ p.classList.remove('is-on'); });
+    document.getElementById('quiz-stage').classList.add('is-active');
+
+    var list = exercisesData[currentLessonSubject] || exercisesData.histoire;
+    var dots = document.getElementById('quiz-dots');
+    dots.innerHTML = list.map(function(_, i){ return '<span id="qdot-'+i+'" class="'+(i===0?'now':'')+'"></span>'; }).join('');
+
+    renderExercise();
+  }
+
+  function renderExercise(){
+    var body = document.getElementById('quiz-body');
+    var list = exercisesData[currentLessonSubject] || exercisesData.histoire;
+    var ex = list[exIndex];
+    var typeLabel = ex.type === 'qcm' ? 'Choix multiple' : (ex.type === 'vf' ? 'Vrai ou faux' : 'Texte à trous');
+    var html = '<div class="quiz-card" id="quiz-card"><div class="quiz-tag2">'+typeLabel+' · Question '+(exIndex+1)+'/'+list.length+'</div><div class="quiz-q2">' + ex.q + '</div>';
+
+    if(ex.type === 'qcm'){
+      html += '<div id="ex-zone">';
+      ex.opts.forEach(function(o){
+        html += '<button class="quiz-opt2" data-ok="'+o.ok+'" onclick="answerQcm(this)">'+o.t+'</button>';
+      });
+      html += '</div>';
+    } else if(ex.type === 'vf'){
+      html += '<div class="quiz-vf2" id="ex-zone">' +
+        '<button data-ok="true" onclick="answerVf(this,'+ex.ok+')">✓ Vrai</button>' +
+        '<button data-ok="false" onclick="answerVf(this,'+ex.ok+')">✕ Faux</button></div>';
+    } else if(ex.type === 'trou'){
+      html += '<div id="ex-zone">' +
+        '<input type="text" class="ex-blank-input" id="ex-blank" placeholder="Ta réponse..." aria-label="Réponse">' +
+        '<button class="btn-next" style="width:100%;" onclick="answerBlank(\''+ex.answer+'\')">Valider</button></div>';
+    }
+    html += '<div class="quiz-fb2" id="lq-fb"></div>' +
+      '<div class="braise-explain" id="braise-explain">' + BRAISE_ICON_SMALL +
+      '<div><div class="bx-title">Braise t\'explique</div><div class="bx-text" id="braise-explain-text"></div></div></div></div>';
+    body.innerHTML = html;
+
+    if(ex.type === 'trou'){
+      document.getElementById('ex-blank').addEventListener('keydown', function(e){
+        if(e.key === 'Enter') answerBlank(ex.answer);
+      });
+    }
+  }
+
+  function updateStreakBadge(){
+    var el = document.getElementById('quiz-streak');
+    var n = document.getElementById('quiz-streak-n');
+    n.textContent = exStreak;
+    el.classList.toggle('show', exStreak >= 2);
+  }
+
+  function exFeedback(ok){
+    var fb = document.getElementById('lq-fb');
+    var card = document.getElementById('quiz-card');
+    var explainBox = document.getElementById('braise-explain');
+    document.getElementById('qdot-' + exIndex).classList.add('done');
+    document.getElementById('qdot-' + exIndex).classList.remove('now');
+    var list = exercisesData[currentLessonSubject] || exercisesData.histoire;
+    var ex = list[exIndex];
+    if(ok){
+      exScore++; exStreak++;
+      fb.innerHTML = '🎉 Exact !' + (exStreak >= 2 ? ' Tu enchaînes 🔥' : '');
+      fb.className = 'quiz-fb2 ok';
+      playTone('correct');
+      var pop = document.createElement('div');
+      pop.className = 'xp-pop';
+      pop.textContent = '+5 XP';
+      pop.style.left = '50%'; pop.style.top = '10px';
+      card.appendChild(pop);
+      setTimeout(function(){ pop.remove(); }, 900);
+    } else {
+      exStreak = 0;
+      playTone('incorrect');
+      document.getElementById('braise-explain-text').textContent = ex.explain || "On retiendra celle-là pour la prochaine fois.";
+      explainBox.classList.add('show');
+    }
+    updateStreakBadge();
+    setTimeout(nextExercise, ok ? 900 : 1900);
+  }
+  function answerQcm(btn){
+    document.querySelectorAll('#ex-zone .quiz-opt2').forEach(function(o){
+      if(o.dataset.ok === 'true') o.classList.add('correct');
+      else if(o === btn) o.classList.add('wrong');
+      o.disabled = true;
+    });
+    exFeedback(btn.dataset.ok === 'true');
+  }
+  function answerVf(btn, correctVal){
+    var chosen = btn.dataset.ok === 'true';
+    document.querySelectorAll('#ex-zone button').forEach(function(b){ b.disabled = true; });
+    if(chosen === correctVal) btn.classList.add('correct');
+    else btn.classList.add('wrong');
+    exFeedback(chosen === correctVal);
+  }
+  function answerBlank(answer){
+    var input = document.getElementById('ex-blank');
+    var val = input.value.trim().toLowerCase();
+    var ok = val === answer.toLowerCase();
+    input.classList.add(ok ? 'correct' : 'wrong');
+    input.disabled = true;
+    document.querySelector('#ex-zone button').disabled = true;
+    exFeedback(ok);
+  }
+  function nextExercise(){
+    exIndex++;
+    var list = exercisesData[currentLessonSubject] || exercisesData.histoire;
+    if(exIndex < list.length){
+      var nextDot = document.getElementById('qdot-' + exIndex);
+      if(nextDot) nextDot.classList.add('now');
+      renderExercise();
+      bumpLessonProgress(60 + Math.round((exIndex/list.length)*30));
+    } else {
+      var pct = Math.round((exScore/list.length)*100);
+      var stars = pct===100 ? '⭐⭐⭐' : pct>=60 ? '⭐⭐' : '⭐';
+      document.getElementById('quiz-body').innerHTML =
+        '<div class="quiz-card quiz-summary2">' +
+        '<div class="stars">'+stars+'</div>' +
+        '<div class="quiz-tag2">Questionnaire terminé</div>' +
+        '<div class="big-score">'+exScore+' / '+list.length+'</div>' +
+        '<p>'+(pct===100?'Sans faute, franchement propre 👏':pct>=60?'Solide, continue comme ça 💪':'Pas mal, tu vas retenir petit à petit 🌱')+'</p>' +
+        '<button class="btn-block blue" style="margin-top:16px;" onclick="finishLesson()">Terminer la leçon</button>' +
+        '</div>';
+      document.getElementById('quiz-streak').classList.remove('show');
+      bumpLessonProgress(100);
+    }
+  }
+  function finishLesson(){
+    trackFormatUsage();
+    playTone('complete');
+    var c = document.getElementById('confetti');
+    c.innerHTML = '';
+    var emojis = ['🎉','⭐','🔥','✨','🎊'];
+    for(var i=0;i<14;i++){
+      var s = document.createElement('span');
+      s.textContent = emojis[i % emojis.length];
+      s.style.left = (Math.random()*100) + '%';
+      s.style.animationDelay = (Math.random()*0.6) + 's';
+      c.appendChild(s);
+    }
+    showTab('complete');
+    var list = exercisesData[currentLessonSubject] || exercisesData.histoire;
+    var earnedXp = 10 + (exScore * 5);
+    var scoreEl = document.getElementById('complete-score');
+    var xpEl = document.getElementById('complete-xp');
+    var subEl = document.getElementById('complete-sub');
+    if(scoreEl) scoreEl.textContent = exScore + '/' + list.length;
+    if(xpEl) xpEl.textContent = '+' + earnedXp + ' XP';
+    if(subEl) subEl.textContent = 'Tu viens de finir "' + document.getElementById('lesson-title').textContent + '".';
+
+    document.getElementById('pill-xp').textContent = '⭐ 360';
+    document.getElementById('pill-xp').classList.add('bump');
+    setTimeout(function(){ document.getElementById('pill-xp').classList.remove('bump'); }, 300);
+    var fb = document.getElementById('feed-bar-fill'); if(fb) fb.style.width = '80%';
+    var fp = document.getElementById('feed-pct'); if(fp) fp.textContent = '80% — dernier chapitre à débloquer';
+    var ringPct = document.getElementById('ring-pct');
+    var ringCircle = document.getElementById('ring-circle');
+    if(ringPct){ ringPct.textContent = '78%'; }
+    if(ringCircle){ ringCircle.setAttribute('stroke-dashoffset', '94'); }
+    var pcTag = document.getElementById('pc-tag');
+    var pcTitle = document.getElementById('pc-title');
+    var pcDesc = document.getElementById('pc-desc');
+    var pcBtn = document.getElementById('pc-btn');
+    if(pcTag) pcTag.textContent = 'Reprendre · Histoire-Géo · 4 min';
+    if(pcTitle) pcTitle.textContent = "La fin de l'Ancien Régime";
+    if(pcDesc) pcDesc.textContent = 'Le dernier chapitre de ce module — pour tout comprendre de la chute de la monarchie.';
+    if(pcBtn){ pcBtn.setAttribute('onclick', "startLesson('histoire',5)"); pcBtn.textContent = 'Continuer le chapitre 4 →'; }
+    var hc = document.getElementById('hist-count'); if(hc) hc.textContent = '4/5';
+    var hb = document.getElementById('hist-bar'); if(hb) hb.style.width = '80%';
+    document.getElementById('day-today').classList.add('done');
+    document.getElementById('day-today').classList.remove('today');
+    document.getElementById('day-today').textContent = '✓';
+  }
+  var shareOrigin = 'home';
+  function openShareCard(origin){
+    shareOrigin = origin || 'complete';
+    var streakText = document.getElementById('pill-streak').textContent.trim();
+    document.getElementById('share-streak').textContent = streakText;
+    showTab('share');
+  }
+  function goBackFromShare(){ showTab(shareOrigin === 'profile' ? 'profile' : 'complete'); }
+
+  function returnHome(){ showTab('home'); }
+
+  function setLessonMode(mode){
+    document.querySelectorAll('.lesson-mode-btn').forEach(b => b.classList.remove('is-on'));
+    document.getElementById('lmode-' + mode).classList.add('is-on');
+    document.querySelectorAll('.lesson-panel').forEach(p => p.classList.remove('is-on'));
+    document.getElementById('panel-' + mode).classList.add('is-on');
+  }
+
+  var audioPlaying = false, audioSeconds = 0, audioTimer = null;
+  function toggleAudio(){
+    audioPlaying = !audioPlaying;
+    document.getElementById('audio-play-btn').textContent = audioPlaying ? '❚❚' : '▶';
+    document.getElementById('audio-wave').classList.toggle('is-playing', audioPlaying);
+    if(audioPlaying){
+      bumpLessonProgress(Math.max(lessonProgress, 10));
+      audioTimer = setInterval(function(){
+        audioSeconds++;
+        var m = Math.floor(audioSeconds/60), s = audioSeconds%60;
+        document.getElementById('audio-time').textContent = m+':' + (s<10?'0':'') + s + ' / 2:14 · Racontée par Braise';
+        bumpLessonProgress(Math.min(100, Math.round((audioSeconds/134)*100)));
+        if(audioSeconds >= 134){
+          toggleAudio();
+          document.getElementById('audio-play-btn').outerHTML = '<div style="font-family:\'Baloo 2\',sans-serif; font-weight:700; color:var(--mint-text); margin-bottom:14px;">✓ Écouté en entier</div><button class="btn-block blue" onclick="finishLesson()">Terminer la leçon</button>';
+        }
+      }, 1000);
+    } else {
+      clearInterval(audioTimer);
+    }
+  }
+
+  function escapeHtml(s){
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  var aiHistory = [];
+
+  async function sendPeerMsg(){
+    var input = document.getElementById('peer-input');
+    var text = input.value.trim();
+    if(!text) return;
+    var wrap = document.getElementById('ai-chat');
+    wrap.insertAdjacentHTML('beforeend',
+      '<div class="peer-msg me"><div class="peer-avatar" style="background:var(--sun-ink)">Toi</div><div class="peer-bubble">'+escapeHtml(text)+'</div></div>'
+    );
+    input.value = '';
+    wrap.scrollTop = wrap.scrollHeight;
+    bumpLessonProgress(Math.min(lessonProgress + 10, 90));
+
+    var typingId = 'typing-' + Date.now();
+    wrap.insertAdjacentHTML('beforeend',
+      '<div class="peer-msg" id="'+typingId+'"><div class="peer-avatar" style="background:var(--sun);">🧠</div><div class="peer-bubble"><span class="typing-dots"><span></span><span></span><span></span></span></div></div>'
+    );
+    wrap.scrollTop = wrap.scrollHeight;
+
+    var content = lessonContent[currentLessonSubject] || lessonContent.histoire;
+    var chapterTitle = document.getElementById('lesson-title').textContent;
+    var systemPrompt = "Tu es Braise, la mascotte-compagnon de l'application d'apprentissage SAPIE, faite pour des collégiens et lycéens français. Tu discutes comme le ferait un pote qui a bien compris le cours — jamais comme un manuel scolaire, jamais de listes à puces, pas de markdown. Ton : décontracté, chaleureux, encourageant, en français, tutoiement. Réponds en 2 à 4 phrases courtes maximum. Le chapitre étudié en ce moment est \""+chapterTitle+"\". Voici le contenu du cours pour t'aider à répondre avec justesse : "+content.audio;
+
+    aiHistory.push({role:"user", content: text});
+
+    try{
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 300,
+          system: systemPrompt,
+          messages: aiHistory
+        })
+      });
+      const data = await response.json();
+      var reply = (data.content || []).filter(function(b){ return b.type === 'text'; }).map(function(b){ return b.text; }).join('\n').trim();
+      if(!reply) reply = "Hmm, reformule un peu ta question, je n'ai pas capté 😅";
+      aiHistory.push({role:"assistant", content: reply});
+      var el = document.getElementById(typingId);
+      if(el) el.outerHTML = '<div class="peer-msg"><div class="peer-avatar" style="background:var(--sun);">🧠</div><div class="peer-bubble">'+escapeHtml(reply)+'</div></div>';
+    } catch(err){
+      var el2 = document.getElementById(typingId);
+      if(el2) el2.outerHTML = '<div class="peer-msg"><div class="peer-avatar" style="background:var(--sun);">🧠</div><div class="peer-bubble">Petit souci de connexion — réessaie dans un instant 🔌</div></div>';
+    }
+    wrap.scrollTop = wrap.scrollHeight;
+  }
+</script>
+
+</body>
+</html>
