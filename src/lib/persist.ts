@@ -6,6 +6,7 @@ const CARDS_KEY = 'sapie_card_reviews';
 type StoredProgress = {
   xp: number;
   streak: number;
+  bestCombo: number;
   freezes: number;
   freezeArmed: boolean;
   dailyGoalMet: boolean;
@@ -14,6 +15,8 @@ type StoredProgress = {
   soundOn: boolean;
   user: UserProfile;
   completedChapters: string[];
+  lastSubjectId: string | null;
+  lastChapterId: string | null;
   sessionDate: string;
   sessionCardsReviewed: number;
   sessionChaptersDone: number;
@@ -37,14 +40,17 @@ export async function loadProgress(): Promise<Partial<AppState> | null> {
     return {
       xp: p.xp,
       streak: p.streak,
+      bestCombo: p.bestCombo ?? 0,
       freezes: p.freezes,
       freezeArmed: p.freezeArmed,
       dailyGoalMet: p.dailyGoalMet,
       darkMode: p.darkMode,
       dyslexiaMode: p.dyslexiaMode,
       soundOn: p.soundOn,
-      user: p.user,
+      user: { ...p.user, personality: p.user?.personality ?? 'chill' },
       completedChapters: p.completedChapters ?? [],
+      lastSubjectId: p.lastSubjectId ?? null,
+      lastChapterId: p.lastChapterId ?? null,
       cardReviews,
       sessionDate: p.sessionDate ?? '',
       sessionCardsReviewed: p.sessionCardsReviewed ?? 0,
@@ -60,6 +66,7 @@ export async function saveProgress(state: AppState): Promise<void> {
     const row: StoredProgress = {
       xp: state.xp,
       streak: state.streak,
+      bestCombo: state.bestCombo,
       freezes: state.freezes,
       freezeArmed: state.freezeArmed,
       dailyGoalMet: state.dailyGoalMet,
@@ -68,6 +75,8 @@ export async function saveProgress(state: AppState): Promise<void> {
       soundOn: state.soundOn,
       user: state.user,
       completedChapters: state.completedChapters,
+      lastSubjectId: state.lastSubjectId,
+      lastChapterId: state.lastChapterId,
       sessionDate: state.sessionDate,
       sessionCardsReviewed: state.sessionCardsReviewed,
       sessionChaptersDone: state.sessionChaptersDone,

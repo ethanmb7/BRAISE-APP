@@ -1,4 +1,5 @@
 import type { ChatMessage } from '@/types';
+import { toneSystemPrompt, type VoiceCtx } from '@/lib/braiseVoice';
 
 const MISTRAL_API_KEY = import.meta.env.VITE_MISTRAL_API_KEY as string | undefined;
 const MISTRAL_MODEL = 'mistral-small-latest';
@@ -20,19 +21,24 @@ RÈGLES DE PERSONNALITÉ :
 export async function sendChatMessage(
   messages: ChatMessage[],
   _chapterId: string | null,
-  subject: string | null
+  subject: string | null,
+  voiceCtx?: VoiceCtx,
+  extraContext?: string
 ): Promise<{ text: string } | { error: string }> {
   if (!MISTRAL_API_KEY) {
-    return { error: 'Clé API manquante. Vérifie le fichier .env' };
+    return { error: 'Oups, il manque la clé API. Vérifie le fichier .env' };
   }
+
+  const toneLine = voiceCtx ? `\n\n${toneSystemPrompt(voiceCtx)}` : '';
+  const contextLine = extraContext ? `\n\n${extraContext}` : '';
 
   const apiMessages = [
     {
       role: 'system' as const,
-      content: `${SYSTEM_PROMPT}\n\nContexte : ${subject ? `Matière : ${subject}.` : ''} L'élève pose une question sur un cours ou un piège d'examen.`,
+      content: `${SYSTEM_PROMPT}\n\nContexte : ${subject ? `Matière : ${subject}.` : ''} L'élève pose une question sur un cours ou un piège d'examen.${toneLine}${contextLine}`,
     },
     ...messages.map((m) => ({
-      role: m.role,
+      role: m.role === 'model' ? ('assistant' as const) : m.role,
       content: m.text,
     })),
   ];
@@ -53,18 +59,18 @@ export async function sendChatMessage(
     });
 
     if (!res.ok) {
-      return { error: `Erreur API (${res.status})` };
+      return { error: `Oups, l'API a bugué (${res.status})` };
     }
 
     const data = await res.json();
     const text = data?.choices?.[0]?.message?.content;
 
     if (typeof text !== 'string') {
-      return { error: 'Réponse invalide de l\'API' };
+      return { error: 'Oups, réponse bizarre de l\'API' };
     }
 
     return { text: text.trim() };
   } catch {
-    return { error: 'Connexion impossible. Vérifie ton réseau.' };
+    return { error: 'Oups, connexion impossible. Check ton réseau.' };
   }
 }

@@ -5,7 +5,8 @@ import { sfx } from '@/lib/sound';
 import { TopBar } from '@/components/TopBar';
 import { BraiseMascot } from '@/components/BraiseMascot';
 import { sendChatMessage } from '@/lib/chat';
-import { SUBJECTS, STORIES, AUDIO_TRANSCRIPTS, PEER_CHAT_SEED } from '@/data';
+import { getAgeGroup, quizCorrect, quizWrong, lessonOpenerCheckIn } from '@/lib/braiseVoice';
+import { SUBJECTS, STORIES, AUDIO_TRANSCRIPTS, LESSON_INTRO } from '@/data';
 import type { QuizQuestion, ChatMessage } from '@/types';
 
 type Mode = 'vocal' | 'echanger';
@@ -36,32 +37,30 @@ export function LessonView() {
     <div>
       <TopBar title={chapter.title} onBack={goBack} />
       <div className="view is-active">
-        <div className="lesson-progress">
-          <span style={{ width: '35%' }} />
-        </div>
-
-        <div className="lesson-modes">
-          <button
-            className={`lesson-mode-btn ${mode === 'vocal' ? 'is-on' : ''}`}
-            onClick={() => {
-              sfx.tap(state.soundOn);
-              setMode('vocal');
-            }}
-          >
-            <Headphones size={13} />
-            Vocal Animé
-          </button>
-          <button
-            className={`lesson-mode-btn ${mode === 'echanger' ? 'is-on' : ''}`}
-            onClick={() => {
-              sfx.tap(state.soundOn);
-              setMode('echanger');
-            }}
-          >
-            <MessageCircle size={13} />
-            Échanger
-          </button>
-        </div>
+        {storyData && (
+          <div className="lesson-modes">
+            <button
+              className={`lesson-mode-btn ${mode === 'vocal' ? 'is-on' : ''}`}
+              onClick={() => {
+                sfx.tap(state.soundOn);
+                setMode('vocal');
+              }}
+            >
+              <Headphones size={13} />
+              Vocal Animé
+            </button>
+            <button
+              className={`lesson-mode-btn ${mode === 'echanger' ? 'is-on' : ''}`}
+              onClick={() => {
+                sfx.tap(state.soundOn);
+                setMode('echanger');
+              }}
+            >
+              <MessageCircle size={13} />
+              Échanger
+            </button>
+          </div>
+        )}
 
         {mode === 'vocal' && storyData && (
           <div className="lesson-panel is-on">
@@ -74,13 +73,14 @@ export function LessonView() {
           </div>
         )}
 
-        {mode === 'echanger' && (
+        {(mode === 'echanger' || !storyData) && (
           <div className="lesson-panel is-on">
             <ChatMode
               chapterId={chapter.id}
               subjectId={subject.id}
               soundOn={state.soundOn}
               bridgeMessage={state.chatBridgeMessage}
+              onComplete={handleComplete}
             />
           </div>
         )}
@@ -235,7 +235,7 @@ function VocalMode({
         </div>
       )}
 
-      <div className="story-stage" style={{ background: slides[idx].bg }}>
+      <div className="story-stage">
         <div className="story-progress-row">
           {slides.map((_, i) => (
             <div key={i} className={`story-seg ${i < idx ? 'done' : ''}`}>
@@ -266,7 +266,9 @@ function VocalMode({
           }}
         />
         <div className="story-slide" key={idx}>
-          <div className="story-emoji">{slides[idx].emoji}</div>
+          <div className="story-emoji-badge" style={{ background: slides[idx].bg }}>
+            <span className="story-emoji">{slides[idx].emoji}</span>
+          </div>
           <div className="story-text">{slides[idx].text}</div>
         </div>
         <div className="story-hint">
@@ -318,41 +320,61 @@ function ChatMode({
   subjectId,
   soundOn,
   bridgeMessage,
+  onComplete,
 }: {
   chapterId: string;
   subjectId: string;
   soundOn: boolean;
   bridgeMessage: string | null;
+  onComplete: () => void;
 }) {
-  const [messages, setMessages] = useState<Msg[]>(PEER_CHAT_SEED[chapterId] ?? []);
+  const { state } = useApp();
+  const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
+  const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState('');
   const [typing, setTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const bridgeHandled = useRef(false);
+  const openerStarted = useRef(false);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, typing]);
 
+  // Braise takes the lead: she narrates the chapter first instead of waiting for a question.
+  useEffect(() => {
+    if (openerStarted.current || bridgeMessage) return;
+    const intro = LESSON_INTRO[chapterId];
+    if (!intro) return;
+    openerStarted.current = true;
+
+    const lines = [intro.hook, intro.cheatCode, intro.piege, lessonOpenerCheckIn(voiceCtx)];
+    let cumulative = 300;
+    lines.forEach((line) => {
+      const typingTime = 500 + Math.min(line.length * 12, 1100);
+      setTimeout(() => setTyping(true), cumulative);
+      cumulative += typingTime;
+      setTimeout(() => {
+        setTyping(false);
+        setMessages((m) => [...m, { from: 'braise', text: line }]);
+      }, cumulative);
+      cumulative += 250;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chapterId, bridgeMessage]);
+
   // Handle quiz→chat bridge: auto-send the bridge message
   useEffect(() => {
     if (bridgeMessage && !bridgeHandled.current) {
       bridgeHandled.current = true;
+      openerStarted.current = true;
       setMessages((m) => [...m, { from: 'me', text: bridgeMessage }]);
       setInput('');
       setTyping(true);
       setError(null);
 
-      const apiMessages: ChatMessage[] = [
-        ...(PEER_CHAT_SEED[chapterId] ?? []).map((m) => ({
-          role: (m.from === 'me' ? 'user' : 'model') as 'user' | 'model',
-          text: m.text,
-        })),
-        { role: 'user' as const, text: bridgeMessage },
-      ];
-
-      sendChatMessage(apiMessages, chapterId, subjectId).then((res) => {
+      sendChatMessage([{ role: 'user' as const, text: bridgeMessage }], chapterId, subjectId, voiceCtx).then((res) => {
         setTyping(false);
         if ('text' in res) {
           sfx.correct(soundOn);
@@ -366,6 +388,7 @@ function ChatMode({
         }
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bridgeMessage, chapterId, subjectId, soundOn]);
 
   const send = async () => {
@@ -373,25 +396,17 @@ function ChatMode({
     if (!text || typing) return;
     sfx.tap(soundOn);
     setError(null);
-    setMessages((m) => [...m, { from: 'me', text }]);
+    const nextMessages: Msg[] = [...messages, { from: 'me', text }];
+    setMessages(nextMessages);
     setInput('');
     setTyping(true);
 
-    const apiMessages: ChatMessage[] = [
-      ...(PEER_CHAT_SEED[chapterId] ?? []).map((m) => ({
-        role: (m.from === 'me' ? 'user' : 'model') as 'user' | 'model',
-        text: m.text,
-      })),
-      ...messages
-        .filter((m) => !(PEER_CHAT_SEED[chapterId] ?? []).includes(m))
-        .map((m) => ({
-          role: (m.from === 'me' ? 'user' : 'model') as 'user' | 'model',
-          text: m.text,
-        })),
-      { role: 'user' as const, text },
-    ];
+    const apiMessages: ChatMessage[] = nextMessages.map((m) => ({
+      role: (m.from === 'me' ? 'user' : 'model') as 'user' | 'model',
+      text: m.text,
+    }));
 
-    const res = await sendChatMessage(apiMessages, chapterId, subjectId);
+    const res = await sendChatMessage(apiMessages, chapterId, subjectId, voiceCtx);
     setTyping(false);
     if ('text' in res) {
       sfx.correct(soundOn);
@@ -446,6 +461,19 @@ function ChatMode({
           </p>
         )}
       </div>
+      {messages.length > 0 && !typing && (
+        <button
+          className="explain-btn"
+          style={{ marginBottom: 10 }}
+          onClick={() => {
+            sfx.complete(soundOn);
+            onComplete();
+          }}
+        >
+          <Check size={15} />
+          Terminer le chapitre
+        </button>
+      )}
       <div className="peer-input-row">
         <input
           type="text"
@@ -483,6 +511,9 @@ function Quiz({
   const [showStreak, setShowStreak] = useState(false);
   const [done, setDone] = useState(false);
   const [xpPop, setXpPop] = useState<{ x: number; y: number } | null>(null);
+  const [feedbackLine, setFeedbackLine] = useState('');
+  const { state } = useApp();
+  const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
 
   const q = questions[idx];
 
@@ -492,6 +523,7 @@ function Quiz({
     const correct = optIdx === q.answer;
     if (correct) {
       sfx.correct(soundOn);
+      setFeedbackLine(quizCorrect(voiceCtx));
       setScore((s) => s + 1);
       setStreak((s) => {
         const ns = s + 1;
@@ -511,6 +543,7 @@ function Quiz({
       setTimeout(() => setXpPop(null), 900);
     } else {
       sfx.wrong(soundOn);
+      setFeedbackLine(quizWrong(voiceCtx));
       setStreak(0);
     }
     setTimeout(() => setShowExplain(true), 400);
@@ -523,6 +556,7 @@ function Quiz({
       setIdx((i) => i + 1);
       setSelected(null);
       setShowExplain(false);
+      setFeedbackLine('');
     }
   };
 
@@ -606,7 +640,7 @@ function Quiz({
       )}
 
       <div className={`quiz-fb2 ${selected === q.answer ? 'ok' : ''}`}>
-        {selected !== null && (selected === q.answer ? '✓ Correct !' : 'Pas de panique ! C\'est un piège classique.')}
+        {selected !== null && feedbackLine}
       </div>
 
       <div className={`braise-explain ${showExplain ? 'show' : ''}`}>

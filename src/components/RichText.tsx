@@ -1,0 +1,44 @@
+import { Fragment, useMemo } from 'react';
+import katex from 'katex';
+
+// Lightweight inline markup for flashcard content, authored directly in data.ts (never user
+// input, so injecting KaTeX's HTML output below is safe):
+//   $...$ / $$...$$  -> math, rendered via KaTeX instead of unicode-superscript approximations
+//   **...**          -> emphasis on a key term
+//   ==...==          -> neobrutalist highlight (pastel-yellow marker) under a key number/fact,
+//                       the thing a student's eye should land on first when scanning the card
+const TOKEN_SPLIT = /(\$\$[^$]+\$\$|\$[^$]+\$|\*\*[^*]+\*\*|==[^=]+==)/g;
+
+export function RichText({ text }: { text: string }) {
+  const parts = useMemo(() => text.split(TOKEN_SPLIT).filter((part) => part.length > 0), [text]);
+
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (part.startsWith('$$') && part.endsWith('$$')) {
+          return <MathSpan key={i} expr={part.slice(2, -2)} display />;
+        }
+        if (part.startsWith('$') && part.endsWith('$')) {
+          return <MathSpan key={i} expr={part.slice(1, -1)} />;
+        }
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return <strong key={i}>{part.slice(2, -2)}</strong>;
+        }
+        if (part.startsWith('==') && part.endsWith('==')) {
+          return (
+            <mark key={i} className="neo-highlight">
+              {part.slice(2, -2)}
+            </mark>
+          );
+        }
+        return <Fragment key={i}>{part}</Fragment>;
+      })}
+    </>
+  );
+}
+
+function MathSpan({ expr, display = false }: { expr: string; display?: boolean }) {
+  const html = katex.renderToString(expr, { throwOnError: false, displayMode: display });
+  // eslint-disable-next-line react/no-danger
+  return <span className="math-inline" dangerouslySetInnerHTML={{ __html: html }} />;
+}

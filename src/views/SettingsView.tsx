@@ -1,4 +1,4 @@
-import { Moon, Type, Volume2, Bell, Globe, Shield, HelpCircle, LogOut } from 'lucide-react';
+import { Moon, Type, Volume2, Globe } from 'lucide-react';
 import { useApp } from '@/store';
 import { sfx } from '@/lib/sound';
 import { TopBar } from '@/components/TopBar';
@@ -47,13 +47,6 @@ export function SettingsView() {
             </span>
             <Switch checked={state.soundOn} onChange={toggleSound} aria-label="Sons" />
           </div>
-          <div className="settings-row">
-            <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Bell size={18} color="var(--ink-soft)" />
-              Notifications
-            </span>
-            <Switch checked={true} onChange={() => sfx.tap(state.soundOn)} aria-label="Notifications" />
-          </div>
         </div>
 
         {/* Compte */}
@@ -86,27 +79,6 @@ export function SettingsView() {
               ))}
             </select>
           </div>
-          <button className="settings-row" style={{ width: '100%', textAlign: 'left', color: 'var(--ink)' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Shield size={18} color="var(--ink-soft)" />
-              Confidentialité
-            </span>
-          </button>
-          <button className="settings-row" style={{ width: '100%', textAlign: 'left', color: 'var(--ink)' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <HelpCircle size={18} color="var(--ink-soft)" />
-              Aide & support
-            </span>
-          </button>
-          <button
-            className="settings-row"
-            style={{ width: '100%', textAlign: 'left', color: 'var(--coral-2)' }}
-          >
-            <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <LogOut size={18} color="var(--coral-2)" />
-              Se déconnecter
-            </span>
-          </button>
         </div>
 
         <p style={{ textAlign: 'center', color: 'var(--ink-soft)', fontSize: '0.72rem', marginTop: 20 }}>

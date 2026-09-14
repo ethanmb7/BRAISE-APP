@@ -3,9 +3,8 @@ import { TabBar } from '@/components/TabBar';
 import { BraiseMascot } from '@/components/BraiseMascot';
 import { OnboardingView } from '@/views/OnboardingView';
 import { HomeView } from '@/views/HomeView';
-import { MatieresView } from '@/views/MatieresView';
 import { RevisionsView } from '@/views/RevisionsView';
-import { ProgresView } from '@/views/ProgresView';
+import { ProfilAuraView } from '@/views/ProfilAuraView';
 import { SubjectView } from '@/views/SubjectView';
 import { LessonView } from '@/views/LessonView';
 import { CompleteView } from '@/views/CompleteView';
@@ -15,7 +14,7 @@ import { SettingsView } from '@/views/SettingsView';
 function Screen() {
   const { state, setTab, loaded } = useApp();
 
-  const showTabBar = ['home', 'matieres', 'revisions', 'progres', 'profile'].includes(state.view);
+  const showTabBar = ['home', 'revisions', 'progres', 'profile'].includes(state.view);
 
   if (!loaded) {
     return (
@@ -33,9 +32,8 @@ function Screen() {
       <div className="app-content">
         {state.view === 'onboarding' && <OnboardingView />}
         {state.view === 'home' && <HomeView />}
-        {state.view === 'matieres' && <MatieresView />}
         {state.view === 'revisions' && <RevisionsView />}
-        {state.view === 'progres' && <ProgresView />}
+        {state.view === 'progres' && <ProfilAuraView />}
         {state.view === 'subject' && <SubjectView />}
         {state.view === 'lesson' && <LessonView />}
         {state.view === 'complete' && <CompleteView />}

@@ -3,12 +3,21 @@ import { Share2, Home } from 'lucide-react';
 import { useApp } from '@/store';
 import { sfx } from '@/lib/sound';
 import { BraiseMascot } from '@/components/BraiseMascot';
+import { getAgeGroup, lessonComplete } from '@/lib/braiseVoice';
+import { SUBJECTS } from '@/data';
 
 const CONFETTI = ['🎉', '⭐', '🔥', '✨', '🎊', '⭐', '🎉', '✨'];
 
 export function CompleteView() {
   const { state, setView } = useApp();
   const [showShare, setShowShare] = useState(false);
+  const chapterTitle =
+    SUBJECTS.find((s) => s.id === state.currentSubjectId)?.chapters.find((c) => c.id === state.currentChapterId)
+      ?.title ?? 'cette leçon';
+  const completeLine = lessonComplete(
+    { personality: state.user.personality, age: getAgeGroup(state.user.level) },
+    chapterTitle
+  );
 
   if (showShare) {
     return (
@@ -70,7 +79,7 @@ export function CompleteView() {
           <BraiseMascot size={50} mood="proud" />
         </div>
         <h2>Leçon terminée !</h2>
-        <p>Tu gères, {state.user.name} ! Braise est fier de toi.</p>
+        <p>{completeLine}</p>
         <div className="complete-xp">+50 XP</div>
         <div className="complete-stats">
           <div className="complete-stat">

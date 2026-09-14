@@ -39,6 +39,7 @@ export function OnboardingView() {
       goal,
       subjects,
       avatar,
+      personality: state.user.personality,
     });
     setView('home');
   };

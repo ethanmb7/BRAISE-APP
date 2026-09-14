@@ -1,7 +1,6 @@
 export type ViewId =
   | 'onboarding'
   | 'home'
-  | 'matieres'
   | 'revisions'
   | 'progres'
   | 'subject'
@@ -11,7 +10,7 @@ export type ViewId =
   | 'profile'
   | 'settings';
 
-export type TabId = 'home' | 'matieres' | 'revisions' | 'progres' | 'profile';
+export type TabId = 'home' | 'revisions' | 'progres' | 'profile';
 
 export type Level = {
   id: string;
@@ -45,6 +44,12 @@ export type StorySlide = {
   duration: number;
 };
 
+export type LessonIntro = {
+  hook: string;
+  cheatCode: string;
+  piege: string;
+};
+
 export type QuizQuestion = {
   type: 'mcq' | 'vf';
   q: string;
@@ -57,6 +62,7 @@ export type Flashcard = {
   id: string;
   q: string;
   a: string;
+  wrongA: string;
   subject: string;
   topic: string;
   level: 'easy' | 'medium' | 'hard';
@@ -67,7 +73,6 @@ export type Badge = {
   emoji: string;
   name: string;
   cond: string;
-  unlocked: boolean;
 };
 
 export type ChatMessage = { role: 'user' | 'model'; text: string };
@@ -82,6 +87,10 @@ export type CardReview = {
   lastConfidence: Confidence;
 };
 
+export type Personality = 'chill' | 'savage';
+
+export type AgeGroup = 'college' | 'lycee';
+
 export type UserProfile = {
   name: string;
   level: string;
@@ -89,6 +98,7 @@ export type UserProfile = {
   goal: string;
   subjects: string[];
   avatar: string;
+  personality: Personality;
 };
 
 export type AppState = {
@@ -97,6 +107,7 @@ export type AppState = {
   user: UserProfile;
   streak: number;
   xp: number;
+  bestCombo: number;
   freezes: number;
   freezeArmed: boolean;
   dailyGoalMet: boolean;
@@ -105,6 +116,8 @@ export type AppState = {
   soundOn: boolean;
   currentSubjectId: string | null;
   currentChapterId: string | null;
+  lastSubjectId: string | null;
+  lastChapterId: string | null;
   currentLessonMode: 'vocal' | 'echanger';
   completedChapters: string[];
   chatBridgeMessage: string | null;

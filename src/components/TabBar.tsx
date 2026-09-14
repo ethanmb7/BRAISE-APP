@@ -1,4 +1,4 @@
-import { Home, BookOpen, Layers, TrendingUp, User } from 'lucide-react';
+import { Home, Layers, TrendingUp, User } from 'lucide-react';
 import type { TabId } from '@/types';
 
 type Props = {
@@ -8,9 +8,8 @@ type Props = {
 
 const TABS: { id: TabId; label: string; icon: typeof Home }[] = [
   { id: 'home', label: 'Accueil', icon: Home },
-  { id: 'matieres', label: 'Matières', icon: BookOpen },
   { id: 'revisions', label: 'Réviser', icon: Layers },
-  { id: 'progres', label: 'Progrès', icon: TrendingUp },
+  { id: 'progres', label: 'Ton Aura', icon: TrendingUp },
   { id: 'profile', label: 'Profil', icon: User },
 ];
 

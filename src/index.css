@@ -3,22 +3,38 @@
 @tailwind utilities;
 
 :root {
-  --blue: #2f5fe3;
-  --blue-2: #1e48c4;
-  --blue-ink: #13214f;
-  --blue-pale: #eaf1ff;
-  --paper: #ffffff;
-  --sun: #ffc24b;
-  --sun-ink: #5c3a00;
-  --coral: #ff6f59;
-  --coral-2: #c23f2e;
-  --mint: #2fbe9f;
-  --mint-text: #146e5a;
-  --violet: #8b6be0;
+  /* Signature — the one true action colour. Every major CTA in the app ("Continuer",
+     "Partager", "Valider", "Terminer") uses --neo-orange, full stop. Nothing else claims it. */
+  --neo-orange: #ff4500;
+  --neo-ink: #151821;
+  --neo-blue: #1e3a8a;
+
+  /* Canvas & surfaces — shared by every view (Accueil, Quiz, Aura). --bg is the page canvas,
+     --paper is any card/panel sitting on it; both are neutral off-whites by design (paper
+     warmer, bg very slightly cooler) so cards read as a distinct surface without a colour
+     shift. No view should introduce its own flat-colour canvas — see .story-stage, whose
+     theme colour is now confined to a badge instead of the whole card. */
+  --bg: #f8fafc;
+  --paper: #faf8f3;
   --ink: #16213a;
   --ink-soft: rgba(22, 33, 58, 0.72);
   --line: rgba(22, 33, 58, 0.1);
-  --bg: #eaf1ff;
+
+  /* Accent palette — reserved for icons, tags, status colours and secondary UI (subject
+     colours, correct/wrong feedback, badges). Never used for a primary CTA background. */
+  --blue: #3b82f6;
+  --blue-2: #2563eb;
+  --blue-ink: #1e3a8a;
+  --blue-pale: #eaf1ff;
+  --orange: #f97316;
+  --orange-ink: #7c2d12;
+  --sun: #f59e0b;
+  --sun-ink: #78350f;
+  --coral: #ff6f59;
+  --coral-2: #c23f2e;
+  --mint: #10b981;
+  --mint-text: #047857;
+  --violet: #8b5cf6;
 }
 
 .dark {
@@ -68,10 +84,23 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: 'IBM Plex Sans', sans-serif;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   display: flex;
   justify-content: center;
+  /* 100vh on mobile Safari/Chrome includes the address-bar strip, which either clips content
+     or leaves a jump when the bar shows/hides. 100dvh tracks the real visible viewport; the
+     vh line stays first as a fallback for browsers that don't support dvh. */
   min-height: 100vh;
+  min-height: 100dvh;
+}
+/* #root is a flex item of body with no width of its own, so its size defaults to a
+   content-based shrink-to-fit — normally harmless, but any descendant allowed to reflow
+   very narrow (e.g. overflow-wrap: break-word on long text) removes the "longest word"
+   floor that shrink-to-fit relies on, and the whole app can collapse to a sliver. Giving
+   it an explicit width makes its size depend on the flex container, never on content. */
+#root {
+  width: 100%;
 }
 
 h1,
@@ -111,8 +140,9 @@ select {
   width: 100%;
   max-width: 428px;
   min-height: 100vh;
+  min-height: 100dvh;
   margin: 0 auto;
-  background: var(--blue-pale);
+  background: var(--bg);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -121,8 +151,11 @@ select {
 @media (min-width: 429px) {
   .app-shell {
     min-height: 100vh;
+    min-height: 100dvh;
     height: 100vh;
+    height: 100dvh;
     max-height: 100vh;
+    max-height: 100dvh;
     border-radius: 0;
     box-shadow: 0 0 60px -20px rgba(19, 33, 79, 0.3);
   }
@@ -151,7 +184,7 @@ select {
   padding: 16px 20px 14px;
   position: sticky;
   top: 0;
-  background: var(--blue-pale);
+  background: var(--bg);
   z-index: 10;
 }
 .topbar h1 {
@@ -173,31 +206,35 @@ select {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 10px 8px calc(10px + env(safe-area-inset-bottom, 0px));
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid var(--line);
+  padding: 9px 4px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: var(--paper);
+  border-top: 2.5px solid var(--neo-ink);
 }
 .dark .tabbar {
-  background: rgba(26, 36, 68, 0.82);
+  background: var(--paper);
+  border-top-color: rgba(234, 241, 255, 0.16);
 }
 .tab-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  font-size: 0.64rem;
+  font-size: 0.56rem;
+  line-height: 1.15;
   color: var(--ink-soft);
-  font-weight: 500;
-  padding: 4px 10px;
+  font-weight: 700;
+  padding: 4px 6px;
+  max-width: 76px;
+  text-align: center;
   transition: color 0.2s ease, transform 0.15s ease;
 }
 .tab-btn:active {
   transform: scale(0.92);
 }
 .tab-btn.is-active {
-  color: var(--blue);
+  /* --ink, not --neo-blue (fixed) — the tabbar's own background is --paper, which flips in
+     dark mode; a fixed dark navy on a fixed-looking dark bg drops to ~1.5:1 contrast. */
+  color: var(--ink);
 }
 .tab-btn.is-active svg {
   transform: scale(1.1);
@@ -280,9 +317,18 @@ select {
 .btn-block:active {
   transform: scale(0.97);
 }
+/* The app's other primary CTA class (Quiz "Continuer"/"Question suivante", checkpoint
+   "Continuer", Onboarding/CompleteView "Suivant"/"Terminer") — same signature orange and same
+   hard-shadow physical press as every other major action button in the app. */
 .btn-block.blue {
-  background: var(--blue);
-  color: var(--paper);
+  background: var(--neo-orange);
+  color: #fff;
+  border: 2.5px solid #000;
+  box-shadow: 3px 3px 0 #000;
+}
+.btn-block.blue:active {
+  box-shadow: 0 0 0 #000;
+  transform: translateY(3px);
 }
 .btn-block:disabled {
   opacity: 0.4;
@@ -449,994 +495,1502 @@ select {
   color: var(--blue-2);
 }
 
-/* ===== Home ===== */
-.braise-hero {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-.braise-hero-mascot {
-  flex-shrink: 0;
-  width: 56px;
-  height: 56px;
-}
-.braise-hero-bubble {
-  flex: 1;
+/* ===== Home — Neobrutalist Hype (palette officielle 60/30/10) ===== */
+.setup-banner {
   background: var(--paper);
-  border-radius: 16px;
-  padding: 12px 14px;
-  position: relative;
-  box-shadow: 0 4px 14px -8px rgba(22, 33, 58, 0.18);
-}
-.braise-hero-bubble::before {
-  content: '';
-  position: absolute;
-  left: -7px;
-  top: 18px;
-  width: 14px;
-  height: 14px;
-  background: var(--paper);
-  border-radius: 2px;
-  transform: rotate(45deg);
-}
-.braise-hero-bubble p {
-  font-size: 0.84rem;
-  line-height: 1.45;
+  border: 2px solid var(--neo-ink);
   color: var(--ink);
-  margin: 0;
-  position: relative;
-  z-index: 1;
-}
-.braise-hero .avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--paper);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.3rem;
-  transition: transform 0.15s ease;
-}
-.avatar:active {
-  transform: scale(0.92);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 10px 14px;
+  border-radius: 12px;
+  margin-bottom: 14px;
 }
 
-.ring-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 26px;
-}
-.ring-svg {
-  width: 168px;
-  height: 168px;
-}
-.ring-center {
-  position: relative;
-  margin-bottom: 2px;
-}
-.ring-label {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-.ring-label b {
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 1.7rem;
-  color: var(--ink);
-}
-.ring-label span {
-  font-size: 0.68rem;
-  color: var(--ink-soft);
-  text-align: center;
-  max-width: 80px;
-  line-height: 1.2;
-}
-.ring-chips {
-  display: flex;
-  gap: 10px;
-  margin-top: 14px;
-}
-.ring-chip {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: var(--paper);
-  border-radius: 999px;
-  padding: 6px 12px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.74rem;
-  font-weight: 600;
-  box-shadow: 0 3px 10px -6px rgba(22, 33, 58, 0.2);
-}
-.ring-chip.c-streak {
-  color: var(--coral-2);
-}
-.ring-chip.c-xp {
-  color: var(--blue-2);
-}
-.ring-chip.bump {
-  animation: bumpPop 0.4s ease;
-}
+/* Home is now built with Tailwind utility classes (src/components/HeaderHUD.tsx,
+   HeroLessonCard.tsx, PriorityExams.tsx, DecksGrid.tsx) instead of hand-written classes here —
+   these three small helpers bridge things Tailwind's core doesn't ship (a reusable keyframe,
+   cross-browser scrollbar hiding) without duplicating them. */
 @keyframes bumpPop {
   0% { transform: scale(1); }
   50% { transform: scale(1.25); }
   100% { transform: scale(1); }
 }
-.freeze-chip {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  background: var(--paper);
-  border-radius: 999px;
-  padding: 6px 12px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: var(--blue-2);
-  border: 1px solid transparent;
-  transition: background 0.2s ease, border-color 0.2s ease;
+.tw-bump {
+  animation: bumpPop 0.4s ease;
 }
-.freeze-chip.is-armed {
-  background: rgba(47, 95, 227, 0.1);
-  border-color: var(--blue);
+@keyframes h-float {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-6px) rotate(3deg); }
 }
-
-.primary-cta {
-  background: linear-gradient(120deg, var(--blue), var(--blue-2));
-  color: var(--paper);
-  border-radius: 22px;
-  padding: 22px;
-  margin-bottom: 22px;
-  box-shadow: 0 16px 32px -18px rgba(47, 95, 227, 0.55);
-  transition: transform 0.15s ease;
+.tw-float {
+  animation: h-float 3s ease-in-out infinite;
 }
-.primary-cta:active {
-  transform: scale(0.98);
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-.primary-cta .pc-tag {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  opacity: 0.85;
-}
-.primary-cta h2 {
-  font-size: 1.25rem;
-  margin: 8px 0 4px;
-}
-.primary-cta p {
-  font-size: 0.82rem;
-  opacity: 0.85;
-  margin: 0 0 16px;
-  line-height: 1.4;
-}
-.primary-cta button {
-  background: var(--sun);
-  color: var(--sun-ink);
-  border-radius: 999px;
-  padding: 13px;
-  font-weight: 700;
-  font-size: 0.9rem;
-  width: 100%;
-  transition: transform 0.15s ease;
-}
-.primary-cta button:active {
-  transform: scale(0.97);
-}
-
-.quick-row {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  padding-bottom: 6px;
-  margin: -2px -2px 22px;
-  -webkit-overflow-scrolling: touch;
-}
-.quick-row::-webkit-scrollbar {
+.no-scrollbar::-webkit-scrollbar {
   display: none;
 }
-.quick-chip {
-  flex-shrink: 0;
-  background: var(--paper);
-  border-radius: 14px;
-  padding: 12px 14px;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  min-width: 150px;
-  transition: transform 0.15s ease;
-}
-.quick-chip:active {
-  transform: scale(0.96);
-}
-.quick-chip .qc-ic {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.quick-chip .qc-tag {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.6rem;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-}
-.quick-chip .qc-title {
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 0.8rem;
-}
 
-.nudge {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(255, 111, 89, 0.1);
-  border: 1px solid rgba(255, 111, 89, 0.25);
-  border-radius: 16px;
-  padding: 13px 15px;
+/* ===== Ton Aura (Profil) — néo-brutaliste strict ===== */
+.aura-view {
+  padding-bottom: 40px;
 }
-.nudge svg {
-  width: 30px;
-  height: 30px;
-  flex-shrink: 0;
-}
-.nudge b {
-  display: block;
+.aura-view-title {
   font-family: 'Baloo 2', sans-serif;
-  font-size: 0.85rem;
-}
-.nudge span {
-  font-size: 0.76rem;
-  color: var(--ink-soft);
-}
-.nudge button {
-  background: var(--paper);
-  color: var(--coral-2);
-  border-radius: 999px;
-  padding: 8px 13px;
-  font-size: 0.76rem;
-  font-weight: 700;
-  flex-shrink: 0;
-  transition: transform 0.15s ease;
-}
-.nudge button:active {
-  transform: scale(0.94);
-}
-
-/* ===== Matières ===== */
-.curriculum-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: var(--paper);
-  border-radius: 999px;
-  padding: 5px 11px;
-  font-size: 0.72rem;
-  color: var(--ink-soft);
-  margin-bottom: 12px;
-  cursor: pointer;
-}
-.curriculum-tag b {
+  font-size: 1.4rem;
+  font-weight: 800;
+  /* --ink (theme-aware), not --neo-ink (fixed near-black) — this text sits directly on the
+     page background, which flips in dark mode; --neo-ink wouldn't and would go near-invisible. */
   color: var(--ink);
-  font-weight: 600;
+  margin: 4px 0 16px;
 }
-.search-bar {
+.aura-offline-banner {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--paper);
-  border-radius: 14px;
-  padding: 11px 14px;
-  margin-bottom: 16px;
-}
-.search-bar input {
-  border: none;
-  background: transparent;
-  font-size: 0.86rem;
-  flex: 1;
-  color: var(--ink);
-}
-.search-bar input:focus {
-  outline: none;
-}
-.subject-card {
-  background: var(--paper);
-  border-radius: 16px;
-  padding: 14px 15px;
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  cursor: pointer;
-  transition: transform 0.15s ease;
-}
-.subject-card:active {
-  transform: scale(0.98);
-}
-.mini-ring {
-  width: 46px;
-  height: 46px;
-  flex-shrink: 0;
-  position: relative;
-}
-.mini-ring svg {
-  width: 100%;
-  height: 100%;
-}
-.mini-ring-pct {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.6rem;
-  font-weight: 700;
-  color: var(--ink);
-}
-.subject-body {
-  flex: 1;
-  min-width: 0;
-}
-.subject-body h4 {
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 0.92rem;
-  margin: 0 0 3px;
-}
-.subject-body .next-up {
-  font-size: 0.72rem;
-  color: var(--ink-soft);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.subject-chevron {
-  color: var(--ink-soft);
-  flex-shrink: 0;
-}
-.subjects {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-/* ===== Matières vibrant cards ===== */
-.matieres-view .curriculum-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 7px 14px;
-  font-size: 0.82rem;
-  color: var(--ink-soft);
-  margin-bottom: 14px;
-  cursor: pointer;
-}
-.matieres-view .curriculum-tag b {
-  color: var(--ink);
-  font-weight: 700;
-}
-.matieres-view .search-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--paper);
-  border-radius: 14px;
+  background: #fff3d6;
+  border: 2px solid #000;
+  border-radius: 12px;
   padding: 10px 14px;
   margin-bottom: 14px;
-}
-.matieres-view .search-bar input {
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 0.88rem;
-  width: 100%;
-  font-family: inherit;
-  color: var(--ink);
-}
-.vibe-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 18px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 2px;
-}
-.vibe-row::-webkit-scrollbar { display: none; }
-.vibe-chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: var(--paper);
-  font-size: 0.78rem;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-weight: 600;
-  color: var(--ink-soft);
-  white-space: nowrap;
-  border: 2px solid transparent;
-  transition: all 0.15s;
-  cursor: pointer;
-}
-.vibe-chip.is-active {
-  background: var(--blue-pale);
-  color: var(--blue);
-  border-color: var(--blue);
-}
-.subject-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.vibe-card {
-  position: relative;
-  background: var(--paper);
-  border-radius: 18px;
-  padding: 16px;
-  text-align: left;
-  border: none;
-  cursor: pointer;
-  overflow: hidden;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  box-shadow: 0 4px 14px -8px rgba(22, 33, 58, 0.18);
-}
-.vibe-card:active {
-  transform: scale(0.98);
-}
-.vibe-card::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 5px;
-  background: var(--card-color);
-  border-radius: 18px 0 0 18px;
-}
-.vibe-card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-.vibe-card-emoji {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.6rem;
-  background: color-mix(in srgb, var(--card-color) 12%, transparent);
-}
-.mini-ring {
-  position: relative;
-  width: 40px;
-  height: 40px;
-}
-.mini-ring svg {
-  width: 100%;
-  height: 100%;
-}
-.mini-ring-pct {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.58rem;
-  font-weight: 700;
-  color: var(--ink);
-}
-.vibe-card h4 {
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--ink);
-  margin-bottom: 6px;
-}
-.vibe-card-chapter {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-.vibe-chapter-title {
-  font-size: 0.78rem;
-  color: var(--ink-soft);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.vibe-chapter-time {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--card-color);
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.vibe-card-arrow {
-  position: absolute;
-  right: 14px;
-  bottom: 14px;
-  color: var(--ink-soft);
-  opacity: 0.5;
+  font-size: 0.76rem;
+  color: var(--neo-ink);
 }
 
-/* ===== Progrès — Aura & motivation ===== */
-.aura-card {
-  position: relative;
-  border-radius: 20px;
-  padding: 18px 20px;
-  margin-bottom: 14px;
-  background: linear-gradient(135deg, #2F5FE3 0%, #5B8DEF 100%);
-  overflow: hidden;
-  box-shadow: 0 8px 24px -10px rgba(47, 95, 227, 0.5);
+/* --- Loading skeleton — every block reuses the real component's own card class (same
+   border/shadow/padding), so swapping skeleton -> real content shifts zero pixels. --- */
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }
-.aura-glow {
-  position: absolute;
-  top: -40px; right: -30px;
-  width: 120px; height: 120px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 194, 75, 0.35) 0%, transparent 70%);
-  pointer-events: none;
+.skeleton-block {
+  flex-shrink: 0;
+  background: rgba(21, 24, 33, 0.12);
+  animation: skeletonPulse 1.3s ease-in-out infinite;
 }
-.aura-content {
-  position: relative;
+.skeleton-row {
   display: flex;
   align-items: center;
-  gap: 14px;
+  justify-content: space-between;
+  gap: 10px;
 }
-.aura-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.2);
+
+/* --- AuraHeroScene — a double-ring medallion (black structural border + rank-tinted inner
+   ring) framing the mascot, with two corner badges: streak top-left (emotional/urgency) and
+   rank bottom-right (status). Pure identity, zero progression numbers — the ring is always
+   drawn at 100% of its own colour, never a fractional arc, so it reads as a solid badge rather
+   than a bar that looks unfinished early in a rank. --- */
+.aura-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 0 4px;
+  margin-bottom: 8px;
+}
+.aura-ring-frame {
+  position: relative;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #000;
+  box-shadow: 6px 6px 0 #000;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #FFC24B;
-  flex-shrink: 0;
 }
-.aura-text { flex: 1; }
-.aura-label {
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.75);
-  font-weight: 600;
+.aura-ring-inner {
+  width: calc(100% - 22px);
+  height: calc(100% - 22px);
+  border-radius: 50%;
+  /* border-color set inline per rank — the one place rank identity shows as pure colour. */
+  border: 10px solid var(--rank-accent, #ffd166);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.aura-value {
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #fff;
-  line-height: 1.1;
+.aura-hero-avatar {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.aura-streak {
+/* Streak — the emotional/urgency signal — pinned top-left, mirroring the rank medal at
+   bottom-right. Two corner badges is the entire "micro-information" budget around the Hero:
+   anything else would blunt the sub-0.5s read. */
+.aura-streak-badge {
+  position: absolute;
+  top: -8px;
+  left: -10px;
   display: flex;
   align-items: center;
   gap: 4px;
-  background: rgba(255, 255, 255, 0.18);
+  background: #fff;
+  border: 2.5px solid #000;
   border-radius: 999px;
-  padding: 6px 12px;
-  color: #fff;
+  padding: 6px 10px 6px 8px;
+  box-shadow: 3px 3px 0 #000;
+}
+.aura-streak-badge.is-danger {
+  background: #ffd7d2;
+}
+.aura-streak-flame {
+  font-size: 1rem;
+  line-height: 1;
+}
+.aura-streak-count {
   font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
+  line-height: 1;
+  /* --neo-ink (fixed), not --ink (theme-aware) — this badge's own background is a hardcoded
+     #fff that never flips in dark mode, so its text can't flip either or it goes
+     near-invisible against its own white pill. */
+  color: var(--neo-ink);
 }
-.aura-streak svg { color: #FFC24B; }
-
-.freeze-row {
+.aura-streak-pips {
+  display: flex;
+  gap: 2px;
+  margin-left: 1px;
+}
+.aura-streak-pip {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(21, 24, 33, 0.22);
+}
+.aura-streak-pip.is-filled {
+  background: var(--blue, #3b82f6);
+}
+/* The rank badge, pinned to the ring's own edge like a season-pass medallion. */
+.aura-hero-medal {
+  position: absolute;
+  bottom: -6px;
+  right: -8px;
+  width: 42px;
+  height: 42px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  background: var(--paper);
-  border-radius: 16px;
-  padding: 12px 16px;
-  margin-bottom: 14px;
+  justify-content: center;
+  font-size: 1.35rem;
+  background: #fff;
+  border: 2.5px solid #000;
+  border-radius: 50%;
+  box-shadow: 3px 3px 0 #000;
 }
-.freeze-info {
+.aura-hero-rankname {
+  display: block;
+  margin-top: 12px;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 1.3rem;
+  letter-spacing: 0.03em;
+  /* --ink, not --neo-ink — sits on the page background, which flips in dark mode. */
+  color: var(--ink);
+}
+/* Rank cosmetics beyond the ring — Or/Légende only, each adding exactly one more layer so the
+   jump in visual richness across the ladder reads as real progression. */
+.aura-crown {
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-6deg);
+  font-size: 2rem;
+  z-index: 2;
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.35));
+}
+.aura-sparkle {
+  position: absolute;
+  color: #e8a317;
+  font-size: 1.1rem;
+  animation: auraSparkle 1.8s ease-in-out infinite;
+}
+.aura-sparkle.s1 { top: 4px; left: 2px; animation-delay: 0s; }
+.aura-sparkle.s2 { top: 14px; right: -4px; animation-delay: 0.5s; }
+.aura-sparkle.s3 { bottom: 10px; left: -8px; animation-delay: 1s; }
+@keyframes auraSparkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+/* --- NextRankCallout — the season pass's headline: the single next reward, framed as a short
+   distance ("1 556 XP jusqu'à Légende") rather than a cumulative total. Anticipation over
+   bookkeeping — this is the one place progression maths lives on the page. --- */
+.season-eyebrow {
+  text-align: center;
+  margin: 0 0 12px;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 0.98rem;
+}
+.season-eyebrow-amount {
+  color: var(--neo-orange);
+}
+.season-eyebrow-rest {
+  color: var(--ink);
+}
+
+/* --- PrideStats — only two survive the cull: best combo and accuracy, both pure mastery/pride
+   signals. Wider chips than a 4-up row allowed, so each carries an icon + a real text column
+   instead of a cramped stack. --- */
+.pride-stats {
+  display: flex;
+  gap: 10px;
+}
+.pride-stat {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 10px;
-}
-.freeze-info b {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--ink);
-}
-.freeze-info span {
-  font-size: 0.72rem;
-  color: var(--ink-soft);
-}
-.freeze-toggle {
-  padding: 8px 16px;
-  border-radius: 999px;
-  background: var(--blue-pale);
-  color: var(--blue);
-  font-size: 0.8rem;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.freeze-toggle.is-armed {
-  background: var(--mint);
-  color: #fff;
-}
-
-.advice-bubble {
-  display: flex;
-  gap: 12px;
-  background: var(--blue-pale);
-  border-radius: 18px;
-  padding: 14px 16px;
-  margin-bottom: 20px;
-  align-items: flex-start;
-}
-.advice-text { flex: 1; }
-.advice-label {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.62rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--blue);
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-.advice-bubble p {
-  font-size: 0.84rem;
-  line-height: 1.5;
-  color: var(--ink);
-  margin: 0;
-}
-
-.stat-chip {
   background: var(--paper);
+  border: 2px solid #000;
   border-radius: 14px;
-  padding: 12px;
-  text-align: center;
-  flex: 1;
+  box-shadow: 3px 3px 0 #000;
+  padding: 12px 14px;
 }
-.stat-chip b {
-  display: block;
+.pride-stat-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.pride-stat-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.pride-stat-value {
   font-family: 'Baloo 2', sans-serif;
-  font-size: 1.2rem;
   font-weight: 800;
+  font-size: 1.12rem;
+  line-height: 1.2;
+  /* --ink, not --neo-ink — the chip's own background is --paper, which flips in dark mode. */
   color: var(--ink);
 }
-.stat-chip span {
-  font-size: 0.72rem;
+.pride-stat-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
   color: var(--ink-soft);
 }
-.stats-week {
+
+/* --- RankRail — every rank visible at once on a single always-on progress rail, season-pass
+   style. Replaces the tabs + swipeable carousel (and the accordion before that): nothing is
+   hidden behind a tap, a swipe, or an expand. --- */
+.rank-rail {
+  margin-bottom: 18px;
+}
+.rank-rail-track {
+  position: relative;
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.rank-rail-line {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 50%;
+  height: 7px;
+  transform: translateY(-50%);
+  background: rgba(21, 24, 33, 0.12);
+  border: 2px solid #000;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.rank-rail-line-fill {
+  height: 100%;
+  background: var(--neo-orange);
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.rank-rail-node {
+  position: relative;
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 50%;
+  box-shadow: 2px 2px 0 #000;
+}
+.rank-rail-node.is-done {
+  background: #dbeeff;
+}
+.rank-rail-node.is-locked {
+  background: var(--bg);
+  border-style: dashed;
+  border-color: rgba(21, 24, 33, 0.35);
+  box-shadow: none;
+  opacity: 0.55;
+}
+.rank-rail-node.is-current {
+  width: 48px;
+  height: 48px;
+  border-width: 3px;
+  background: color-mix(in srgb, var(--rank-accent, #ffd166) 45%, #fff);
+  box-shadow: 3px 3px 0 #000;
+  animation: railPulse 1.8s ease-in-out infinite;
+}
+@keyframes railPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+/* --- Share CTA — the single primary action on the screen, so it's the loudest element on
+   the page after the mascot itself: full width, vivid, its own hard shadow, plus a shine
+   sweep to keep it feeling alive rather than static. --- */
+.aura-share-cta {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  background: var(--neo-orange);
+  color: #fff;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  border: 3px solid #000;
+  border-radius: 999px;
+  padding: 8px 22px 8px 8px;
+  box-shadow: 5px 5px 0 #000;
+  margin-bottom: 16px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+/* A gold medallion for the trophy icon — the button reads as "the reward you're about to
+   flex", not just a generic action pill. */
+.aura-share-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: #ffd166;
+  color: #000;
+  border: 2px solid #000;
+  border-radius: 50%;
+}
+/* A diagonal light band swept across the button — sits above the fill, below the label
+   (z-index isn't needed since it's painted before the text in source order and the text has
+   no background of its own to be occluded by). Idle off-screen to the left; sweeps through
+   on hover (desktop) and on every tap (mobile, which has no hover state to rely on). */
+.aura-share-cta::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(115deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+.aura-share-cta:hover::after,
+.aura-share-cta:active::after {
+  animation: shineSweep 0.7s ease forwards;
+}
+@keyframes shineSweep {
+  from { left: -60%; }
+  to { left: 130%; }
+}
+.aura-share-cta:active {
+  transform: translate(3px, 3px);
+  box-shadow: 2px 2px 0 #000;
+}
+
+/* --- ShareAuraModal — full screen, summoned only while actively sharing. --- */
+.share-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(21, 24, 33, 0.68);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeUp 0.2s ease;
+}
+.share-modal-panel {
+  width: 100%;
+  max-width: 340px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: var(--paper);
+  border: 2px solid #000;
+  border-radius: 24px;
+  box-shadow: 6px 6px 0 #000;
+  padding: 18px 18px 20px;
+}
+.share-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.share-modal-title {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--neo-ink);
+}
+.share-modal-close {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  border: 2px solid #000;
+  border-radius: 50%;
+  color: var(--neo-ink);
+}
+.share-preview-frame {
+  border: 2px solid #000;
+  border-radius: 20px;
+  box-shadow: 4px 4px 0 #000;
+  overflow: hidden;
+  margin: 0 auto 14px;
+  max-width: 260px;
+}
+.share-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1080 / 1920;
+}
+.share-export-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
-  margin-bottom: 20px;
+  background: #22c55e;
+  color: #000;
+  font-weight: 800;
+  border: 3.5px solid #000;
+  box-shadow: 5px 5px 0 #000;
+  border-radius: 999px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.share-export-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 2px 2px 0 #000;
+}
+.share-export-btn:disabled {
+  opacity: 0.6;
 }
 
 /* ===== Révisions ===== */
-.ai-note {
-  background: rgba(47, 95, 227, 0.08);
-  border: 1px solid rgba(47, 95, 227, 0.2);
-  color: var(--blue-2);
-  font-size: 0.78rem;
-  padding: 10px 13px;
-  border-radius: 12px;
-  margin-bottom: 14px;
-  line-height: 1.4;
+.rev-view {
+  background: #f2f0ea;
+  background-image: radial-gradient(rgba(21, 24, 33, 0.07) 1.5px, transparent 1.5px);
+  background-size: 22px 22px;
+  animation: revBgDrift 40s linear infinite;
+  min-height: 100%;
 }
-.rev-modes {
+.view.is-active.rev-view {
+  margin: 0;
+  padding: 0;
+}
+@keyframes revBgDrift {
+  from { background-position: 0 0; }
+  to { background-position: 220px 220px; }
+}
+.recap-overlay {
+  position: relative;
   display: flex;
-  gap: 8px;
-  margin-bottom: 14px;
+  flex-direction: column;
+  height: calc(100dvh - 68px);
+  min-height: 480px;
+  overflow: hidden;
   background: var(--paper);
-  border-radius: 999px;
-  padding: 4px;
+  transition: background 0.3s ease;
 }
-.rev-mode-btn {
+.recap-overlay.bg-ink {
+  background: linear-gradient(150deg, var(--neo-ink), #2b3350);
+}
+.recap-overlay.bg-orange {
+  background: linear-gradient(150deg, var(--neo-orange), #c81e3a);
+}
+.recap-overlay.bg-mint {
+  background: linear-gradient(150deg, var(--mint), #06b6d4);
+}
+.recap-overlay.bg-paper {
+  background: linear-gradient(150deg, #ffd9b3, #c7d2fe);
+}
+.recap-avatar {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 6;
+  pointer-events: none;
+  filter: drop-shadow(2.5px 2.5px 0 #000);
+}
+.recap-progress {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  gap: 6px;
+  padding: 14px 14px 0;
+}
+.recap-seg {
   flex: 1;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.35);
+  overflow: hidden;
+}
+.recap-seg .fill {
+  display: block;
+  height: 100%;
+  background: #000;
+  transform-origin: left;
+  transform: scaleX(0);
+}
+.recap-seg.done .fill {
+  transform: scaleX(1);
+}
+.recap-seg.active .fill {
+  animation: recapFill var(--dur, 2000ms) linear forwards;
+}
+@keyframes recapFill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+/* Single full-cover tap target — a tap anywhere jumps straight to the trophy card (see
+   skipToEnd in BraiseRecap.tsx), so there's no left/right split to style separately anymore. */
+.recap-taps {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  cursor: pointer;
+}
+/* The tap zone that skips these auto-advancing slides had no visible affordance — nothing
+   told a first-time viewer the screen was tappable at all. A quiet, slowly-pulsing label at
+   the bottom is enough to register as "tap to skip" without competing with the slide's own
+   big number/title for attention. */
+.recap-tap-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 22px;
+  z-index: 5;
   text-align: center;
-  padding: 8px;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--ink-soft);
-  transition: background 0.2s ease, color 0.2s ease;
-}
-.rev-mode-btn.is-on {
-  background: var(--blue);
-  color: var(--paper);
-}
-.rev-filters {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 18px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-.rev-filters::-webkit-scrollbar {
-  display: none;
-}
-.rev-filter {
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: var(--paper);
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--ink-soft);
-  white-space: nowrap;
-}
-.rev-filter.is-on {
-  background: var(--blue);
-  color: var(--paper);
-}
-.rev-progress {
-  text-align: center;
+  pointer-events: none;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.75);
+  animation: recapTapPulse 1.8s ease-in-out infinite;
+}
+@keyframes recapTapPulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+.recap-slide {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px 26px;
+  gap: 8px;
+}
+/* Progress segments default to a light track/fill (right for the three hype slides, which
+   are always dark/saturated) and flip to dark on the final cream slide, which would
+   otherwise render a near-invisible white-on-white bar. */
+.recap-overlay.bg-paper .recap-seg {
+  background: rgba(21, 24, 33, 0.15);
+}
+.recap-overlay.bg-paper .recap-seg .fill {
+  background: var(--neo-ink);
+}
+.recap-title {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 2.1rem;
+  line-height: 1.15;
+  color: #fff;
+  max-width: 15ch;
+}
+/* Named "on-light", never "dark" — this codebase's app-wide dark-theme class is literally
+   `.dark`, and it redefines --ink-soft/--paper/etc. as CSS custom properties, which cascade.
+   Reusing that exact class name here as a local "dark text" modifier would locally re-trigger
+   those global theme overrides on the element itself, corrupting its own --ink-soft read even
+   though no actual dark theme is active anywhere in the page. */
+.recap-title.on-light {
+  color: var(--neo-ink);
+}
+.recap-sub {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+.recap-sub.on-light {
   color: var(--ink-soft);
-  margin-bottom: 14px;
+  margin-bottom: 10px;
+}
+.recap-xp {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 3.4rem;
+  color: #fff;
+  text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
+}
+/* The finale gets a real bordered "trophy card" rather than sitting flush with the full-bleed
+   overlay like the hype slides — a deliberate departure that marks this as the one moment
+   that isn't just another beat in the swipe loop, it's the payoff. */
+.recap-trophy-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 360px;
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 24px;
+  box-shadow: 4px 4px 0 #000;
+  padding: 28px 22px 24px;
+}
+.recap-trophy-mascot {
+  margin-bottom: 4px;
+  filter: drop-shadow(3.5px 3.5px 0 #000);
+}
+/* Quiet exit — a plain X rather than a second full CTA, so leaving without restarting reads
+   as a lightweight, always-available option instead of competing with the green button for
+   the player's attention. */
+.recap-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper);
+  color: var(--neo-ink);
+  border: 2px solid #000;
+  border-radius: 50%;
+  box-shadow: 2px 2px 0 #000;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.recap-close:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+.recap-stat-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  margin: 14px 0 4px;
+}
+.recap-stat-chip {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: #c4b5fd;
+  border: 2px solid #000;
+  border-radius: 14px;
+  box-shadow: 4px 4px 0 #000;
+  padding: 10px 6px;
+}
+.recap-stat-chip.combo {
+  background: #ffd166;
+}
+.recap-stat-chip.precision {
+  background: #a7f3d0;
+}
+.recap-stat-icon {
+  font-size: 1.1rem;
+}
+.recap-stat-value {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--neo-ink);
+}
+.recap-stat-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  /* Fully opaque ink, not a translucent tint — a 0.75-alpha label read fine on paper but
+     lost real contrast against these vivid pastel chip backgrounds. */
+  color: var(--neo-ink);
+}
+.recap-btn {
+  max-width: 300px;
+  margin-top: 18px;
+  background: #22c55e;
+  color: #000000;
+  font-weight: 900;
+  border: 3.5px solid #000;
+  box-shadow: 5px 5px 0 #000;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.recap-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 2px 2px 0 #000;
+}
+.rev-top-row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 16px 0;
+}
+/* Wraps the bar and its riding mascot chip together so the chip can be positioned by simple
+   percentage math against a track whose width IS the bar's own width — no more reserving a
+   fixed 46px on the left for a mascot that used to sit fixed there instead of on the bar. */
+.rev-progress-track {
+  position: relative;
+  flex: 1;
+  height: 30px;
+  display: flex;
+  align-items: center;
+}
+.rev-progress-bar {
+  width: 100%;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+}
+.rev-progress-bar span {
+  display: block;
+  height: 100%;
+  background: #fff;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+/* Rides the leading edge of the fill, driven by the same `left: <pct>%` inline style each
+   render — the CSS `transition` on `left` is what turns each card-to-card jump into a smooth
+   glide instead of a teleport. */
+.rev-progress-mascot {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: left 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+  pointer-events: none;
+}
+/* No chip behind it anymore — just the mascot's own SVG riding the bar. A drop-shadow keeps
+   it readable against the gradient (which shifts per subject) without reintroducing the
+   circle/border it used to sit in. */
+.rev-progress-mascot svg {
+  filter: drop-shadow(1.5px 2px 0 rgba(0, 0, 0, 0.4));
+}
+/* First-card-only callout (see .swipe-tutorial for its counterpart hint on the card itself).
+   Anchored to the RIGHT of the mascot rather than above it — the mascot chip sits only ~16px
+   from the very top of the screen, so a bubble above it would push past the safe area. To the
+   side there's plenty of room and it still reads as "the mascot is telling you this". */
+.mascot-hint {
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  background: var(--paper);
+  color: var(--neo-ink);
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 0.66rem;
+  border: 2px solid #000;
+  border-radius: 10px;
+  padding: 5px 10px;
+  box-shadow: 3px 3px 0 #000;
+  z-index: 8;
+  pointer-events: none;
+}
+.mascot-hint::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-right-color: #000;
+}
+.mascot-hint::after {
+  content: '';
+  position: absolute;
+  right: calc(100% - 2px);
+  top: 50%;
+  transform: translateY(-50%);
+  border: 5px solid transparent;
+  border-right-color: var(--paper);
+}
+/* Height pinned to exactly match .rev-progress-track (30px) — the pill's own font metrics
+   made it a few px taller than the track when only centered via padding, which was enough
+   overflow to dip into .ftag-row below and clip the report button. Capping the box itself
+   (rather than trusting padding to happen to fit) guarantees that never happens again,
+   whatever the combo count's digit width does to the text. */
+.rev-combo {
+  flex-shrink: 0;
+  height: 30px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 0.78rem;
+  background: var(--paper);
+  border: 2px solid #000;
+  color: var(--neo-ink);
+  border-radius: 999px;
+  padding: 0 11px;
+  box-shadow: 3px 3px 0 #000;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+.rev-combo.is-hot {
+  color: #fff;
+  background: var(--neo-orange);
+}
+.rev-combo-shake {
+  animation: comboShake 0.4s ease;
+}
+@keyframes comboShake {
+  0% { transform: scale(1) rotate(0); }
+  25% { transform: scale(1.14) rotate(-6deg); }
+  55% { transform: scale(1.06) rotate(5deg); }
+  80% { transform: scale(1.08) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+/* First-card-only swipe tutorial — a drifting hand between two direction chips, docked above
+   the action bar but well clear of the combo toast's own bottom offset (which can never
+   actually appear this early anyway: reaching a combo of 2 requires two judged cards, so
+   index is always past 0 by then). AnimatePresence handles the fade in/out on mount/unmount
+   in RevisionsView.tsx — this only styles the settled state and the hand's drift loop. */
+.swipe-tutorial {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100px;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  pointer-events: none;
+}
+.tut-hand {
+  font-size: 2rem;
+  line-height: 1;
+  animation: tutorialHandSwipe 1.4s ease-in-out infinite;
+  filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, 0.35));
+}
+@keyframes tutorialHandSwipe {
+  0%, 100% { transform: translateX(-20px) rotate(-8deg); }
+  50% { transform: translateX(20px) rotate(8deg); }
+}
+.tut-chip {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 0.78rem;
+  color: #fff;
+  border: 2px solid #000;
+  border-radius: 999px;
+  padding: 6px 12px;
+  white-space: nowrap;
+  box-shadow: 2px 2px 0 #000;
+}
+.tut-chip.tut-left {
+  background: rgba(232, 86, 75, 0.9);
+}
+.tut-chip.tut-right {
+  background: rgba(15, 158, 110, 0.9);
+}
+/* Ephemeral streak tag — distinct from the small persistent .rev-combo badge in the header,
+   which stays up for the rest of the streak. Docked just above the action bar (in the space
+   freed under the centered Q&A block) rather than dead-center, so it celebrates the streak
+   without ever covering the question or answer text. Rises + fades in place; the `forwards`
+   fill plus the matching 1100ms JS timeout mean the element unmounts right as the animation
+   settles, not mid-motion. */
+.combo-toast {
+  position: absolute;
+  bottom: 106px;
+  left: 50%;
+  z-index: 40;
+  pointer-events: none;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 1.05rem;
+  white-space: nowrap;
+  color: #fff;
+  background: var(--neo-ink);
+  border: 2.5px solid #000;
+  border-radius: 999px;
+  padding: 10px 22px;
+  box-shadow: 4px 4px 0 #000;
+  animation: comboToastRise 1.1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.combo-toast.is-hot {
+  background: var(--neo-orange);
+}
+@keyframes comboToastRise {
+  0% { transform: translate(-50%, 16px) scale(0.85); opacity: 0; }
+  20% { transform: translate(-50%, 0) scale(1.06); opacity: 1; }
+  35% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+  78% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -8px) scale(0.94); opacity: 0; }
 }
 .flash-stack {
   position: relative;
-  height: 280px;
-  margin-bottom: 20px;
-}
-.flash-stack::before,
-.flash-stack::after {
-  content: '';
-  position: absolute;
-  inset: 6px 10px 0;
-  background: var(--paper);
-  border-radius: 20px;
-  box-shadow: 0 6px 16px -12px rgba(22, 33, 58, 0.25);
-}
-.flash-stack::before {
-  transform: scale(0.96) translateY(10px);
-  opacity: 0.7;
-  z-index: 0;
-}
-.flash-stack::after {
-  transform: scale(0.92) translateY(18px);
-  opacity: 0.4;
-  z-index: -1;
+  height: calc(100dvh - 68px);
+  min-height: 480px;
 }
 .flashcard {
   position: absolute;
   inset: 0;
-  background: var(--paper);
-  border-radius: 20px;
-  padding: 26px;
+  background: linear-gradient(150deg, var(--subject-color, var(--neo-blue)), var(--subject-color-2, var(--neo-orange)));
+  /* Clears .rev-top-row (16px padding-top + 30px track height) now that the mascot rides
+     the progress bar instead of sitting fixed at 50px tall in the top-left corner. */
+  padding: 50px 0 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   text-align: center;
-  box-shadow: 0 10px 26px -16px rgba(22, 33, 58, 0.3);
   cursor: grab;
   touch-action: pan-y;
   user-select: none;
   perspective: 1000px;
+  overflow: hidden;
 }
-.flashcard.dragging {
+.flashcard:active {
   cursor: grabbing;
-  transition: none !important;
 }
-.flashcard.snap-back {
-  transition: transform 0.25s ease;
+.flashcard.is-judged {
+  cursor: default;
 }
-.flashcard.fly-out {
-  transition: transform 0.35s ease, opacity 0.35s ease;
+/* One-shot impulse on a correct verdict — layered on top of the mascot's own continuous
+   mood animation, not a replacement for it. Plays exactly once because the class is only
+   present while judged+correct is true for this card, and CSS animations hold their final
+   frame rather than looping without an `infinite` count. Applied directly to the mascot SVG
+   (not its .rev-progress-mascot wrapper) so the burst's scale/rotate transform never fights
+   the wrapper's own translate(-50%, -50%) centering transform. */
+.fc-mascot-burst {
+  animation: mascotBurst 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.flashcard .ftag {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.66rem;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-  margin-bottom: 12px;
+@keyframes mascotBurst {
+  0% { transform: scale(1); filter: drop-shadow(2.5px 2.5px 0 #000); }
+  40% {
+    transform: scale(1.4) rotate(-4deg);
+    filter: drop-shadow(2.5px 2.5px 0 #000) drop-shadow(0 0 16px rgba(255, 216, 75, 0.95));
+  }
+  70% { transform: scale(1.12) rotate(2deg); }
+  100% { transform: scale(1) rotate(0); filter: drop-shadow(2.5px 2.5px 0 #000); }
 }
-.flashcard .fq {
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 1.15rem;
-  line-height: 1.35;
+/* Wrong-answer counterpart to the burst above — a quick horizontal shudder instead of a
+   growth pulse, so the mascot's own body language tells you the verdict before you've read
+   the correction text. Same one-shot logic: class only present while judged+incorrect. */
+.fc-mascot-shake {
+  animation: mascotShake 0.4s ease;
 }
-.flashcard .fhint {
-  margin-top: 16px;
-  font-size: 0.74rem;
-  color: var(--ink-soft);
+@keyframes mascotShake {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  20% { transform: translateX(-5px) rotate(-10deg); }
+  40% { transform: translateX(4px) rotate(8deg); }
+  60% { transform: translateX(-3px) rotate(-6deg); }
+  80% { transform: translateX(2px) rotate(3deg); }
 }
-.flashcard .fa {
-  display: none;
-  font-size: 0.95rem;
-  color: var(--ink);
-  line-height: 1.5;
-}
-.flashcard.flipped .fq {
-  display: none;
-}
-.flashcard.flipped .fa {
-  display: block;
-}
-.flashcard.flipped {
-  background: var(--blue-pale);
-}
-.swipe-tag {
-  position: absolute;
-  top: 16px;
-  padding: 6px 14px;
-  border-radius: 999px;
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 800;
-  font-size: 0.82rem;
-  border: 3px solid;
-  opacity: 0;
-  z-index: 10;
-}
-.swipe-tag.know {
-  right: 16px;
-  color: var(--mint-text);
-  border-color: var(--mint);
-  background: rgba(47, 190, 159, 0.14);
-}
-.swipe-tag.again {
-  left: 16px;
-  color: var(--sun-ink);
-  border-color: var(--sun);
-  background: rgba(255, 194, 75, 0.18);
-}
-.confidence-row {
+.fc-scroll {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 20px;
+  align-items: center;
+  overflow-y: auto;
+  padding: 0 22px 96px;
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 96px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 96px), transparent 100%);
+}
+/* While the first-card tutorial is up, .fc-qa-block's auto-margin centering (see below) needs
+   to treat the bottom of the *tutorial band* as the floor, not the action bar — otherwise a
+   long answer can grow tall enough to reach up under .swipe-tutorial and get covered by it.
+   Reserving the tutorial's own footprint (its ~35px height + the gap above the action bar)
+   on top of the usual 96px means the centered block can never grow into that space at all. */
+.fc-scroll.has-tutorial {
+  padding-bottom: 146px;
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 146px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 146px), transparent 100%);
+}
+.fc-qa-block {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Auto top/bottom margins center this block in whatever space is left under the pinned
+     .ftag-row, rather than justify-content on .fc-scroll (which would pull the pill down
+     with it). Falls back to flow layout if content overflows — no clipping risk. */
+  margin: auto 0;
 }
-.flashcard.flipped .confidence-row {
-  display: none;
+.ftag-row {
+  width: 100%;
+  /* Pinned right under the header, not swept into .fc-qa-block's auto-margin centering below
+     it — otherwise the pill would drift toward mid-screen with the Q&A block and leave a
+     dead orange gap under the mascot/progress row. */
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
 }
-.conf-btn {
-  border-radius: 12px;
-  padding: 12px;
-  font-size: 0.86rem;
-  font-weight: 600;
-  color: var(--ink);
+/* Solid neobrutalist pill instead of frosted glass — the old translucent-white-on-blur
+   treatment relied on the card's own gradient showing through it for contrast, which meant
+   legibility varied by subject color (fine on the darker blues/violets, weak on the lighter
+   ones). An opaque paper background with hard-black text guarantees the same contrast no
+   matter which subject gradient sits behind it. */
+.subject-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--neo-ink);
+  background: var(--paper);
+  border: 2px solid #000;
+  border-radius: 999px;
+  padding: 5px 12px;
+  box-shadow: 3px 3px 0 #000;
+}
+.fq-zone {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  transition: transform 0.12s ease;
+  /* Bottom margin needs to clear the speech-bubble's tail, which pokes 13px above the
+     bubble itself (see .braise-tail) — anything tighter lets that tail visually collide
+     with this notification's hard shadow instead of reading as two separate elements. */
+  margin: 2px 0 22px;
 }
-.conf-btn:active {
-  transform: scale(0.96);
+.fq-notif {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 340px;
+  background: var(--paper);
+  border: 2px solid #000;
+  border-radius: 16px;
+  padding: 10px 20px 10px 14px;
+  box-shadow: 4px 4px 0 #000;
+  text-align: left;
+  animation: notifDrop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.conf-btn.not-sure {
-  background: rgba(255, 111, 89, 0.12);
-  color: var(--coral-2);
+@keyframes notifDrop {
+  0% { transform: translateY(-26px); opacity: 0; }
+  60% { transform: translateY(3px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 1; }
 }
-.conf-btn.doubt {
-  background: rgba(255, 194, 75, 0.18);
-  color: var(--sun-ink);
+.fq-notif-icon {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  background: var(--subject-color, var(--neo-orange));
+  border: 1.5px solid #000;
 }
-.conf-btn.sure {
-  background: rgba(47, 190, 159, 0.14);
-  color: var(--mint-text);
+.fq-notif-body {
+  flex: 1;
+  min-width: 0;
 }
-.confidence-note {
-  font-size: 0.76rem;
-  color: var(--ink-soft);
+.fq-notif-title {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 600;
+  font-size: 0.86rem;
+  line-height: 1.32;
+  color: var(--neo-ink);
+  overflow-wrap: break-word;
+}
+.fq-notif-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: rgba(21, 24, 33, 0.82);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-top: 3px;
+}
+.fa-row {
+  /* Not flex:1 on purpose — growing to fill all remaining height (then centering within it)
+     is what pushed the bubble away from the notification above it, down toward the middle
+     of the card. Sitting at natural height keeps the notification + bubble as one compact,
+     top-anchored block instead of two elements that read as visually unrelated. */
+  flex: 0 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 0;
+  text-align: center;
+}
+.braise-say {
+  position: relative;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 1.22rem;
+  line-height: 1.32;
+  color: var(--neo-ink);
+  background: var(--paper);
+  /* Matches .fq-notif's border/shadow exactly (2px / 4px 4px 0) so the question widget and
+     the answer card read as one consistent neobrutalist family instead of the bubble
+     carrying a heavier 3.5px/6px treatment the notif above it never had. */
+  border: 2px solid #000;
+  border-radius: 20px;
+  box-shadow: 4px 4px 0 #000;
+  padding: 20px 20px 22px;
+  overflow-wrap: break-word;
+}
+.flashcard .fa-proposed {
+  margin: 0;
+}
+.braise-tail {
+  position: absolute;
+  top: -13px;
+  left: 30px;
+  width: 22px;
+  height: 22px;
+  background: var(--paper);
+  border-left: 2px solid #000;
+  border-top: 2px solid #000;
+  border-radius: 5px 0 0 0;
+  transform: rotate(45deg);
+}
+.braise-typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 18px 22px;
+}
+.typing-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--neo-ink);
+  opacity: 0.35;
+  animation: typingBounce 1s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.typing-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
+  30% { transform: translateY(-5px); opacity: 1; }
+}
+.flashcard .fhint {
+  margin-top: 18px;
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+/* Staggered in behind the corner stamp's own claque-then-fade cycle (see .swipe-tag.stamped)
+   rather than appearing instantly at the same moment — landing exactly when the verdict does
+   was what made the judged moment feel like everything firing at once. Starting after a short
+   delay means the stamp has already begun clearing out by the time this text asserts itself. */
+.flashcard .fb-line {
+  margin-top: 18px;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+  animation: judgedTextIn 0.3s ease both;
+  animation-delay: 0.16s;
+}
+.reveal-line {
   margin-top: 10px;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.92);
+  text-align: left;
+  width: 100%;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+  animation: judgedTextIn 0.3s ease both;
+  animation-delay: 0.22s;
+}
+@keyframes judgedTextIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.reveal-line b {
+  color: #ffd84b;
+}
+/* KaTeX renders its own glyph colors via currentColor for the base symbols, so this just
+   makes sure the formula reads in whatever ink color its surrounding bubble/line already
+   uses (dark ink in the paper bubble, white in the reveal line) instead of KaTeX's own
+   black default fighting a dark background. */
+.math-inline {
+  color: inherit;
+}
+.math-inline .katex {
+  font-size: 1.05em;
+}
+/* Emphasis from **...** (see RichText). Weight alone can't be trusted to read as "bolder"
+   here — the answer bubble's own text already sits at font-weight: 800, so a plain <strong>
+   (bolder -> ~900, often clamped to the same rendered weight by the font's available cuts)
+   can end up visually identical to its surroundings. The underline is weight-independent, so
+   a key term still pops whether it lands in that heavy bubble, the 600-weight question title,
+   or the regular-weight reveal line. */
+.rev-view strong {
+  font-weight: 900;
+  text-decoration: underline;
+  text-decoration-thickness: 2.5px;
+  text-underline-offset: 3px;
+}
+/* Neobrutalist keyword highlight from ==...== (see RichText) — a small pastel-yellow chip a
+   student's eye should land on first when scanning a card. Ink text color is hardcoded
+   rather than inherited so it stays legible whether the mark lands in the dark-ink-on-paper
+   bubble/notif or the white-on-gradient reveal line. box-decoration-break keeps each
+   wrapped line of a multi-line highlight getting its own rounded chip instead of one
+   deformed box spanning the line break. */
+/* Deliberately understated — a translucent wash close to the text's own line height rather
+   than a bordered, opaque "pill" sitting on top of it. A hard black outline and thick padding
+   read as a UI chip; this should read as a highlighter pen, there to aid scanning without
+   competing with the text for attention. */
+.neo-highlight {
+  background: rgba(254, 240, 138, 0.65);
+  color: var(--neo-ink);
+  padding: 2px 4px;
+  border-radius: 3px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+/* The full-card color wash driven by drag position (see the `washColor` motion value) —
+   sits above the card's own gradient and content but below the verdict stamps/action bar, so
+   the whole card visibly leans red/green as the player drags, not just its border. */
+.fc-swipe-wash {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+/* Dead-center verdict copy that rides the same opacity ramp as the corner .swipe-tag stamps
+   (knowOpacity/againOpacity) — the stamps stay as the game's own flavor text (CARRÉ/INTOX),
+   this is the plain-language label ("understood" vs "needs another look") a first-time player
+   reads at a glance while dragging, without needing to parse slang. Sits above the wash
+   (z-index 10) but below the corner stamps/action bar so it never gets visually buried. */
+.fc-gesture-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-4deg);
+  z-index: 12;
+  pointer-events: none;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 900;
+  font-size: 1.6rem;
+  letter-spacing: 0.02em;
+  color: #fff;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  white-space: nowrap;
+}
+.fc-gesture-label.right {
+  color: #eafff3;
+}
+.fc-gesture-label.left {
+  color: #fff0ee;
+}
+/* Sized and positioned to fit entirely above .ftag-row (which starts at y:50px, set by
+   .flashcard's own padding-top) — at the old 1.3rem/8px-padding/top:28px sizing this stamp
+   was ~48px tall starting at y:28, so it ran to y:76 and plowed straight through the subject
+   pill's text. Shrunk + pulled up so its full box now fits inside that 50px budget with
+   margin to spare, confirmed against the tallest real subject label in the deck. */
+.swipe-tag {
+  position: absolute;
+  top: 1px;
+  padding: 3px 11px;
+  border-radius: 9px;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 1.02rem;
+  letter-spacing: 0.02em;
+  border: 2.5px solid #000;
+  background: var(--paper);
+  opacity: 0;
+  z-index: 25;
+  /* Purely a visual stamp, never interactive — without this, the invisible (opacity: 0)
+     "know" stamp sits directly over the top-right report button (both anchored to that
+     corner) and silently swallows every click on it, since opacity: 0 doesn't remove an
+     element from hit-testing. */
+  pointer-events: none;
+}
+/* Verdict "claque" — the winning stamp overshoots past its resting size then settles back,
+   a bounce read as a hard physical stamp hitting the card rather than a fade-in. Animates
+   font-size (not transform) so it never fights each stamp's own rotate()/translateX(). */
+/* Owns opacity outright once active (no competing inline style — see the JSX) so the winning
+   stamp claques down hard immediately, holds just long enough to register, then clears itself
+   out well before the 5s feedback window ends — `forwards` keeps it landed at opacity 0
+   rather than snapping back to whatever the live drag-position opacity would otherwise read. */
+.swipe-tag.stamped {
+  animation: stampClaqueFade 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes stampClaqueFade {
+  0% { font-size: 0.7em; opacity: 0; }
+  20% { font-size: 1.12em; opacity: 1; }
+  45% { font-size: 1.02em; opacity: 1; }
+  70% { font-size: 1.02em; opacity: 1; }
+  100% { font-size: 1.02em; opacity: 0; }
+}
+.swipe-tag.know {
+  right: 20px;
+  color: var(--mint-text);
+  border-color: var(--mint-text);
+  transform: rotate(6deg);
+}
+.swipe-tag.again {
+  left: 20px;
+  color: var(--coral-2);
+  border-color: var(--coral-2);
+  transform: rotate(-6deg);
+}
+.swipe-tag.super {
+  left: 50%;
+  top: 1px;
+  transform: translateX(-50%);
+  color: var(--sun-ink);
+  border-color: var(--sun-ink);
 }
 .rev-actions {
   display: flex;
-  gap: 10px;
-  margin-top: 16px;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  margin-top: 18px;
+}
+.rev-actions-embedded {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 20px;
+  margin-top: 0;
+  z-index: 20;
 }
 .rev-btn {
-  flex: 1;
-  border-radius: 999px;
-  padding: 14px;
-  font-weight: 700;
-  font-size: 0.86rem;
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  border: 3.5px solid #000;
+  border-radius: 50%;
+  /* Hard offset shadow (the neobrutalist signature) plus a soft ambient shadow underneath for
+     extra lift — the hard shadow alone read as flat pasted-on at this size. */
+  box-shadow: 8px 8px 0 #000, 8px 10px 16px rgba(0, 0, 0, 0.28);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  transition: transform 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .rev-btn:active {
-  transform: scale(0.96);
+  transform: translate(5px, 5px) scale(0.96);
+  box-shadow: 3px 3px 0 #000;
 }
 .rev-btn.again {
   background: var(--coral);
-  color: var(--paper);
+  color: #fff;
 }
 .rev-btn.know {
   background: var(--mint);
-  color: var(--paper);
+  color: #fff;
 }
-
-/* ===== Test mode ===== */
-.lquiz {
-  background: var(--paper);
-  border-radius: 16px;
-  padding: 18px;
+.rev-btn.super {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  background: var(--sun);
+  color: var(--sun-ink);
 }
-.lquiz-q {
+/* Permanent bonus badge — the joker is available on every card now, so the ×2 payoff stays
+   visible at all times, not just during the first-card tutorial. A tiny corner badge riding
+   ON the button's own rim (like an app icon's notification dot) rather than a tooltip stacked
+   above it: that strip between the answer bubble and the action bar is already spoken for by
+   .swipe-tutorial during onboarding, and staying inside the button's own footprint means this
+   never has to fight it for space. */
+.joker-tooltip {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  background: var(--coral);
+  color: #fff;
   font-family: 'Baloo 2', sans-serif;
-  font-size: 1rem;
-  margin-bottom: 13px;
+  font-weight: 800;
+  font-size: 0.6rem;
+  border: 2px solid #000;
+  border-radius: 999px;
+  padding: 2px 5px;
+  box-shadow: 2px 2px 0 #000;
+  z-index: 22;
+  pointer-events: none;
 }
-.lquiz-opts {
-  display: grid;
-  gap: 8px;
-}
-.lquiz-opt {
-  text-align: left;
-  background: var(--blue-pale);
-  border: 2px solid var(--line);
-  border-radius: 11px;
-  padding: 10px 13px;
-  font-size: 0.85rem;
-}
-.lquiz-opt.correct {
-  background: rgba(47, 190, 159, 0.16);
-  border-color: var(--mint);
-}
-.lquiz-opt.wrong {
-  background: rgba(232, 86, 68, 0.1);
-  border-color: var(--coral-2);
-}
-.lquiz-fb {
-  margin-top: 12px;
-  font-size: 0.84rem;
-  font-weight: 600;
-  min-height: 1.2em;
-}
-.lquiz-fb.ok {
-  color: var(--mint-text);
-}
-.lquiz-fb.ko {
-  color: var(--coral-2);
-}
-.braise-quiz-help {
+.hint-btn {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(10px) saturate(160%);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
+  color: #fff;
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  background: var(--blue-pale);
-  border-radius: 14px;
-  padding: 12px 14px;
-  margin-top: 12px;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s ease;
 }
-.braise-quiz-help b {
-  display: block;
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 0.82rem;
-  color: var(--ink);
+.hint-btn:active {
+  transform: scale(0.92);
 }
-.braise-quiz-help span {
-  font-size: 0.78rem;
-  color: var(--ink-soft);
-  line-height: 1.45;
+.hint-btn.is-reported {
+  background: var(--mint);
+  border-color: var(--mint);
+  color: #fff;
 }
 
-/* ===== Progrès ===== */
+/* ===== Progrès (suite) ===== */
 .section-title {
   font-size: 0.76rem;
   color: var(--ink-soft);
@@ -1445,224 +1999,113 @@ select {
   letter-spacing: 0.04em;
   margin: 4px 0 10px;
 }
-.stats-week {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 20px;
+/* ===== Subject view — skill tree path ===== */
+.skill-path {
+  position: relative;
+  padding: 14px 4px 10px;
 }
-.stat-chip {
-  background: var(--paper);
-  border-radius: 12px;
-  padding: 11px 4px;
-  text-align: center;
+.skill-path-line {
+  position: absolute;
+  left: 50%;
+  top: 30px;
+  bottom: 40px;
+  width: 3px;
+  background: repeating-linear-gradient(to bottom, var(--line) 0 8px, transparent 8px 16px);
+  transform: translateX(-50%);
+  z-index: 0;
 }
-.stat-chip b {
-  display: block;
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 1.05rem;
+.skill-node-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  margin-bottom: 28px;
 }
-.stat-chip span {
-  font-size: 0.62rem;
-  color: var(--ink-soft);
-}
-.weak-list,
-.hw-list {
+.skill-node-row.pos-center { justify-content: center; }
+.skill-node-row.pos-right { justify-content: flex-end; padding-right: 10%; }
+.skill-node-row.pos-left { justify-content: flex-start; padding-left: 10%; }
+.skill-node-wrap {
+  position: relative;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 8px;
-  margin-bottom: 20px;
 }
-.weak-item {
-  background: var(--paper);
-  border-radius: 12px;
-  padding: 12px 14px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border-left: 3px solid var(--coral);
-}
-.weak-item .wtext {
-  flex: 1;
-}
-.weak-item b {
-  display: block;
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 0.84rem;
-}
-.weak-item span {
-  font-size: 0.72rem;
-  color: var(--ink-soft);
-}
-.weak-item button {
-  background: var(--blue-pale);
-  color: var(--blue-2);
-  border-radius: 999px;
-  padding: 7px 12px;
-  font-size: 0.74rem;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-.hw-item {
-  background: var(--paper);
-  border-radius: 12px;
-  padding: 12px 14px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.hw-due {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.62rem;
-  background: rgba(255, 194, 75, 0.28);
-  color: var(--sun-ink);
-  padding: 3px 8px;
-  border-radius: 999px;
-  flex-shrink: 0;
-}
-.hw-item b {
-  display: block;
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 0.84rem;
-}
-.hw-item span {
-  font-size: 0.72rem;
-  color: var(--ink-soft);
-}
-.week {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 20px;
-}
-.week .day {
-  flex: 1;
-  text-align: center;
-}
-.week .lbl {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.6rem;
-  color: var(--ink-soft);
-  margin-bottom: 5px;
-  display: block;
-}
-.week .dot {
-  width: 26px;
-  height: 26px;
+.skill-node {
+  width: 62px;
+  height: 62px;
   border-radius: 50%;
-  margin: 0 auto;
+  background: var(--paper);
+  border: 4px solid var(--line);
+  color: var(--ink-soft);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.72rem;
-  background: var(--paper);
-  border: 2px solid var(--line);
-}
-.week .dot.done {
-  background: var(--coral);
-  border-color: var(--coral);
-  color: var(--paper);
-}
-.week .dot.today {
-  border-color: var(--blue);
-  color: var(--blue);
-  font-weight: 700;
-}
-
-/* ===== Subject view ===== */
-.chapters {
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-}
-.chapter {
-  background: var(--paper);
-  border-radius: 14px;
-  padding: 13px 15px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
+  font-weight: 800;
+  font-size: 1.1rem;
+  box-shadow: 0 8px 16px -10px rgba(22, 33, 58, 0.25);
   transition: transform 0.15s ease;
 }
-.chapter:not(.is-locked):active {
-  transform: scale(0.98);
+.skill-node:not(:disabled):active { transform: scale(0.92); }
+.skill-node.is-done {
+  border-color: var(--subject-color);
+  background: var(--subject-color);
+  color: #fff;
 }
-.chapter.is-locked {
-  opacity: 0.5;
-  cursor: default;
+.skill-node.is-current {
+  border-color: var(--subject-color);
+  background: var(--paper);
+  color: var(--subject-color);
+  animation: nodePulse 1.8s ease-in-out infinite;
 }
-.cnum {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.76rem;
-  font-weight: 700;
-  flex-shrink: 0;
-}
-.chapter.done .cnum {
-  background: var(--mint);
-  color: var(--paper);
-}
-.chapter.current .cnum {
-  background: var(--blue);
-  color: var(--paper);
-}
-.chapter.is-locked .cnum {
+.skill-node.is-locked {
+  border-color: var(--line);
   background: var(--blue-pale);
   color: var(--ink-soft);
+  opacity: 0.55;
 }
-.ctext b {
+@keyframes nodePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.25), 0 8px 16px -10px rgba(22, 33, 58, 0.25); }
+  50% { box-shadow: 0 0 0 8px rgba(249, 115, 22, 0), 0 8px 16px -10px rgba(22, 33, 58, 0.25); }
+}
+.skill-node-mascot {
+  position: absolute;
+  top: -20px;
+  right: -12px;
+  z-index: 2;
+  filter: drop-shadow(0 4px 8px rgba(22, 33, 58, 0.25));
+}
+.skill-node-label {
+  text-align: center;
+  max-width: 130px;
+}
+.skill-node-label b {
   display: block;
   font-family: 'Baloo 2', sans-serif;
-  font-size: 0.86rem;
+  font-size: 0.8rem;
+  color: var(--ink);
+  line-height: 1.25;
 }
-.ctext span {
-  font-size: 0.72rem;
+.skill-node-label span {
+  font-size: 0.66rem;
   color: var(--ink-soft);
 }
-.chapter.reinforce {
-  border: 2px dashed var(--coral);
-  background: rgba(255, 111, 89, 0.05);
-}
-.chapter.skip {
-  border: 2px solid var(--mint);
-}
-.chap-tag {
-  display: inline-block;
+.skill-node-tag {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 4px;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   text-transform: uppercase;
   padding: 2px 7px;
   border-radius: 999px;
-  margin-top: 3px;
 }
-.chap-tag.reinf {
+.skill-node-tag.reinf {
   background: rgba(255, 111, 89, 0.16);
   color: var(--coral-2);
 }
-.chap-tag.skip {
-  background: rgba(47, 190, 159, 0.16);
+.skill-node-tag.skip {
+  background: rgba(16, 185, 129, 0.16);
   color: var(--mint-text);
-}
-.chap-mastery {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.68rem;
-  color: var(--ink-soft);
-  flex-shrink: 0;
-}
-.dl-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: var(--blue-pale);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: var(--blue-2);
 }
 
 /* ===== Lesson ===== */
@@ -1684,27 +2127,37 @@ select {
   display: flex;
   gap: 6px;
   margin-bottom: 18px;
-  background: var(--paper);
+  background: var(--bg);
+  border: 2px solid #000;
   border-radius: 999px;
-  padding: 4px;
+  padding: 5px;
 }
 .lesson-mode-btn {
   flex: 1;
   text-align: center;
-  padding: 8px 4px;
+  padding: 9px 4px;
+  border: 2px solid transparent;
   border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
   color: var(--ink-soft);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 5px;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.lesson-mode-btn:not(.is-on) {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(21, 24, 33, 0.16);
 }
 .lesson-mode-btn.is-on {
-  background: var(--blue);
-  color: var(--paper);
+  background: var(--neo-ink);
+  color: #fff;
+  border-color: #000;
 }
 .lesson-panel {
   display: none;
@@ -1714,15 +2167,20 @@ select {
   animation: fadeUp 0.26s ease;
 }
 
-/* Story / Vocal Animé */
+/* Story / Vocal Animé — the card itself is neutral paper, not a full-bleed subject colour.
+   The theme colour (slides[idx].bg, set inline in LessonView) is confined to the circular
+   badge behind the emoji instead of flooding the whole stage — same "colour lives in a badge,
+   not the canvas" principle as the rest of the app. */
 .story-stage {
   position: relative;
+  background: var(--paper);
+  border: 2.5px solid #000;
   border-radius: 22px;
   min-height: 380px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 16px 32px -18px rgba(22, 33, 58, 0.3);
+  box-shadow: 5px 5px 0 #000;
 }
 
 /* Checkpoint micro-quiz overlay */
@@ -1740,22 +2198,25 @@ select {
 }
 .checkpoint-card {
   background: var(--paper);
+  border: 2.5px solid #000;
   border-radius: 22px;
   padding: 24px 20px;
   width: 100%;
   max-width: 340px;
   text-align: center;
-  box-shadow: 0 20px 40px -12px rgba(0,0,0,0.4);
+  box-shadow: 6px 6px 0 #000;
   animation: pop-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .checkpoint-badge {
   display: inline-block;
   font-family: '"IBM Plex Mono", monospace';
   font-size: 0.62rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--blue);
+  color: var(--neo-ink);
   background: var(--blue-pale);
+  border: 1.5px solid #000;
   padding: 5px 12px;
   border-radius: 100px;
   margin-bottom: 14px;
@@ -1775,17 +2236,19 @@ select {
   flex: 1;
   padding: 14px;
   border-radius: 14px;
-  border: 2px solid var(--line);
+  border: 2px solid #000;
   background: var(--paper);
+  box-shadow: 3px 3px 0 #000;
   font-family: '"Baloo 2", sans-serif';
+  font-weight: 700;
   font-size: 0.95rem;
   color: var(--ink);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease;
 }
 .checkpoint-opt:active {
-  transform: scale(0.96);
-  border-color: var(--blue);
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000;
   background: var(--blue-pale);
 }
 .checkpoint-fb {
@@ -1819,16 +2282,17 @@ select {
 }
 .story-seg {
   flex: 1;
-  height: 4px;
+  height: 5px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(21, 24, 33, 0.12);
+  border: 1.5px solid rgba(21, 24, 33, 0.2);
   overflow: hidden;
 }
 .story-seg span {
   display: block;
   height: 100%;
   width: 0%;
-  background: #fff;
+  background: var(--neo-orange);
   border-radius: 999px;
   transition: width 0.3s linear;
 }
@@ -1843,16 +2307,34 @@ select {
   justify-content: center;
   text-align: center;
   padding: 46px 28px 30px;
-  color: #fff;
+  color: var(--ink);
   animation: storyIn 0.3s ease;
 }
 @keyframes storyIn {
   from { opacity: 0; transform: scale(0.97); }
   to { opacity: 1; transform: none; }
 }
+/* The subject/chapter's theme colour (a gradient from data.ts) lives here — a medallion, not
+   the whole stage — with a hard black border/shadow matching every other badge in the app. */
+.story-emoji-badge {
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  border: 3px solid #000;
+  box-shadow: 4px 4px 0 #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  flex-shrink: 0;
+}
 .story-emoji {
-  font-size: 2.6rem;
-  margin-bottom: 16px;
+  font-size: 3rem;
+  line-height: 1;
+  /* The badge's fill is an arbitrary per-chapter gradient of unknown brightness — a soft drop
+     shadow keeps the emoji glyph readable against any of them without needing a fixed text
+     colour. */
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
 }
 .story-text {
   font-family: 'Baloo 2', sans-serif;
@@ -1877,7 +2359,7 @@ select {
   text-align: center;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.68rem;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--ink-soft);
   z-index: 3;
 }
 .story-cta {
@@ -1895,9 +2377,11 @@ select {
 /* Audio player (Vocal Animé) */
 .audio-bar {
   background: var(--paper);
+  border: 2px solid #000;
   border-radius: 16px;
   padding: 14px 18px;
-  margin-bottom: 14px;
+  margin: 14px 0 18px;
+  box-shadow: 3px 3px 0 #000;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -1907,7 +2391,8 @@ select {
   height: 48px;
   border-radius: 50%;
   background: var(--blue);
-  color: var(--paper);
+  color: #fff;
+  border: 2px solid #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2000,7 +2485,7 @@ select {
   gap: 8px;
   position: sticky;
   bottom: 0;
-  background: var(--blue-pale);
+  background: var(--bg);
   padding: 8px 0;
 }
 .peer-input-row input {
@@ -2053,9 +2538,10 @@ select {
 .quiz-card {
   position: relative;
   background: var(--paper);
-  border-radius: 22px;
+  border: 2.5px solid #000;
+  border-radius: 24px;
   padding: 24px 22px;
-  box-shadow: 0 12px 28px -16px rgba(22, 33, 58, 0.2);
+  box-shadow: 6px 6px 0 #000;
   animation: cardIn 0.35s ease;
 }
 @keyframes cardIn {
@@ -2087,7 +2573,7 @@ select {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.76rem;
   font-weight: 600;
-  color: var(--coral-2);
+  color: var(--orange);
   opacity: 0;
   transition: opacity 0.5s ease;
 }
@@ -2097,7 +2583,7 @@ select {
   transform: translateX(-50%);
   font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
-  color: var(--mint-text);
+  color: var(--orange);
   font-size: 1.15rem;
   animation: xpFloat 0.9s ease forwards;
   pointer-events: none;
@@ -2117,34 +2603,49 @@ select {
 }
 .quiz-q2 {
   font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
   font-size: 1.15rem;
   margin-bottom: 20px;
   line-height: 1.35;
+  color: var(--ink);
 }
+/* Default: a real card, not a flat pale tint — 2px black border + hard shadow, matching
+   every other tappable surface in the app. Correct/wrong feedback is a solid, unambiguous
+   colour swap (not a fade to low opacity), which reads faster and more satisfyingly for a
+   teenage audience than a muted "almost invisible" wrong-state used to. */
 .quiz-opt2 {
   display: block;
   width: 100%;
   text-align: left;
-  background: var(--blue-pale);
-  border: 2px solid transparent;
+  background: var(--paper);
+  border: 2px solid #000;
   border-radius: 14px;
   padding: 14px 16px;
+  box-shadow: 3px 3px 0 #000;
   font-size: 0.92rem;
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--ink);
   margin-bottom: 10px;
-  transition: transform 0.12s ease;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
-.quiz-opt2:active { transform: scale(0.98); }
+.quiz-opt2:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000;
+}
+/* --neo-ink, not --ink — these two states have a hardcoded light pastel background that
+   never flips in dark mode, so their text can't flip either or it goes near-invisible. */
 .quiz-opt2.correct {
-  background: linear-gradient(120deg, rgba(47, 190, 159, 0.22), rgba(255, 194, 75, 0.22));
-  border-color: var(--mint);
-  font-weight: 700;
+  background: #baf3d8;
+  border-color: #000;
+  color: var(--neo-ink);
+  font-weight: 800;
   animation: correctPop 0.5s ease;
 }
 .quiz-opt2.wrong {
-  background: var(--blue-pale);
-  border-color: var(--line);
-  opacity: 0.5;
+  background: #ffd7d2;
+  border-color: #000;
+  color: var(--neo-ink);
+  box-shadow: 1px 1px 0 #000;
 }
 .quiz-vf2 {
   display: flex;
@@ -2154,24 +2655,31 @@ select {
   flex: 1;
   padding: 16px;
   border-radius: 14px;
-  border: 2px solid var(--line);
-  background: var(--blue-pale);
+  border: 2px solid #000;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 #000;
   font-weight: 700;
   font-size: 0.95rem;
+  color: var(--ink);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.quiz-vf2 button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000;
 }
 .quiz-vf2 button.correct {
-  background: linear-gradient(120deg, rgba(47, 190, 159, 0.22), rgba(255, 194, 75, 0.22));
-  border-color: var(--mint);
+  background: #baf3d8;
+  color: var(--neo-ink);
   animation: correctPop 0.5s ease;
 }
 .quiz-vf2 button.wrong {
-  background: var(--blue-pale);
-  border-color: var(--line);
-  opacity: 0.5;
+  background: #ffd7d2;
+  color: var(--neo-ink);
+  box-shadow: 1px 1px 0 #000;
 }
 @keyframes correctPop {
   0% { transform: scale(1); }
@@ -2192,8 +2700,10 @@ select {
   display: none;
   margin-top: 14px;
   background: var(--blue-pale);
+  border: 2px solid #000;
   border-radius: 16px;
   padding: 14px 16px;
+  box-shadow: 3px 3px 0 #000;
   gap: 12px;
   align-items: flex-start;
 }
@@ -2227,16 +2737,19 @@ select {
   gap: 8px;
   width: 100%;
   background: var(--coral);
-  color: var(--paper);
+  color: #fff;
+  border: 2px solid #000;
   border-radius: 999px;
   padding: 13px;
   font-weight: 700;
   font-size: 0.86rem;
   margin-top: 14px;
-  transition: transform 0.15s ease;
+  box-shadow: 3px 3px 0 #000;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 .quiz-bridge-btn:active {
-  transform: scale(0.97);
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000;
 }
 .quiz-summary2 {
   text-align: center;
@@ -2244,8 +2757,9 @@ select {
 }
 .quiz-summary2 .big-score {
   font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
   font-size: 2.6rem;
-  color: var(--blue);
+  color: var(--neo-orange);
   margin: 14px 0 6px;
 }
 .quiz-summary2 .stars {
@@ -2296,7 +2810,7 @@ select {
 .complete-xp {
   font-family: 'Baloo 2', sans-serif;
   font-size: 1.8rem;
-  color: var(--blue);
+  color: var(--orange);
   margin: 14px 0 4px;
   animation: xpBounce 0.5s ease;
 }
@@ -2382,6 +2896,60 @@ select {
   letter-spacing: 0.03em;
 }
 
+/* ===== Personality picker ===== */
+.persona-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.persona-card {
+  position: relative;
+  background: var(--paper);
+  border: 2px solid var(--neo-ink);
+  border-radius: 18px;
+  padding: 16px 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.persona-card:active {
+  transform: scale(0.97);
+}
+.persona-card.is-active {
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  background: #eff3ff;
+}
+.persona-emoji {
+  font-size: 1.6rem;
+  margin-bottom: 4px;
+}
+.persona-card b {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 0.88rem;
+}
+.persona-sub {
+  font-size: 0.68rem;
+  color: var(--ink-soft);
+  line-height: 1.35;
+}
+.persona-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--neo-blue);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* ===== Profile ===== */
 .profile-stats {
   display: grid;
@@ -2391,6 +2959,7 @@ select {
 }
 .pstat {
   background: var(--paper);
+  border: 2px solid var(--neo-ink);
   border-radius: 12px;
   padding: 12px 4px;
   text-align: center;
@@ -2399,6 +2968,7 @@ select {
   display: block;
   font-family: 'Baloo 2', sans-serif;
   font-size: 1.05rem;
+  color: var(--ink);
 }
 .pstat span {
   font-size: 0.62rem;
@@ -2417,6 +2987,7 @@ select {
   width: 46px;
   height: 46px;
   border-radius: 50%;
+  border: 2px solid var(--neo-ink);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2425,7 +2996,7 @@ select {
 }
 .badge.locked .ring {
   background: var(--paper);
-  border: 2px dashed var(--line);
+  border: 2px dashed rgba(21, 24, 33, 0.35);
   filter: grayscale(1);
   opacity: 0.55;
 }
@@ -2443,6 +3014,7 @@ select {
 /* ===== Settings ===== */
 .settings-group {
   background: var(--paper);
+  border: 2px solid var(--neo-ink);
   border-radius: 16px;
   margin-bottom: 16px;
   overflow: hidden;
@@ -2460,7 +3032,7 @@ select {
   align-items: center;
   padding: 13px 16px;
   font-size: 0.88rem;
-  border-top: 1px solid var(--line);
+  border-top: 1.5px solid rgba(21, 24, 33, 0.15);
 }
 .settings-row:first-of-type {
   border-top: none;
@@ -2594,6 +3166,119 @@ select {
 @keyframes eyesDroop {
   0%, 100% { transform: scaleY(1); }
   50% { transform: scaleY(0.3); }
+}
+
+/* ===== Braise explain drawer ===== */
+.explain-drawer {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
+  width: 100%;
+  max-width: 428px;
+  background: var(--bg);
+  border-radius: 24px 24px 0 0;
+  padding: 10px 20px calc(14px + env(safe-area-inset-bottom, 0px));
+  z-index: 91;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+.explain-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0 12px;
+}
+.explain-head-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.explain-head-info b {
+  display: block;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 0.92rem;
+}
+.explain-head-info span {
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+}
+.explain-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.explain-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1.5px solid rgba(21, 24, 33, 0.35);
+  border-radius: 999px;
+  padding: 11px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  margin-top: 14px;
+  transition: transform 0.15s ease;
+}
+.explain-btn:active {
+  transform: scale(0.97);
+}
+.listen-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1.5px solid rgba(21, 24, 33, 0.35);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-top: 10px;
+  transition: transform 0.15s ease;
+}
+.listen-btn:active {
+  transform: scale(0.94);
+}
+.listen-btn.is-speaking {
+  background: var(--neo-blue);
+  border-color: var(--neo-blue);
+  color: #fff;
+}
+.listen-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  margin-top: 10px;
+  padding: 2px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+.listen-link.is-speaking {
+  color: #ffd84b;
+}
+
+/* Frozen — icy tint + slow drift, streak freeze active */
+.mood-frozen-tint {
+  filter: saturate(0.55) hue-rotate(70deg) brightness(1.02);
+}
+.mood-frozen {
+  animation: braiseShiver 3.2s ease-in-out infinite;
+}
+@keyframes braiseShiver {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-2px) rotate(-1deg); }
 }
 
 /* ===== Views ===== */

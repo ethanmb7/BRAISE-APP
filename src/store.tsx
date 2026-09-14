@@ -7,7 +7,7 @@ import {
   useRef,
   type ReactNode,
 } from 'react';
-import type { ViewId, TabId, UserProfile, AppState, Confidence, CardReview } from '@/types';
+import type { ViewId, TabId, UserProfile, AppState, Confidence, CardReview, Personality } from '@/types';
 import { DEFAULT_USER, FLASHCARDS } from '@/data';
 import { sfx } from '@/lib/sound';
 import { loadProgress, saveProgress, saveCardReview } from '@/lib/persist';
@@ -18,7 +18,9 @@ type Ctx = {
   setView: (v: ViewId) => void;
   setTab: (t: TabId) => void;
   setUser: (u: UserProfile) => void;
+  setPersonality: (p: Personality) => void;
   addXp: (n: number) => void;
+  updateBestCombo: (n: number) => void;
   setStreak: (n: number) => void;
   setFreezes: (n: number) => void;
   toggleFreeze: () => void;
@@ -38,11 +40,20 @@ type Ctx = {
 const AppCtx = createContext<Ctx | null>(null);
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const DAILY_GOAL_TARGET = 10;
+const GOAL_TARGETS: Record<string, number> = {
+  '15 min/jour': 6,
+  '30 min/jour': 10,
+  '1 heure/jour': 18,
+};
+const DEFAULT_GOAL_TARGET = 10;
+
+function goalTarget(s: AppState): number {
+  return GOAL_TARGETS[s.user.goal] ?? DEFAULT_GOAL_TARGET;
+}
 
 export function computeGoalPct(s: AppState): number {
   const activity = s.sessionCardsReviewed + s.sessionChaptersDone * 3;
-  return Math.min(100, Math.round((activity / DAILY_GOAL_TARGET) * 100));
+  return Math.min(100, Math.round((activity / goalTarget(s)) * 100));
 }
 
 function sm2(review: CardReview | undefined, confidence: Confidence): CardReview {
@@ -88,6 +99,7 @@ const INITIAL: AppState = {
   user: DEFAULT_USER,
   streak: 5,
   xp: 340,
+  bestCombo: 0,
   freezes: 2,
   freezeArmed: false,
   dailyGoalMet: false,
@@ -96,6 +108,8 @@ const INITIAL: AppState = {
   soundOn: true,
   currentSubjectId: null,
   currentChapterId: null,
+  lastSubjectId: null,
+  lastChapterId: null,
   currentLessonMode: 'vocal' as const,
   completedChapters: [],
   chatBridgeMessage: null,
@@ -153,8 +167,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, ...ensureSession(s), user: u }));
   }, []);
 
+  const setPersonality = useCallback((p: Personality) => {
+    setState((s) => ({ ...s, ...ensureSession(s), user: { ...s.user, personality: p } }));
+  }, []);
+
   const addXp = useCallback((n: number) => {
     setState((s) => ({ ...s, ...ensureSession(s), xp: s.xp + n }));
+  }, []);
+
+  const updateBestCombo = useCallback((n: number) => {
+    setState((s) => (n > s.bestCombo ? { ...s, ...ensureSession(s), bestCombo: n } : { ...s, ...ensureSession(s) }));
   }, []);
 
   const setStreak = useCallback((n: number) => {
@@ -215,6 +237,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         view: 'lesson',
         currentSubjectId: subjectId,
         currentChapterId: chapterId,
+        lastSubjectId: subjectId,
+        lastChapterId: chapterId,
         currentLessonMode: mode ?? 'vocal',
         chatBridgeMessage: null,
       }));
@@ -245,7 +269,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         completedChapters: already ? s.completedChapters : [...s.completedChapters, chapterId],
         sessionChaptersDone,
         xp: already ? s.xp : s.xp + 50,
-        dailyGoalMet: activity >= DAILY_GOAL_TARGET,
+        dailyGoalMet: activity >= goalTarget(s),
       };
     });
   }, []);
@@ -264,7 +288,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         cardReviews: { ...s.cardReviews, [cardId]: updated },
         sessionCardsReviewed,
         xp: s.xp + xpGain,
-        dailyGoalMet: activity >= DAILY_GOAL_TARGET,
+        dailyGoalMet: activity >= goalTarget(s),
       };
     });
   }, []);
@@ -295,7 +319,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setView,
         setTab,
         setUser,
+        setPersonality,
         addXp,
+        updateBestCombo,
         setStreak,
         setFreezes,
         toggleFreeze,
