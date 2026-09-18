@@ -348,6 +348,47 @@ function SwipeDeck({
     }
   }, [tutorialDismissed]);
 
+  // This is a web app, not only a mobile wrapper — a player at a laptop reaches for arrow keys
+  // by reflex, and the touch-only swipe/tap surface has no equivalent for them. Mirrors the
+  // swipe semantics: ← Intox / → Carré / ↑ arme le joker before a verdict, any of the three
+  // (plus Enter/Espace) advances after one, matching "any direction moves on" once judged.
+  // MUST be declared before the two early returns below (empty deck / session complete) — every
+  // hook in a component has to run on every render regardless of which branch returns, and
+  // `index` genuinely reaches `cards.length` within a single mounted instance's lifetime (a
+  // session finishing), so this isn't just a lint nitpick: an earlier version had this effect
+  // AFTER those returns, and finishing a session called one fewer hook than every render before
+  // it — React's "Rendered fewer hooks than expected" crash, straight to a blank white screen.
+  // `judge`/`toggleArm`/`skipToNext` are defined further down (they close over `card`, which
+  // only exists past both early returns) — fine for the closure itself (effects only run after
+  // the full render, by which point those consts are assigned, in the branch that reaches
+  // them), but onKeyDown guards on `cards`/`index` BEFORE ever touching them, so the early-return
+  // renders — where those consts were never assigned at all — never try to read them either.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (cards.length === 0 || index >= cards.length) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (judged) {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          skipToNext();
+        }
+        return;
+      }
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        judge('reject');
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        judge('accept');
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        toggleArm();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  });
+
   const handleListen = (text: string) => {
     sfx.tap(soundOn);
     setSpeaking(true);
@@ -496,37 +537,6 @@ function SwipeDeck({
       : `Je viens de me planter sur « ${card.q} ». Tu peux me réexpliquer ${card.topic}, vite fait ?`;
     bridgeToChat(card.subject, card.chapterId, ask, 'revisions');
   };
-
-  // This is a web app, not only a mobile wrapper — a player at a laptop reaches for arrow keys
-  // by reflex, and the touch-only swipe/tap surface has no equivalent for them. Mirrors the
-  // swipe semantics exactly: ← Intox / → Carré / ↑ arme le joker before a verdict, any of the
-  // three (plus Enter/Espace) advances after one, matching "any direction moves on" once
-  // judged. Every handler called already guards its own preconditions (judged/typing/flying),
-  // so this can call them unconditionally without duplicating that logic.
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
-      if (judged) {
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          skipToNext();
-        }
-        return;
-      }
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        judge('reject');
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        judge('accept');
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        toggleArm();
-      }
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  });
 
   const progressPct = ((index + (judged ? 1 : 0.5)) / cards.length) * 100;
   // Held off until typing finishes so the hint doesn't compete with the answer bubble's own
