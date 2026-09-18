@@ -14,14 +14,15 @@ const TABS: { id: TabId; label: string; icon: typeof Home }[] = [
   { id: 'profile', label: 'Profil', icon: User },
 ];
 
-// Floating dock in the app's own material — a paper bar with the 2.5px black border and the
-// hard offset shadow, hovering over the bottom of every screen (safe-area aware), with an
-// ink "puck" that slides behind the active tab. Absolutely positioned inside .app-shell so
-// the screen behind keeps its full height; .app-content reserves the dock's footprint.
+// Floating dock — the app's tactile 3D construction (2.5px black border, hard offset shadow)
+// with a "neo-glass" treatment on the fill: translucent paper + a blur of whatever's behind
+// it, since this bar is chrome, not a reading surface, so it can afford the depth. An ink
+// "puck" slides behind the active tab. Absolutely positioned inside .app-shell so the screen
+// behind keeps its full height; .app-content reserves the dock's footprint.
 export function TabBar({ active, onChange }: Props) {
   return (
     <nav
-      className="absolute inset-x-4 z-40 flex items-center rounded-2xl border-[2.5px] border-black bg-[var(--paper)] p-1.5 shadow-[4px_4px_0_#000]"
+      className="absolute inset-x-4 z-40 flex items-center rounded-2xl border-[2.5px] border-black bg-[var(--paper)]/80 p-1.5 shadow-[4px_4px_0_#000] backdrop-blur-xl"
       style={{ bottom: 'calc(12px + env(safe-area-inset-bottom, 0px))' }}
       aria-label="Navigation principale"
     >

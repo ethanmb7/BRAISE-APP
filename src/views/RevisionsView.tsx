@@ -420,7 +420,7 @@ function SwipeDeck({
         <div className="rev-top-row">
           <span className="rev-count">{index + 1}/{cards.length}</span>
           <div className="rev-progress-track">
-            <div className="rev-progress-bar">
+            <div key={`bar-${index}-${judged}`} className={`rev-progress-bar ${judged && wasCorrect ? 'is-win-flash' : ''}`}>
               <span style={{ width: `${progressPct}%` }} />
             </div>
           </div>
@@ -473,24 +473,30 @@ function SwipeDeck({
           onTap={judged ? skipToNext : undefined}
         >
           <div className="fc-scroll">
-            {/* Subject pill sits directly under the header — it's context, it belongs with
-                the header, not floating mid-card above the thread. */}
-            <div className="ftag-row">
-              <span className="subject-tag" style={{ '--tag-color': subject?.color } as React.CSSProperties}>
-                {subject?.emoji} {SUBJECT_SHORT[card.subject] ?? subject?.name} · {card.topic}
-              </span>
-            </div>
+            {/* A giant watermark of the subject's own emoji, faint behind the cards — fills
+                the vertical space between header and dock with texture instead of empty
+                colour, without competing with the cards sitting on top of it (z-index below
+                CardStack, which stakes its own stacking context). */}
+            <span className="fc-watermark" aria-hidden="true">
+              {subject?.emoji ?? '📚'}
+            </span>
             {/* The centre of the screen: question, claim, then the result strip once judged —
                 one column, centred both ways, `layout` so the stack re-flows smoothly as the
                 correction unfolds and the result strip slots in. On a win it shivers once. */}
             <motion.div
-              className="flex w-full flex-1 flex-col"
+              className="relative flex w-full flex-1 flex-col"
               layout
               animate={judged && wasCorrect ? { x: [0, -5, 5, -3, 3, 0] } : { x: 0 }}
               transition={{ duration: 0.42, ease: 'easeOut' }}
             >
               <CardStack>
-                <QuestionCard question={card.q} emoji={subject?.emoji ?? '📚'} color={subject?.color ?? 'var(--sun)'} />
+                <QuestionCard
+                  question={card.q}
+                  emoji={subject?.emoji ?? '📚'}
+                  color={subject?.color ?? 'var(--sun)'}
+                  subjectLabel={SUBJECT_SHORT[card.subject] ?? subject?.name ?? ''}
+                  topic={card.topic}
+                />
                 <AnimatePresence mode="wait" initial={false}>
                   <AnswerCard
                     key={typing ? 'typing' : 'claim'}
@@ -659,7 +665,7 @@ function BevelButton({
   pressed?: boolean;
   className?: string;
 }) {
-  const radius = round ? 'rounded-full' : 'rounded-2xl';
+  const radius = round ? 'rounded-full' : 'rounded-[22px]';
   return (
     <button
       type="button"
@@ -670,7 +676,7 @@ function BevelButton({
     >
       <span aria-hidden="true" className={`absolute inset-0 translate-y-[4px] ${radius} border-[2.5px] border-black ${base}`} />
       <span
-        className={`relative flex h-[58px] items-center justify-center gap-2 ${radius} border-[2.5px] border-black px-3 font-display font-black uppercase tracking-wide shadow-[4px_4px_0_#000] transition-transform duration-100 group-active:translate-y-[4px] group-active:shadow-none ${
+        className={`relative flex h-[58px] items-center justify-center gap-2 ${radius} border-[2.5px] border-black px-3 font-display font-black uppercase tracking-wide shadow-[4px_4px_0_#000,inset_0_1.5px_0_rgba(255,255,255,0.5)] transition-transform duration-100 group-active:translate-y-[4px] group-active:scale-[0.97] group-active:shadow-none ${
           compact ? 'text-[0.82rem] normal-case tracking-normal' : 'text-[1.02rem]'
         } ${face}`}
       >

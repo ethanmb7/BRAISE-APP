@@ -3,17 +3,20 @@ import { motion } from 'framer-motion';
 import { Volume2 } from 'lucide-react';
 import { RichText } from '@/components/RichText';
 
-// The centre of the Réviser screen, in the app's own material: paper cards with the 2.5px
-// black border and the hard offset shadow every card on Home and Ton Aura wears, Baloo 2 for
-// the words, Plex Mono for the eyebrows, per-subject colour on the stage behind. The one
-// thing that makes a neo-brutalist screen feel top-10 rather than dated is the system being
-// held without a single exception — so nothing here is soft, blurred, or borderless.
+// The centre of the Réviser screen: "Tactile 3D" neo-brutalism — opaque paper cards, generous
+// rounding, a hard extruded shadow (the same construction as every button in the app) — with
+// the glass treatment reserved for the screen's chrome (header pills, tab dock) so a formula
+// or a fine print never has to fight a blurred surface for contrast. Baloo 2 stays the voice
+// (buttons, badges, Braise's own lines, the amorce sticker); IBM Plex Sans carries the actual
+// content — the question, the claim, the truth — because that's the text a science or maths
+// card lives or dies on for legibility.
 
-const CARD = 'w-full rounded-2xl border-[2.5px] border-black bg-[var(--paper)] shadow-[6px_6px_0_#000]';
+const CARD =
+  'w-full rounded-[28px] border-[2.5px] border-black bg-[var(--paper)] shadow-[6px_6px_0_#000,inset_0_1.5px_0_rgba(255,255,255,0.7)]';
 
 // A real highlighter stroke, not a box: the bottom 45% of the line is painted yellow behind
 // the words (a gradient with a hard stop, see .rev-marker), text stays ink, and it flows
-// across a line break as one continuous stroke — the way a marker does on paper.
+// across a line break as one continuous fluid block — never chopped word by word.
 const HIGHLIGHT = 'rev-marker font-black text-black';
 const STRONG = 'font-black text-black underline decoration-[3px] underline-offset-[3px] decoration-black';
 
@@ -22,10 +25,23 @@ const SPRING = { type: 'spring', stiffness: 520, damping: 26 } as const;
 /** Centred column for the cards (`my-auto`: a card taller than the viewport scrolls from its
  *  top instead of being clipped, which `justify-center` on the parent would do). */
 export function CardStack({ children }: { children: ReactNode }) {
-  return <div className="mx-auto my-auto flex w-full max-w-md flex-col items-center gap-4">{children}</div>;
+  return <div className="relative z-[1] mx-auto my-auto flex w-full max-w-md flex-col items-center gap-4">{children}</div>;
 }
 
-export function QuestionCard({ question, emoji, color }: { question: string; emoji: string; color: string }) {
+export function QuestionCard({
+  question,
+  emoji,
+  color,
+  subjectLabel,
+  topic,
+}: {
+  question: string;
+  emoji: string;
+  color: string;
+  /** Folded into this card's own header — no separate pill floating above it anymore. */
+  subjectLabel: string;
+  topic: string;
+}) {
   return (
     <motion.div
       className={`${CARD} px-5 py-4 text-left`}
@@ -36,15 +52,17 @@ export function QuestionCard({ question, emoji, color }: { question: string; emo
       <div className="flex items-center gap-2.5">
         {/* The subject's own icon tile, the same construction as the deck cards on Home. */}
         <span
-          className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border-2 border-black text-base shadow-[2px_2px_0_#000]"
+          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border-2 border-black text-base shadow-[2px_2px_0_#000,inset_0_1px_0_rgba(255,255,255,0.5)]"
           style={{ background: color }}
           aria-hidden="true"
         >
           {emoji}
         </span>
-        <span className="font-mono text-[0.64rem] font-bold uppercase tracking-[0.08em] text-black/70">Braise · à l'instant</span>
+        <span className="font-display text-[0.92rem] font-extrabold leading-tight text-black">
+          {subjectLabel} <span className="text-black/40">·</span> {topic}
+        </span>
       </div>
-      <p className="mt-3 font-display text-lg font-bold leading-snug text-black">
+      <p className="mt-3 font-sans text-[1.2rem] font-bold leading-snug text-black">
         <RichText text={question} markClass={HIGHLIGHT} strongClass={STRONG} />
       </p>
     </motion.div>
@@ -83,21 +101,21 @@ export function AnswerCard({
   wasLie: boolean;
   judged: boolean;
   verdict: Verdict;
-  /** Braise's dare ("Je dis vrai ou je raconte n'importe quoi ?"), shown as this card's
-   *  footer until a verdict lands — the instruction lives with the thing it's about. */
+  /** Braise's dare ("Je dis vrai ou je raconte n'importe quoi ?"), shown as a comic sticker
+   *  encastré in this card's footer until a verdict lands — the instruction lives with the
+   *  thing it's about. */
   prompt: string;
   /** First card ever: the footer slot shows the swipe gesture instead of the prompt. */
   tutorial?: boolean;
   /** Once judged: the result strip rendered as this card's footer. */
   result?: ResultProps;
 }) {
-  // The verdict lands on the card itself: border + shadow take the colour, and a sticker
-  // gets slapped on its corner.
+  // The verdict lands on the card itself: border + shadow take the colour.
   const verdictClass =
     verdict === 'win'
-      ? 'border-[var(--mint-text)] shadow-[6px_6px_0_var(--mint-text)]'
+      ? 'border-[var(--mint-text)] shadow-[6px_6px_0_var(--mint-text),inset_0_1.5px_0_rgba(255,255,255,0.7)]'
       : verdict === 'miss'
-        ? 'border-[var(--coral-2)] shadow-[6px_6px_0_var(--coral-2)]'
+        ? 'border-[var(--coral-2)] shadow-[6px_6px_0_var(--coral-2),inset_0_1.5px_0_rgba(255,255,255,0.7)]'
         : '';
 
   if (typing) {
@@ -136,30 +154,41 @@ export function AnswerCard({
 
       {judged && wasLie ? (
         <>
-          {/* The trap, struck through where it stands — small and clamped: it's the thing to
-              forget, the truth below is the thing to keep. `bg-transparent` kills the
-              browser's default yellow on <mark>. */}
-          <p className="line-clamp-2 font-display text-[0.92rem] font-bold leading-snug text-black/45 line-through decoration-[var(--coral-2)] decoration-[2.5px]">
-            <RichText text={claim} markClass="bg-transparent font-black" strongClass="font-black" />
-          </p>
-          {/* …and the truth unfolding right under it. */}
+          {/* The trap, crossed out elegantly — a single stroke drawing itself left to right
+              (not a static text-decoration snapping on), then the truth unfolds right under
+              it once the strike lands. Single line + truncate: the trap is the thing to
+              forget, it doesn't need room to wrap. */}
+          <div className="relative inline-block max-w-full">
+            <p className="truncate font-sans text-[0.98rem] font-semibold text-black/40">
+              <RichText text={claim} markClass="bg-transparent font-semibold" strongClass="font-semibold" />
+            </p>
+            <motion.span
+              aria-hidden="true"
+              className="absolute left-0 top-1/2 h-[2.5px] w-full rounded-full bg-[var(--coral-2)]"
+              style={{ originX: 0 }}
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 0.28, delay: 0.16, ease: 'easeOut' }}
+            />
+          </div>
+          {/* …and the truth unfolding right under it, timed to start once the strike lands. */}
           <motion.div
             className="mt-3 border-t-2 border-dashed border-black/20 pt-3"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
-            transition={{ height: { type: 'spring', stiffness: 320, damping: 30 }, opacity: { duration: 0.3, delay: 0.1 } }}
+            transition={{ height: { type: 'spring', stiffness: 320, damping: 30, delay: 0.36 }, opacity: { duration: 0.3, delay: 0.42 } }}
             style={{ overflow: 'hidden' }}
           >
             <span className="inline-block rounded-md bg-black px-2 py-0.5 font-mono text-[0.62rem] font-bold uppercase tracking-[0.08em] text-white">
               En vrai
             </span>
-            <p className="mt-2 font-display text-xl font-black leading-snug text-black">
+            <p className="mt-2 font-sans text-[1.3rem] font-bold leading-snug text-black">
               <RichText text={truth} markClass={HIGHLIGHT} strongClass={STRONG} />
             </p>
           </motion.div>
         </>
       ) : (
-        <p className="font-display text-xl font-black leading-snug text-black">
+        <p className="font-sans text-[1.3rem] font-bold leading-snug text-black">
           <RichText text={claim} markClass={HIGHLIGHT} strongClass={STRONG} />
         </p>
       )}
@@ -169,9 +198,11 @@ export function AnswerCard({
       ) : tutorial ? (
         <TutorialHint />
       ) : (
-        <p className="mt-4 border-t-2 border-dashed border-black/15 pt-3 font-mono text-[0.68rem] font-bold uppercase tracking-[0.06em] text-black/60">
-          {prompt}
-        </p>
+        // The amorce, as a comic sticker encastré at the bottom of the card, not a line of
+        // uppercase monospace instructions — Braise's dare, in Braise's own voice.
+        <div className="prompt-sticker mt-5 inline-block">
+          <p className="font-display text-[0.86rem] font-bold leading-snug text-black">{prompt}</p>
+        </div>
       )}
     </motion.div>
   );
@@ -182,7 +213,7 @@ export function AnswerCard({
 function TutorialHint() {
   return (
     <div className="mt-4 flex items-center justify-between gap-3 border-t-2 border-dashed border-black/15 pt-3" aria-hidden="true">
-      <span className="rounded-lg border-2 border-black bg-[var(--coral)] px-2.5 py-1 font-display text-[0.72rem] font-black uppercase tracking-wide text-white shadow-[2px_2px_0_#000]">
+      <span className="rounded-xl border-2 border-black bg-[var(--coral)] px-2.5 py-1 font-display text-[0.72rem] font-black uppercase tracking-wide text-white shadow-[2px_2px_0_#000]">
         ← Intox
       </span>
       <motion.span
@@ -192,7 +223,7 @@ function TutorialHint() {
       >
         ✋
       </motion.span>
-      <span className="rounded-lg border-2 border-black bg-[var(--mint)] px-2.5 py-1 font-display text-[0.72rem] font-black uppercase tracking-wide text-black shadow-[2px_2px_0_#000]">
+      <span className="rounded-xl border-2 border-black bg-[var(--mint)] px-2.5 py-1 font-display text-[0.72rem] font-black uppercase tracking-wide text-black shadow-[2px_2px_0_#000]">
         Carré →
       </span>
     </div>
@@ -200,13 +231,15 @@ function TutorialHint() {
 }
 
 /** The verdict as a row of chips at the top of the card, in its own slot. Each chip is the
- *  app's sticker (border + hard shadow); they pop in one after the other. */
+ *  app's sticker (border + hard shadow + a glossy inner edge); they pop in one after another
+ *  with spring overshoot, like a real reward landing rather than a UI element fading in. */
 function VerdictBar({ verdict, tag, xp, combo }: ResultProps) {
   const win = verdict === 'win';
-  const chip = 'rounded-lg border-2 border-black px-2.5 py-1 font-display text-[0.72rem] font-black uppercase tracking-wide shadow-[2px_2px_0_#000]';
+  const chip =
+    'rounded-xl border-2 border-black px-2.5 py-1 font-display text-[0.72rem] font-black uppercase tracking-wide shadow-[2px_2px_0_#000,inset_0_1px_0_rgba(255,255,255,0.55)]';
   const pop = (delay: number) => ({
     initial: { opacity: 0, scale: 0.5, y: -6 },
-    animate: { opacity: 1, scale: [0.5, 1.12, 1], y: 0 },
+    animate: { opacity: 1, scale: [0.5, 1.15, 1], y: 0 },
     transition: { duration: 0.4, delay },
   });
   return (
@@ -214,17 +247,36 @@ function VerdictBar({ verdict, tag, xp, combo }: ResultProps) {
       <motion.span className={`${chip} ${win ? 'bg-[var(--mint)] text-black' : 'bg-[var(--coral-2)] text-white'}`} {...pop(0.08)}>
         {tag}
       </motion.span>
-      {xp > 0 && (
-        <motion.span className={`${chip} bg-gradient-to-b from-[#FFE066] to-[#FDC800] text-black`} {...pop(0.22)}>
-          +{xp} XP
-        </motion.span>
-      )}
+      {xp > 0 && <XpChip xp={xp} chip={chip} />}
       {win && combo >= 2 && (
         <motion.span className={`${chip} ml-auto ${combo >= 3 ? 'bg-[var(--neo-orange)] text-white' : 'bg-white text-black'}`} {...pop(0.34)}>
           🔥 {combo >= 3 ? `En chauffant ×${combo}` : `×${combo}`}
         </motion.span>
       )}
     </div>
+  );
+}
+
+/** The XP chip as an actual token, not a label: pops in with spring overshoot, then a diagonal
+ *  shine sweeps across it once — the same beat a coin or a loot drop gets in the games this
+ *  screen is competing with for a teenager's attention. */
+function XpChip({ xp, chip }: { xp: number; chip: string }) {
+  return (
+    <motion.span
+      className={`${chip} relative overflow-hidden bg-gradient-to-b from-[#FFE066] to-[#FDC800] text-black`}
+      initial={{ opacity: 0, scale: 0.5, y: -6 }}
+      animate={{ opacity: 1, scale: [0.5, 1.15, 1], y: 0 }}
+      transition={{ duration: 0.4, delay: 0.22 }}
+    >
+      +{xp} XP
+      <motion.span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 bg-gradient-to-r from-transparent via-white/70 to-transparent"
+        initial={{ x: '-40%' }}
+        animate={{ x: '280%' }}
+        transition={{ duration: 0.65, delay: 0.55, ease: 'easeOut' }}
+      />
+    </motion.span>
   );
 }
 
@@ -249,7 +301,7 @@ function ResultStrip({ verdict, text, speaking, onListen }: ResultProps) {
           onPointerDown={(e) => e.stopPropagation()}
           aria-label={speaking ? 'Lecture en cours' : 'Écouter la bonne réponse'}
           aria-pressed={speaking}
-          className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border-2 border-black shadow-[2px_2px_0_#000] transition-transform active:translate-y-[2px] active:shadow-none ${
+          className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border-2 border-black shadow-[2px_2px_0_#000] transition-transform active:translate-y-[2px] active:shadow-none ${
             speaking ? 'bg-[var(--sun)] text-black' : 'bg-white text-black'
           }`}
         >
