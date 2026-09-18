@@ -26,6 +26,19 @@ export function quizCorrect(ctx: VoiceCtx): string {
   });
 }
 
+// The "aïe" case — the student called INTOX on a claim that was actually true — used to be a
+// single hardcoded line ("Le piège était là, celle-là était pourtant bonne.") with no variation
+// at all, the one spot in the judge() flow that never rotated. Same byCombo system as
+// quizWrong, its sibling for the other kind of miss (falling for an actual trap).
+export function missedTruth(ctx: VoiceCtx): string {
+  return byCombo(ctx, {
+    'chill-college': ['Pas de piège cette fois, celle-là était vraie !', 'Fausse alerte : elle était bonne, en fait.', 'Aucune intox ici, tu as flairé un piège qui n\'existait pas.'],
+    'chill-lycee': ['Pas de piège, celle-là était correcte.', 'Fausse alerte, cette fois c\'était la vérité.', 'Tu as flairé un piège qui n\'était pas là.'],
+    'savage-college': ['Ah non, celle-là était clean, fallait me faire confiance.', 'Trop de méfiance : elle était vraie, cette fois.', 'Raté, y\'avait pas d\'arnaque sur ce coup.'],
+    'savage-lycee': ['Celle-là était réglo, fallait valider.', 'Excès de méfiance : elle était vraie.', 'Pas d\'embrouille ici, juste la vérité toute simple.'],
+  });
+}
+
 export function quizWrong(ctx: VoiceCtx, topic?: string): string {
   const t = topic ? ` sur ${topic}` : '';
   return byCombo(ctx, {
@@ -85,6 +98,41 @@ export function judgePrompt(ctx: VoiceCtx): string {
     'savage-college': ['Alors, je bluffe ou pas ?', 'Ose me dire que c\'est faux.'],
     'savage-lycee': ['Je bluffe, ou pas ?', 'Vas-y, cale-moi si tu peux.'],
   });
+}
+
+// The short tag chip on the verdict bar (Réviser) — used to be four hardcoded strings, always
+// the same one per outcome. On a 15-card session that's the same "💯 C'EST CARRÉ" read eight or
+// nine times identically; Braise's own line underneath already rotates, the tag it sits next to
+// didn't. Same byCombo system as the rest of this file, so the tag's energy tracks the chosen
+// personality/age too, not just the outcome.
+export function verdictTag(ctx: VoiceCtx, kind: 'carre' | 'super' | 'aie' | 'grille'): string {
+  const tables: Record<typeof kind, Record<string, string[]>> = {
+    carre: {
+      'chill-college': ["💯 C'est carré", '🎯 Dans le mille', '🔥 Nickel', '✅ Carton plein'],
+      'chill-lycee': ["💯 C'est carré", '🎯 En plein dans le mille', '✅ Solide', '🔥 Propre'],
+      'savage-college': ["💯 C'est carré", '🎯 Boum, dans le mille', '😎 Pas mal du tout', '🔥 Ça envoie'],
+      'savage-lycee': ["💯 C'est carré", '🎯 Dans le mille', '😏 Pas si nul finalement', '🔥 Ça poutre'],
+    },
+    super: {
+      'chill-college': ['⚡ Super Braise', '⚡ Double ou rien, gagné', '⚡ Boum, ×2'],
+      'chill-lycee': ['⚡ Super Braise', '⚡ Coup double réussi', '⚡ ×2, propre'],
+      'savage-college': ['⚡ Super Braise', '⚡ Coup critique !', "⚡ Boum, ×2, t'as osé"],
+      'savage-lycee': ['⚡ Super Braise', '⚡ Coup critique', '⚡ ×2 assumé'],
+    },
+    aie: {
+      'chill-college': ['🙈 Aïe', '😬 Raté de peu', "🙊 Dommage, c'était vrai"],
+      'chill-lycee': ['🙈 Aïe', '😬 Presque', '🙊 Celle-là était bonne pourtant'],
+      'savage-college': ['🙈 Aïe', '😬 Tu doutes trop', '🙊 Fallait me faire confiance'],
+      'savage-lycee': ['🙈 Aïe', '😬 Trop de méfiance, là', '🙊 Elle était clean pourtant'],
+    },
+    grille: {
+      'chill-college': ['💀 Grillé', '🎭 Dans le panneau', '🙃 Roulé'],
+      'chill-lycee': ['💀 Grillé', '🎭 Piégé en beauté', '🙃 Roulé dans la farine'],
+      'savage-college': ['💀 Grillé', '🎭 Direct dans le panneau', '😵 Piégé comme un débutant'],
+      'savage-lycee': ['💀 Grillé', '🎭 Tombé dans le panneau', '😵 Roulé sans forcer'],
+    },
+  };
+  return byCombo(ctx, tables[kind]);
 }
 
 export function dailyPickLine(ctx: VoiceCtx, userName: string, subjectName: string, chapterTitle: string): string {

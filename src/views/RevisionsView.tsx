@@ -1,13 +1,24 @@
 import { useState, useEffect, useMemo, useRef, type ReactNode } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform, animate, type PanInfo, type MotionValue } from 'framer-motion';
+import {
+  motion,
+  AnimatePresence,
+  MotionConfig,
+  useMotionValue,
+  useReducedMotion,
+  useTransform,
+  animate,
+  type PanInfo,
+  type MotionValue,
+} from 'framer-motion';
 import { Flag, Check, X, Zap, BookOpen, ArrowRight } from 'lucide-react';
 import { useApp } from '@/store';
 import { sfx } from '@/lib/sound';
 import { fireConfetti, fireMicroConfetti } from '@/lib/confetti';
 import { speak, stopSpeaking } from '@/lib/speech';
 import { BraiseRecap } from '@/components/BraiseRecap';
+import { BraiseMascot } from '@/components/BraiseMascot';
 import { CardStack, QuestionCard, AnswerCard } from '@/components/RevisionCards';
-import { getAgeGroup, judgePrompt, quizCorrect, quizWrong } from '@/lib/braiseVoice';
+import { getAgeGroup, judgePrompt, missedTruth, quizCorrect, quizWrong, verdictTag } from '@/lib/braiseVoice';
 import { reportCard } from '@/lib/reports';
 import { FLASHCARDS, SUBJECTS } from '@/data';
 import type { Flashcard, Confidence } from '@/types';
@@ -17,6 +28,8 @@ import type { Flashcard, Confidence } from '@/types';
 // streak, completed chapters...), and this is a single one-way "has this device ever seen the
 // tutorial" flag with no need to round-trip through that machinery.
 const TUTORIAL_SEEN_KEY = 'sapie_rev_tutorial_seen';
+// Same one-way "seen it once" pattern, for the joker's first-ever charge-complete explainer.
+const JOKER_SEEN_KEY = 'sapie_joker_seen';
 
 // A daily session is a sprint, not the whole library: ~15 cards, mixed. The deck used to
 // serve every due card (26 on a fresh install) with no cap at all.
@@ -127,17 +140,25 @@ export function RevisionsView() {
 
   return (
     <div className="view is-active rev-view">
-      <SwipeDeck
-        key={sessionKey}
-        cards={cards}
-        resume={resume && resume.cardIds.length === cards.length ? resume : null}
-        soundOn={state.soundOn}
-        onReview={reviewCard}
-        onRestartSession={() => {
-          writeSnapshot(null);
-          setSessionKey((k) => k + 1);
-        }}
-      />
+      {/* "user": follows the OS/browser prefers-reduced-motion setting, not a manual toggle —
+          transform-based animations (scale/rotate/x/y: the card punch, the Suivant pulse, the
+          win shiver, drag tilt, the strike-through draw) snap straight to their end state
+          instead of animating; opacity crossfades (the subject-colour stage, card entrances)
+          still run, since those carry real information and aren't the vestibular-triggering
+          kind this setting exists for. */}
+      <MotionConfig reducedMotion="user">
+        <SwipeDeck
+          key={sessionKey}
+          cards={cards}
+          resume={resume && resume.cardIds.length === cards.length ? resume : null}
+          soundOn={state.soundOn}
+          onReview={reviewCard}
+          onRestartSession={() => {
+            writeSnapshot(null);
+            setSessionKey((k) => k + 1);
+          }}
+        />
+      </MotionConfig>
     </div>
   );
 }
@@ -160,6 +181,10 @@ function SwipeDeck({
 }) {
   const { state, addXp, updateBestCombo, setTab, bridgeToChat } = useApp();
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
+  // Confetti isn't a transform MotionConfig can neuter (it's a canvas particle burst, not a
+  // framer animation) — gated explicitly. The verdict is still fully communicated without it
+  // (colour, chips, text), so skipping it under reduced motion loses nothing but the flourish.
+  const reducedMotion = useReducedMotion();
   const [index, setIndex] = useState(resume?.index ?? 0);
   const [isTrueAnswer, setIsTrueAnswer] = useState(true);
   const [judged, setJudged] = useState(false);
@@ -200,16 +225,49 @@ function SwipeDeck({
   // after, so the ring fires on the very next moment the joker button is actually on screen —
   // normally the next card — and never again until the joker is spent and earned afresh.
   const [jokerJustCharged, setJokerJustCharged] = useState(false);
+  // First-time-only explainer: the burst ring above tells a RETURNING player something just
+  // happened; a first-time player needs the sentence too, or the button just silently changed
+  // colour for no stated reason. Persisted like the swipe tutorial below — seen once, never
+  // shown again on this device.
+  const [jokerExplainerSeen, setJokerExplainerSeen] = useState(() => {
+    try {
+      return localStorage.getItem(JOKER_SEEN_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
+  const [showJokerExplainer, setShowJokerExplainer] = useState(false);
   const jokerWasReady = useRef(false);
   useEffect(() => {
     if (jokerReady && !jokerWasReady.current) {
       setJokerJustCharged(true);
       const t = setTimeout(() => setJokerJustCharged(false), 700);
+      if (!jokerExplainerSeen) {
+        setShowJokerExplainer(true);
+        setJokerExplainerSeen(true);
+      }
       jokerWasReady.current = jokerReady;
       return () => clearTimeout(t);
     }
     jokerWasReady.current = jokerReady;
-  }, [jokerReady]);
+  }, [jokerReady, jokerExplainerSeen]);
+  useEffect(() => {
+    if (!jokerExplainerSeen) return;
+    try {
+      localStorage.setItem(JOKER_SEEN_KEY, '1');
+    } catch {
+      // ignore quota/availability errors, same defensive pattern as lib/persist.ts
+    }
+  }, [jokerExplainerSeen]);
+  // Only counts down once the joker button is actually back on screen (`!judged` — the dock
+  // swaps away from the verdict row the instant a card is answered, same timing quirk as
+  // jokerJustCharged above): a player who lingers on the previous card's feedback still gets
+  // the full read, instead of a countdown that finishes before they ever see the bubble.
+  useEffect(() => {
+    if (!showJokerExplainer || judged) return;
+    const t = setTimeout(() => setShowJokerExplainer(false), 3500);
+    return () => clearTimeout(t);
+  }, [showJokerExplainer, judged]);
   // First-card-only swipe tutorial. Dismissed permanently the moment the player does anything
   // — starts a drag or taps a verdict button. Seeded from localStorage (lazy initializer, read
   // exactly once per mount) so a returning player never sees it again once they've dismissed
@@ -242,7 +300,7 @@ function SwipeDeck({
   }, [index]);
 
   useEffect(() => {
-    if (cards.length > 0 && index === cards.length) fireConfetti();
+    if (cards.length > 0 && index === cards.length && !reducedMotion) fireConfetti();
   }, [index, cards.length]);
 
   // Keep the resumable snapshot current while the session is live; drop it the moment the
@@ -297,7 +355,19 @@ function SwipeDeck({
   };
 
   if (cards.length === 0) {
-    return <p style={{ textAlign: 'center', color: 'var(--ink-soft)' }}>Aucune carte pour ce filtre.</p>;
+    // Genuinely rare (needs FLASHCARDS itself to be empty) but was a single unstyled grey line
+    // with no way back — anyone who did land on it would have read it as a bug, not a designed
+    // state, and had no path except the browser's own back button.
+    return (
+      <div className="rev-empty">
+        <BraiseMascot size={72} mood="hesitant" />
+        <p className="rev-empty-title">Rien à réviser pour l'instant</p>
+        <p className="rev-empty-sub">Termine quelques cours et reviens — je te prépare un nouveau lot de cartes.</p>
+        <button type="button" className="rev-empty-btn" onClick={() => setTab('home')}>
+          Retour à l'accueil
+        </button>
+      </div>
+    );
   }
 
   if (index >= cards.length) {
@@ -321,12 +391,14 @@ function SwipeDeck({
     if (judged || typing || !jokerReady) return;
     sfx.flip(soundOn);
     setTutorialDismissed(true);
+    setShowJokerExplainer(false);
     setArmed((a) => !a);
   };
 
   const judge = (mode: Verdict) => {
     if (judged || typing) return;
     setTutorialDismissed(true);
+    setShowJokerExplainer(false);
     const useSuper = armed && jokerReady;
     const acceptedAsTrue = mode === 'accept';
     const correctJudgment = acceptedAsTrue === isTrueAnswer;
@@ -344,10 +416,10 @@ function SwipeDeck({
       if (bonus > 0) addXp(bonus);
       const total = base + bonus;
       setXpEarned((v) => v + total);
-      setFeedback({ tag: useSuper ? '⚡ SUPER BRAISE' : "💯 C'EST CARRÉ", text: quizCorrect(voiceCtx), xp: total });
+      setFeedback({ tag: verdictTag(voiceCtx, useSuper ? 'super' : 'carre'), text: quizCorrect(voiceCtx), xp: total });
       // Immediate, physical: a small burst fires from the side of the dock that was pressed
       // (INTOX left / CARRÉ right), the whole stack shivers, the result strip pops in.
-      fireMicroConfetti(mode === 'accept' ? 0.76 : 0.24, 0.9, useSuper);
+      if (!reducedMotion) fireMicroConfetti(mode === 'accept' ? 0.76 : 0.24, 0.9, useSuper);
       // Spending the joker empties its charge; otherwise a correct answer charges it.
       setJokerCharge((c) => (useSuper ? 0 : Math.min(JOKER_CHARGE_NEEDED, c + 1)));
       setCombo((c) => {
@@ -365,8 +437,8 @@ function SwipeDeck({
       setWrongCount((w) => w + 1);
       setFeedback(
         isTrueAnswer
-          ? { tag: '🙈 AÏE', text: 'Le piège était là, celle-là était pourtant bonne.', xp: 0 }
-          : { tag: '💀 GRILLÉ', text: quizWrong(voiceCtx, card.topic), xp: 0 }
+          ? { tag: verdictTag(voiceCtx, 'aie'), text: missedTruth(voiceCtx), xp: 0 }
+          : { tag: verdictTag(voiceCtx, 'grille'), text: quizWrong(voiceCtx, card.topic), xp: 0 }
       );
       setCombo(0);
       setJokerCharge(0);
@@ -424,6 +496,37 @@ function SwipeDeck({
       : `Je viens de me planter sur « ${card.q} ». Tu peux me réexpliquer ${card.topic}, vite fait ?`;
     bridgeToChat(card.subject, card.chapterId, ask, 'revisions');
   };
+
+  // This is a web app, not only a mobile wrapper — a player at a laptop reaches for arrow keys
+  // by reflex, and the touch-only swipe/tap surface has no equivalent for them. Mirrors the
+  // swipe semantics exactly: ← Intox / → Carré / ↑ arme le joker before a verdict, any of the
+  // three (plus Enter/Espace) advances after one, matching "any direction moves on" once
+  // judged. Every handler called already guards its own preconditions (judged/typing/flying),
+  // so this can call them unconditionally without duplicating that logic.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (judged) {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          skipToNext();
+        }
+        return;
+      }
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        judge('reject');
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        judge('accept');
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        toggleArm();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  });
 
   const progressPct = ((index + (judged ? 1 : 0.5)) / cards.length) * 100;
   // Held off until typing finishes so the hint doesn't compete with the answer bubble's own
@@ -610,6 +713,20 @@ function SwipeDeck({
                         button (and this ring) don't exist yet at that instant. This flag
                         survives to the next time they do. */}
                     {jokerJustCharged && <span key="joker-burst" className="joker-burst-ring" aria-hidden="true" />}
+                    <AnimatePresence>
+                      {showJokerExplainer && (
+                        <motion.div
+                          className="joker-tip"
+                          role="status"
+                          initial={{ opacity: 0, y: 6, scale: 0.92 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 4, scale: 0.95 }}
+                          transition={{ type: 'spring', stiffness: 480, damping: 30 }}
+                        >
+                          Il est prêt ! ×2 sur ta prochaine bonne réponse.
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                     <BevelButton
                       className="w-[62px]"
                       round

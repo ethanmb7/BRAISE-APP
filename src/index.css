@@ -1024,6 +1024,50 @@ select {
   background-size: 22px 22px;
   min-height: 100%;
 }
+/* Rare (needs the whole flashcard bank to be empty) but designed like every other screen
+   instead of a bare line of grey text: the mascot, a "pote" line rather than an error message,
+   and an actual way out — Braise's own paper/CTA construction, not a dead end. */
+.rev-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 100dvh;
+  min-height: 480px;
+  padding: 32px;
+  text-align: center;
+}
+.rev-empty-title {
+  margin-top: 14px;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--neo-ink);
+}
+.rev-empty-sub {
+  max-width: 30ch;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.rev-empty-btn {
+  margin-top: 20px;
+  border: 2.5px solid #000;
+  border-radius: 999px;
+  padding: 12px 26px;
+  background: linear-gradient(to bottom, #ffe066, #fdc800);
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 0.92rem;
+  color: #000;
+  box-shadow: 3px 3px 0 #000;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.rev-empty-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 #000;
+}
 .view.is-active.rev-view {
   margin: 0;
   padding: 0;
@@ -1646,6 +1690,55 @@ select {
   0% { transform: scale(0.6); opacity: 0.9; border-width: 4px; }
   70% { transform: scale(1.35); opacity: 0.35; border-width: 2px; }
   100% { transform: scale(1.65); opacity: 0; border-width: 1px; }
+}
+/* These two are plain CSS @keyframes, not framer-motion — MotionConfig's reducedMotion="user"
+   (RevisionsView) only reaches motion components, so the couple of CSS-only animations on this
+   screen need their own opt-out. Both are decoration on top of a verdict/streak already fully
+   conveyed by colour and text, so removing the motion loses no information. */
+@media (prefers-reduced-motion: reduce) {
+  .joker-burst-ring,
+  .rev-combo-shake,
+  .rev-progress-bar.is-win-flash {
+    animation: none !important;
+  }
+}
+/* First-time-only explainer bubble, anchored above the joker button — same comic-sticker
+   construction as .prompt-sticker, tail pointing down into the button it's explaining instead
+   of up into a card. Never wraps (the sentence is short by design; width:max-content plus a
+   generous max-width keeps a long device-font override from ever forcing an ugly wrap). */
+.joker-tip {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  width: max-content;
+  max-width: 168px;
+  background: var(--paper);
+  border: 2.5px solid #000;
+  border-radius: 14px;
+  padding: 8px 12px;
+  box-shadow: 3px 3px 0 #000;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 0.74rem;
+  line-height: 1.3;
+  color: #000;
+  text-align: center;
+  pointer-events: none;
+}
+.joker-tip::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  background: var(--paper);
+  border-right: 2.5px solid #000;
+  border-bottom: 2.5px solid #000;
+  border-radius: 0 0 3px 0;
+  transform: translateX(-50%) rotate(45deg);
 }
 /* Highlighter stroke for ==key terms== on the cards: the bottom 45% of the line painted
    yellow behind the words, hard edge, text stays ink, flows across a line break as one
