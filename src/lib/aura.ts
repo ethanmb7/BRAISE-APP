@@ -12,7 +12,11 @@ export type Rank = {
 // fast; the curve stretches out after that so Légende stays a genuine long-term target.
 export const RANKS: Rank[] = [
   { id: 'bronze', name: 'Bronze', emoji: '🥉', min: 0, colorFrom: '#e8b088', colorTo: '#8a4a26' },
-  { id: 'argent', name: 'Argent', emoji: '🥈', min: 500, colorFrom: '#dbe4f0', colorTo: '#7c8fa8' },
+  // Argent used to be a near-neutral grey-blue (#dbe4f0/#7c8fa8) — the only one of the 5 ranks
+  // without a real saturated hue, which read as flat next to bronze/or/platine/légende and landed
+  // worst on exactly the first rank-up most new users ever see. A vivid "chrome blue" keeps the
+  // cool/metallic read of silver through hue and shine rather than through desaturation.
+  { id: 'argent', name: 'Argent', emoji: '🥈', min: 500, colorFrom: '#8ecfff', colorTo: '#3373d6' },
   { id: 'or', name: 'Or', emoji: '🥇', min: 1500, colorFrom: '#ffe08a', colorTo: '#e8a317' },
   { id: 'platine', name: 'Platine', emoji: '💎', min: 3500, colorFrom: '#b9f3ea', colorTo: '#7c3aed' },
   { id: 'legende', name: 'Légende', emoji: '👑', min: 7000, colorFrom: '#ffb199', colorTo: '#ff6f59' },

@@ -7,8 +7,8 @@ import {
   useRef,
   type ReactNode,
 } from 'react';
-import type { ViewId, TabId, UserProfile, AppState, Confidence, CardReview, Personality } from '@/types';
-import { DEFAULT_USER, FLASHCARDS } from '@/data';
+import type { ViewId, TabId, UserProfile, AppState, Confidence, CardReview, Personality, Chapter } from '@/types';
+import { DEFAULT_USER, FLASHCARDS, SUBJECTS } from '@/data';
 import { sfx } from '@/lib/sound';
 import { loadProgress, saveProgress, saveCardReview } from '@/lib/persist';
 
@@ -34,7 +34,7 @@ type Ctx = {
   reviewCard: (cardId: string, confidence: Confidence) => void;
   getDueCards: () => string[];
   goBack: () => void;
-  bridgeToChat: (subjectId: string, chapterId: string, bridgeMessage: string) => void;
+  bridgeToChat: (subjectId: string, chapterId: string, bridgeMessage: string, returnTo?: ViewId) => void;
 };
 
 const AppCtx = createContext<Ctx | null>(null);
@@ -54,6 +54,87 @@ function goalTarget(s: AppState): number {
 export function computeGoalPct(s: AppState): number {
   const activity = s.sessionCardsReviewed + s.sessionChaptersDone * 3;
   return Math.min(100, Math.round((activity / goalTarget(s)) * 100));
+}
+
+/** Remaining "card-equivalent" units to hit today's goal (cards count 1, chapters count 3 —
+ *  same weighting as computeGoalPct) — real, derived from the same activity formula, never a
+ *  separate guess. 0 once the goal is already met. */
+export function remainingToGoal(s: AppState): number {
+  const activity = s.sessionCardsReviewed + s.sessionChaptersDone * 3;
+  return Math.max(0, goalTarget(s) - activity);
+}
+
+/** Real chapter progression, derived from `completedChapters` — the one dynamic signal the app
+ *  actually tracks. `data.ts` only ships a fresh-install baseline (chapter 0 of each subject
+ *  open, the rest locked); this recomputes status/mastery from real completion every render, so
+ *  finishing a chapter anywhere actually unlocks the next one everywhere. Without this, `status`
+ *  in data.ts never changes and every subject stays stuck on its first chapter forever — the
+ *  same "static field never reflects real progress" bug the streak/XP fix addressed, just one
+ *  level deeper. A completed chapter shows 100% (real completion, not a graded score — nothing
+ *  in the data model tracks partial per-chapter mastery); anything not yet completed shows 0%,
+ *  never a fabricated in-between number.
+ */
+export function resolveChapters(chapters: Chapter[], completedChapters: string[]): Chapter[] {
+  const firstOpenIndex = chapters.findIndex((c) => !completedChapters.includes(c.id));
+  return chapters.map((c, i) => {
+    if (completedChapters.includes(c.id)) return { ...c, status: 'done', mastery: 100 };
+    if (i === firstOpenIndex) return { ...c, status: 'current', mastery: 0 };
+    return { ...c, status: 'locked', mastery: 0 };
+  });
+}
+
+/** Real count of finished chapters across every subject — via `resolveChapters`, not the static
+ *  per-chapter `status` in data.ts (that field is only ever a fresh-install baseline now; reading
+ *  it directly here would silently undercount every real user's progress). */
+export function countDoneChapters(completedChapters: string[]): number {
+  return SUBJECTS.reduce(
+    (acc, s) => acc + resolveChapters(s.chapters, completedChapters).filter((c) => c.status === 'done').length,
+    0
+  );
+}
+
+/** Single source of truth for which of the BADGES in data.ts are earned — used by ProfileView to
+ *  render them and by the milestone-celebration hook to detect a fresh unlock. Previously
+ *  duplicated inline in ProfileView with its own `chaptersDone`, which read the static chapter
+ *  status directly and could therefore never see a real "done" chapter post-resolveChapters. */
+export function computeUnlockedBadges(
+  s: Pick<AppState, 'streak' | 'xp' | 'freezeArmed' | 'freezes' | 'completedChapters'>
+): Record<string, boolean> {
+  const chaptersDone = countDoneChapters(s.completedChapters);
+  return {
+    b1: s.streak >= 3,
+    b2: s.xp >= 100,
+    b3: chaptersDone >= 1,
+    b4: s.freezeArmed || s.freezes < 2,
+    b5: s.streak >= 7,
+    b6: s.xp >= 1000,
+  };
+}
+
+/** A reload used to always land back on 'home', even mid-lesson, because the saved view was never
+ *  validated against real content — restoring a stale/renamed subject or chapter id blindly would
+ *  hand LessonView/SubjectView an id that resolves to nothing, and both just render null: a blank
+ *  screen forever, worse than the reset it replaces. Only 'lesson'/'subject' need this check —
+ *  every other resumable view is self-contained and doesn't reference content by id. */
+function resolveRestoredView(saved: Partial<AppState>): ViewId {
+  const view = saved.view;
+  if (view === 'lesson' || view === 'subject') {
+    const subject = SUBJECTS.find((s) => s.id === saved.currentSubjectId);
+    if (!subject) return 'home';
+    if (view === 'lesson' && !subject.chapters.find((c) => c.id === saved.currentChapterId)) return 'home';
+    return view;
+  }
+  if (view === 'revisions' || view === 'progres' || view === 'profile' || view === 'settings') return view;
+  return 'home';
+}
+
+// `tab` drives the bottom nav highlight independently of `view` (SubjectView/SettingsView both
+// use it to know which tab "back" returns to — see goBack below), so it needs restoring too, not
+// just `view` — otherwise resuming into e.g. Revisions would show the right screen with the wrong
+// tab lit up, and a subsequent "back" from Subject/Settings would return to the wrong place.
+function resolveRestoredTab(view: ViewId, savedTab: TabId | undefined): TabId {
+  if (view === 'home' || view === 'revisions' || view === 'progres' || view === 'profile') return view;
+  return savedTab ?? 'home';
 }
 
 function sm2(review: CardReview | undefined, confidence: Confidence): CardReview {
@@ -93,12 +174,18 @@ function ensureSession(s: AppState): Partial<AppState> {
   return {};
 }
 
+// streak/xp were 5/340 here — demo-convenience values so testing didn't start from zero every
+// reload, but they shipped as the real default for a genuine first launch: a brand-new user's
+// very first screen claimed a 5-day streak they never earned. Onboarding's finish() only ever
+// sets `user` fields, never these, so nothing downstream cleared them. `freezes: 2` stays as a
+// real welcome gift (a resource handed to you, not a fabricated record of past use), same logic
+// game onboarding flows use for starting currency.
 const INITIAL: AppState = {
   view: 'onboarding',
   tab: 'home',
   user: DEFAULT_USER,
-  streak: 5,
-  xp: 340,
+  streak: 0,
+  xp: 0,
   bestCombo: 0,
   freezes: 2,
   freezeArmed: false,
@@ -113,6 +200,7 @@ const INITIAL: AppState = {
   currentLessonMode: 'vocal' as const,
   completedChapters: [],
   chatBridgeMessage: null,
+  lessonReturnTo: null,
   cardReviews: {},
   sessionDate: new Date().toDateString(),
   sessionCardsReviewed: 0,
@@ -130,11 +218,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const saved = await loadProgress();
       if (cancelled) return;
       if (saved) {
+        const restoredView = resolveRestoredView(saved);
         setState((s) => ({
           ...s,
           ...saved,
           ...ensureSession({ ...s, ...saved }),
-          view: 'home',
+          view: restoredView,
+          tab: resolveRestoredTab(restoredView, saved.tab),
         }));
       }
       setLoaded(true);
@@ -246,17 +336,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
     []
   );
 
-  const bridgeToChat = useCallback((subjectId: string, chapterId: string, bridgeMessage: string) => {
-    setState((s) => ({
-      ...s,
-      ...ensureSession(s),
-      view: 'lesson',
-      currentSubjectId: subjectId,
-      currentChapterId: chapterId,
-      currentLessonMode: 'echanger',
-      chatBridgeMessage: bridgeMessage,
-    }));
-  }, []);
+  const bridgeToChat = useCallback(
+    (subjectId: string, chapterId: string, bridgeMessage: string, returnTo?: ViewId) => {
+      setState((s) => ({
+        ...s,
+        ...ensureSession(s),
+        view: 'lesson',
+        currentSubjectId: subjectId,
+        currentChapterId: chapterId,
+        currentLessonMode: 'echanger',
+        chatBridgeMessage: bridgeMessage,
+        // "Revoir la notion" from a Réviser session comes back to the session, not to the
+        // subject page it was never on.
+        lessonReturnTo: returnTo ?? null,
+      }));
+    },
+    []
+  );
 
   const completeChapter = useCallback((chapterId: string) => {
     setState((s) => {
@@ -279,7 +375,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const prev = s.cardReviews[cardId];
       const updated = sm2(prev, confidence);
       const sessionCardsReviewed = s.sessionCardsReviewed + 1;
-      const xpGain = confidence === 'sure' ? 15 : confidence === 'doubt' ? 8 : 3;
+      // A wrong swipe-judgment (RevisionsView's only caller for 'not-sure') used to still grant
+      // +3 XP here — invisible everywhere a student could see it: the "GRILLÉ" feedback line
+      // never mentioned it, and BraiseRecap's own +XP total only ever summed correct answers.
+      // The real account XP (this field) and the celebratory total shown at the end of a
+      // session could silently drift apart by 3 XP per mistake with no explanation offered.
+      const xpGain = confidence === 'sure' ? 15 : confidence === 'doubt' ? 8 : 0;
       const activity = sessionCardsReviewed + s.sessionChaptersDone * 3;
       void saveCardReview(cardId, updated);
       return {
@@ -304,6 +405,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const goBack = useCallback(() => {
     setState((s) => {
+      if (s.view === 'lesson' && s.lessonReturnTo) {
+        return { ...s, view: s.lessonReturnTo, lessonReturnTo: null };
+      }
       if (s.view === 'lesson' || s.view === 'complete') return { ...s, view: 'subject' };
       if (s.view === 'subject' || s.view === 'settings' || s.view === 'share')
         return { ...s, view: s.tab };

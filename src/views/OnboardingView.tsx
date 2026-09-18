@@ -18,6 +18,7 @@ export function OnboardingView() {
   const [subjects, setSubjects] = useState<string[]>([]);
   const [avatar, setAvatar] = useState('🦊');
   const [consent, setConsent] = useState(false);
+  const [showPrivacyInfo, setShowPrivacyInfo] = useState(false);
 
   const total = 4;
   const next = () => {
@@ -207,16 +208,31 @@ export function OnboardingView() {
           ))}
         </div>
 
-        <label className="consent-row" style={{ marginTop: 'auto', marginBottom: 14 }}>
-          <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
-          <span>
-            J'accepte que mes données de progression soient utilisées pour personnaliser mon
-            apprentissage.{' '}
-            <a href="#" onClick={(e) => e.preventDefault()}>
-              En savoir plus
-            </a>
-          </span>
-        </label>
+        <div style={{ marginTop: 'auto', marginBottom: 14 }}>
+          <label className="consent-row" style={{ marginBottom: 0 }}>
+            <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+            <span>
+              J'accepte que mes données de progression soient utilisées pour personnaliser mon
+              apprentissage.{' '}
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowPrivacyInfo((v) => !v);
+                }}
+              >
+                En savoir plus
+              </a>
+            </span>
+          </label>
+          {showPrivacyInfo && (
+            <p className="sub" style={{ marginTop: 8, marginBottom: 0 }}>
+              Ta progression (série, XP, cartes revues) est enregistrée uniquement sur cet
+              appareil, dans ton navigateur — rien n'est envoyé à un serveur externe pour la
+              faire fonctionner.
+            </p>
+          )}
+        </div>
         <div style={{ display: 'flex', gap: 10 }}>
           <button
             className="btn-block"

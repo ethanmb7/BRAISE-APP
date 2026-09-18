@@ -45,12 +45,54 @@ export function lessonComplete(ctx: VoiceCtx, name: string): string {
   });
 }
 
-export function dailyPickLine(ctx: VoiceCtx, subjectName: string, chapterTitle: string): string {
+/** Short, visible hookline for the hero card — the chapter title and subject already have their
+ *  own slots there, so unlike `dailyPickLine` this never repeats them; it only has to carry the
+ *  personality/age tone in a few words. Onboarding's own first question justifies asking for a
+ *  first name with "Braise a besoin d'un prénom pour te parler comme un vrai pote" — it was never
+ *  actually used anywhere on Home, so that promise went unkept on the one screen seen the most.
+ *  `userName` sits right at the start of every variant, not the end: this line is `truncate`d to
+ *  one line in a narrow card, and CSS ellipsis always cuts from the end — if anything has to get
+ *  clipped for a long name, it should be the flavour text, never the name itself. */
+export function dailyHookLine(ctx: VoiceCtx, userName: string): string {
   return byCombo(ctx, {
-    'chill-college': [`Aujourd'hui, Braise a pioché "${chapterTitle}" (${subjectName}) pour toi. 3 min, zéro pression.`],
-    'chill-lycee': [`Pioche du jour : "${chapterTitle}" en ${subjectName}. 3 minutes, tranquille.`],
-    'savage-college': [`Le sort en a décidé : "${chapterTitle}" (${subjectName}). Tu peux pas fuir, désolé.`],
-    'savage-lycee': [`Tirage au sort du jour : "${chapterTitle}" en ${subjectName}. Le hasard ne négocie pas.`],
+    'chill-college': [`Salut ${userName} ! Ta pioche du jour est prête 🧠`, `${userName}, ton casse-tête du jour t'attend 🧠`],
+    'chill-lycee': [`${userName}, ta session du jour, tranquille 🧠`, `Salut ${userName}, pioche du jour à ton rythme 🧠`],
+    'savage-college': [`${userName}, le sort a tranché. Bouge-toi 🔥`, `${userName}, ta pioche du jour. Pas d'échappatoire 🔥`],
+    'savage-lycee': [`${userName}, tirage du jour. Le hasard ne négocie pas 🔥`, `${userName}, pioche du jour, aucune excuse 🔥`],
+  });
+}
+
+/** The line under Braise's transformation when a real rank threshold (getRankInfo) is crossed —
+ *  same tone system as everywhere else, so the app's one big celebratory moment doesn't suddenly
+ *  drop into generic copy. */
+export function rankUpLine(ctx: VoiceCtx, rankName: string): string {
+  return byCombo(ctx, {
+    'chill-college': [`Nouveau rang débloqué : ${rankName} ! Trop fort.`, `Tu passes ${rankName} ! Continue comme ça.`],
+    'chill-lycee': [`Rang ${rankName} débloqué. Beau parcours.`, `Nouveau rang : ${rankName}. Bien joué.`],
+    'savage-college': [`${rankName} débloqué. Même moi je suis impressionné.`, `Rang ${rankName}. Pas mal pour un mardi.`],
+    'savage-lycee': [`Rang ${rankName}. Le classement tremble.`, `${rankName} débloqué. Le bac recule encore d'un pas.`],
+  });
+}
+
+// The standing instruction over the verdict buttons on every flashcard. "Vrai ou Faux ?"
+// used to exist only as a first-card tutorial chip — after that, nothing on the screen said
+// what the student was supposed to do with Braise's message. Phrased as Braise daring you to
+// call him out, not as an exercise header.
+export function judgePrompt(ctx: VoiceCtx): string {
+  return byCombo(ctx, {
+    'chill-college': ['Je dis vrai ou je raconte n\'importe quoi ?', 'Tu me crois, ou pas ?'],
+    'chill-lycee': ['Vrai, ou je raconte n\'importe quoi ?', 'Tu valides ou tu me cales ?'],
+    'savage-college': ['Alors, je bluffe ou pas ?', 'Ose me dire que c\'est faux.'],
+    'savage-lycee': ['Je bluffe, ou pas ?', 'Vas-y, cale-moi si tu peux.'],
+  });
+}
+
+export function dailyPickLine(ctx: VoiceCtx, userName: string, subjectName: string, chapterTitle: string): string {
+  return byCombo(ctx, {
+    'chill-college': [`Salut ${userName} ! Aujourd'hui, Braise a pioché "${chapterTitle}" (${subjectName}) pour toi. 3 min, zéro pression.`],
+    'chill-lycee': [`${userName}, pioche du jour : "${chapterTitle}" en ${subjectName}. 3 minutes, tranquille.`],
+    'savage-college': [`${userName}, le sort en a décidé : "${chapterTitle}" (${subjectName}). Tu peux pas fuir, désolé.`],
+    'savage-lycee': [`${userName}, tirage au sort du jour : "${chapterTitle}" en ${subjectName}. Le hasard ne négocie pas.`],
   });
 }
 

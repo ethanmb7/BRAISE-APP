@@ -1,16 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
-import { useApp } from '@/store';
+import { useApp, computeGoalPct, remainingToGoal, resolveChapters } from '@/store';
 import { sfx } from '@/lib/sound';
 import { fireConfetti } from '@/lib/confetti';
 import { LevelSheet } from '@/components/LevelSheet';
 import { HeaderHUD } from '@/components/HeaderHUD';
 import { HeroPiocheCard } from '@/components/HeroPiocheCard';
-import { PriorityExams } from '@/components/PriorityExams';
-import { DecksGrid } from '@/components/DecksGrid';
-import { SUBJECTS } from '@/data';
-import { dailyPickLine, getAgeGroup } from '@/lib/braiseVoice';
+import { SubjectDecks } from '@/components/SubjectDecks';
+import { TodayStrip } from '@/components/TodayStrip';
+import { ShareAuraModal } from '@/components/ShareAuraModal';
+import { SUBJECTS, FLASHCARDS } from '@/data';
+import { dailyPickLine, dailyHookLine, getAgeGroup } from '@/lib/braiseVoice';
+import { getRankInfo } from '@/lib/aura';
 import type { Level, Subject, Chapter } from '@/types';
 
 // Same choreography language as Ton Aura: a calm stagger fade for each block.
@@ -26,7 +28,18 @@ const staggerItem = {
 export function HomeView() {
   const { state, setTab, setView, openSubject, setUser, toggleFreeze, getDueCards } = useApp();
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [bump, setBump] = useState<'streak' | 'xp' | null>(null);
+  const [bump, setBump] = useState<'streak' | 'xp' | 'freeze' | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
+  // Toggling a freeze used to be silent beyond the pill's own colour swap (cyan/amber) — no
+  // confirmation that the tap actually registered or what it just did. This is the same
+  // "combo-toast" pattern already used in RevisionsView (see .freeze-toast in index.css, which
+  // reuses its exact comboToastRise animation), not a new one.
+  const [freezeToast, setFreezeToast] = useState<'on' | 'off' | null>(null);
+  useEffect(() => {
+    if (freezeToast === null) return;
+    const t = setTimeout(() => setFreezeToast(null), 1100);
+    return () => clearTimeout(t);
+  }, [freezeToast]);
   const prevGoalMet = useRef(state.dailyGoalMet);
 
   useEffect(() => {
@@ -44,63 +57,102 @@ export function HomeView() {
     setTimeout(() => setBump(null), 300);
   };
 
+  const handleFreezeClick = () => {
+    sfx.flip(state.soundOn);
+    // toggleFreeze() itself silently no-ops when trying to arm with 0 freezes left (see
+    // store.tsx) — mirror that guard here too, so the toast never confirms something that didn't
+    // actually happen.
+    const willToggle = state.freezeArmed || state.freezes > 0;
+    if (willToggle) {
+      setBump('freeze');
+      setTimeout(() => setBump(null), 300);
+      setFreezeToast(state.freezeArmed ? 'off' : 'on');
+    }
+    toggleFreeze();
+  };
+
   const handleLevel = (l: Level) => {
     sfx.tap(state.soundOn);
     setUser({ ...state.user, level: l.id, levelLabel: l.label });
     setSheetOpen(false);
   };
 
-  const lastSubject = state.lastSubjectId ? SUBJECTS.find((s) => s.id === state.lastSubjectId) : null;
-  const lastChapter = lastSubject?.chapters.find((c) => c.id === state.lastChapterId);
-  const fallbackSubject = SUBJECTS.find((s) => s.chapters.some((c) => c.status === 'current'));
-  const fallbackChapter = fallbackSubject?.chapters.find((c) => c.status === 'current');
-  const currentSubject = lastSubject && lastChapter ? lastSubject : fallbackSubject;
-  const currentChapter = lastSubject && lastChapter ? lastChapter : fallbackChapter;
-
-  const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
-  const bubbleLine =
-    currentSubject && currentChapter
-      ? dailyPickLine(voiceCtx, currentSubject.name, currentChapter.title)
-      : `Série de ${state.streak} jours. On lâche rien !`;
-
   // "Chapitres prioritaires" — every subject's in-progress chapter, ranked by real mastery
   // (lowest first). No exam-date field exists anywhere in the data model, so this deliberately
   // isn't a fabricated "DS dans 2 jours" countdown — mastery % and the reinforce flag are the
   // real signals already tracked per chapter.
   const priorityChapters: { subject: Subject; chapter: Chapter }[] = SUBJECTS.map((s) => {
-    const chapter = s.chapters.find((c) => c.status === 'current');
+    const chapter = resolveChapters(s.chapters, state.completedChapters).find((c) => c.status === 'current');
     return chapter ? { subject: s, chapter } : null;
   })
     .filter((x): x is { subject: Subject; chapter: Chapter } => x !== null)
     .sort((a, b) => a.chapter.mastery - b.chapter.mastery);
 
-  const priorityItems = priorityChapters.map(({ subject, chapter }) => ({
-    id: chapter.id,
-    title: chapter.title,
-    subjectName: subject.name,
-    subjectEmoji: subject.emoji,
-    subjectColor: subject.color,
-    mastery: chapter.mastery,
-    reinforce: !!chapter.reinforce,
-  }));
+  // "Pioche du jour" — a real daily random draw across every subject's in-progress chapter,
+  // not a "continue where you left off" shortcut: the same pool as "Chapitres prioritaires"
+  // above, indexed by a hash of today's date so the pick is stable all day and changes
+  // tomorrow. (The previous version just replayed state.lastSubjectId/lastChapterId, which is
+  // a "continue" feature, not a draw — it's still tracked in the store for other uses, just no
+  // longer what drives this card, since the product is explicitly framed as a daily draw.)
+  const todaySeed = new Date().toISOString().slice(0, 10);
+  let hash = 0;
+  for (let i = 0; i < todaySeed.length; i++) hash = (hash * 31 + todaySeed.charCodeAt(i)) >>> 0;
+  const dailyPick = priorityChapters.length > 0 ? priorityChapters[hash % priorityChapters.length] : null;
+  const currentSubject = dailyPick?.subject;
+  const currentChapter = dailyPick?.chapter;
 
-  const decks = SUBJECTS.map((s) => {
-    const doneCount = s.chapters.filter((c) => c.status === 'done').length;
-    const pct = Math.round((doneCount / s.chapters.length) * 100);
+  const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
+  const hookLine = dailyHookLine(voiceCtx, state.user.name);
+  const bubbleLine =
+    currentSubject && currentChapter
+      ? dailyPickLine(voiceCtx, state.user.name, currentSubject.name, currentChapter.title)
+      : `${state.user.name}, série de ${state.streak} jours. On lâche rien !`;
+
+  // Each card's "Niv." is the current chapter's real position in the subject's own sequence
+  // (no separate per-subject level field exists), and its label is that chapter's own title
+  // with a leading article stripped for brevity — real data, never a generated sentence, and
+  // never truncated with an ellipsis. "Maths" is the only display shortening on the subject
+  // name itself (same subject, casual form) — every other name is the real one, shown in full.
+  //
+  // Sorted by the current chapter's own mastery, lowest first: this grid now does the job that
+  // "Chapitres prioritaires" used to do as a separate carousel — same data (every subject's
+  // current chapter), it was never two different things, just the same list shown twice.
+  const SHORT_SUBJECT_NAME: Record<string, string> = { maths: 'Maths' };
+  const stripLeadingArticle = (title: string) => title.replace(/^(les |la |le |l')/i, '');
+  const subjectDecks = SUBJECTS.map((s) => {
+    const chapters = resolveChapters(s.chapters, state.completedChapters);
+    const doneCount = chapters.filter((c) => c.status === 'done').length;
+    const pct = Math.round((doneCount / chapters.length) * 100);
+    const currentIndex = chapters.findIndex((c) => c.status === 'current');
+    const current = currentIndex >= 0 ? chapters[currentIndex] : null;
     return {
       id: s.id,
-      name: s.name,
-      emoji: s.emoji,
+      name: SHORT_SUBJECT_NAME[s.id] ?? s.name,
       color: s.color,
       pct,
-      reinforce: s.chapters.some((c) => c.status === 'current' && c.reinforce),
+      level: currentIndex >= 0 ? currentIndex + 1 : chapters.length,
+      chapterLabel: current ? stripLeadingArticle(current.title) : s.name,
+      currentChapterId: current?.id,
+      currentMastery: current?.mastery ?? 100,
+      // Same subject the hero card above already names as today's draw — surfacing it first
+      // here too, instead of leaving the grid to sort purely on mastery, matters most on a
+      // fresh account: a real new user's 6 decks all tie at 0% mastery (see resolveChapters),
+      // so without this every card looks interchangeable and nothing says where to start.
+      isDailyPick: s.id === currentSubject?.id,
     };
-  });
+  }).sort((a, b) => Number(b.isDailyPick) - Number(a.isDailyPick) || a.currentMastery - b.currentMastery);
 
   const goToChapter = (subjectId: string, chapterId?: string) => {
     sfx.tap(state.soundOn);
     openSubject(subjectId, chapterId);
   };
+
+  // Same derivation as ProfilAuraView's own share button — real distinct-subjects-reviewed
+  // count from card review history, not a second, possibly-diverging computation.
+  const subjectsCount = new Set(
+    Object.keys(state.cardReviews).map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)
+  ).size;
+  const rank = getRankInfo(state.xp).current;
 
   return (
     <>
@@ -109,7 +161,7 @@ export function HomeView() {
           <div className="setup-banner">Configure ton niveau pour des leçons sur mesure.</div>
         )}
 
-        <motion.div variants={staggerContainer} initial="hidden" animate="show">
+        <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-6 pb-8">
           <motion.div variants={staggerItem}>
             <HeaderHUD
               avatar={state.user.avatar}
@@ -118,17 +170,15 @@ export function HomeView() {
               freezes={state.freezes}
               freezeArmed={state.freezeArmed}
               streakBumped={bump === 'streak'}
-              hasAlert={dueCount > 0}
+              freezeBumped={bump === 'freeze'}
+              dueCount={dueCount}
               onAvatarClick={() => setView('profile')}
               onStreakClick={fireStreak}
               onAuraClick={() => {
                 sfx.tap(state.soundOn);
                 setTab('progres');
               }}
-              onFreezeClick={() => {
-                sfx.tap(state.soundOn);
-                toggleFreeze();
-              }}
+              onFreezeClick={handleFreezeClick}
               onBellClick={() => {
                 sfx.tap(state.soundOn);
                 setTab('revisions');
@@ -136,15 +186,12 @@ export function HomeView() {
             />
           </motion.div>
 
-          <motion.div variants={staggerItem} className="mt-4">
+          <motion.div variants={staggerItem}>
             <HeroPiocheCard
+              hookLine={hookLine}
               bubbleLine={bubbleLine}
               subjectName={currentSubject?.name}
-              subjectColor={currentSubject?.color}
-              subjectEmoji={currentSubject?.emoji}
-              needsReinforce={!!currentChapter?.reinforce}
               chapterTitle={currentChapter?.title ?? 'Leçon du jour'}
-              durationMin={currentChapter?.duration}
               onStart={() => {
                 sfx.whoosh(state.soundOn);
                 if (currentSubject && currentChapter) openSubject(currentSubject.id, currentChapter.id);
@@ -152,27 +199,41 @@ export function HomeView() {
             />
           </motion.div>
 
-          <motion.div variants={staggerItem} className="mb-2 mt-5 font-display text-base font-extrabold text-[var(--ink)]">
-            Chapitres prioritaires
-          </motion.div>
           <motion.div variants={staggerItem}>
-            <PriorityExams
-              items={priorityItems}
-              onSelect={(chapterId) => {
-                const found = priorityChapters.find((p) => p.chapter.id === chapterId);
-                if (found) goToChapter(found.subject.id, found.chapter.id);
+            <TodayStrip
+              streak={state.streak}
+              remaining={remainingToGoal(state)}
+              goalPct={computeGoalPct(state)}
+              dueCount={dueCount}
+              onContinue={() => {
+                sfx.tap(state.soundOn);
+                setTab('revisions');
+              }}
+              onShare={() => {
+                sfx.tap(state.soundOn);
+                if (navigator.vibrate) navigator.vibrate(10);
+                setShareOpen(true);
               }}
             />
           </motion.div>
 
-          <motion.div variants={staggerItem} className="mb-2 mt-5 font-display text-base font-extrabold text-[var(--ink)]">
-            Tes decks
-          </motion.div>
-          <motion.div variants={staggerItem}>
-            <DecksGrid decks={decks} onSelect={(id) => goToChapter(id)} />
+          <motion.div variants={staggerItem} className="space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="font-display text-base font-extrabold text-[var(--ink)]">Tes decks</span>
+              <span className="rounded-lg border border-black bg-[var(--neo-orange)] px-2 py-0.5 text-xs font-black text-white shadow-[1px_1px_0px_0px_#000]">
+                {SUBJECTS.length}
+              </span>
+            </div>
+            <SubjectDecks
+              items={subjectDecks}
+              onSelect={(id) => {
+                const deck = subjectDecks.find((d) => d.id === id);
+                goToChapter(id, deck?.currentChapterId);
+              }}
+            />
           </motion.div>
 
-          <motion.div variants={staggerItem} className="mt-4 text-center">
+          <motion.div variants={staggerItem} className="text-center">
             <button
               onClick={() => setView('settings')}
               className="inline-flex items-center gap-1.5 text-[0.8rem] text-[var(--ink-soft)]"
@@ -183,7 +244,23 @@ export function HomeView() {
         </motion.div>
       </div>
 
+      {freezeToast && (
+        <div key={freezeToast} className="freeze-toast">
+          {freezeToast === 'on' ? '🧊 Gel activé pour ce soir !' : 'Gel désactivé'}
+        </div>
+      )}
+
       <LevelSheet open={sheetOpen} current={state.user.level} onSelect={handleLevel} onClose={() => setSheetOpen(false)} />
+
+      {shareOpen && (
+        <ShareAuraModal
+          rank={rank}
+          streak={state.streak}
+          xp={state.xp}
+          subjectsCount={subjectsCount}
+          onClose={() => setShareOpen(false)}
+        />
+      )}
     </>
   );
 }

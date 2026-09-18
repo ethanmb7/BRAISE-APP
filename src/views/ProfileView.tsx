@@ -1,5 +1,5 @@
 import { Settings, ChevronRight, Check } from 'lucide-react';
-import { useApp } from '@/store';
+import { useApp, computeUnlockedBadges, countDoneChapters } from '@/store';
 import { sfx } from '@/lib/sound';
 import { TopBar } from '@/components/TopBar';
 import { BADGES, SUBJECTS } from '@/data';
@@ -14,19 +14,8 @@ export function ProfileView() {
   const { state, setView, setPersonality } = useApp();
 
   const subjectsCount = state.user.subjects.length;
-  const chaptersDone = SUBJECTS.reduce(
-    (acc, s) => acc + s.chapters.filter((c) => c.status === 'done').length,
-    0
-  );
-
-  const badgeUnlocked: Record<string, boolean> = {
-    b1: state.streak >= 3,
-    b2: state.xp >= 100,
-    b3: chaptersDone >= 1,
-    b4: state.freezeArmed || state.freezes < 2,
-    b5: state.streak >= 7,
-    b6: state.xp >= 1000,
-  };
+  const chaptersDone = countDoneChapters(state.completedChapters);
+  const badgeUnlocked = computeUnlockedBadges(state);
 
   return (
     <div>

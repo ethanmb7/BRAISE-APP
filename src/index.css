@@ -125,6 +125,17 @@ button {
   -webkit-appearance: none;
 }
 
+/* WCAG 2.4.7 Focus Visible — grepping every component built this session turned up zero
+   `focus:`/`focus-visible:` classes anywhere, so every button relied on whatever faint default
+   the browser happens to draw. One global rule instead of patching each button individually:
+   `:focus-visible` (not `:focus`) so the ring only shows for keyboard/switch-control navigation,
+   never on a mouse tap. --neo-orange keeps it on-brand instead of the default browser blue. */
+:focus-visible {
+  outline: 3px solid var(--neo-orange);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 input,
 select {
   font-family: inherit;
@@ -139,8 +150,16 @@ select {
 .app-shell {
   width: 100%;
   max-width: 428px;
-  min-height: 100vh;
-  min-height: 100dvh;
+  /* A definite height everywhere, not just above 429px — below that (i.e. on an actual
+     phone), `min-height` alone let this grow past the viewport to match whatever the
+     tallest view's content needed, since a flex column with no fixed height sizes itself
+     to its content instead of capping at the floor. `.app-content` (flex:1; min-height:0)
+     only scrolls internally instead of growing the whole shell when the shell itself has a
+     real height to shrink it against — pinning it here is what makes that work on mobile too. */
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100vh;
+  max-height: 100dvh;
   margin: 0 auto;
   background: var(--bg);
   display: flex;
@@ -150,12 +169,6 @@ select {
 }
 @media (min-width: 429px) {
   .app-shell {
-    min-height: 100vh;
-    min-height: 100dvh;
-    height: 100vh;
-    height: 100dvh;
-    max-height: 100vh;
-    max-height: 100dvh;
     border-radius: 0;
     box-shadow: 0 0 60px -20px rgba(19, 33, 79, 0.3);
   }
@@ -172,6 +185,14 @@ select {
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  /* The tab bar floats over this area (see TabBar) — reserve its footprint so the last row
+     of any screen can always scroll clear of it. */
+  padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+}
+/* Réviser is a fixed 100dvh stage that reserves the dock's footprint itself (.flashcard's
+   bottom padding) — the generic reserve above would only make the stage scroll by 92px. */
+.app-content:has(> .rev-view) {
+  padding-bottom: 0;
 }
 .app-content::-webkit-scrollbar {
   display: none;
@@ -199,46 +220,6 @@ select {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-}
-
-.tabbar {
-  flex-shrink: 0;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 9px 4px calc(12px + env(safe-area-inset-bottom, 0px));
-  background: var(--paper);
-  border-top: 2.5px solid var(--neo-ink);
-}
-.dark .tabbar {
-  background: var(--paper);
-  border-top-color: rgba(234, 241, 255, 0.16);
-}
-.tab-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  font-size: 0.56rem;
-  line-height: 1.15;
-  color: var(--ink-soft);
-  font-weight: 700;
-  padding: 4px 6px;
-  max-width: 76px;
-  text-align: center;
-  transition: color 0.2s ease, transform 0.15s ease;
-}
-.tab-btn:active {
-  transform: scale(0.92);
-}
-.tab-btn.is-active {
-  /* --ink, not --neo-blue (fixed) — the tabbar's own background is --paper, which flips in
-     dark mode; a fixed dark navy on a fixed-looking dark bg drops to ~1.5:1 contrast. */
-  color: var(--ink);
-}
-.tab-btn.is-active svg {
-  transform: scale(1.1);
-  transition: transform 0.2s ease;
 }
 
 /* ===== Onboarding ===== */
@@ -508,9 +489,9 @@ select {
 }
 
 /* Home is now built with Tailwind utility classes (src/components/HeaderHUD.tsx,
-   HeroLessonCard.tsx, PriorityExams.tsx, DecksGrid.tsx) instead of hand-written classes here —
-   these three small helpers bridge things Tailwind's core doesn't ship (a reusable keyframe,
-   cross-browser scrollbar hiding) without duplicating them. */
+   HeroPiocheCard.tsx, SubjectDecks.tsx) instead of hand-written classes here — these three
+   small helpers bridge things Tailwind's core doesn't ship (a reusable keyframe, cross-browser
+   scrollbar hiding) without duplicating them. */
 @keyframes bumpPop {
   0% { transform: scale(1); }
   50% { transform: scale(1.25); }
@@ -525,6 +506,45 @@ select {
 }
 .tw-float {
   animation: h-float 3s ease-in-out infinite;
+}
+/* Combines the two — a one-shot reveal pop plus the continuous float — since stacking
+   .tw-bump and .tw-float as separate classes on one element just has the later rule in the
+   cascade win the whole `animation` shorthand instead of both playing. */
+.tw-float-pop {
+  animation: bumpPop 0.4s ease, h-float 3s ease-in-out 0.4s infinite;
+}
+/* A near-imperceptible idle "breathing" scale on a CTA — an ambient tell that it's the thing to
+   press, distinct from any tap/press feedback. Kept on a wrapper, never the interactive element
+   itself: the button also carries Tailwind's own `active:scale-95` etc., a `transform`-driven
+   utility, and stacking a CSS `animation` (also `transform`-driven) directly on that same
+   element would have the animation silently overwrite the utility's transform every frame. */
+@keyframes ctaPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.018); }
+}
+.tw-cta-pulse {
+  animation: ctaPulse 2.4s ease-in-out infinite;
+}
+/* Reuses .aura-share-cta's own `shineSweep` keyframe (defined further down, still the only
+   definition) instead of a duplicate — a diagonal light band that sweeps across on hover/tap. */
+.tw-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.tw-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(115deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+.tw-shimmer:hover::after,
+.tw-shimmer:active::after {
+  animation: shineSweep 0.7s ease forwards;
 }
 .no-scrollbar {
   scrollbar-width: none;
@@ -995,26 +1015,24 @@ select {
 }
 
 /* ===== Révisions ===== */
+/* No drifting-dots animation anymore: the opaque full-bleed card (and then the recap) covers
+   this background for the entire session, so a 40s infinite animation was burning battery on
+   pixels nobody could ever see. */
 .rev-view {
   background: #f2f0ea;
   background-image: radial-gradient(rgba(21, 24, 33, 0.07) 1.5px, transparent 1.5px);
   background-size: 22px 22px;
-  animation: revBgDrift 40s linear infinite;
   min-height: 100%;
 }
 .view.is-active.rev-view {
   margin: 0;
   padding: 0;
 }
-@keyframes revBgDrift {
-  from { background-position: 0 0; }
-  to { background-position: 220px 220px; }
-}
 .recap-overlay {
   position: relative;
   display: flex;
   flex-direction: column;
-  height: calc(100dvh - 68px);
+  height: 100dvh;
   min-height: 480px;
   overflow: hidden;
   background: var(--paper);
@@ -1256,6 +1274,11 @@ select {
   transform: translate(3px, 3px);
   box-shadow: 2px 2px 0 #000;
 }
+/* Header: count · bar · combo slot · report · quit. Safe-area aware on top now that this
+   row is the topmost thing on screen for the whole session (no app chrome above it). */
+/* ===== Réviser — chrome, in the app's own system =====
+   Paper pills, 2.5px black border, hard 3px shadow, Baloo 2 + Plex Mono — the same family as
+   every pill on Home ("Niv. 2", the HUD tiles) and on Ton Aura. Nothing soft, nothing blurred. */
 .rev-top-row {
   position: absolute;
   top: 0;
@@ -1264,24 +1287,63 @@ select {
   z-index: 25;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 16px 16px 0;
+  gap: 8px;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 0;
 }
-/* Wraps the bar and its riding mascot chip together so the chip can be positioned by simple
-   percentage math against a track whose width IS the bar's own width — no more reserving a
-   fixed 46px on the left for a mascot that used to sit fixed there instead of on the bar. */
 .rev-progress-track {
   position: relative;
   flex: 1;
-  height: 30px;
+  height: 32px;
   display: flex;
   align-items: center;
 }
+/* Always occupies its width, combo or not — the pill used to mount/unmount, shrinking and
+   re-growing the progress bar every time a streak started or broke. */
+.rev-combo-slot {
+  flex-shrink: 0;
+  min-width: 58px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+/* Report + quit: 32px paper circle, 44px tap target via a transparent ::after halo. */
+.rev-icon-btn {
+  position: relative;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2.5px solid #000;
+  color: #000;
+  box-shadow: 3px 3px 0 #000;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
+}
+.rev-icon-btn::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+}
+.rev-icon-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000;
+}
+.rev-icon-btn.is-reported {
+  background: var(--mint);
+}
+/* A bordered "thermometer", not a hairline: the bar is an object on the stage like the pills. */
 .rev-progress-bar {
   width: 100%;
-  height: 5px;
+  height: 12px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.35);
+  border: 2.5px solid #000;
+  box-shadow: 3px 3px 0 #000;
   overflow: hidden;
 }
 .rev-progress-bar span {
@@ -1291,90 +1353,21 @@ select {
   border-radius: 999px;
   transition: width 0.3s ease;
 }
-/* Rides the leading edge of the fill, driven by the same `left: <pct>%` inline style each
-   render — the CSS `transition` on `left` is what turns each card-to-card jump into a smooth
-   glide instead of a teleport. */
-.rev-progress-mascot {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  transition: left 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-  width: 30px;
-  height: 30px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 6;
-  pointer-events: none;
-}
-/* No chip behind it anymore — just the mascot's own SVG riding the bar. A drop-shadow keeps
-   it readable against the gradient (which shifts per subject) without reintroducing the
-   circle/border it used to sit in. */
-.rev-progress-mascot svg {
-  filter: drop-shadow(1.5px 2px 0 rgba(0, 0, 0, 0.4));
-}
-/* First-card-only callout (see .swipe-tutorial for its counterpart hint on the card itself).
-   Anchored to the RIGHT of the mascot rather than above it — the mascot chip sits only ~16px
-   from the very top of the screen, so a bubble above it would push past the safe area. To the
-   side there's plenty of room and it still reads as "the mascot is telling you this". */
-.mascot-hint {
-  position: absolute;
-  left: calc(100% + 12px);
-  top: 0;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  white-space: nowrap;
-  background: var(--paper);
-  color: var(--neo-ink);
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 800;
-  font-size: 0.66rem;
-  border: 2px solid #000;
-  border-radius: 10px;
-  padding: 5px 10px;
-  box-shadow: 3px 3px 0 #000;
-  z-index: 8;
-  pointer-events: none;
-}
-.mascot-hint::before {
-  content: '';
-  position: absolute;
-  right: 100%;
-  top: 50%;
-  transform: translateY(-50%);
-  border: 6px solid transparent;
-  border-right-color: #000;
-}
-.mascot-hint::after {
-  content: '';
-  position: absolute;
-  right: calc(100% - 2px);
-  top: 50%;
-  transform: translateY(-50%);
-  border: 5px solid transparent;
-  border-right-color: var(--paper);
-}
-/* Height pinned to exactly match .rev-progress-track (30px) — the pill's own font metrics
-   made it a few px taller than the track when only centered via padding, which was enough
-   overflow to dip into .ftag-row below and clip the report button. Capping the box itself
-   (rather than trusting padding to happen to fit) guarantees that never happens again,
-   whatever the combo count's digit width does to the text. */
+.rev-count,
 .rev-combo {
   flex-shrink: 0;
-  height: 30px;
+  height: 32px;
   box-sizing: border-box;
   display: flex;
   align-items: center;
   font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
-  font-size: 0.78rem;
-  background: var(--paper);
-  border: 2px solid #000;
-  color: var(--neo-ink);
+  font-size: 0.8rem;
   border-radius: 999px;
   padding: 0 11px;
+  background: var(--paper);
+  border: 2.5px solid #000;
+  color: #000;
   box-shadow: 3px 3px 0 #000;
   transition: color 0.2s ease, background 0.2s ease;
 }
@@ -1392,76 +1385,48 @@ select {
   80% { transform: scale(1.08) rotate(-3deg); }
   100% { transform: scale(1) rotate(0); }
 }
-/* First-card-only swipe tutorial — a drifting hand between two direction chips, docked above
-   the action bar but well clear of the combo toast's own bottom offset (which can never
-   actually appear this early anyway: reaching a combo of 2 requires two judged cards, so
-   index is always past 0 by then). AnimatePresence handles the fade in/out on mount/unmount
-   in RevisionsView.tsx — this only styles the settled state and the hand's drift loop. */
-.swipe-tutorial {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 100px;
-  z-index: 15;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  pointer-events: none;
-}
-.tut-hand {
-  font-size: 2rem;
-  line-height: 1;
-  animation: tutorialHandSwipe 1.4s ease-in-out infinite;
-  filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, 0.35));
-}
-@keyframes tutorialHandSwipe {
-  0%, 100% { transform: translateX(-20px) rotate(-8deg); }
-  50% { transform: translateX(20px) rotate(8deg); }
-}
-.tut-chip {
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 800;
-  font-size: 0.78rem;
-  color: #fff;
-  border: 2px solid #000;
-  border-radius: 999px;
-  padding: 6px 12px;
-  white-space: nowrap;
-  box-shadow: 2px 2px 0 #000;
-}
-.tut-chip.tut-left {
-  background: rgba(232, 86, 75, 0.9);
-}
-.tut-chip.tut-right {
-  background: rgba(15, 158, 110, 0.9);
-}
-/* Ephemeral streak tag — distinct from the small persistent .rev-combo badge in the header,
-   which stays up for the rest of the streak. Docked just above the action bar (in the space
-   freed under the centered Q&A block) rather than dead-center, so it celebrates the streak
-   without ever covering the question or answer text. Rises + fades in place; the `forwards`
-   fill plus the matching 1100ms JS timeout mean the element unmounts right as the animation
-   settles, not mid-motion. */
-.combo-toast {
-  position: absolute;
-  bottom: 106px;
+/* Ephemeral toast (matching 1100ms JS timeout in HomeView) — Home has no `position: relative`
+   stage to anchor an absolute toast to, so this one is fixed to the viewport. */
+.freeze-toast {
+  position: fixed;
+  top: 84px;
   left: 50%;
-  z-index: 40;
+  z-index: 60;
   pointer-events: none;
   font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   white-space: nowrap;
   color: #fff;
   background: var(--neo-ink);
   border: 2.5px solid #000;
   border-radius: 999px;
-  padding: 10px 22px;
+  padding: 8px 18px;
   box-shadow: 4px 4px 0 #000;
   animation: comboToastRise 1.1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
-.combo-toast.is-hot {
+/* Same construction as .freeze-toast, same comboToastRise animation — just a longer
+   2.2s hold (rank-ups and badge unlocks are meant to be a "sit with it a beat" moment, unlike the
+   quick freeze-toggle confirmation) and the brand orange, since this is the app's bigger
+   celebration alongside confetti, not a small utility confirmation. Mounted in App.tsx rather than
+   a single view, since a rank or badge can be earned from any screen. */
+.milestone-toast {
+  position: fixed;
+  top: 84px;
+  left: 50%;
+  z-index: 70;
+  pointer-events: none;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  white-space: nowrap;
+  color: #fff;
   background: var(--neo-orange);
+  border: 2.5px solid #000;
+  border-radius: 999px;
+  padding: 10px 20px;
+  box-shadow: 4px 4px 0 #000;
+  animation: comboToastRise 2.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 @keyframes comboToastRise {
   0% { transform: translate(-50%, 16px) scale(0.85); opacity: 0; }
@@ -1470,18 +1435,31 @@ select {
   78% { transform: translate(-50%, 0) scale(1); opacity: 1; }
   100% { transform: translate(-50%, -8px) scale(0.94); opacity: 0; }
 }
+/* Full viewport: the tab bar is hidden for the whole session (see App.tsx showTabBar), so
+   there's no 68px strip to reserve under it anymore. */
 .flash-stack {
   position: relative;
-  height: calc(100dvh - 68px);
+  height: 100dvh;
   min-height: 480px;
 }
+/* Three fixed zones on the screen: header (absolute, top), this card's scroll area (the
+   space between header and dock, thread centered inside it), and the dock (absolute, bottom,
+   a sibling of the card — see .rev-dock). The card's padding is what reserves the header's
+   and the dock's footprints so content can never slide under either; both are safe-area
+   aware because nothing else frames this screen during a session. */
 .flashcard {
   position: absolute;
   inset: 0;
-  background: linear-gradient(150deg, var(--subject-color, var(--neo-blue)), var(--subject-color-2, var(--neo-orange)));
-  /* Clears .rev-top-row (16px padding-top + 30px track height) now that the mascot rides
-     the progress bar instead of sitting fixed at 50px tall in the top-left corner. */
-  padding: 50px 0 0;
+  /* One flat colour per subject — the same colour as that subject's deck on Home, so
+     "you're in Physique" reads the instant the card lands. A slight deepening of the same
+     hue toward the bottom is all the depth it gets. */
+  background: linear-gradient(
+    170deg,
+    var(--subject-color, var(--neo-blue)) 0%,
+    color-mix(in srgb, var(--subject-color, var(--neo-blue)) 78%, #151821) 100%
+  );
+  /* Top: header. Bottom: action dock + floating tab dock + gaps. */
+  padding: calc(58px + env(safe-area-inset-top, 0px)) 0 calc(178px + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1498,37 +1476,9 @@ select {
 .flashcard.is-judged {
   cursor: default;
 }
-/* One-shot impulse on a correct verdict — layered on top of the mascot's own continuous
-   mood animation, not a replacement for it. Plays exactly once because the class is only
-   present while judged+correct is true for this card, and CSS animations hold their final
-   frame rather than looping without an `infinite` count. Applied directly to the mascot SVG
-   (not its .rev-progress-mascot wrapper) so the burst's scale/rotate transform never fights
-   the wrapper's own translate(-50%, -50%) centering transform. */
-.fc-mascot-burst {
-  animation: mascotBurst 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-@keyframes mascotBurst {
-  0% { transform: scale(1); filter: drop-shadow(2.5px 2.5px 0 #000); }
-  40% {
-    transform: scale(1.4) rotate(-4deg);
-    filter: drop-shadow(2.5px 2.5px 0 #000) drop-shadow(0 0 16px rgba(255, 216, 75, 0.95));
-  }
-  70% { transform: scale(1.12) rotate(2deg); }
-  100% { transform: scale(1) rotate(0); filter: drop-shadow(2.5px 2.5px 0 #000); }
-}
-/* Wrong-answer counterpart to the burst above — a quick horizontal shudder instead of a
-   growth pulse, so the mascot's own body language tells you the verdict before you've read
-   the correction text. Same one-shot logic: class only present while judged+incorrect. */
-.fc-mascot-shake {
-  animation: mascotShake 0.4s ease;
-}
-@keyframes mascotShake {
-  0%, 100% { transform: translateX(0) rotate(0); }
-  20% { transform: translateX(-5px) rotate(-10deg); }
-  40% { transform: translateX(4px) rotate(8deg); }
-  60% { transform: translateX(-3px) rotate(-6deg); }
-  80% { transform: translateX(2px) rotate(3deg); }
-}
+/* Fills exactly the space between header and dock (both reserved by .flashcard's padding).
+   Scrolls internally only for the rare card that doesn't fit; the bottom fade is that "there's
+   more" affordance. */
 .fc-scroll {
   flex: 1;
   min-height: 0;
@@ -1537,40 +1487,17 @@ select {
   flex-direction: column;
   align-items: center;
   overflow-y: auto;
-  padding: 0 22px 96px;
-  mask-image: linear-gradient(to bottom, #000 calc(100% - 96px), transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 96px), transparent 100%);
+  padding: 0 22px 12px;
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent 100%);
 }
-/* While the first-card tutorial is up, .fc-qa-block's auto-margin centering (see below) needs
-   to treat the bottom of the *tutorial band* as the floor, not the action bar — otherwise a
-   long answer can grow tall enough to reach up under .swipe-tutorial and get covered by it.
-   Reserving the tutorial's own footprint (its ~35px height + the gap above the action bar)
-   on top of the usual 96px means the centered block can never grow into that space at all. */
-.fc-scroll.has-tutorial {
-  padding-bottom: 146px;
-  mask-image: linear-gradient(to bottom, #000 calc(100% - 146px), transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 146px), transparent 100%);
-}
-.fc-qa-block {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  /* Auto top/bottom margins center this block in whatever space is left under the pinned
-     .ftag-row, rather than justify-content on .fc-scroll (which would pull the pill down
-     with it). Falls back to flow layout if content overflows — no clipping risk. */
-  margin: auto 0;
-}
+/* Subject pill: pinned right under the header, never swept into the thread's centering. */
 .ftag-row {
   width: 100%;
-  /* Pinned right under the header, not swept into .fc-qa-block's auto-margin centering below
-     it — otherwise the pill would drift toward mid-screen with the Q&A block and leave a
-     dead orange gap under the mascot/progress row. */
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  justify-content: flex-start;
   margin-bottom: 10px;
 }
 /* Solid neobrutalist pill instead of frosted glass — the old translucent-white-on-blur
@@ -1581,185 +1508,18 @@ select {
 .subject-tag {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-family: 'IBM Plex Mono', monospace;
   font-weight: 700;
   font-size: 0.68rem;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--neo-ink);
+  letter-spacing: 0.04em;
+  color: #000;
   background: var(--paper);
-  border: 2px solid #000;
+  border: 2.5px solid #000;
   border-radius: 999px;
   padding: 5px 12px;
   box-shadow: 3px 3px 0 #000;
-}
-.fq-zone {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* Bottom margin needs to clear the speech-bubble's tail, which pokes 13px above the
-     bubble itself (see .braise-tail) — anything tighter lets that tail visually collide
-     with this notification's hard shadow instead of reading as two separate elements. */
-  margin: 2px 0 22px;
-}
-.fq-notif {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  max-width: 340px;
-  background: var(--paper);
-  border: 2px solid #000;
-  border-radius: 16px;
-  padding: 10px 20px 10px 14px;
-  box-shadow: 4px 4px 0 #000;
-  text-align: left;
-  animation: notifDrop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-@keyframes notifDrop {
-  0% { transform: translateY(-26px); opacity: 0; }
-  60% { transform: translateY(3px); opacity: 1; }
-  100% { transform: translateY(0); opacity: 1; }
-}
-.fq-notif-icon {
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  border-radius: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  background: var(--subject-color, var(--neo-orange));
-  border: 1.5px solid #000;
-}
-.fq-notif-body {
-  flex: 1;
-  min-width: 0;
-}
-.fq-notif-title {
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 600;
-  font-size: 0.86rem;
-  line-height: 1.32;
-  color: var(--neo-ink);
-  overflow-wrap: break-word;
-}
-.fq-notif-meta {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: rgba(21, 24, 33, 0.82);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  margin-top: 3px;
-}
-.fa-row {
-  /* Not flex:1 on purpose — growing to fill all remaining height (then centering within it)
-     is what pushed the bubble away from the notification above it, down toward the middle
-     of the card. Sitting at natural height keeps the notification + bubble as one compact,
-     top-anchored block instead of two elements that read as visually unrelated. */
-  flex: 0 1 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  margin: 0;
-  text-align: center;
-}
-.braise-say {
-  position: relative;
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 800;
-  font-size: 1.22rem;
-  line-height: 1.32;
-  color: var(--neo-ink);
-  background: var(--paper);
-  /* Matches .fq-notif's border/shadow exactly (2px / 4px 4px 0) so the question widget and
-     the answer card read as one consistent neobrutalist family instead of the bubble
-     carrying a heavier 3.5px/6px treatment the notif above it never had. */
-  border: 2px solid #000;
-  border-radius: 20px;
-  box-shadow: 4px 4px 0 #000;
-  padding: 20px 20px 22px;
-  overflow-wrap: break-word;
-}
-.flashcard .fa-proposed {
-  margin: 0;
-}
-.braise-tail {
-  position: absolute;
-  top: -13px;
-  left: 30px;
-  width: 22px;
-  height: 22px;
-  background: var(--paper);
-  border-left: 2px solid #000;
-  border-top: 2px solid #000;
-  border-radius: 5px 0 0 0;
-  transform: rotate(45deg);
-}
-.braise-typing {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 18px 22px;
-}
-.typing-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--neo-ink);
-  opacity: 0.35;
-  animation: typingBounce 1s ease-in-out infinite;
-}
-.typing-dot:nth-child(2) {
-  animation-delay: 0.15s;
-}
-.typing-dot:nth-child(3) {
-  animation-delay: 0.3s;
-}
-@keyframes typingBounce {
-  0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
-  30% { transform: translateY(-5px); opacity: 1; }
-}
-.flashcard .fhint {
-  margin-top: 18px;
-  font-size: 0.74rem;
-  color: rgba(255, 255, 255, 0.75);
-}
-/* Staggered in behind the corner stamp's own claque-then-fade cycle (see .swipe-tag.stamped)
-   rather than appearing instantly at the same moment — landing exactly when the verdict does
-   was what made the judged moment feel like everything firing at once. Starting after a short
-   delay means the stamp has already begun clearing out by the time this text asserts itself. */
-.flashcard .fb-line {
-  margin-top: 18px;
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 800;
-  font-size: 0.9rem;
-  color: #fff;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
-  animation: judgedTextIn 0.3s ease both;
-  animation-delay: 0.16s;
-}
-.reveal-line {
-  margin-top: 10px;
-  font-size: 0.86rem;
-  line-height: 1.5;
-  color: rgba(255, 255, 255, 0.92);
-  text-align: left;
-  width: 100%;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
-  animation: judgedTextIn 0.3s ease both;
-  animation-delay: 0.22s;
-}
-@keyframes judgedTextIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.reveal-line b {
-  color: #ffd84b;
 }
 /* KaTeX renders its own glyph colors via currentColor for the base symbols, so this just
    makes sure the formula reads in whatever ink color its surrounding bubble/line already
@@ -1771,36 +1531,6 @@ select {
 .math-inline .katex {
   font-size: 1.05em;
 }
-/* Emphasis from **...** (see RichText). Weight alone can't be trusted to read as "bolder"
-   here — the answer bubble's own text already sits at font-weight: 800, so a plain <strong>
-   (bolder -> ~900, often clamped to the same rendered weight by the font's available cuts)
-   can end up visually identical to its surroundings. The underline is weight-independent, so
-   a key term still pops whether it lands in that heavy bubble, the 600-weight question title,
-   or the regular-weight reveal line. */
-.rev-view strong {
-  font-weight: 900;
-  text-decoration: underline;
-  text-decoration-thickness: 2.5px;
-  text-underline-offset: 3px;
-}
-/* Neobrutalist keyword highlight from ==...== (see RichText) — a small pastel-yellow chip a
-   student's eye should land on first when scanning a card. Ink text color is hardcoded
-   rather than inherited so it stays legible whether the mark lands in the dark-ink-on-paper
-   bubble/notif or the white-on-gradient reveal line. box-decoration-break keeps each
-   wrapped line of a multi-line highlight getting its own rounded chip instead of one
-   deformed box spanning the line break. */
-/* Deliberately understated — a translucent wash close to the text's own line height rather
-   than a bordered, opaque "pill" sitting on top of it. A hard black outline and thick padding
-   read as a UI chip; this should read as a highlighter pen, there to aid scanning without
-   competing with the text for attention. */
-.neo-highlight {
-  background: rgba(254, 240, 138, 0.65);
-  color: var(--neo-ink);
-  padding: 2px 4px;
-  border-radius: 3px;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-}
 /* The full-card color wash driven by drag position (see the `washColor` motion value) —
    sits above the card's own gradient and content but below the verdict stamps/action bar, so
    the whole card visibly leans red/green as the player drags, not just its border. */
@@ -1810,184 +1540,41 @@ select {
   z-index: 10;
   pointer-events: none;
 }
-/* Dead-center verdict copy that rides the same opacity ramp as the corner .swipe-tag stamps
-   (knowOpacity/againOpacity) — the stamps stay as the game's own flavor text (CARRÉ/INTOX),
-   this is the plain-language label ("understood" vs "needs another look") a first-time player
-   reads at a glance while dragging, without needing to parse slang. Sits above the wash
-   (z-index 10) but below the corner stamps/action bar so it never gets visually buried. */
-.fc-gesture-label {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(-4deg);
-  z-index: 12;
-  pointer-events: none;
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 900;
-  font-size: 1.6rem;
-  letter-spacing: 0.02em;
-  color: #fff;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
-  white-space: nowrap;
-}
-.fc-gesture-label.right {
-  color: #eafff3;
-}
-.fc-gesture-label.left {
-  color: #fff0ee;
-}
-/* Sized and positioned to fit entirely above .ftag-row (which starts at y:50px, set by
-   .flashcard's own padding-top) — at the old 1.3rem/8px-padding/top:28px sizing this stamp
-   was ~48px tall starting at y:28, so it ran to y:76 and plowed straight through the subject
-   pill's text. Shrunk + pulled up so its full box now fits inside that 50px budget with
-   margin to spare, confirmed against the tallest real subject label in the deck. */
-.swipe-tag {
-  position: absolute;
-  top: 1px;
-  padding: 3px 11px;
-  border-radius: 9px;
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 800;
-  font-size: 1.02rem;
-  letter-spacing: 0.02em;
-  border: 2.5px solid #000;
-  background: var(--paper);
-  opacity: 0;
-  z-index: 25;
-  /* Purely a visual stamp, never interactive — without this, the invisible (opacity: 0)
-     "know" stamp sits directly over the top-right report button (both anchored to that
-     corner) and silently swallows every click on it, since opacity: 0 doesn't remove an
-     element from hit-testing. */
-  pointer-events: none;
-}
-/* Verdict "claque" — the winning stamp overshoots past its resting size then settles back,
-   a bounce read as a hard physical stamp hitting the card rather than a fade-in. Animates
-   font-size (not transform) so it never fights each stamp's own rotate()/translateX(). */
-/* Owns opacity outright once active (no competing inline style — see the JSX) so the winning
-   stamp claques down hard immediately, holds just long enough to register, then clears itself
-   out well before the 5s feedback window ends — `forwards` keeps it landed at opacity 0
-   rather than snapping back to whatever the live drag-position opacity would otherwise read. */
-.swipe-tag.stamped {
-  animation: stampClaqueFade 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-@keyframes stampClaqueFade {
-  0% { font-size: 0.7em; opacity: 0; }
-  20% { font-size: 1.12em; opacity: 1; }
-  45% { font-size: 1.02em; opacity: 1; }
-  70% { font-size: 1.02em; opacity: 1; }
-  100% { font-size: 1.02em; opacity: 0; }
-}
-.swipe-tag.know {
-  right: 20px;
-  color: var(--mint-text);
-  border-color: var(--mint-text);
-  transform: rotate(6deg);
-}
-.swipe-tag.again {
-  left: 20px;
-  color: var(--coral-2);
-  border-color: var(--coral-2);
-  transform: rotate(-6deg);
-}
-.swipe-tag.super {
-  left: 50%;
-  top: 1px;
-  transform: translateX(-50%);
-  color: var(--sun-ink);
-  border-color: var(--sun-ink);
-}
-.rev-actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 22px;
-  margin-top: 18px;
-}
-.rev-actions-embedded {
+/* ===== Réviser — action dock =====
+   Pinned above the floating tab dock (12px gap), safe-area aware, a sibling of the card so it
+   neither drags nor flies with it. Two states swap in place: the verdict row and the
+   post-verdict row. The buttons themselves are the app's bevel buttons (BevelButton in
+   RevisionsView.tsx) — same construction as the HUD tiles and "Je pioche !". */
+.rev-dock {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 20px;
-  margin-top: 0;
-  z-index: 20;
+  bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+  z-index: 30;
+  padding: 0 18px;
 }
-.rev-btn {
-  width: 72px;
-  height: 72px;
-  flex-shrink: 0;
-  border: 3.5px solid #000;
-  border-radius: 50%;
-  /* Hard offset shadow (the neobrutalist signature) plus a soft ambient shadow underneath for
-     extra lift — the hard shadow alone read as flat pasted-on at this size. */
-  box-shadow: 8px 8px 0 #000, 8px 10px 16px rgba(0, 0, 0, 0.28);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-.rev-btn:active {
-  transform: translate(5px, 5px) scale(0.96);
-  box-shadow: 3px 3px 0 #000;
-}
-.rev-btn.again {
-  background: var(--coral);
-  color: #fff;
-}
-.rev-btn.know {
-  background: var(--mint);
-  color: #fff;
-}
-.rev-btn.super {
+.rev-dock-inner {
   position: relative;
-  width: 56px;
-  height: 56px;
-  background: var(--sun);
-  color: var(--sun-ink);
-}
-/* Permanent bonus badge — the joker is available on every card now, so the ×2 payoff stays
-   visible at all times, not just during the first-card tutorial. A tiny corner badge riding
-   ON the button's own rim (like an app icon's notification dot) rather than a tooltip stacked
-   above it: that strip between the answer bubble and the action bar is already spoken for by
-   .swipe-tutorial during onboarding, and staying inside the button's own footprint means this
-   never has to fight it for space. */
-.joker-tooltip {
-  position: absolute;
-  top: -7px;
-  right: -7px;
-  background: var(--coral);
-  color: #fff;
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 800;
-  font-size: 0.6rem;
-  border: 2px solid #000;
-  border-radius: 999px;
-  padding: 2px 5px;
-  box-shadow: 2px 2px 0 #000;
-  z-index: 22;
-  pointer-events: none;
-}
-.hint-btn {
-  width: 30px;
-  height: 30px;
-  flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.22);
-  backdrop-filter: blur(10px) saturate(160%);
-  -webkit-backdrop-filter: blur(10px) saturate(160%);
-  color: #fff;
+  width: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
+}
+.rev-actions {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
   justify-content: center;
-  transition: transform 0.12s ease;
+  gap: 12px;
 }
-.hint-btn:active {
-  transform: scale(0.92);
-}
-.hint-btn.is-reported {
-  background: var(--mint);
-  border-color: var(--mint);
-  color: #fff;
+/* Highlighter stroke for ==key terms== on the cards: the bottom 45% of the line painted
+   yellow behind the words, hard edge, text stays ink, flows across a line break as one
+   continuous stroke. `slice` (the default) is what keeps it from becoming per-line capsules. */
+.rev-marker {
+  background-image: linear-gradient(to top, #ffe066 0 46%, transparent 46%);
+  padding: 0 2px;
+  box-decoration-break: slice;
+  -webkit-box-decoration-break: slice;
 }
 
 /* ===== Progrès (suite) ===== */
@@ -1999,115 +1586,6 @@ select {
   letter-spacing: 0.04em;
   margin: 4px 0 10px;
 }
-/* ===== Subject view — skill tree path ===== */
-.skill-path {
-  position: relative;
-  padding: 14px 4px 10px;
-}
-.skill-path-line {
-  position: absolute;
-  left: 50%;
-  top: 30px;
-  bottom: 40px;
-  width: 3px;
-  background: repeating-linear-gradient(to bottom, var(--line) 0 8px, transparent 8px 16px);
-  transform: translateX(-50%);
-  z-index: 0;
-}
-.skill-node-row {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  margin-bottom: 28px;
-}
-.skill-node-row.pos-center { justify-content: center; }
-.skill-node-row.pos-right { justify-content: flex-end; padding-right: 10%; }
-.skill-node-row.pos-left { justify-content: flex-start; padding-left: 10%; }
-.skill-node-wrap {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-.skill-node {
-  width: 62px;
-  height: 62px;
-  border-radius: 50%;
-  background: var(--paper);
-  border: 4px solid var(--line);
-  color: var(--ink-soft);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 1.1rem;
-  box-shadow: 0 8px 16px -10px rgba(22, 33, 58, 0.25);
-  transition: transform 0.15s ease;
-}
-.skill-node:not(:disabled):active { transform: scale(0.92); }
-.skill-node.is-done {
-  border-color: var(--subject-color);
-  background: var(--subject-color);
-  color: #fff;
-}
-.skill-node.is-current {
-  border-color: var(--subject-color);
-  background: var(--paper);
-  color: var(--subject-color);
-  animation: nodePulse 1.8s ease-in-out infinite;
-}
-.skill-node.is-locked {
-  border-color: var(--line);
-  background: var(--blue-pale);
-  color: var(--ink-soft);
-  opacity: 0.55;
-}
-@keyframes nodePulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.25), 0 8px 16px -10px rgba(22, 33, 58, 0.25); }
-  50% { box-shadow: 0 0 0 8px rgba(249, 115, 22, 0), 0 8px 16px -10px rgba(22, 33, 58, 0.25); }
-}
-.skill-node-mascot {
-  position: absolute;
-  top: -20px;
-  right: -12px;
-  z-index: 2;
-  filter: drop-shadow(0 4px 8px rgba(22, 33, 58, 0.25));
-}
-.skill-node-label {
-  text-align: center;
-  max-width: 130px;
-}
-.skill-node-label b {
-  display: block;
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 0.8rem;
-  color: var(--ink);
-  line-height: 1.25;
-}
-.skill-node-label span {
-  font-size: 0.66rem;
-  color: var(--ink-soft);
-}
-.skill-node-tag {
-  display: inline-flex;
-  align-items: center;
-  margin-top: 4px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.58rem;
-  text-transform: uppercase;
-  padding: 2px 7px;
-  border-radius: 999px;
-}
-.skill-node-tag.reinf {
-  background: rgba(255, 111, 89, 0.16);
-  color: var(--coral-2);
-}
-.skill-node-tag.skip {
-  background: rgba(16, 185, 129, 0.16);
-  color: var(--mint-text);
-}
-
 /* ===== Lesson ===== */
 .lesson-progress {
   height: 5px;

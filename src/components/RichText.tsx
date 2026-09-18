@@ -5,11 +5,19 @@ import katex from 'katex';
 // input, so injecting KaTeX's HTML output below is safe):
 //   $...$ / $$...$$  -> math, rendered via KaTeX instead of unicode-superscript approximations
 //   **...**          -> emphasis on a key term
-//   ==...==          -> neobrutalist highlight (pastel-yellow marker) under a key number/fact,
-//                       the thing a student's eye should land on first when scanning the card
+//   ==...==          -> highlight under a key number/fact, the thing a student's eye should
+//                       land on first when scanning the card
 const TOKEN_SPLIT = /(\$\$[^$]+\$\$|\$[^$]+\$|\*\*[^*]+\*\*|==[^=]+==)/g;
 
-export function RichText({ text }: { text: string }) {
+type Props = {
+  text: string;
+  /** Classes for ==highlight== marks; defaults to the app-wide `.neo-highlight` marker. */
+  markClass?: string;
+  /** Classes for **emphasis** terms; unstyled by default (inherits the surrounding rule). */
+  strongClass?: string;
+};
+
+export function RichText({ text, markClass = 'neo-highlight', strongClass }: Props) {
   const parts = useMemo(() => text.split(TOKEN_SPLIT).filter((part) => part.length > 0), [text]);
 
   return (
@@ -22,11 +30,15 @@ export function RichText({ text }: { text: string }) {
           return <MathSpan key={i} expr={part.slice(1, -1)} />;
         }
         if (part.startsWith('**') && part.endsWith('**')) {
-          return <strong key={i}>{part.slice(2, -2)}</strong>;
+          return (
+            <strong key={i} className={strongClass}>
+              {part.slice(2, -2)}
+            </strong>
+          );
         }
         if (part.startsWith('==') && part.endsWith('==')) {
           return (
-            <mark key={i} className="neo-highlight">
+            <mark key={i} className={markClass}>
               {part.slice(2, -2)}
             </mark>
           );

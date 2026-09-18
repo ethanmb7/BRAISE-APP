@@ -1,41 +1,64 @@
 import { Play } from 'lucide-react';
 
 interface HeroPiocheCardProps {
-  /** Braise's full daily-pick sentence — kept for screen readers (sr-only) even though the
-   * visible card no longer has room to show it as a full sentence; the mascot + compact meta
-   * line carry the "Braise picked this for you" feeling visually instead. */
+  /** Short, visible hookline (from `dailyHookLine()`) — carries the real personality/age tone;
+   *  never repeats chapterTitle/subjectName since those already have their own slots below. */
+  hookLine: string;
+  /** Fuller sentence (from `dailyPickLine()`) announced to screen readers only — folds the
+   *  hookline, chapter and subject into one flowing sentence instead of three separate DOM
+   *  fragments read one after another. */
   bubbleLine: string;
   subjectName?: string;
-  subjectColor?: string;
-  subjectEmoji?: string;
-  needsReinforce: boolean;
   chapterTitle: string;
-  durationMin?: number;
   onStart: () => void;
 }
 
-// Concept A — Compact Banner. Mascot + a two-line text column share one row instead of being
-// stacked as separate blocks; the full-width CTA stays the one thing every reference app
-// (Duolingo, Brilliant, ELSA) never shrinks. Everything else that used to live here — the
-// full sentence, the subject/reinforce badges, the mini priority-path stepper — is either
-// folded into the compact meta line, or was genuinely redundant with what's already visible
-// one scroll away (the priority carousel below already shows the same ranking).
+// Fifth pass on the validated base (indigo card, amber CTA, top-right mascot):
+//
+// - The blurred glow behind the mascot (two soft radial layers) got flagged twice now as a
+//   smudge against the page's light grey background, even after being shrunk to the mascot's
+//   own footprint — a blur-based glow on a light backdrop just doesn't read as "light source"
+//   the way it does on a dark card. Dropped entirely. The vector `drop-shadow` filter that
+//   replaced it got dropped too — its offset silhouette traced the flame's own teardrop shape,
+//   reading as an unwanted dark halo rather than depth. The mascot's own 2.5px SVG stroke is
+//   the only outline now; it floats and breaks out over the card's top border on its own.
+// - Card keeps its flat, uniform #5865F2 (a dark gradient there was a separate bug fixed a few
+//   passes ago) — "gloss" is a thin inset highlight layered into the box-shadow, not a bg change.
+// - Every animated layer (CTA idle pulse, mascot hover react) lives on its own wrapper element,
+//   never stacked with Tailwind's `active:`/`group-hover:` transform utilities on the SAME
+//   node — that conflict (a CSS `animation` silently overwriting a utility's `transform` every
+//   frame) already bit the mascot once this session.
+// - Trimmed to essentials: the reinforce tag, the XP capsule and the "Fast Session" pill all
+//   competed for attention with the one thing that matters — starting. "Je pioche !" keeps the
+//   real draw mechanic (HomeView seeds a daily pick) in three words instead of four.
+// - Hierarchy between the hookline and the title comes from weight (font-semibold vs
+//   font-black), not opacity: white text on #5865F2 already sits at 4.61:1, the floor for normal
+//   text — dropping the hookline to white/75 measured at 3.32:1, a real AA failure, not a
+//   stylistic nuance. Full-opacity white stays the only safe choice on this background.
+// - The top sheen is a hard-stopped gradient (0 to transparent by 20px), not a soft half-card
+//   wash — it reads as a beveled edge catching light without reaching down into the padding box
+//   where the text sits, so it can't erode the contrast margin that's already tight.
 export function HeroPiocheCard({
+  hookLine,
   bubbleLine,
   subjectName,
-  subjectColor,
-  subjectEmoji,
-  needsReinforce,
   chapterTitle,
-  durationMin,
   onStart,
 }: HeroPiocheCardProps) {
-  return (
-    <div className="rounded-3xl border-2 border-black bg-white p-3 shadow-[3px_4px_0_#000] dark:bg-[var(--paper)]">
-      <span className="sr-only">{bubbleLine}</span>
+  const handleStart = () => {
+    if ('vibrate' in navigator) navigator.vibrate(12);
+    onStart();
+  };
 
-      <div className="mb-2.5 flex items-center gap-3">
-        <div className="tw-float h-11 w-11 flex-shrink-0 drop-shadow-[2px_3px_0_#000]">
+  return (
+    <div className="group relative overflow-visible rounded-2xl border-[2.5px] border-black bg-[#5865F2] p-4 shadow-[3px_3px_0px_0px_#000]">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 rounded-2xl"
+        style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.08) 0px, rgba(255,255,255,0) 20px)' }}
+      />
+      <div className="tw-float-pop pointer-events-none absolute -right-2 -top-3 z-20 h-20 w-20">
+        <div className="h-full w-full -rotate-6 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">
           <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
             <path
               d="M50 8 C 60 25, 71 31, 71 52 C 71 69, 61 80, 50 80 C 39 80, 29 69, 29 52 C 29 35, 40 31, 44 20 C 46 14, 48 10, 50 8 Z"
@@ -63,33 +86,38 @@ export function HeroPiocheCard({
             <circle cx="43" cy="52.4" r="1.5" fill="#fff" />
             <circle cx="60" cy="52.4" r="1.5" fill="#fff" />
             <path d="M42 62 Q 50 70, 58 62" stroke="#151821" strokeWidth="2.8" strokeLinecap="round" fill="none" />
+            <ellipse cx="41" cy="30" rx="5" ry="8" fill="#fff" opacity="0.35" transform="rotate(-18 41 30)" />
           </svg>
-        </div>
-
-        <div className="min-w-0 flex-1">
-          {subjectName && (
-            <p
-              className="truncate font-mono text-[0.62rem] font-extrabold uppercase tracking-wide"
-              style={{ color: subjectColor }}
-            >
-              {subjectEmoji} {subjectName}
-              {durationMin != null && <span className="text-[var(--ink-soft)]"> · {durationMin} min</span>}
-              {needsReinforce && <span aria-label="À renforcer"> ⚠️</span>}
-            </p>
-          )}
-          <h2 className="truncate font-display text-lg font-extrabold leading-tight text-[var(--ink)]">
-            {chapterTitle}
-          </h2>
         </div>
       </div>
 
-      <button
-        onClick={onStart}
-        className="flex w-full items-center justify-center gap-2 rounded-full border-2 border-black bg-sapie-neo-orange py-2.5 font-display text-sm font-extrabold text-white shadow-[3px_3px_0_#000] transition-all active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
-      >
-        <Play size={15} />
-        Continuer la leçon {durationMin != null && `(${durationMin} min)`}
-      </button>
+      <div className="max-w-[76%]">
+        <p className="mb-0.5 truncate text-xs font-semibold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]">
+          {hookLine}
+        </p>
+        <h2 className="truncate font-display text-lg font-black leading-tight text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]">
+          {chapterTitle}
+        </h2>
+      </div>
+      <span className="sr-only">{bubbleLine}</span>
+
+      {subjectName && (
+        <div className="mb-1 mt-1">
+          <span className="whitespace-nowrap rounded-full border border-white/30 bg-black/15 px-2 py-0.5 text-[0.7rem] font-semibold text-white">
+            🔥 {subjectName}
+          </span>
+        </div>
+      )}
+
+      <div className="tw-cta-pulse">
+        <button
+          onClick={handleStart}
+          className="tw-shimmer flex w-full items-center justify-center gap-1.5 rounded-full border-[2.5px] border-black bg-gradient-to-b from-[#FFE066] to-[#FDC800] px-3.5 py-3 font-display text-sm font-black text-black shadow-[3px_3px_0px_0px_#000] transition-all active:translate-y-1 active:scale-95 active:shadow-none"
+        >
+          <Play size={15} />
+          Je pioche !
+        </button>
+      </div>
     </div>
   );
 }

@@ -65,6 +65,8 @@ export type Flashcard = {
   wrongA: string;
   subject: string;
   topic: string;
+  /** Chapter this card drills, so "Revoir la notion" can open the exact lesson. */
+  chapterId: string;
   level: 'easy' | 'medium' | 'hard';
 };
 
@@ -121,6 +123,9 @@ export type AppState = {
   currentLessonMode: 'vocal' | 'echanger';
   completedChapters: string[];
   chatBridgeMessage: string | null;
+  /** Where "back" from a lesson should land when it wasn't reached through a subject (e.g.
+   *  "Revoir la notion" mid-session on Réviser). In-memory only, never persisted. */
+  lessonReturnTo: ViewId | null;
   cardReviews: Record<string, CardReview>;
   sessionDate: string;
   sessionCardsReviewed: number;

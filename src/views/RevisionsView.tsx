@@ -1,14 +1,14 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
-import { motion, AnimatePresence, useMotionValue, useTransform, useMotionValueEvent, animate, type PanInfo, type MotionValue } from 'framer-motion';
-import { Flag, Check, X, Zap, Volume2 } from 'lucide-react';
+import { useState, useEffect, useMemo, type ReactNode } from 'react';
+import { motion, AnimatePresence, useMotionValue, useTransform, animate, type PanInfo, type MotionValue } from 'framer-motion';
+import { Flag, Check, X, Zap, BookOpen, ArrowRight } from 'lucide-react';
 import { useApp } from '@/store';
 import { sfx } from '@/lib/sound';
-import { fireConfetti } from '@/lib/confetti';
+import { fireConfetti, fireMicroConfetti } from '@/lib/confetti';
 import { speak, stopSpeaking } from '@/lib/speech';
 import { BraiseRecap } from '@/components/BraiseRecap';
-import { BraiseMascot } from '@/components/BraiseMascot';
-import { RichText } from '@/components/RichText';
-import { getAgeGroup, quizCorrect, quizWrong } from '@/lib/braiseVoice';
+import { CardStack, QuestionCard, AnswerCard } from '@/components/RevisionCards';
+import { getAgeGroup, judgePrompt, quizCorrect, quizWrong } from '@/lib/braiseVoice';
+import { reportCard } from '@/lib/reports';
 import { FLASHCARDS, SUBJECTS } from '@/data';
 import type { Flashcard, Confidence } from '@/types';
 
@@ -18,92 +18,182 @@ import type { Flashcard, Confidence } from '@/types';
 // tutorial" flag with no need to round-trip through that machinery.
 const TUTORIAL_SEEN_KEY = 'sapie_rev_tutorial_seen';
 
-// Second gradient stop per subject — paired by analogous hue so the card reads like a
-// social-feed filter wash rather than a clashing two-tone.
-const SUBJECT_GRADIENT_END: Record<string, string> = {
-  maths: '#8B5CF6',
-  francais: '#EC4899',
-  'histoire-geo': '#EF4444',
-  svt: '#06B6D4',
-  physique: '#3B82F6',
-  anglais: '#A855F7',
+// A daily session is a sprint, not the whole library: ~15 cards, mixed. The deck used to
+// serve every due card (26 on a fresh install) with no cap at all.
+const SESSION_SIZE = 15;
+
+// In-progress session snapshot so "Revoir la notion" (which leaves for the chapter's chat)
+// comes back to the NEXT card with the streak, joker charge and totals intact, instead of
+// remounting a brand-new deck at 1/15. sessionStorage, not localStorage: a session is a
+// single sitting, it has no business surviving the tab.
+const SESSION_SNAPSHOT_KEY = 'sapie_rev_session';
+const SESSION_SNAPSHOT_TTL = 30 * 60 * 1000;
+type SessionSnapshot = {
+  cardIds: string[];
+  index: number;
+  combo: number;
+  maxCombo: number;
+  xpEarned: number;
+  reviewed: number;
+  wrongCount: number;
+  jokerCharge: number;
+  at: number;
 };
+function readSnapshot(): SessionSnapshot | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_SNAPSHOT_KEY);
+    if (!raw) return null;
+    const snap = JSON.parse(raw) as SessionSnapshot;
+    if (Date.now() - snap.at > SESSION_SNAPSHOT_TTL) return null;
+    return snap;
+  } catch {
+    return null;
+  }
+}
+function writeSnapshot(snap: SessionSnapshot | null) {
+  try {
+    if (snap) sessionStorage.setItem(SESSION_SNAPSHOT_KEY, JSON.stringify(snap));
+    else sessionStorage.removeItem(SESSION_SNAPSHOT_KEY);
+  } catch {
+    // ignore quota/availability errors, same defensive pattern as lib/persist.ts
+  }
+}
+
+// The joker (×2) has to be earned, not free: available on every card at no cost it strictly
+// dominated CARRÉ (a rational player never pressed CARRÉ again). It charges with the combo —
+// two correct in a row lights it up, using it spends the charge, a miss empties it. Scarcity,
+// never a penalty: no negative XP for a teenager.
+const JOKER_CHARGE_NEEDED = 2;
+
+// Compact subject tag in the header pill ("⚗️ PHYSIQUE · ÉNERGIE"), not the full display name
+// — the pill has to stay one line next to the report/quit buttons.
+const SUBJECT_SHORT: Record<string, string> = {
+  maths: 'Maths',
+  francais: 'Français',
+  'histoire-geo': 'Histoire-Géo',
+  svt: 'SVT',
+  physique: 'Physique',
+  anglais: 'Anglais',
+};
+
 
 export function RevisionsView() {
   const { state, reviewCard, getDueCards } = useApp();
+  // Bumped on "Enchaîner une autre série" to force a fresh draw below AND, via `key` on
+  // SwipeDeck, a full remount — that second part matters as much as the reshuffle: a manual
+  // reset of only some state fields could leave a verdict from the previous session showing on
+  // the new first card. A remount can't leave anything half-reset.
+  const [sessionKey, setSessionKey] = useState(0);
 
-  // Snapshotted + shuffled once per mount so reviewing a card mid-session (which shrinks the
-  // due-set) can't shift the deck's array or its length out from under a running index, and so
-  // every session mixes subjects in a fresh random order rather than the fixed curriculum
-  // order the data happens to be authored in.
-  //
-  // No "nothing due" interstitial: due cards are prioritized when there are any, but the
-  // session always starts immediately — falling back to the full deck rather than stopping to
-  // ask, since spaced repetition finding nothing urgent today is not a reason to make the
-  // student click through an extra screen before they can practice at all.
+  // A fresh, in-progress snapshot (coming back from "Revoir la notion") resumes that exact
+  // deck; otherwise a new draw. Read once per session key, so a restart always re-draws.
+  const resume = useMemo(() => (sessionKey === 0 ? readSnapshot() : null), [sessionKey]);
+
+  // One session = SESSION_SIZE cards, drawn once (re-drawn on restart via `sessionKey`) so
+  // reviewing a card mid-session can't shift the deck under a running index. Priority, then
+  // shuffle: due cards first (spaced repetition), then the subjects the student picked in
+  // onboarding (weighted, not exclusive — the Home screen still shows all six decks, and an
+  // exclusive filter would make the two screens disagree), then a difficulty nudge by age
+  // group. Cards carry a difficulty, not a school grade, so this is the honest limit of
+  // "adapted to their level" until the content has a grades field.
   const cards = useMemo(() => {
-    const dueIds = new Set(getDueCards());
-    const duePool = FLASHCARDS.filter((c) => dueIds.has(c.id));
-    const pool = duePool.length > 0 ? duePool : FLASHCARDS;
-    const shuffled = [...pool];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    if (resume) {
+      const byId = new Map(FLASHCARDS.map((c) => [c.id, c]));
+      const restored = resume.cardIds.map((id) => byId.get(id)).filter((c): c is Flashcard => !!c);
+      if (restored.length === resume.cardIds.length) return restored;
     }
-    return shuffled;
+    const dueIds = new Set(getDueCards());
+    const chosen = new Set(state.user.subjects);
+    const age = getAgeGroup(state.user.level);
+    const priority = (c: Flashcard) => {
+      let p = Math.random();
+      if (dueIds.has(c.id)) p += 2;
+      if (chosen.has(c.subject)) p += 0.7;
+      if (age === 'college' ? c.level === 'easy' : c.level === 'hard') p += 0.3;
+      return p;
+    };
+    const picked = [...FLASHCARDS]
+      .map((c) => ({ c, p: priority(c) }))
+      .sort((a, b) => b.p - a.p)
+      .slice(0, SESSION_SIZE)
+      .map(({ c }) => c);
+    for (let i = picked.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [picked[i], picked[j]] = [picked[j], picked[i]];
+    }
+    return picked;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [sessionKey, resume]);
 
   return (
     <div className="view is-active rev-view">
-      <SwipeDeck cards={cards} soundOn={state.soundOn} onReview={reviewCard} />
+      <SwipeDeck
+        key={sessionKey}
+        cards={cards}
+        resume={resume && resume.cardIds.length === cards.length ? resume : null}
+        soundOn={state.soundOn}
+        onReview={reviewCard}
+        onRestartSession={() => {
+          writeSnapshot(null);
+          setSessionKey((k) => k + 1);
+        }}
+      />
     </div>
   );
 }
 
-type JudgeMode = 'accept' | 'reject' | 'super';
+type Verdict = 'accept' | 'reject';
+type FlyDir = 'left' | 'right' | 'up';
 
-function SwipeDeck({ cards, soundOn, onReview }: { cards: Flashcard[]; soundOn: boolean; onReview: (id: string, c: Confidence) => void }) {
-  const { state, addXp, updateBestCombo, setTab } = useApp();
+function SwipeDeck({
+  cards,
+  resume,
+  soundOn,
+  onReview,
+  onRestartSession,
+}: {
+  cards: Flashcard[];
+  resume: SessionSnapshot | null;
+  soundOn: boolean;
+  onReview: (id: string, c: Confidence) => void;
+  onRestartSession: () => void;
+}) {
+  const { state, addXp, updateBestCombo, setTab, bridgeToChat } = useApp();
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(resume?.index ?? 0);
   const [isTrueAnswer, setIsTrueAnswer] = useState(true);
   const [judged, setJudged] = useState(false);
-  // Which direction was actually judged, independent of `flying` — `flying` only turns
-  // truthy later (5s auto-advance or manual skip), so the corner stamp's "claque" used to be
-  // tied to that instead of to the verdict itself. That meant a button-tap judgment (x never
-  // leaves 0, so the old drag-position-derived opacity stayed at 0 throughout) showed no stamp
-  // at all, and a swipe-released judgment showed the stamp fading in lockstep with the card's
-  // spring-back position instead of on its own fast timeline. This tracks the verdict the
-  // instant it lands so the stamp can claque immediately and fade out on a fixed schedule.
-  const [judgedMode, setJudgedMode] = useState<JudgeMode | null>(null);
+  // The verdict itself, the instant it lands — colours the card's fly-out border later, when
+  // `flying` turns truthy on "next".
+  const [judgedMode, setJudgedMode] = useState<Verdict | null>(null);
   const [wasCorrect, setWasCorrect] = useState(false);
-  const [flying, setFlying] = useState<JudgeMode | null>(null);
-  const [feedbackLine, setFeedbackLine] = useState('');
-  const [combo, setCombo] = useState(0);
-  const [maxCombo, setMaxCombo] = useState(0);
-  const [xpEarned, setXpEarned] = useState(0);
-  const [reviewed, setReviewed] = useState(0);
-  const [wrongCount, setWrongCount] = useState(0);
+  const [flying, setFlying] = useState(false);
+  const [flyDir, setFlyDir] = useState<FlyDir>('right');
+  // Verdict feedback: emoji tag, Braise's line, and the XP won (0 on a miss) — rendered
+  // inside the answer card (verdict bar on top, Braise's line as footer).
+  const [feedback, setFeedback] = useState<{ tag: string; text: string; xp: number } | null>(null);
+  // Picked once per card (in the index effect), not in render — byCombo() draws at random,
+  // so reading it during render would reshuffle the wording on every re-render mid-card.
+  const [prompt, setPrompt] = useState('');
+  const [combo, setCombo] = useState(resume?.combo ?? 0);
+  const [maxCombo, setMaxCombo] = useState(resume?.maxCombo ?? 0);
+  const [xpEarned, setXpEarned] = useState(resume?.xpEarned ?? 0);
+  const [reviewed, setReviewed] = useState(resume?.reviewed ?? 0);
+  const [wrongCount, setWrongCount] = useState(resume?.wrongCount ?? 0);
   const [speaking, setSpeaking] = useState(false);
   const [typing, setTyping] = useState(true);
   const [reported, setReported] = useState(false);
-  // Ephemeral center-screen celebration, separate from the small persistent .rev-combo badge
-  // in the top row — this one pops in big, holds briefly, then clears itself. Number, not a
-  // boolean, both so the toast can show which streak it's celebrating and so the key={} on it
-  // changes on every landed combo, forcing a fresh mount (and thus a replayed pop animation)
-  // even for two same-length streaks in a row.
-  const [comboPopup, setComboPopup] = useState<number | null>(null);
-  // First-card-only swipe tutorial (hand hint + mascot callout). Dismissed permanently the
-  // moment the player does anything — starts a drag or taps a verdict button — rather than
-  // only once they land a full swipe, since the goal is just to get out of the way as soon as
-  // the gesture has been demonstrated. Only ever consulted while index === 0, so it never
-  // needs resetting between cards.
-  //
-  // Seeded from localStorage (lazy initializer, so it's read exactly once per mount, not on
-  // every render) so a returning player never sees it again once they've dismissed it a single
-  // time in their life — replaying a "here's how this works" overlay on every session is the
-  // kind of thing that reads as patronizing past the very first visit.
+  // Joker: `jokerCharge` counts consecutive correct answers toward JOKER_CHARGE_NEEDED;
+  // `armed` is the player's "sûr de moi" declaration for THIS card, applied to whichever
+  // verdict they give next (INTOX or CARRÉ — it used to be accept-only, so you could never
+  // bet on catching a lie).
+  const [jokerCharge, setJokerCharge] = useState(resume?.jokerCharge ?? 0);
+  const [armed, setArmed] = useState(false);
+  const jokerReady = jokerCharge >= JOKER_CHARGE_NEEDED;
+  // First-card-only swipe tutorial. Dismissed permanently the moment the player does anything
+  // — starts a drag or taps a verdict button. Seeded from localStorage (lazy initializer, read
+  // exactly once per mount) so a returning player never sees it again once they've dismissed
+  // it a single time in their life.
   const [tutorialDismissed, setTutorialDismissed] = useState(() => {
     try {
       return localStorage.getItem(TUTORIAL_SEEN_KEY) === '1';
@@ -111,28 +201,50 @@ function SwipeDeck({ cards, soundOn, onReview }: { cards: Flashcard[]; soundOn: 
       return false;
     }
   });
-  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const [dragMood, setDragMood] = useState<'happy' | 'hesitant' | 'proud'>('happy');
-  useMotionValueEvent(x, 'change', (latest) => {
-    if (latest > 40) setDragMood('proud');
-    else if (latest < -40) setDragMood('hesitant');
-    else setDragMood('happy');
-  });
+  // The drag previews the button it's about to press: as the card leans right, CARRÉ lifts
+  // (scale) and INTOX does the same on the left — the same idea as the swipe preview on the
+  // big dating/learning apps, and it keeps the verdict words off the cards while dragging.
+  const acceptLift = useTransform(x, [20, 110], [1, 1.08]);
+  const rejectLift = useTransform(x, [-110, -20], [1.08, 1]);
 
   useEffect(() => {
     setIsTrueAnswer(Math.random() < 0.5);
     setTyping(true);
     setReported(false);
+    setArmed(false);
+    setPrompt(judgePrompt(voiceCtx));
     const t = setTimeout(() => setTyping(false), 450);
     return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index]);
 
   useEffect(() => {
     if (cards.length > 0 && index === cards.length) fireConfetti();
   }, [index, cards.length]);
+
+  // Keep the resumable snapshot current while the session is live; drop it the moment the
+  // deck is finished so a later visit to Réviser starts a genuinely new session.
+  useEffect(() => {
+    if (cards.length === 0) return;
+    if (index >= cards.length) {
+      writeSnapshot(null);
+      return;
+    }
+    writeSnapshot({
+      cardIds: cards.map((c) => c.id),
+      index,
+      combo,
+      maxCombo,
+      xpEarned,
+      reviewed,
+      wrongCount,
+      jokerCharge,
+      at: Date.now(),
+    });
+  }, [cards, index, combo, maxCombo, xpEarned, reviewed, wrongCount, jokerCharge]);
 
   // Reports this session's best streak to the store's lifetime record the moment the deck
   // finishes — maxCombo itself is local, per-session state (reset on every restart), so the
@@ -148,18 +260,6 @@ function SwipeDeck({ cards, soundOn, onReview }: { cards: Flashcard[]; soundOn: 
   }, [index]);
 
   useEffect(() => stopSpeaking, []);
-
-  useEffect(() => {
-    return () => {
-      if (advanceTimer.current) clearTimeout(advanceTimer.current);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (comboPopup === null) return;
-    const t = setTimeout(() => setComboPopup(null), 1100);
-    return () => clearTimeout(t);
-  }, [comboPopup]);
 
   useEffect(() => {
     if (!tutorialDismissed) return;
@@ -187,14 +287,7 @@ function SwipeDeck({ cards, soundOn, onReview }: { cards: Flashcard[]; soundOn: 
         wrongCount={wrongCount}
         maxCombo={maxCombo}
         xpEarned={xpEarned}
-        onRestart={() => {
-          setIndex(0);
-          setReviewed(0);
-          setCombo(0);
-          setMaxCombo(0);
-          setXpEarned(0);
-          setWrongCount(0);
-        }}
+        onRestart={onRestartSession}
         onGoHome={() => setTab('home')}
       />
     );
@@ -204,17 +297,23 @@ function SwipeDeck({ cards, soundOn, onReview }: { cards: Flashcard[]; soundOn: 
   const subject = SUBJECTS.find((s) => s.id === card.subject);
   const shownAnswer = isTrueAnswer ? card.a : card.wrongA;
 
-  const judge = (mode: JudgeMode) => {
+  const toggleArm = () => {
+    if (judged || typing || !jokerReady) return;
+    sfx.flip(soundOn);
+    setTutorialDismissed(true);
+    setArmed((a) => !a);
+  };
+
+  const judge = (mode: Verdict) => {
     if (judged || typing) return;
     setTutorialDismissed(true);
-    // Available on every card now — no longer a once-per-session resource — so this just
-    // reads the mode the player picked for this specific question.
-    const useSuper = mode === 'super';
-    const acceptedAsTrue = mode !== 'reject';
+    const useSuper = armed && jokerReady;
+    const acceptedAsTrue = mode === 'accept';
     const correctJudgment = acceptedAsTrue === isTrueAnswer;
     setJudged(true);
     setJudgedMode(mode);
     setWasCorrect(correctJudgment);
+    setArmed(false);
     if (correctJudgment) {
       sfx.correct(soundOn);
       const base = 15;
@@ -224,8 +323,13 @@ function SwipeDeck({ cards, soundOn, onReview }: { cards: Flashcard[]; soundOn: 
       const bonus = useSuper ? base : 0;
       if (bonus > 0) addXp(bonus);
       const total = base + bonus;
-      setXpEarned((x) => x + total);
-      setFeedbackLine(`${useSuper ? '⚡ SUPER BRAISE ! ' : 'CARTON. '}${quizCorrect(voiceCtx)} (+${total} XP)`);
+      setXpEarned((v) => v + total);
+      setFeedback({ tag: useSuper ? '⚡ SUPER BRAISE' : "💯 C'EST CARRÉ", text: quizCorrect(voiceCtx), xp: total });
+      // Immediate, physical: a small burst fires from the side of the dock that was pressed
+      // (INTOX left / CARRÉ right), the whole stack shivers, the result strip pops in.
+      fireMicroConfetti(mode === 'accept' ? 0.76 : 0.24, 0.9, useSuper);
+      // Spending the joker empties its charge; otherwise a correct answer charges it.
+      setJokerCharge((c) => (useSuper ? 0 : Math.min(JOKER_CHARGE_NEEDED, c + 1)));
       setCombo((c) => {
         const next = c + 1;
         setMaxCombo((m) => Math.max(m, next));
@@ -234,48 +338,71 @@ function SwipeDeck({ cards, soundOn, onReview }: { cards: Flashcard[]; soundOn: 
         // buzz a hot combo gives on its own.
         if (useSuper && navigator.vibrate) navigator.vibrate([30, 40, 60]);
         else if (next >= 3 && navigator.vibrate) navigator.vibrate(40);
-        if (next >= 2) setComboPopup(next);
         return next;
       });
     } else {
       sfx.wrong(soundOn);
       setWrongCount((w) => w + 1);
-      setFeedbackLine(isTrueAnswer ? 'AÏE. Le piège était là, celle-là était pourtant bonne.' : `GRILLÉ. ${quizWrong(voiceCtx, card.topic)}`);
+      setFeedback(
+        isTrueAnswer
+          ? { tag: '🙈 AÏE', text: 'Le piège était là, celle-là était pourtant bonne.', xp: 0 }
+          : { tag: '💀 GRILLÉ', text: quizWrong(voiceCtx, card.topic), xp: 0 }
+      );
       setCombo(0);
+      setJokerCharge(0);
     }
     onReview(card.id, correctJudgment ? 'sure' : 'not-sure');
-    advanceTimer.current = setTimeout(() => advance(mode), 5000);
+    // No auto-advance, on purpose. The dock is pinned in one place, so a timer that swapped
+    // "Suivant" for INTOX/CARRÉ under a thumb already reaching for it would turn that tap
+    // into a verdict on the next card. The student always moves on themselves: "Suivant",
+    // a tap on the card, or a swipe in any direction — the way Duolingo's CONTINUE works.
   };
 
-  // Single entry point for leaving the current card — used by both the auto-advance timeout
-  // and the manual "tap to skip" path. Always clearing the pending timer here (not just at
-  // the call site that happens to fire first) means a manual skip can never race a stale
-  // timeout into firing a second, phantom advance on whatever card has since taken its place.
-  const advance = (mode: JudgeMode) => {
-    if (advanceTimer.current) {
-      clearTimeout(advanceTimer.current);
-      advanceTimer.current = null;
-    }
-    setFlying(mode);
+  // Single entry point for leaving the current card — tap, "Suivant", and a post-verdict
+  // swipe all land here.
+  const advance = (dir: FlyDir) => {
+    setFlyDir(dir);
+    setFlying(true);
   };
 
   const onAdvanceComplete = () => {
     if (!flying) return;
     x.set(0);
     y.set(0);
-    setFlying(null);
+    setFlying(false);
     setJudged(false);
     setJudgedMode(null);
-    setFeedbackLine('');
+    setFeedback(null);
     setIndex((i) => i + 1);
     setReviewed((r) => r + 1);
   };
 
-  const mood = judged ? (wasCorrect ? 'cool' : 'hesitant') : dragMood;
-
   const skipToNext = () => {
     if (!judged || flying) return;
-    advance(wasCorrect ? 'accept' : 'reject');
+    advance('right');
+  };
+
+  // "Revoir la notion": drops the student into the chapter's chat with Braise, first person,
+  // same voice as the lesson's own "explique-moi le piège" bridge — not a link to a syllabus.
+  const reviewNotion = () => {
+    sfx.tap(soundOn);
+    // This card is done — the snapshot points at the NEXT one, so coming back from the chat
+    // lands on a fresh card with everything else (streak, joker, totals) exactly as left.
+    writeSnapshot({
+      cardIds: cards.map((c) => c.id),
+      index: index + 1,
+      combo,
+      maxCombo,
+      xpEarned,
+      reviewed: reviewed + 1,
+      wrongCount,
+      jokerCharge,
+      at: Date.now(),
+    });
+    const ask = wasCorrect
+      ? `Tu peux m'en dire un peu plus sur ${card.topic} ? Je veux être sûr de bien capter.`
+      : `Je viens de me planter sur « ${card.q} ». Tu peux me réexpliquer ${card.topic}, vite fait ?`;
+    bridgeToChat(card.subject, card.chapterId, ask, 'revisions');
   };
 
   const progressPct = ((index + (judged ? 1 : 0.5)) / cards.length) * 100;
@@ -287,59 +414,47 @@ function SwipeDeck({ cards, soundOn, onReview }: { cards: Flashcard[]; soundOn: 
   return (
     <>
       <div className="flash-stack">
+        {/* Header: count · progress · combo (slot always reserved so the bar never jumps
+            when a streak starts or breaks) · report · quit. Report lives up here now, styled
+            as a sibling of the quit button, off the card's reading area. */}
         <div className="rev-top-row">
+          <span className="rev-count">{index + 1}/{cards.length}</span>
           <div className="rev-progress-track">
             <div className="rev-progress-bar">
               <span style={{ width: `${progressPct}%` }} />
             </div>
-            <div className="rev-progress-mascot" style={{ left: `${progressPct}%` }}>
-              <BraiseMascot
-                size={22}
-                mood={mood}
-                className={judged ? (wasCorrect ? 'fc-mascot-burst' : 'fc-mascot-shake') : ''}
-              />
-              <AnimatePresence>
-                {showTutorial && (
-                  <motion.div
-                    className="mascot-hint"
-                    initial={{ opacity: 0, scale: 0.5, x: -6 }}
-                    animate={{ opacity: 1, scale: 1, x: 0 }}
-                    exit={{ opacity: 0, scale: 0.5, x: -6 }}
-                    transition={{ type: 'spring', stiffness: 480, damping: 26 }}
-                  >
-                    Vrai ou Faux ?
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
           </div>
-          {combo >= 2 && (
-            <span key={combo} className={`rev-combo rev-combo-shake ${combo >= 3 ? 'is-hot' : ''}`}>
-              🔥 ×{combo}
-            </span>
-          )}
+          <span className="rev-combo-slot" aria-live="polite">
+            {combo >= 1 && (
+              <span key={combo} className={`rev-combo rev-combo-shake ${combo >= 3 ? 'is-hot' : ''}`}>
+                🔥 ×{combo}
+              </span>
+            )}
+          </span>
+          <button
+            className={`rev-icon-btn ${reported ? 'is-reported' : ''}`}
+            onClick={() => {
+              if (reported) return;
+              sfx.tap(soundOn);
+              setReported(true);
+              reportCard(card.id, card.q);
+            }}
+            aria-label={reported ? 'Signalé, merci' : 'Signaler un problème sur cette carte'}
+          >
+            {reported ? <Check size={15} strokeWidth={3} /> : <Flag size={15} strokeWidth={2.5} />}
+          </button>
+          <button
+            className="rev-icon-btn"
+            onClick={() => {
+              sfx.tap(soundOn);
+              writeSnapshot(null);
+              setTab('home');
+            }}
+            aria-label="Quitter la série"
+          >
+            <X size={16} strokeWidth={3} />
+          </button>
         </div>
-        {comboPopup !== null && (
-          <div key={comboPopup} className={`combo-toast ${comboPopup >= 3 ? 'is-hot' : ''}`}>
-            🔥 Série de {comboPopup} !
-          </div>
-        )}
-        <AnimatePresence>
-          {showTutorial && (
-            <motion.div
-              className="swipe-tutorial"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.25 }}
-              aria-hidden="true"
-            >
-              <span className="tut-chip tut-left">← FAUX</span>
-              <span className="tut-hand">✋</span>
-              <span className="tut-chip tut-right">VRAI →</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
         <SwipeCard
           key={card.id}
           x={x}
@@ -348,110 +463,230 @@ function SwipeDeck({ cards, soundOn, onReview }: { cards: Flashcard[]; soundOn: 
           judgedMode={judgedMode}
           typing={typing}
           flying={flying}
+          flyDir={flyDir}
           subjectColor={subject?.color}
-          subjectColor2={SUBJECT_GRADIENT_END[subject?.id ?? ''] || 'var(--neo-blue)'}
-          onDragJudge={(mode) => judge(mode)}
+          onDragJudge={judge}
+          onDragArm={toggleArm}
+          onDragNext={(dir) => advance(dir)}
           onFlyComplete={onAdvanceComplete}
           onDragStart={() => setTutorialDismissed(true)}
           onTap={judged ? skipToNext : undefined}
         >
-          <div className={`fc-scroll ${showTutorial ? 'has-tutorial' : ''}`}>
+          <div className="fc-scroll">
+            {/* Subject pill sits directly under the header — it's context, it belongs with
+                the header, not floating mid-card above the thread. */}
             <div className="ftag-row">
               <span className="subject-tag" style={{ '--tag-color': subject?.color } as React.CSSProperties}>
-                {subject?.emoji} {subject?.name} — {card.topic}
+                {subject?.emoji} {SUBJECT_SHORT[card.subject] ?? subject?.name} · {card.topic}
               </span>
-              <button
-                className={`hint-btn ${reported ? 'is-reported' : ''}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (reported) return;
-                  sfx.tap(soundOn);
-                  setReported(true);
-                }}
-                aria-label={reported ? 'Signalé' : 'Signaler un problème'}
-              >
-                {reported ? <Check size={15} /> : <Flag size={15} />}
-              </button>
             </div>
-            <div className="fc-qa-block">
-              <div className="fq-zone">
-                <div className="fq-notif">
-                  <span className="fq-notif-icon">{subject?.emoji}</span>
-                  <div className="fq-notif-body">
-                    <div className="fq-notif-title"><RichText text={card.q} /></div>
-                    <div className="fq-notif-meta">Braise · à l'instant</div>
-                  </div>
-                </div>
-              </div>
-              <div className="fa-row">
-                {typing ? (
-                  <div className="braise-say braise-typing" aria-hidden="true">
-                    <span className="typing-dot" />
-                    <span className="typing-dot" />
-                    <span className="typing-dot" />
-                  </div>
-                ) : (
-                  <div className="braise-say fa-proposed">
-                    <span className="braise-tail" />
-                    <RichText text={shownAnswer} />
-                  </div>
-                )}
-              </div>
-              {judged && (
-                <>
-                  <div className="fb-line">{feedbackLine}</div>
-                  <div className="reveal-line">
-                    <b>La vraie réponse&nbsp;:</b> <RichText text={card.a} />
-                  </div>
-                  <button
-                    className={`listen-link ${speaking ? 'is-speaking' : ''}`}
-                    onPointerDown={(e) => e.stopPropagation()}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleListen(card.a);
-                    }}
-                  >
-                    <Volume2 size={13} />
-                    {speaking ? 'Lecture...' : 'Écouter la réponse'}
-                  </button>
-                  <div className="fhint">Touche la carte pour continuer</div>
-                </>
-              )}
-            </div>
+            {/* The centre of the screen: question, claim, then the result strip once judged —
+                one column, centred both ways, `layout` so the stack re-flows smoothly as the
+                correction unfolds and the result strip slots in. On a win it shivers once. */}
+            <motion.div
+              className="flex w-full flex-1 flex-col"
+              layout
+              animate={judged && wasCorrect ? { x: [0, -5, 5, -3, 3, 0] } : { x: 0 }}
+              transition={{ duration: 0.42, ease: 'easeOut' }}
+            >
+              <CardStack>
+                <QuestionCard question={card.q} emoji={subject?.emoji ?? '📚'} color={subject?.color ?? 'var(--sun)'} />
+                <AnimatePresence mode="wait" initial={false}>
+                  <AnswerCard
+                    key={typing ? 'typing' : 'claim'}
+                    typing={typing}
+                    claim={shownAnswer}
+                    truth={card.a}
+                    wasLie={!isTrueAnswer}
+                    judged={judged}
+                    verdict={judged ? (wasCorrect ? 'win' : 'miss') : null}
+                    prompt={prompt}
+                    tutorial={showTutorial}
+                    result={
+                      judged && feedback
+                        ? {
+                            verdict: wasCorrect ? 'win' : 'miss',
+                            tag: feedback.tag,
+                            text: feedback.text,
+                            xp: feedback.xp,
+                            combo,
+                            speaking,
+                            onListen: () => handleListen(card.a),
+                          }
+                        : undefined
+                    }
+                  />
+                </AnimatePresence>
+              </CardStack>
+            </motion.div>
           </div>
-
-          {!judged && (
-            <div className="rev-actions rev-actions-embedded">
-              <button
-                className="rev-btn again"
-                onPointerDown={(e) => e.stopPropagation()}
-                onClick={(e) => { e.stopPropagation(); judge('reject'); }}
-                aria-label="Intox"
-              >
-                <X size={28} />
-              </button>
-              <button
-                className="rev-btn super"
-                onPointerDown={(e) => e.stopPropagation()}
-                onClick={(e) => { e.stopPropagation(); judge('super'); }}
-                aria-label="Joker — double les points"
-              >
-                <Zap size={22} />
-                <span className="joker-tooltip">×2</span>
-              </button>
-              <button
-                className="rev-btn know"
-                onPointerDown={(e) => e.stopPropagation()}
-                onClick={(e) => { e.stopPropagation(); judge('accept'); }}
-                aria-label="Carré"
-              >
-                <Check size={28} />
-              </button>
-            </div>
-          )}
         </SwipeCard>
+
+        {/* The dock is a sibling of the card, not a child: it's pinned to the bottom of the
+            screen (safe-area aware) and never moves — not with the card's drag, not with the
+            card flying off, not with how long the text above it is. The thumb learns one
+            position. It swaps between two states in place: verdicts before, "Revoir la
+            notion" + "Suivant" after. */}
+        <div className="rev-dock">
+          <AnimatePresence mode="wait" initial={false}>
+            {!judged ? (
+              <motion.div
+                key="verdict"
+                className="rev-dock-inner"
+                exit={{ opacity: 0, y: 6 }}
+                transition={{ duration: 0.14, ease: 'easeIn' }}
+              >
+                <div className="rev-actions">
+                  <motion.div className="flex-1" style={{ scale: rejectLift }}>
+                    <BevelButton
+                      className="w-full"
+                      base="bg-[var(--coral-2)]"
+                      face="bg-[var(--coral)] text-white"
+                      onClick={() => judge('reject')}
+                      label="Intox — c'est faux"
+                      badge={armed ? '+30' : '+15'}
+                    >
+                      <X size={20} strokeWidth={3.2} />
+                      <span>Intox</span>
+                    </BevelButton>
+                  </motion.div>
+                  <BevelButton
+                    className="w-[62px]"
+                    round
+                    base={armed ? 'bg-black' : jokerReady ? 'bg-[var(--sun-ink)]' : 'bg-black/30'}
+                    face={
+                      armed
+                        ? 'bg-black text-[var(--sun)]'
+                        : jokerReady
+                          ? 'bg-gradient-to-b from-[#FFE066] to-[#FDC800] text-black'
+                          : 'bg-[var(--paper)] text-black/40 border-dashed'
+                    }
+                    onClick={toggleArm}
+                    pressed={armed}
+                    label={
+                      jokerReady
+                        ? armed
+                          ? 'Joker armé : ×2 sur ta prochaine réponse'
+                          : 'Joker — double les points de ta prochaine réponse'
+                        : `Joker — se charge avec ${JOKER_CHARGE_NEEDED} bonnes réponses d'affilée`
+                    }
+                    badge={jokerReady ? '×2' : `${jokerCharge}/${JOKER_CHARGE_NEEDED}`}
+                    badgeTone={jokerReady ? 'hot' : 'muted'}
+                  >
+                    <Zap size={22} strokeWidth={2.6} />
+                  </BevelButton>
+                  <motion.div className="flex-1" style={{ scale: acceptLift }}>
+                    <BevelButton
+                      className="w-full"
+                      base="bg-[var(--mint-text)]"
+                      face="bg-[var(--mint)] text-black"
+                      onClick={() => judge('accept')}
+                      label="Carré — c'est vrai"
+                      badge={armed ? '+30' : '+15'}
+                    >
+                      <Check size={20} strokeWidth={3.2} />
+                      <span>Carré</span>
+                    </BevelButton>
+                  </motion.div>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="next"
+                className="rev-dock-inner"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.18, delay: 0.2 }}
+              >
+                <div className="rev-actions">
+                  <BevelButton
+                    className="flex-[1.15]"
+                    base="bg-black/60"
+                    face="bg-[var(--paper)] text-black"
+                    onClick={reviewNotion}
+                    label="Revoir la notion"
+                    compact
+                  >
+                    <BookOpen size={17} strokeWidth={2.6} />
+                    <span>Revoir la notion</span>
+                  </BevelButton>
+                  <BevelButton
+                    className="flex-1"
+                    base="bg-[#b98a00]"
+                    face="bg-gradient-to-b from-[#FFE066] to-[#FDC800] text-black"
+                    onClick={skipToNext}
+                    label="Carte suivante"
+                  >
+                    <span>Suivant</span>
+                    <ArrowRight size={20} strokeWidth={3.2} />
+                  </BevelButton>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </>
+  );
+}
+
+// The app's own tactile button (see HeaderHUD's BeveledButton and Home's "Je pioche !"):
+// a darker base underneath, a face with the 2.5px border and hard shadow that presses down
+// 3px onto it. `round` makes the joker's circle; `compact` is the lighter post-verdict pill.
+function BevelButton({
+  children,
+  onClick,
+  label,
+  base,
+  face,
+  badge,
+  badgeTone = 'hot',
+  round = false,
+  compact = false,
+  pressed,
+  className = '',
+}: {
+  children: ReactNode;
+  onClick: () => void;
+  label: string;
+  base: string;
+  face: string;
+  badge?: string;
+  badgeTone?: 'hot' | 'muted';
+  round?: boolean;
+  compact?: boolean;
+  pressed?: boolean;
+  className?: string;
+}) {
+  const radius = round ? 'rounded-full' : 'rounded-2xl';
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      aria-pressed={pressed}
+      className={`group relative block min-w-0 ${className}`}
+    >
+      <span aria-hidden="true" className={`absolute inset-0 translate-y-[4px] ${radius} border-[2.5px] border-black ${base}`} />
+      <span
+        className={`relative flex h-[58px] items-center justify-center gap-2 ${radius} border-[2.5px] border-black px-3 font-display font-black uppercase tracking-wide shadow-[4px_4px_0_#000] transition-transform duration-100 group-active:translate-y-[4px] group-active:shadow-none ${
+          compact ? 'text-[0.82rem] normal-case tracking-normal' : 'text-[1.02rem]'
+        } ${face}`}
+      >
+        {children}
+      </span>
+      {badge && (
+        <span
+          aria-hidden="true"
+          className={`absolute -top-2.5 right-2 rounded-md border-2 border-black px-1.5 py-0.5 font-display text-[0.62rem] font-black shadow-[2px_2px_0_#000] ${
+            badgeTone === 'hot' ? 'bg-[var(--sun)] text-black' : 'bg-white text-black/60'
+          }`}
+        >
+          {badge}
+        </span>
+      )}
+    </button>
   );
 }
 
@@ -462,9 +697,11 @@ function SwipeCard({
   judgedMode,
   typing,
   flying,
+  flyDir,
   subjectColor,
-  subjectColor2,
   onDragJudge,
+  onDragArm,
+  onDragNext,
   onFlyComplete,
   onDragStart,
   onTap,
@@ -473,83 +710,83 @@ function SwipeCard({
   x: MotionValue<number>;
   y: MotionValue<number>;
   judged: boolean;
-  judgedMode: JudgeMode | null;
+  judgedMode: Verdict | null;
   typing: boolean;
-  flying: JudgeMode | null;
+  flying: boolean;
+  flyDir: FlyDir;
   subjectColor?: string;
-  subjectColor2?: string;
-  onDragJudge: (mode: JudgeMode) => void;
+  onDragJudge: (mode: Verdict) => void;
+  onDragArm: () => void;
+  onDragNext: (dir: FlyDir) => void;
   onFlyComplete: () => void;
   onDragStart?: () => void;
   onTap?: () => void;
   children: React.ReactNode;
 }) {
-  // Tilt is a pure function of the current horizontal drag offset, nothing else. An earlier
-  // version blended in a velocity term (via useVelocity / an independent motion value driven
-  // from onDrag) to make fast flicks tilt harder — but that broke the return-to-rest spring
-  // for x/y/rotate together: releasing a drag that didn't cross the judge threshold left the
-  // card permanently stuck off-center and tilted instead of springing back. Reverted to this
-  // simple, provably-correct form: rotate is fully derived from x, so whenever x is animated
-  // back to 0 (by the `animate` target below, on any non-judged release), rotate follows it
-  // to exactly 0 automatically, with nothing separate left to reset or go stale.
+  // Tilt is a pure function of the current horizontal drag offset, nothing else — rotate is
+  // fully derived from x, so whenever x is animated back to 0 rotate follows it to exactly 0
+  // automatically, with nothing separate left to reset or go stale.
   const rotate = useTransform(x, [-200, 200], [-16, 16]);
 
-  // Stamp opacity ramps in over a drag window well short of the release threshold, so the
-  // player sees the verdict coming before they've committed to it (progressive feedback,
-  // not a binary flip at the last pixel).
-  const knowOpacity = useTransform(x, [20, 110], [0, 1]);
-  const againOpacity = useTransform(x, [-110, -20], [1, 0]);
-  const superOpacity = useTransform(y, [-110, -20], [1, 0]);
   // Border tints green/red as the drag leans toward accept/reject, fully saturated well
   // before the 90px release threshold so the color itself previews the outcome.
   const borderColor = useTransform(x, [-140, 0, 140], ['#E8564B', '#000000', '#0F9E6E']);
   // Full-card color wash layered on top of the content (see .fc-swipe-wash) — the border tint
-  // alone reads as a thin accent; this makes the whole card visibly lean red/green as you drag,
-  // the way a Tinder-style swipe reads its verdict at a glance rather than needing a close look.
+  // alone reads as a thin accent; this makes the whole stage visibly lean red/green as you
+  // drag. Together with the dock button lifting (SwipeDeck), that's the whole drag preview:
+  // nothing is written over the cards while the student is moving them.
   const washColor = useTransform(
     x,
     [-140, 0, 140],
     ['rgba(232, 86, 75, 0.28)', 'rgba(0, 0, 0, 0)', 'rgba(15, 158, 110, 0.28)']
   );
 
+  const springBack = () => {
+    // Released without crossing a threshold. With dragMomentum off and no dragConstraints,
+    // framer freezes x/y wherever the finger lifted — forcing the spring back explicitly is
+    // what keeps an aborted swipe from leaving the card stuck off-center and tilted.
+    animate(x, 0, { type: 'spring', stiffness: 420, damping: 32 });
+    animate(y, 0, { type: 'spring', stiffness: 420, damping: 32 });
+  };
+
   const handleDragEnd = (_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    if (judged) return;
-    // Release threshold: 90px covers a comfortable thumb flick without being so short that
-    // a small readjustment mid-read accidentally commits a verdict. Vertical (up = Super
-    // Braise) is checked first and only wins when the gesture is more vertical than
-    // horizontal, so a mostly-sideways swipe never gets misread as the risk-it gesture.
     const { offset } = info;
-    const isSuperSwipe = offset.y < -90 && Math.abs(offset.y) > Math.abs(offset.x);
-    if (isSuperSwipe) {
-      onDragJudge('super');
+    // Release threshold: 90px covers a comfortable thumb flick without being so short that
+    // a small readjustment mid-read accidentally commits a verdict.
+    const vertical = offset.y < -90 && Math.abs(offset.y) > Math.abs(offset.x);
+    if (judged) {
+      // After the verdict the swipe never blocks: any direction past the threshold moves on,
+      // flying the card out the way it was thrown.
+      if (vertical) onDragNext('up');
+      else if (offset.x > 90) onDragNext('right');
+      else if (offset.x < -90) onDragNext('left');
+      else springBack();
+      return;
+    }
+    if (vertical) {
+      // Up = arm the joker for this card (a declaration, not a verdict), then settle back.
+      onDragArm();
+      springBack();
     } else if (offset.x > 90) {
       onDragJudge('accept');
     } else if (offset.x < -90) {
       onDragJudge('reject');
     } else {
-      // Released without crossing any threshold. With dragMomentum off and no
-      // dragConstraints, framer just freezes x/y wherever the finger lifted — it does not
-      // reliably hand control back to the `animate` prop's rest target on its own. Without
-      // this, an aborted swipe (started, then let go short of the threshold) would leave the
-      // card permanently stuck off-center and tilted, which is exactly the "tilt at rest"
-      // bug this fixes: forcing the spring back explicitly, every time, rather than hoping
-      // the declarative animation reclaims the value.
-      animate(x, 0, { type: 'spring', stiffness: 420, damping: 32 });
-      animate(y, 0, { type: 'spring', stiffness: 420, damping: 32 });
+      springBack();
     }
   };
 
   // Verdict lock: once a direction is committed, the card animates to a fixed off-screen
   // target rather than continuing on drag momentum — the outcome (and its color) needs to
   // be deterministic, not dependent on exactly how hard the release throw was.
-  const target =
-    flying === 'accept'
-      ? { x: 480, y: -30, rotate: 22, scale: 1, opacity: 0, borderColor: '#0F9E6E' }
-      : flying === 'reject'
-        ? { x: -480, y: -30, rotate: -22, scale: 1, opacity: 0, borderColor: '#E8564B' }
-        : flying === 'super'
-          ? { x: 0, y: -700, rotate: 0, scale: 1, opacity: 0, borderColor: '#000000' }
-          : { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1, borderColor: '#000000' };
+  const verdictColor = judgedMode === 'accept' ? '#0F9E6E' : judgedMode === 'reject' ? '#E8564B' : '#000000';
+  const target = !flying
+    ? { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1, borderColor: '#000000' }
+    : flyDir === 'up'
+      ? { x: 0, y: -700, rotate: 0, scale: 1, opacity: 0, borderColor: verdictColor }
+      : flyDir === 'left'
+        ? { x: -480, y: -30, rotate: -22, scale: 1, opacity: 0, borderColor: verdictColor }
+        : { x: 480, y: -30, rotate: 22, scale: 1, opacity: 0, borderColor: verdictColor };
 
   return (
     <motion.div
@@ -560,23 +797,20 @@ function SwipeCard({
         rotate,
         borderColor,
         '--subject-color': subjectColor || 'var(--neo-orange)',
-        '--subject-color-2': subjectColor2 || 'var(--neo-blue)',
       } as any}
-      drag={!judged && !typing}
+      // Draggable before AND after the verdict — post-verdict drags advance instead of judging
+      // (see handleDragEnd). Only the typing beat is off-limits.
+      drag={!typing && !flying}
       // 0.55 = the physical "resistance": at 1 the card would track the finger 1:1 with no
-      // give, at 0 it wouldn't move past the origin at all. 0.55 lets it travel most of the
-      // way with the finger while still feeling like it's being pulled against something,
-      // rather than gliding freely.
+      // give, at 0 it wouldn't move past the origin at all.
       dragElastic={0.55}
       // Momentum is off deliberately — release-throw physics are replaced by the fixed
-      // `target` animation above once a verdict is locked, so the card shouldn't also keep
-      // drifting on whatever velocity the release happened to have.
+      // `target` animation above once a verdict is locked.
       dragMomentum={false}
       onDragStart={onDragStart}
       onDragEnd={handleDragEnd}
       // Each new card mounts fresh (key={card.id}), so this initial state is what makes it
-      // arrive with a soft pop rather than snapping straight to rest right as the previous
-      // card finishes flying away — the two halves of the transition read as one motion.
+      // arrive with a soft pop rather than snapping straight to rest.
       initial={{ scale: 0.92, opacity: 0 }}
       animate={target}
       transition={
@@ -590,53 +824,6 @@ function SwipeCard({
       onClick={onTap}
     >
       <motion.div className="fc-swipe-wash" style={{ background: washColor }} aria-hidden="true" />
-      {/* `judged && !flying` — the resting window between a verdict landing and the card
-          actually flying off — is pinned to a hard 0 rather than left to whatever knowOpacity/
-          againOpacity currently read off x. Those are only meant to track a live drag; once
-          judged they have no more reason to move, but nothing was forcing them back to exactly
-          0 on that specific frame, which was enough to leave a faint "VRAI"/"FAUX" ghost sitting
-          over the answer bubble while the feedback text was showing. */}
-      <motion.div
-        className="fc-gesture-label right"
-        style={{ opacity: flying === 'accept' ? 1 : judged ? 0 : knowOpacity }}
-        aria-hidden="true"
-      >
-        VRAI
-      </motion.div>
-      <motion.div
-        className="fc-gesture-label left"
-        style={{ opacity: flying === 'reject' ? 1 : judged ? 0 : againOpacity }}
-        aria-hidden="true"
-      >
-        FAUX
-      </motion.div>
-      {/* Stamp lifecycle is driven by `judgedMode`, not `flying` — `flying` only turns truthy
-          5s later (auto-advance) or on manual skip, so tying the claque to it meant a button
-          judgment never showed a stamp at all (x never left 0) and a swipe judgment showed it
-          fading in lockstep with the card's own spring-back instead of on a fixed timeline.
-          `judgedMode` fires the claque the instant the verdict lands; the `.stamped` class's
-          own `stampClaqueFade` keyframe (pop in, hold, fade to 0, `forwards`-filled) then owns
-          opacity outright — no inline style fighting it — so the winning stamp is reliably
-          gone well before the 5s feedback window is over, clearing the way for the feedback
-          text instead of lingering through it. */}
-      <motion.span
-        className={`swipe-tag know ${judgedMode === 'accept' ? 'stamped' : ''}`}
-        style={judgedMode === 'accept' ? undefined : { opacity: judged ? 0 : knowOpacity }}
-      >
-        CARRÉ ✔️
-      </motion.span>
-      <motion.span
-        className={`swipe-tag again ${judgedMode === 'reject' ? 'stamped' : ''}`}
-        style={judgedMode === 'reject' ? undefined : { opacity: judged ? 0 : againOpacity }}
-      >
-        INTOX ✖️
-      </motion.span>
-      <motion.span
-        className={`swipe-tag super ${judgedMode === 'super' ? 'stamped' : ''}`}
-        style={judgedMode === 'super' ? undefined : { opacity: judged ? 0 : superOpacity }}
-      >
-        ⚡ SUPER
-      </motion.span>
       {children}
     </motion.div>
   );

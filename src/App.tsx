@@ -1,6 +1,13 @@
+import { useState } from 'react';
 import { AppProvider, useApp } from '@/store';
 import { TabBar } from '@/components/TabBar';
 import { BraiseMascot } from '@/components/BraiseMascot';
+import { RankUpCelebration } from '@/components/RankUpCelebration';
+import { ShareAuraModal } from '@/components/ShareAuraModal';
+import { useMilestoneCelebrations } from '@/lib/useMilestoneCelebrations';
+import { rankUpLine, getAgeGroup } from '@/lib/braiseVoice';
+import { getRankInfo } from '@/lib/aura';
+import { FLASHCARDS } from '@/data';
 import { OnboardingView } from '@/views/OnboardingView';
 import { HomeView } from '@/views/HomeView';
 import { RevisionsView } from '@/views/RevisionsView';
@@ -13,7 +20,14 @@ import { SettingsView } from '@/views/SettingsView';
 
 function Screen() {
   const { state, setTab, loaded } = useApp();
+  // Mounted regardless of which view is active — a rank-up or badge unlock can be earned from
+  // LessonView or RevisionsView just as easily as from Home, and should be celebrated the moment
+  // it happens, not only if the student later happens to reopen Profile.
+  const { celebration, dismiss } = useMilestoneCelebrations(state, loaded, state.soundOn);
+  const [shareOpen, setShareOpen] = useState(false);
 
+  // The floating dock stays through a review session too — it sits under the action row,
+  // in its own glass layer, so it never competes with the verdict buttons for the thumb.
   const showTabBar = ['home', 'revisions', 'progres', 'profile'].includes(state.view);
 
   if (!loaded) {
@@ -42,6 +56,47 @@ function Screen() {
       </div>
 
       {showTabBar && <TabBar active={state.tab} onChange={setTab} />}
+
+      {celebration?.type === 'badge' && (
+        <div key={`badge-${celebration.badge.id}`} className="milestone-toast">
+          {celebration.badge.emoji} Badge débloqué : {celebration.badge.name} !
+        </div>
+      )}
+
+      {celebration?.type === 'rank' && (
+        <RankUpCelebration
+          key={`rank-${celebration.toRank.id}`}
+          fromRank={celebration.fromRank}
+          toRank={celebration.toRank}
+          xp={state.xp}
+          // "Cool" (sunglasses) for the Coach Savage tone, "proud" for Pote Chill — the mood and
+          // the voice tone were two already-built systems that just never spoke to each other on
+          // this screen; a savage-toned message paired with a plain happy face undercut its own
+          // punchline.
+          mood={state.user.personality === 'savage' ? 'cool' : 'proud'}
+          ageGroup={getAgeGroup(state.user.level)}
+          message={rankUpLine(
+            { personality: state.user.personality, age: getAgeGroup(state.user.level) },
+            celebration.toRank.name
+          )}
+          onDismiss={dismiss}
+          onShare={() => setShareOpen(true)}
+        />
+      )}
+
+      {shareOpen && (
+        <ShareAuraModal
+          rank={celebration?.type === 'rank' ? celebration.toRank : getRankInfo(state.xp).current}
+          streak={state.streak}
+          xp={state.xp}
+          subjectsCount={
+            new Set(
+              Object.keys(state.cardReviews).map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)
+            ).size
+          }
+          onClose={() => setShareOpen(false)}
+        />
+      )}
     </div>
   );
 }
