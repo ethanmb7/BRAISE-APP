@@ -301,7 +301,7 @@ function SwipeDeck({
 
   useEffect(() => {
     if (cards.length > 0 && index === cards.length && !reducedMotion) fireConfetti();
-  }, [index, cards.length]);
+  }, [index, cards.length, reducedMotion]);
 
   // Keep the resumable snapshot current while the session is live; drop it the moment the
   // deck is finished so a later visit to Réviser starts a genuinely new session.
