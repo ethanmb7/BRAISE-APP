@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useRef, type ReactNode } from 'react';
+import { motion, useAnimationControls } from 'framer-motion';
 import { Volume2 } from 'lucide-react';
 import { RichText } from '@/components/RichText';
 
@@ -118,6 +118,29 @@ export function AnswerCard({
         ? 'border-[var(--coral-2)] shadow-[6px_6px_0_var(--coral-2),inset_0_1.5px_0_rgba(255,255,255,0.7)]'
         : '';
 
+  // Imperative controls, not a declarative `animate` object: the entrance (on mount) and the
+  // verdict "punch" (once, exactly when `judged` flips true) are two different events on the
+  // same element, and a plain `animate` prop would either replay the punch on every unrelated
+  // re-render (speaking toggling, combo changing) or never fire it at all. Hooks run
+  // unconditionally, before the `typing` early return, so this stays legal regardless of which
+  // branch below actually renders.
+  const controls = useAnimationControls();
+  const wasJudged = useRef(judged);
+
+  useEffect(() => {
+    controls.start({ opacity: 1, y: 0, scaleY: 1, scale: 1, transition: SPRING });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (judged && !wasJudged.current) {
+      // The verdict lands: a quick physical punch, distinct from the border/shadow colour
+      // fade — a win or a miss should feel like something hit the card, not just recoloured it.
+      controls.start({ scale: [1, 0.965, 1.02, 1], transition: { duration: 0.34, ease: 'easeOut' } });
+    }
+    wasJudged.current = judged;
+  }, [judged, controls]);
+
   if (typing) {
     return (
       <motion.div
@@ -143,9 +166,8 @@ export function AnswerCard({
   return (
     <motion.div
       className={`${CARD} relative px-5 py-5 text-left transition-[border-color,box-shadow] duration-300 ${verdictClass}`}
-      initial={{ opacity: 0, y: -14, scaleY: 0.94 }}
-      animate={{ opacity: 1, y: 0, scaleY: 1 }}
-      transition={SPRING}
+      initial={{ opacity: 0, y: -14, scaleY: 0.94, scale: 1 }}
+      animate={controls}
       style={{ transformOrigin: 'top center' }}
     >
       {/* Verdict bar: a reserved header slot INSIDE the card — never a sticker over the
@@ -157,18 +179,25 @@ export function AnswerCard({
           {/* The trap, crossed out elegantly — a single stroke drawing itself left to right
               (not a static text-decoration snapping on), then the truth unfolds right under
               it once the strike lands. Single line + truncate: the trap is the thing to
-              forget, it doesn't need room to wrap. */}
+              forget, it doesn't need room to wrap. A hair of rotation, tapered ends (mask) and
+              a tiny overshoot in the easing keep it reading as a felt-tip stroke rather than a
+              ruler-drawn vector line — the same "hand-made" imperfection as the tilted cards. */}
           <div className="relative inline-block max-w-full">
             <p className="truncate font-sans text-[0.98rem] font-semibold text-black/40">
               <RichText text={claim} markClass="bg-transparent font-semibold" strongClass="font-semibold" />
             </p>
             <motion.span
               aria-hidden="true"
-              className="absolute left-0 top-1/2 h-[2.5px] w-full rounded-full bg-[var(--coral-2)]"
-              style={{ originX: 0 }}
+              className="absolute left-0 top-1/2 h-[3px] w-full bg-[var(--coral-2)]"
+              style={{
+                originX: 0,
+                rotate: -1.2,
+                maskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
+              }}
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
-              transition={{ duration: 0.28, delay: 0.16, ease: 'easeOut' }}
+              transition={{ duration: 0.3, delay: 0.16, ease: [0.34, 1.35, 0.64, 1] }}
             />
           </div>
           {/* …and the truth unfolding right under it, timed to start once the strike lands. */}

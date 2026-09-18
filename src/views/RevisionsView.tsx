@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, type ReactNode } from 'react';
+import { useState, useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, animate, type PanInfo, type MotionValue } from 'framer-motion';
 import { Flag, Check, X, Zap, BookOpen, ArrowRight } from 'lucide-react';
 import { useApp } from '@/store';
@@ -190,6 +190,26 @@ function SwipeDeck({
   const [jokerCharge, setJokerCharge] = useState(resume?.jokerCharge ?? 0);
   const [armed, setArmed] = useState(false);
   const jokerReady = jokerCharge >= JOKER_CHARGE_NEEDED;
+  // The charge completing and `judged` flipping true happen in the very same commit (both set
+  // inside judge()), which swaps the dock to its "next" state before the joker button — and
+  // the burst ring on it — ever gets to render. A plain `{jokerReady && <ring/>}` would not
+  // only miss that first moment, it would then wrongly replay on every later card as long as
+  // the joker stays unspent (the verdict dock fully remounts each card, so a freshly-true
+  // condition there looks identical to a genuinely new charge either way). This flag survives
+  // that remount instead: it flips true exactly once per charge-up and clears itself shortly
+  // after, so the ring fires on the very next moment the joker button is actually on screen —
+  // normally the next card — and never again until the joker is spent and earned afresh.
+  const [jokerJustCharged, setJokerJustCharged] = useState(false);
+  const jokerWasReady = useRef(false);
+  useEffect(() => {
+    if (jokerReady && !jokerWasReady.current) {
+      setJokerJustCharged(true);
+      const t = setTimeout(() => setJokerJustCharged(false), 700);
+      jokerWasReady.current = jokerReady;
+      return () => clearTimeout(t);
+    }
+    jokerWasReady.current = jokerReady;
+  }, [jokerReady]);
   // First-card-only swipe tutorial. Dismissed permanently the moment the player does anything
   // — starts a drag or taps a verdict button. Seeded from localStorage (lazy initializer, read
   // exactly once per mount) so a returning player never sees it again once they've dismissed
@@ -414,14 +434,43 @@ function SwipeDeck({
   return (
     <>
       <div className="flash-stack">
+        {/* The subject-coloured scene, decoupled from the card that remounts on every
+            `card.id` — without this, the whole stage hard-cuts colour the instant a new card
+            pops in. AnimatePresence with the default (overlapping) mode is the point: the
+            outgoing colour fades out while the incoming one fades in, so a Maths→SVT change
+            dissolves instead of jump-cutting. Sits behind .flashcard by DOM order (both are
+            inset:0 with no z-index of their own; .rev-top-row/.rev-dock's explicit z-index
+            already keeps the chrome above both). */}
+        <div className="flash-stage" aria-hidden="true">
+          <AnimatePresence>
+            <motion.div
+              key={subject?.id ?? 'default'}
+              className="flash-stage-layer"
+              style={{ '--subject-color': subject?.color || 'var(--neo-blue)' } as React.CSSProperties}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5, ease: 'easeInOut' }}
+            />
+          </AnimatePresence>
+          <div className="flash-stage-dots" />
+        </div>
         {/* Header: count · progress · combo (slot always reserved so the bar never jumps
             when a streak starts or breaks) · report · quit. Report lives up here now, styled
             as a sibling of the quit button, off the card's reading area. */}
         <div className="rev-top-row">
           <span className="rev-count">{index + 1}/{cards.length}</span>
           <div className="rev-progress-track">
-            <div key={`bar-${index}-${judged}`} className={`rev-progress-bar ${judged && wasCorrect ? 'is-win-flash' : ''}`}>
-              <span style={{ width: `${progressPct}%` }} />
+            {/* Persistent element (no remount key) — a spring needs a previous value to
+                interpolate from, and a fresh mount would just snap to the new width instead of
+                filling. The win-flash ring below only needs the class to go absent → present,
+                which restarts its CSS animation on its own, no remount required either. */}
+            <div className={`rev-progress-bar ${judged && wasCorrect ? 'is-win-flash' : ''}`}>
+              <motion.span
+                initial={false}
+                animate={{ width: `${progressPct}%` }}
+                transition={{ type: 'spring', stiffness: 300, damping: 26 }}
+              />
             </div>
           </div>
           <span className="rev-combo-slot" aria-live="polite">
@@ -464,7 +513,6 @@ function SwipeDeck({
           typing={typing}
           flying={flying}
           flyDir={flyDir}
-          subjectColor={subject?.color}
           onDragJudge={judge}
           onDragArm={toggleArm}
           onDragNext={(dir) => advance(dir)}
@@ -556,31 +604,38 @@ function SwipeDeck({
                       <span>Intox</span>
                     </BevelButton>
                   </motion.div>
-                  <BevelButton
-                    className="w-[62px]"
-                    round
-                    base={armed ? 'bg-black' : jokerReady ? 'bg-[var(--sun-ink)]' : 'bg-black/30'}
-                    face={
-                      armed
-                        ? 'bg-black text-[var(--sun)]'
-                        : jokerReady
-                          ? 'bg-gradient-to-b from-[#FFE066] to-[#FDC800] text-black'
-                          : 'bg-[var(--paper)] text-black/40 border-dashed'
-                    }
-                    onClick={toggleArm}
-                    pressed={armed}
-                    label={
-                      jokerReady
-                        ? armed
-                          ? 'Joker armé : ×2 sur ta prochaine réponse'
-                          : 'Joker — double les points de ta prochaine réponse'
-                        : `Joker — se charge avec ${JOKER_CHARGE_NEEDED} bonnes réponses d'affilée`
-                    }
-                    badge={jokerReady ? '×2' : `${jokerCharge}/${JOKER_CHARGE_NEEDED}`}
-                    badgeTone={jokerReady ? 'hot' : 'muted'}
-                  >
-                    <Zap size={22} strokeWidth={2.6} />
-                  </BevelButton>
+                  <div className="relative flex-shrink-0">
+                    {/* `jokerJustCharged`, not `jokerReady` — see where it's computed: the
+                        charge completes in the same commit that swaps the dock away, so this
+                        button (and this ring) don't exist yet at that instant. This flag
+                        survives to the next time they do. */}
+                    {jokerJustCharged && <span key="joker-burst" className="joker-burst-ring" aria-hidden="true" />}
+                    <BevelButton
+                      className="w-[62px]"
+                      round
+                      base={armed ? 'bg-black' : jokerReady ? 'bg-[var(--sun-ink)]' : 'bg-black/30'}
+                      face={
+                        armed
+                          ? 'bg-black text-[var(--sun)]'
+                          : jokerReady
+                            ? 'bg-gradient-to-b from-[#FFE066] to-[#FDC800] text-black'
+                            : 'bg-[var(--paper)] text-black/40 border-dashed'
+                      }
+                      onClick={toggleArm}
+                      pressed={armed}
+                      label={
+                        jokerReady
+                          ? armed
+                            ? 'Joker armé : ×2 sur ta prochaine réponse'
+                            : 'Joker — double les points de ta prochaine réponse'
+                          : `Joker — se charge avec ${JOKER_CHARGE_NEEDED} bonnes réponses d'affilée`
+                      }
+                      badge={jokerReady ? '×2' : `${jokerCharge}/${JOKER_CHARGE_NEEDED}`}
+                      badgeTone={jokerReady ? 'hot' : 'muted'}
+                    >
+                      <Zap size={22} strokeWidth={2.6} />
+                    </BevelButton>
+                  </div>
                   <motion.div className="flex-1" style={{ scale: acceptLift }}>
                     <BevelButton
                       className="w-full"
@@ -617,16 +672,29 @@ function SwipeDeck({
                     <BookOpen size={17} strokeWidth={2.6} />
                     <span>Revoir la notion</span>
                   </BevelButton>
-                  <BevelButton
+                  {/* A one-shot invite pulse, not a loop — the eye is still on the verdict up
+                      in the card when this dock mounts; this is what pulls it back down to
+                      the next action instead of leaving the player to notice the dock swapped
+                      on their own. Fresh on every card (this whole block remounts per verdict
+                      via the AnimatePresence key="next" above), so it fires exactly once each
+                      time it's genuinely new, never on an idle re-render. */}
+                  <motion.div
                     className="flex-1"
-                    base="bg-[#b98a00]"
-                    face="bg-gradient-to-b from-[#FFE066] to-[#FDC800] text-black"
-                    onClick={skipToNext}
-                    label="Carte suivante"
+                    initial={{ scale: 1 }}
+                    animate={{ scale: [1, 1.045, 1] }}
+                    transition={{ duration: 0.5, delay: 0.55, ease: 'easeOut' }}
                   >
-                    <span>Suivant</span>
-                    <ArrowRight size={20} strokeWidth={3.2} />
-                  </BevelButton>
+                    <BevelButton
+                      className="w-full"
+                      base="bg-[#b98a00]"
+                      face="bg-gradient-to-b from-[#FFE066] to-[#FDC800] text-black"
+                      onClick={skipToNext}
+                      label="Carte suivante"
+                    >
+                      <span>Suivant</span>
+                      <ArrowRight size={20} strokeWidth={3.2} />
+                    </BevelButton>
+                  </motion.div>
                 </div>
               </motion.div>
             )}
@@ -704,7 +772,6 @@ function SwipeCard({
   typing,
   flying,
   flyDir,
-  subjectColor,
   onDragJudge,
   onDragArm,
   onDragNext,
@@ -720,7 +787,6 @@ function SwipeCard({
   typing: boolean;
   flying: boolean;
   flyDir: FlyDir;
-  subjectColor?: string;
   onDragJudge: (mode: Verdict) => void;
   onDragArm: () => void;
   onDragNext: (dir: FlyDir) => void;
@@ -797,13 +863,7 @@ function SwipeCard({
   return (
     <motion.div
       className={`flashcard ${judged ? 'is-judged' : ''}`}
-      style={{
-        x,
-        y,
-        rotate,
-        borderColor,
-        '--subject-color': subjectColor || 'var(--neo-orange)',
-      } as any}
+      style={{ x, y, rotate, borderColor }}
       // Draggable before AND after the verdict — post-verdict drags advance instead of judging
       // (see handleDragEnd). Only the typing beat is off-limits.
       drag={!typing && !flying}

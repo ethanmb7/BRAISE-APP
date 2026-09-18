@@ -1354,12 +1354,13 @@ select {
   box-shadow: 3px 3px 0 #000;
   overflow: hidden;
 }
+/* Width is owned by a framer-motion spring now (see RevisionsView), not a CSS transition —
+   no `transition:width` here, it would just fight the spring's own per-frame inline style. */
 .rev-progress-bar span {
   display: block;
   height: 100%;
   background: #fff;
   border-radius: 999px;
-  transition: width 0.3s ease;
 }
 /* A quick mint flash on a correct answer — this bar tracks the session's overall progress
    (not a separate XP meter), so the reward beat lands on it as a ring pulse around the
@@ -1463,6 +1464,38 @@ select {
   height: 100dvh;
   min-height: 480px;
 }
+/* The subject-coloured scene, kept OUTSIDE .flashcard on purpose — .flashcard remounts fresh
+   on every card (key={card.id} in RevisionsView), so if it owned the background too, the
+   colour would hard-cut the instant a new card pops in. This sits behind it (DOM order, both
+   inset:0 with no z-index of their own — see RevisionsView's .flash-stage) and crossfades via
+   AnimatePresence instead, so a Maths→SVT change dissolves rather than jump-cutting. */
+.flash-stage {
+  position: absolute;
+  inset: 0;
+}
+/* One colour per subject — the same colour as that subject's deck on Home, so "you're in
+   Physique" reads the instant the card lands — deepening toward the bottom. One layer per
+   subject, crossfaded in/out by the parent's AnimatePresence. */
+.flash-stage-layer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    170deg,
+    var(--subject-color, var(--neo-blue)) 0%,
+    color-mix(in srgb, var(--subject-color, var(--neo-blue)) 78%, #151821) 100%
+  );
+}
+/* A faint halftone over the whole stage, on its own static layer (it doesn't change with the
+   subject, so it never needs to crossfade) — the cards float on a textured scene, not a flat
+   fill: the margin above and below them (wherever the centred stack doesn't reach) is never a
+   dead void, it's just a quieter part of the same surface. */
+.flash-stage-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.14) 1.5px, transparent 1.5px);
+  background-size: 26px 26px;
+  pointer-events: none;
+}
 /* Three fixed zones on the screen: header (absolute, top), this card's scroll area (the
    space between header and dock, thread centered inside it), and the dock (absolute, bottom,
    a sibling of the card — see .rev-dock). The card's padding is what reserves the header's
@@ -1471,18 +1504,8 @@ select {
 .flashcard {
   position: absolute;
   inset: 0;
-  /* One colour per subject — the same colour as that subject's deck on Home, so "you're in
-     Physique" reads the instant the card lands — deepening toward the bottom, plus a faint
-     halftone dot texture over the whole stage. The cards float on a scene, not a flat fill:
-     the margin above and below them (wherever the centred stack doesn't reach) is never a
-     dead void, it's just a quieter part of the same textured surface. */
-  background:
-    radial-gradient(rgba(255, 255, 255, 0.14) 1.5px, transparent 1.5px) 0 0 / 26px 26px,
-    linear-gradient(
-      170deg,
-      var(--subject-color, var(--neo-blue)) 0%,
-      color-mix(in srgb, var(--subject-color, var(--neo-blue)) 78%, #151821) 100%
-    );
+  z-index: 5;
+  /* Transparent — the colour now lives in .flash-stage, behind this. */
   /* Top: header. Bottom: action dock + floating tab dock + gaps. */
   padding: calc(58px + env(safe-area-inset-top, 0px)) 0 calc(178px + env(safe-area-inset-bottom, 0px));
   display: flex;
@@ -1606,6 +1629,23 @@ select {
   align-items: stretch;
   justify-content: center;
   gap: 12px;
+}
+/* Fires once, exactly when the joker becomes ready (see the conditional render in
+   RevisionsView — plain mount/unmount already gives a fresh element each time jokerReady goes
+   false → true, no counter needed). A ring blooming outward and fading, not a loop: earning
+   the joker is a single beat, not an ambient effect. */
+.joker-burst-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 3px solid var(--sun);
+  pointer-events: none;
+  animation: jokerBurst 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes jokerBurst {
+  0% { transform: scale(0.6); opacity: 0.9; border-width: 4px; }
+  70% { transform: scale(1.35); opacity: 0.35; border-width: 2px; }
+  100% { transform: scale(1.65); opacity: 0; border-width: 1px; }
 }
 /* Highlighter stroke for ==key terms== on the cards: the bottom 45% of the line painted
    yellow behind the words, hard edge, text stays ink, flows across a line break as one
