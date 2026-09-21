@@ -566,8 +566,25 @@ select {
 }
 
 /* ===== Ton Aura (Profil) — néo-brutaliste strict ===== */
+/* On a short phone this is just a normal top-to-bottom scrolling page — content is already
+   taller than the viewport, so nothing below changes how it behaves. On a tall screen (a
+   tablet, or a big phone with this page's now-trimmed "indispensable only" content), the exact
+   same page used to leave a dead, unstyled void between the share button and the tab bar —
+   looked unfinished, like the page had simply run out of content. min-height:100% + margin:auto
+   on .aura-content centers the whole hero-through-share block in whatever vertical space is
+   actually available, while the title stays pinned at the top like a normal page header (auto
+   margins only consume the space left over after normal-flow siblings are laid out). Auto
+   margins rather than justify-content:center specifically: the latter clips the top of the
+   content above the scroll start once it overflows a short viewport, auto margins degrade to 0
+   and the page just scrolls normally from the top instead. */
 .aura-view {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
   padding-bottom: 40px;
+}
+.aura-content {
+  margin: auto 0;
 }
 .aura-view-title {
   font-family: 'Baloo 2', sans-serif;

@@ -121,7 +121,7 @@ export function ProfilAuraView() {
         </div>
       )}
 
-      <motion.div variants={staggerContainer} initial="hidden" animate="show">
+      <motion.div className="aura-content" variants={staggerContainer} initial="hidden" animate="show">
         {/* Pillar 1 — Ancrage émotionnel : identité pure, zéro chiffre de progression. */}
         <motion.div variants={heroPop}>
           <AuraHeroScene rank={current} streak={state.streak} freezes={state.freezes} />
