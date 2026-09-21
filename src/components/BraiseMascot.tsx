@@ -20,7 +20,7 @@ const MOOD_CLASS: Record<Mood, string> = {
 // snowflake, légende's inner gold matches bronze's own tip and the coral already used for
 // SapiLogo/badges. Optional and defaults to bronze, so every existing call site (onboarding,
 // SubjectView, TodayStrip) renders exactly as before — only the rank-up celebration passes this.
-const RANK_FLAME_COLORS: Record<string, [string, string, string]> = {
+export const RANK_FLAME_COLORS: Record<string, [string, string, string]> = {
   bronze: ['#FF4500', '#FF9A3D', '#FFD84B'],
   // Was a slate-grey scale (#64748B/#CBD5E1/#F1F5F9) — matches aura.ts's argent fix: a vivid
   // chrome blue instead of a desaturated grey, so the mascot and the rank's own colours agree.

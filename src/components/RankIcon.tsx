@@ -17,6 +17,21 @@ interface RankIconProps {
 
 const INK = '#151821';
 
+// A plain JS mix instead of CSS color-mix() — color-mix() has no fallback path on an SVG
+// presentation attribute (unlike a CSS property, a `fill="..."` attribute can't fall back to
+// an earlier valid declaration), so on a browser without support it would silently render solid
+// black instead of a darkened tint. Computing the same 75% colour / 25% black mix in JS works
+// identically everywhere, no feature support required.
+function darken(hex: string, amount: number): string {
+  const m = hex.replace('#', '');
+  const full = m.length === 3 ? m.split('').map((c) => c + c).join('') : m;
+  const num = parseInt(full, 16);
+  const r = Math.round(((num >> 16) & 255) * (1 - amount));
+  const g = Math.round(((num >> 8) & 255) * (1 - amount));
+  const b = Math.round((num & 255) * (1 - amount));
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
 export function RankIcon({ rankId, color, size = 20, locked = false }: RankIconProps) {
   const common = { width: size, height: size, viewBox: '0 0 24 24', 'aria-hidden': true as const };
 
@@ -34,7 +49,7 @@ export function RankIcon({ rankId, color, size = 20, locked = false }: RankIconP
     case 'bronze':
     case 'argent':
     case 'or': {
-      const ribbon = `color-mix(in srgb, ${color} 75%, #000)`;
+      const ribbon = darken(color, 0.25);
       return (
         <svg {...common}>
           <path d="M7.5 2 L10.5 2 L10.5 12.5 L7.5 15 Z" fill={ribbon} stroke={INK} strokeWidth="1.4" strokeLinejoin="round" />
