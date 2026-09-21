@@ -869,60 +869,35 @@ select {
   50% { transform: scale(1.08); }
 }
 
-/* --- SubjectMasteryGrid — reuses the page's OWN signature shape (the Hero's double-ring
-   medallion) at a fraction of the size, once per subject, rather than a bulletin-scolaire row
-   of icon+name+%-bar. Same construction as .aura-ring-frame/.aura-ring-inner: a black-bordered
-   circle with a colored ring, framing the subject glyph.
-
-   The container went through two passes before this one: bare (no boundary — the one section
-   on the page with no edge of its own), then a rounded rectangle (fixed the boundary, but by
-   then the Hero ring, the rank-rail nodes and the mastery rings themselves were already three
-   rounds in a row — a fourth rounded box made the whole page read as "everything is round",
-   losing the squarer, game-card energy the rest of the app has). This is a cut-corner panel
-   instead — square edges everywhere except one deliberate diagonal notch, the way an inventory
-   slot or a trophy case reads in a game UI, not a rounded card. The shadow can't just be
-   box-shadow here (it doesn't follow clip-path, so it would keep the shadow of the rectangle
-   this shape no longer is) — same two-layer trick SubjectDecks.tsx already uses for its own
-   press-bevel shadow: a solid black copy of the exact same clipped shape, offset behind the
-   real face, not a CSS shadow property. */
+/* --- SubjectMasteryGrid — the container had gone through three passes (bare, a rounded
+   rectangle, a cut-corner panel with a dot-grid backdrop and an overlapping black nameplate)
+   before the card-stack content existed. Once the cards themselves carried real visual weight —
+   rotation, colour, an icon each — that container started competing with its own content
+   instead of framing it: a busy backdrop and a heavy plaque around content that was already
+   busy on its own. Pulled back to one clean bordered card (the same construction as the badge
+   bridge and the pride stats before them), no clip-path, no dot texture — the cards do the
+   game-energy work now, the frame's only job is to hold them. */
 .mastery-section-wrap {
-  position: relative;
   margin-bottom: 16px;
 }
-.mastery-cut-corner {
-  clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 0 100%);
-}
-.mastery-section-shadow {
-  position: absolute;
-  inset: 0;
-  background: #000;
-  transform: translate(3px, 3px);
-}
 .mastery-section {
-  position: relative;
-  padding: 30px 12px 14px;
+  padding: 16px 14px 14px;
   border: 2.5px solid #000;
-  background-color: var(--paper);
-  /* Same dot-grid technique Réviser already paints behind its flashcards (.flash-stage-dots),
-     recoloured off --ink instead of a fixed white — this panel sits on the neutral,
-     theme-reactive page background, not Réviser's saturated per-subject one. Turns what would
-     otherwise be dead space around 6 small rings into game-board texture. */
-  background-image: radial-gradient(color-mix(in srgb, var(--ink) 14%, transparent) 1.5px, transparent 1.5px);
-  background-size: 22px 22px;
+  border-radius: 22px;
+  background: var(--paper);
+  box-shadow: 4px 4px 0 #000;
 }
-/* The nameplate — was a quiet grey caption sitting inside the frame, read last if at all.
-   Overlapping the panel's own top edge like a trophy case's nameplate gives "Maîtrise par
-   matière" real presence instead of being the one label on the page nobody notices. Pinned to
-   the left so it never collides with the cut corner on the right. */
+/* A small tag instead of either extreme this went through (a bare grey caption nobody read, or
+   a full-width black plaque loud enough to compete with the cards below it) — real presence,
+   normal document flow, no absolute-position overlap to get wrong. */
 .mastery-tab {
-  position: absolute;
-  top: -13px;
-  left: 14px;
-  z-index: 2;
-  background: var(--neo-ink);
+  display: inline-block;
+  background: var(--neo-orange);
   color: #fff;
   border: 2px solid #000;
+  border-radius: 8px;
   padding: 4px 10px;
+  margin-bottom: 14px;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.6rem;
   font-weight: 700;

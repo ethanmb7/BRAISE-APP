@@ -319,8 +319,7 @@ const SubjectMasteryGrid = memo(function SubjectMasteryGrid({
 }) {
   return (
     <div className="mastery-section-wrap">
-      <span className="mastery-section-shadow mastery-cut-corner" aria-hidden="true" />
-      <div className="mastery-section mastery-cut-corner">
+      <div className="mastery-section">
         <span className="mastery-tab">Maîtrise par matière</span>
         <div className="mastery-grid" role="list">
           {subjects.map((s) => {
