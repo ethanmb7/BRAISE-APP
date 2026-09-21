@@ -237,9 +237,10 @@ export function AnswerCard({
       ) : tutorial ? (
         <TutorialHint />
       ) : (
-        // The amorce, as a comic sticker encastré at the bottom of the card, not a line of
-        // uppercase monospace instructions — Braise's dare, in Braise's own voice.
-        <div className="prompt-sticker mt-5 inline-block">
+        // The amorce, as a flat chip at the bottom of the card — Braise's own voice (not
+        // uppercase monospace instructions), in the system's own flat construction (not a
+        // tilted, tailed sticker — nothing else on this card rotates or grows a tail either).
+        <div className="prompt-sticker mt-5">
           <p className="font-display text-[0.86rem] font-bold leading-snug text-black">{prompt}</p>
         </div>
       )}

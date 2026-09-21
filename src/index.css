@@ -1621,31 +1621,17 @@ select {
   pointer-events: none;
   user-select: none;
 }
-/* The amorce as a comic sticker encastré in the card's own footer — a speech bubble with a
-   tail pointing up into the content above it, not a line of uppercase instructions. ::after
-   draws the tail: a small square, same fill/border as the bubble, rotated 45° so its top-left
-   corner reads as a triangle pointing into the card. */
+/* The amorce as a plain flat chip, in the app's own construction (border + hard shadow, square
+   corners, dead level) — a tilted speech-bubble-with-tail read as "comic sticker" against a
+   system where nothing else rotates or grows a tail (the cards, the verdict chips, the
+   TutorialHint chips either side of it are all dead flat). No exception here either now. */
 .prompt-sticker {
-  position: relative;
-  transform: rotate(-2deg);
+  display: inline-block;
   background: var(--rev-paper);
   border: 2.5px solid #000;
-  border-radius: 16px;
-  padding: 10px 16px;
+  border-radius: 12px;
+  padding: 8px 14px;
   box-shadow: 3px 3px 0 #000;
-}
-.prompt-sticker::after {
-  content: '';
-  position: absolute;
-  top: -8px;
-  left: 26px;
-  width: 15px;
-  height: 15px;
-  background: var(--rev-paper);
-  border-left: 2.5px solid #000;
-  border-top: 2.5px solid #000;
-  border-radius: 3px 0 0 0;
-  transform: rotate(45deg);
 }
 /* KaTeX renders its own glyph colors via currentColor for the base symbols, so this just
    makes sure the formula reads in whatever ink color its surrounding bubble/line already
@@ -1721,9 +1707,10 @@ select {
     animation: none !important;
   }
 }
-/* First-time-only explainer bubble, anchored above the joker button — same comic-sticker
-   construction as .prompt-sticker, tail pointing down into the button it's explaining instead
-   of up into a card. Never wraps (the sentence is short by design; width:max-content plus a
+/* First-time-only explainer bubble, anchored above the joker button. Unlike the amorce chip,
+   this one earns its tail: it's a transient tooltip pointing at a specific button, not a
+   permanent piece of the card's content, and a tail is the standard way a tooltip claims what
+   it's talking about. Never wraps (the sentence is short by design; width:max-content plus a
    generous max-width keeps a long device-font override from ever forcing an ugly wrap). */
 .joker-tip {
   position: absolute;
