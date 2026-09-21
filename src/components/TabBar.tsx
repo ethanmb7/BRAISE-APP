@@ -36,7 +36,10 @@ export function TabBar({ active, onChange }: Props) {
             onClick={() => onChange(t.id)}
             aria-current={isActive ? 'page' : undefined}
             className={`relative flex flex-1 flex-col items-center gap-0.5 rounded-xl py-2 font-display text-[0.64rem] font-black tracking-wide transition-colors ${
-              isActive ? 'text-white' : 'text-black/60 hover:text-black'
+              // --ink-soft/--ink, not text-black/60 — this bar is shared chrome on every screen
+              // (Home, Aura, Profil too), so unlike Réviser's own cards it should actually
+              // follow the app's light/dark toggle rather than opt out of it.
+              isActive ? 'text-white' : 'text-[var(--ink-soft)] hover:text-[var(--ink)]'
             }`}
           >
             {isActive && (

@@ -208,6 +208,16 @@ function SwipeDeck({
   const [speaking, setSpeaking] = useState(false);
   const [typing, setTyping] = useState(true);
   const [reported, setReported] = useState(false);
+  // The flag swapping to a checkmark was the only feedback reporting a card ever gave — no
+  // word confirming the tap actually did something. This is a one-shot toast, not a persistent
+  // label (the checkmark already stays), so a plain effect tied to the click is enough — no
+  // need for the joker burst's "survives a remount" trick, this button never unmounts mid-card.
+  const [showReportTip, setShowReportTip] = useState(false);
+  useEffect(() => {
+    if (!showReportTip) return;
+    const t = setTimeout(() => setShowReportTip(false), 2200);
+    return () => clearTimeout(t);
+  }, [showReportTip]);
   // Joker: `jokerCharge` counts consecutive correct answers toward JOKER_CHARGE_NEEDED;
   // `armed` is the player's "sûr de moi" declaration for THIS card, applied to whichever
   // verdict they give next (INTOX or CARRÉ — it used to be accept-only, so you could never
@@ -593,18 +603,35 @@ function SwipeDeck({
               </span>
             )}
           </span>
-          <button
-            className={`rev-icon-btn ${reported ? 'is-reported' : ''}`}
-            onClick={() => {
-              if (reported) return;
-              sfx.tap(soundOn);
-              setReported(true);
-              reportCard(card.id, card.q);
-            }}
-            aria-label={reported ? 'Signalé, merci' : 'Signaler un problème sur cette carte'}
-          >
-            {reported ? <Check size={15} strokeWidth={3} /> : <Flag size={15} strokeWidth={2.5} />}
-          </button>
+          <div className="relative">
+            <AnimatePresence>
+              {showReportTip && (
+                <motion.div
+                  className="report-tip"
+                  role="status"
+                  initial={{ opacity: 0, y: -6, scale: 0.92 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -4, scale: 0.95 }}
+                  transition={{ type: 'spring', stiffness: 480, damping: 30 }}
+                >
+                  Merci, on regarde ça !
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <button
+              className={`rev-icon-btn ${reported ? 'is-reported' : ''}`}
+              onClick={() => {
+                if (reported) return;
+                sfx.tap(soundOn);
+                setReported(true);
+                setShowReportTip(true);
+                reportCard(card.id, card.q);
+              }}
+              aria-label={reported ? 'Signalé, merci' : 'Signaler un problème sur cette carte'}
+            >
+              {reported ? <Check size={15} strokeWidth={3} /> : <Flag size={15} strokeWidth={2.5} />}
+            </button>
+          </div>
           <button
             className="rev-icon-btn"
             onClick={() => {
@@ -746,7 +773,7 @@ function SwipeDeck({
                           ? 'bg-black text-[var(--sun)]'
                           : jokerReady
                             ? 'bg-gradient-to-b from-[#FFE066] to-[#FDC800] text-black'
-                            : 'bg-[var(--paper)] text-black/40 border-dashed'
+                            : 'bg-[var(--rev-paper)] text-black/40 border-dashed'
                       }
                       onClick={toggleArm}
                       pressed={armed}
@@ -791,7 +818,7 @@ function SwipeDeck({
                   <BevelButton
                     className="flex-[1.15]"
                     base="bg-black/60"
-                    face="bg-[var(--paper)] text-black"
+                    face="bg-[var(--rev-paper)] text-black"
                     onClick={reviewNotion}
                     label="Revoir la notion"
                     compact
@@ -871,7 +898,12 @@ function BevelButton({
     >
       <span aria-hidden="true" className={`absolute inset-0 translate-y-[4px] ${radius} border-[2.5px] border-black ${base}`} />
       <span
-        className={`relative flex h-[58px] items-center justify-center gap-2 ${radius} border-[2.5px] border-black px-3 font-display font-black uppercase tracking-wide shadow-[4px_4px_0_#000,inset_0_1.5px_0_rgba(255,255,255,0.5)] transition-transform duration-100 group-active:translate-y-[4px] group-active:scale-[0.97] group-active:shadow-none ${
+        // Mouse-only lift (the `[@media(hover:hover)]` guard is what keeps this from sticking
+        // after a tap on touch devices, where Tailwind's plain `hover:` would otherwise latch
+        // on until the next unrelated tap) — this is also a web app, reached from a laptop via
+        // the keyboard shortcuts, and until now nothing told a mouse it was over a button
+        // before the click landed. Rises toward the cursor, the mirror of the press-down.
+        className={`relative flex h-[58px] items-center justify-center gap-2 ${radius} border-[2.5px] border-black px-3 font-display font-black uppercase tracking-wide shadow-[4px_4px_0_#000,inset_0_1.5px_0_rgba(255,255,255,0.5)] transition-transform duration-100 [@media(hover:hover)]:group-hover:-translate-y-0.5 [@media(hover:hover)]:group-hover:shadow-[5px_5px_0_#000,inset_0_1.5px_0_rgba(255,255,255,0.5)] group-active:translate-y-[4px] group-active:scale-[0.97] group-active:shadow-none ${
           compact ? 'text-[0.82rem] normal-case tracking-normal' : 'text-[1.02rem]'
         } ${face}`}
       >

@@ -2,6 +2,7 @@ import { useEffect, useRef, type ReactNode } from 'react';
 import { motion, useAnimationControls } from 'framer-motion';
 import { Volume2 } from 'lucide-react';
 import { RichText } from '@/components/RichText';
+import { BraiseMascot } from '@/components/BraiseMascot';
 
 // The centre of the Réviser screen: "Tactile 3D" neo-brutalism — opaque paper cards, generous
 // rounding, a hard extruded shadow (the same construction as every button in the app) — with
@@ -11,8 +12,12 @@ import { RichText } from '@/components/RichText';
 // content — the question, the claim, the truth — because that's the text a science or maths
 // card lives or dies on for legibility.
 
+// --rev-paper, not --paper: this screen's own atmosphere is the per-subject colour behind the
+// cards, decoupled from the app's light/dark toggle (see index.css) — --paper repoints to a
+// near-black navy under .dark, which would leave this card's hardcoded-black text sitting on a
+// near-black card.
 const CARD =
-  'w-full rounded-[28px] border-[2.5px] border-black bg-[var(--paper)] shadow-[6px_6px_0_#000,inset_0_1.5px_0_rgba(255,255,255,0.7)]';
+  'w-full rounded-[28px] border-[2.5px] border-black bg-[var(--rev-paper)] shadow-[6px_6px_0_#000,inset_0_1.5px_0_rgba(255,255,255,0.7)]';
 
 // A real highlighter stroke, not a box: the bottom 45% of the line is painted yellow behind
 // the words (a gradient with a hard stop, see .rev-marker), text stays ink, and it flows
@@ -142,20 +147,25 @@ export function AnswerCard({
   }, [judged, controls]);
 
   if (typing) {
+    // A compact chat bubble, not a full-width card standing in for one — this used to be the
+    // exact size and shape of the answer card it precedes, which read as an oversized empty
+    // box for three dots. `self-start` + content-width (no `w-full`) is what makes it a real
+    // "typing…" indicator, the iMessage/WhatsApp convention: small, to the left, gone in
+    // 450ms, not a placeholder pretending to be the eventual message.
     return (
       <motion.div
-        className={`${CARD} flex items-center justify-center gap-2 px-6 py-6`}
+        className="flex items-center gap-1.5 self-start rounded-full border-[2.5px] border-black bg-[var(--rev-paper)] px-4 py-3 shadow-[3px_3px_0_#000,inset_0_1px_0_rgba(255,255,255,0.7)]"
         aria-hidden="true"
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96 }}
+        initial={{ opacity: 0, scale: 0.8, y: -8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.85 }}
         transition={SPRING}
       >
         {[0, 1, 2].map((i) => (
           <motion.span
             key={i}
-            className="block h-3 w-3 rounded-full border-2 border-black bg-black"
-            animate={{ y: [0, -6, 0], opacity: [0.3, 1, 0.3] }}
+            className="block h-2 w-2 rounded-full bg-black"
+            animate={{ y: [0, -5, 0], opacity: [0.3, 1, 0.3] }}
             transition={{ duration: 1, repeat: Infinity, delay: i * 0.15 }}
           />
         ))}
@@ -272,15 +282,25 @@ function VerdictBar({ verdict, tag, xp, combo }: ResultProps) {
     transition: { duration: 0.4, delay },
   });
   return (
-    <div className="mb-3 flex flex-wrap items-center gap-2 border-b-2 border-dashed border-black/15 pb-3" aria-live="polite">
-      <motion.span className={`${chip} ${win ? 'bg-[var(--mint)] text-black' : 'bg-[var(--coral-2)] text-white'}`} {...pop(0.08)}>
-        {tag}
-      </motion.span>
-      {xp > 0 && <XpChip xp={xp} chip={chip} />}
-      {win && combo >= 2 && (
-        <motion.span className={`${chip} ml-auto ${combo >= 3 ? 'bg-[var(--neo-orange)] text-white' : 'bg-white text-black'}`} {...pop(0.34)}>
-          🔥 {combo >= 3 ? `En chauffant ×${combo}` : `×${combo}`}
+    // Two deliberate rows, not one row that overflows into a second — `ml-auto` inside a
+    // `flex-wrap` row used to push the streak chip onto its own line ONLY at narrow widths,
+    // landing it stranded at the far right with a big gap to its left, never centred or
+    // designed for. Giving it its own row unconditionally (whenever it's shown) makes that the
+    // one and only layout, at every width, instead of an accident of how much the first row
+    // happened to fit.
+    <div className="mb-3 border-b-2 border-dashed border-black/15 pb-3" aria-live="polite">
+      <div className="flex flex-wrap items-center gap-2">
+        <motion.span className={`${chip} ${win ? 'bg-[var(--mint)] text-black' : 'bg-[var(--coral-2)] text-white'}`} {...pop(0.08)}>
+          {tag}
         </motion.span>
+        {xp > 0 && <XpChip xp={xp} chip={chip} />}
+      </div>
+      {win && combo >= 2 && (
+        <div className="mt-2 flex justify-end">
+          <motion.span className={`${chip} ${combo >= 3 ? 'bg-[var(--neo-orange)] text-white' : 'bg-white text-black'}`} {...pop(0.34)}>
+            🔥 {combo >= 3 ? `En chauffant ×${combo}` : `×${combo}`}
+          </motion.span>
+        </div>
       )}
     </div>
   );
@@ -319,6 +339,11 @@ function ResultStrip({ verdict, text, speaking, onListen }: ResultProps) {
       transition={{ ...SPRING, delay: 0.12 }}
     >
       <div className="flex items-start gap-3">
+        {/* This is Braise's own line — chat-message construction (avatar beside text), reusing
+            space this footer already reserves rather than adding a new one: this is the only
+            place all session Braise actually shows a face reacting to the verdict, instead of
+            colour and text carrying the whole feeling alone. */}
+        <BraiseMascot size={30} mood={verdict === 'win' ? 'happy' : 'hesitant'} className="flex-shrink-0" />
         <p className={`flex-1 font-display text-[0.95rem] font-bold leading-snug ${verdict === 'win' ? 'text-black' : 'text-black/80'}`}>
           {text}
         </p>
