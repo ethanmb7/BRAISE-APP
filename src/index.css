@@ -2817,7 +2817,7 @@ select {
   color: rgba(21, 24, 33, 0.72);
 }
 .persona-emoji {
-  font-size: 1.6rem;
+  display: flex;
   margin-bottom: 4px;
 }
 .persona-card b {
@@ -2844,6 +2844,28 @@ select {
 }
 
 /* ===== Profile ===== */
+/* Same tag-pill treatment as Aura's "MAÎTRISE PAR MATIÈRE" (.mastery-tab) — this page's section
+   labels were still the plain small-caps .section-title shared with Settings/LessonView, the
+   one piece of the page that hadn't adopted Aura's visual language yet. Kept as its own class
+   rather than changing .section-title itself, since that class is shared with views this pass
+   never touched. Same WCAG fix as .mastery-tab: white text on plain --neo-orange is 3.44:1,
+   under the 4.5:1 minimum — darkened 20% clears it in both themes. */
+.profile-tag {
+  display: inline-block;
+  background: color-mix(in srgb, var(--neo-orange) 80%, #000);
+  color: #fff;
+  border: 2px solid #000;
+  border-radius: 8px;
+  padding: 4px 10px;
+  margin-bottom: 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  box-shadow: 2px 2px 0 #000;
+}
+
 /* Avatar + name used to be permanently locked in from onboarding — nowhere in the app could
    change them again. Tapping the avatar now opens an inline editor reusing the same AVATARS set
    onboarding picks from (src/data.ts), so the two pickers can never show different options. */
@@ -2972,6 +2994,9 @@ select {
   margin-bottom: 24px;
 }
 .profile-subject-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: var(--paper);
   border: 2px solid var(--neo-ink);
   border-radius: 999px;
