@@ -621,6 +621,32 @@ select {
      the same story and gets the smaller gap; only this one is a change of subject. */
   margin-bottom: 24px;
 }
+/* Sized well past the ring frame (180px) so it bleeds into the page above/below rather than
+   reading as a tight halo glued to the medallion's edge. Pure decoration, so it's excluded from
+   the accessibility tree and never intercepts a tap. */
+.aura-hero-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 340px;
+  height: 340px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  filter: blur(36px);
+  opacity: 0.4;
+  pointer-events: none;
+  animation: auraHeroGlowBreathe 5s ease-in-out infinite;
+}
+@keyframes auraHeroGlowBreathe {
+  0%, 100% { opacity: 0.32; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.48; transform: translate(-50%, -50%) scale(1.08); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aura-hero-glow {
+    animation: none;
+    opacity: 0.36;
+  }
+}
 .aura-ring-frame {
   position: relative;
   border-radius: 50%;

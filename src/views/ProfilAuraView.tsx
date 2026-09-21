@@ -188,6 +188,18 @@ const AuraHeroScene = memo(function AuraHeroScene({
   const freezeDanger = freezes === 0;
   return (
     <div className="aura-hero">
+      {/* A soft, slowly-breathing glow in the current rank's own colour — the same "tint the
+          scene by rank" idea RankUpCelebration already uses for its full-screen background,
+          just dialled down to an ambient spotlight instead of a solid backdrop. Gives the page
+          a living identity tied to who you are right now (and a real payoff for ranking up:
+          the glow itself gets richer through the ladder), rather than sitting on a flat page
+          background like every other screen. The ring frame's own opaque white face covers the
+          centre, so this only ever shows as a halo peeking around the medallion. */}
+      <div
+        className="aura-hero-glow"
+        aria-hidden="true"
+        style={{ background: `radial-gradient(circle, ${rank.colorFrom} 0%, transparent 70%)` }}
+      />
       <div className="aura-ring-frame" style={{ width: HERO_SIZE, height: HERO_SIZE }}>
         <div className="aura-ring-inner" style={{ borderColor: rank.colorFrom }}>
           <div className="aura-hero-avatar">
