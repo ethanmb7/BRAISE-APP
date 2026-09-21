@@ -136,6 +136,10 @@ export const BADGES: Badge[] = [
   { id: 'b6', emoji: '🏆', name: '1000 XP', cond: '1000 XP gagnés' },
 ];
 
+// Shared between onboarding (first pick) and Profil (change it later) — one source so the two
+// pickers can never drift apart.
+export const AVATARS = ['🦊', '🐼', '🦉', '🐱', '🚀', '⭐'];
+
 export const DEFAULT_USER: UserProfile = {
   name: 'Alex',
   level: '3e',

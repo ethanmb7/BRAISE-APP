@@ -1,10 +1,11 @@
-import { Settings, ChevronRight, Check } from 'lucide-react';
+import { useState } from 'react';
+import { Settings, ChevronRight, Check, Pencil, X } from 'lucide-react';
 import { useApp, computeUnlockedBadges, countDoneChapters } from '@/store';
 import { sfx } from '@/lib/sound';
 import { TopBar } from '@/components/TopBar';
 import { StreakFlameIcon } from '@/components/StreakFlameIcon';
 import { BadgeIcon } from '@/components/BadgeIcon';
-import { BADGES, SUBJECTS } from '@/data';
+import { BADGES, SUBJECTS, AVATARS } from '@/data';
 import type { Personality } from '@/types';
 
 const PERSONAS: { id: Personality; emoji: string; title: string; sub: string }[] = [
@@ -13,39 +14,90 @@ const PERSONAS: { id: Personality; emoji: string; title: string; sub: string }[]
 ];
 
 export function ProfileView() {
-  const { state, setView, setPersonality } = useApp();
+  const { state, setView, setPersonality, setUser } = useApp();
+  const [editingIdentity, setEditingIdentity] = useState(false);
+  const [draftName, setDraftName] = useState(state.user.name);
+  const [draftAvatar, setDraftAvatar] = useState(state.user.avatar);
 
   const subjectsCount = state.user.subjects.length;
   const chaptersDone = countDoneChapters(state.completedChapters);
   const badgeUnlocked = computeUnlockedBadges(state);
+
+  const openIdentityEdit = () => {
+    sfx.tap(state.soundOn);
+    setDraftName(state.user.name);
+    setDraftAvatar(state.user.avatar);
+    setEditingIdentity(true);
+  };
+
+  const saveIdentity = () => {
+    sfx.tap(state.soundOn);
+    setUser({ ...state.user, name: draftName.trim() || state.user.name, avatar: draftAvatar });
+    setEditingIdentity(false);
+  };
+
+  const toggleUserSubject = (id: string) => {
+    sfx.tap(state.soundOn);
+    const has = state.user.subjects.includes(id);
+    const next = has ? state.user.subjects.filter((s) => s !== id) : [...state.user.subjects, id];
+    setUser({ ...state.user, subjects: next });
+  };
 
   return (
     <div>
       <TopBar title="Profil" onBack={() => setView(state.tab)} />
       <div className="view is-active">
         {/* Avatar + name */}
-        <div style={{ textAlign: 'center', marginBottom: 22 }}>
-          <div
-            style={{
-              width: 72,
-              height: 72,
-              borderRadius: '50%',
-              background: 'var(--paper)',
-              border: '2.5px solid var(--neo-ink)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 12px',
-              fontSize: '2.2rem',
-            }}
-          >
-            {state.user.avatar}
+        {!editingIdentity ? (
+          <div className="profile-identity">
+            <button type="button" className="profile-avatar" onClick={openIdentityEdit} aria-label="Modifier ton avatar et ton prénom">
+              {state.user.avatar}
+              <span className="profile-avatar-edit" aria-hidden="true">
+                <Pencil size={11} />
+              </span>
+            </button>
+            <h2 className="profile-name">{state.user.name}</h2>
+            <p className="profile-sub">
+              {state.user.levelLabel} · {state.user.goal}
+            </p>
           </div>
-          <h2 style={{ fontSize: '1.3rem' }}>{state.user.name}</h2>
-          <p style={{ color: 'var(--ink-soft)', fontSize: '0.82rem' }}>
-            {state.user.levelLabel} · {state.user.goal}
-          </p>
-        </div>
+        ) : (
+          <div className="profile-identity-edit">
+            <div className="profile-avatar-picker">
+              {AVATARS.map((a) => (
+                <button
+                  key={a}
+                  type="button"
+                  className={`profile-avatar-option ${draftAvatar === a ? 'is-selected' : ''}`}
+                  onClick={() => {
+                    sfx.tap(state.soundOn);
+                    setDraftAvatar(a);
+                  }}
+                  aria-label={`Choisir l'avatar ${a}`}
+                >
+                  {a}
+                </button>
+              ))}
+            </div>
+            <input
+              type="text"
+              className="profile-name-input"
+              value={draftName}
+              onChange={(e) => setDraftName(e.target.value)}
+              placeholder="Ton prénom"
+              maxLength={20}
+              autoFocus
+            />
+            <div className="profile-identity-actions">
+              <button type="button" className="profile-identity-cancel" onClick={() => setEditingIdentity(false)}>
+                <X size={15} /> Annuler
+              </button>
+              <button type="button" className="profile-identity-save" onClick={saveIdentity}>
+                <Check size={15} /> Enregistrer
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="profile-stats">
@@ -57,7 +109,12 @@ export function ProfileView() {
           </div>
           <div className="pstat">
             <b>{state.xp}</b>
-            <span>XP ⭐</span>
+            <span className="flex items-center justify-center gap-1">
+              XP
+              <svg width="11" height="11" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M13 1.5 3.5 13.8h6.2l-1 8.7L19.5 9h-6.4l1.2-7.5Z" fill="#ffc700" stroke="#151821" strokeWidth="1.7" strokeLinejoin="round" />
+              </svg>
+            </span>
           </div>
           <div className="pstat">
             <b>{chaptersDone}</b>
@@ -109,53 +166,33 @@ export function ProfileView() {
           })}
         </div>
 
-        {/* Subjects */}
+        {/* Subjects — real toggles, not a static recap: these picks weight which cards come up
+            more often in Réviser (see RevisionsView's priority scoring), so showing them as
+            inert text would hide a real effect from the one person it affects. */}
         <div className="section-title" style={{ marginTop: 20 }}>
           Mes matières ({subjectsCount})
         </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
-          {state.user.subjects.map((id) => {
-            const s = SUBJECTS.find((x) => x.id === id);
-            if (!s) return null;
+        <p className="profile-subjects-hint">Favorisées pendant tes révisions — touche pour changer.</p>
+        <div className="profile-subject-chips">
+          {SUBJECTS.map((s) => {
+            const active = state.user.subjects.includes(s.id);
             return (
-              <span
-                key={id}
-                style={{
-                  background: 'var(--paper)',
-                  border: '1.5px solid var(--neo-ink)',
-                  borderRadius: 999,
-                  padding: '8px 13px',
-                  fontSize: '0.82rem',
-                  fontWeight: 600,
-                }}
+              <button
+                key={s.id}
+                type="button"
+                className={`profile-subject-chip ${active ? 'is-active' : ''}`}
+                onClick={() => toggleUserSubject(s.id)}
+                aria-pressed={active}
               >
                 {s.emoji} {s.name}
-              </span>
+              </button>
             );
           })}
         </div>
 
         {/* Settings link */}
-        <button
-          className="settings-row"
-          style={{
-            width: '100%',
-            background: 'var(--paper)',
-            borderRadius: 14,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: '14px 16px',
-            border: '2px solid var(--neo-ink)',
-            color: 'var(--ink)',
-            fontSize: '0.9rem',
-          }}
-          onClick={() => {
-            sfx.tap(state.soundOn);
-            setView('settings');
-          }}
-        >
-          <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <button type="button" className="profile-settings-link" onClick={() => { sfx.tap(state.soundOn); setView('settings'); }}>
+          <span className="profile-settings-link-label">
             <Settings size={18} color="var(--ink-soft)" />
             Paramètres
           </span>

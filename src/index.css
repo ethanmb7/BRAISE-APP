@@ -173,6 +173,15 @@ select {
   max-height: 100dvh;
   margin: 0 auto;
   background: var(--bg);
+  /* body's own `color: var(--ink)` (below) resolves once, against :root's light-mode --ink,
+     because .app-shell.dark's override lives *below* body in the tree — a descendant's
+     redefinition of a custom property never flows back up. Any element in here that inherits
+     its text colour instead of declaring one explicitly was quietly stuck in light-mode ink
+     even under .dark (found via a real dark-mode check on Profil: the name and an unselected
+     persona card's title were both near-invisible dark-on-dark). Re-declaring --ink's resolution
+     here, inside .dark's own scope, fixes every such element at once instead of patching each
+     bare heading one at a time. */
+  color: var(--ink);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -2781,7 +2790,7 @@ select {
 .persona-card {
   position: relative;
   background: var(--paper);
-  border: 2px solid var(--neo-ink);
+  border: 2.5px solid var(--neo-ink);
   border-radius: 18px;
   padding: 16px 12px;
   text-align: center;
@@ -2789,14 +2798,23 @@ select {
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .persona-card:active {
-  transform: scale(0.97);
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--neo-ink);
 }
 .persona-card.is-active {
-  box-shadow: 3px 3px 0 var(--neo-ink);
   background: #eff3ff;
+  /* Fixed light background, so its text must stay fixed dark too — letting it inherit the
+     theme-reactive --ink (light in dark mode) would put light text on this same light blue,
+     the same class of bug the .app-shell colour fix above just surfaced and fixed everywhere
+     else. .persona-sub below needs the same override for the same reason. */
+  color: var(--neo-ink);
+}
+.persona-card.is-active .persona-sub {
+  color: rgba(21, 24, 33, 0.72);
 }
 .persona-emoji {
   font-size: 1.6rem;
@@ -2826,6 +2844,180 @@ select {
 }
 
 /* ===== Profile ===== */
+/* Avatar + name used to be permanently locked in from onboarding — nowhere in the app could
+   change them again. Tapping the avatar now opens an inline editor reusing the same AVATARS set
+   onboarding picks from (src/data.ts), so the two pickers can never show different options. */
+.profile-identity {
+  text-align: center;
+  margin-bottom: 22px;
+}
+.profile-avatar {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2.5px solid var(--neo-ink);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  font-size: 2.2rem;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.profile-avatar:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--neo-ink);
+}
+.profile-avatar-edit {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--neo-orange);
+  color: #fff;
+  border: 2px solid var(--neo-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.profile-name {
+  font-size: 1.3rem;
+}
+.profile-sub {
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+}
+.profile-identity-edit {
+  background: var(--paper);
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 18px;
+  box-shadow: 4px 4px 0 var(--neo-ink);
+  padding: 16px;
+  margin-bottom: 22px;
+}
+.profile-avatar-picker {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.profile-avatar-option {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  font-size: 1.3rem;
+  background: var(--bg);
+  border: 2px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.profile-avatar-option.is-selected {
+  background: #eff3ff;
+  border-color: var(--neo-blue);
+}
+.profile-name-input {
+  width: 100%;
+  background: var(--bg);
+  border: 2px solid var(--neo-ink);
+  border-radius: 12px;
+  padding: 11px 14px;
+  font-size: 0.92rem;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+.profile-identity-actions {
+  display: flex;
+  gap: 10px;
+}
+.profile-identity-cancel,
+.profile-identity-save {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px;
+  border-radius: 12px;
+  border: 2px solid var(--neo-ink);
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 0.86rem;
+}
+.profile-identity-cancel {
+  background: var(--bg);
+  color: var(--ink);
+}
+.profile-identity-save {
+  background: var(--neo-orange);
+  color: #fff;
+}
+
+/* Subject chips — real toggles now (see ProfileView.tsx), so they get the same "act on me"
+   affordance as the onboarding chips they're based on, not a plain static list. */
+.profile-subjects-hint {
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  margin: -6px 0 10px;
+}
+.profile-subject-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.profile-subject-chip {
+  background: var(--paper);
+  border: 2px solid var(--neo-ink);
+  border-radius: 999px;
+  padding: 8px 13px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.profile-subject-chip.is-active {
+  background: #eff3ff;
+  border-color: var(--neo-blue);
+  /* Fixed light background — same reasoning as .persona-card.is-active above: must stay fixed
+     dark text, not the theme-reactive --ink (which goes light in dark mode and would vanish
+     against this same fixed light blue). */
+  color: var(--neo-ink);
+  box-shadow: 2px 2px 0 var(--neo-blue);
+}
+.profile-subject-chip:active {
+  transform: translate(1px, 1px);
+}
+
+.profile-settings-link {
+  width: 100%;
+  background: var(--paper);
+  border-radius: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border: 2.5px solid var(--neo-ink);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: var(--ink);
+  font-size: 0.9rem;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.profile-settings-link:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--neo-ink);
+}
+.profile-settings-link-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .profile-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -2834,10 +3026,11 @@ select {
 }
 .pstat {
   background: var(--paper);
-  border: 2px solid var(--neo-ink);
+  border: 2.5px solid var(--neo-ink);
   border-radius: 12px;
   padding: 12px 4px;
   text-align: center;
+  box-shadow: 3px 3px 0 var(--neo-ink);
 }
 .pstat b {
   display: block;

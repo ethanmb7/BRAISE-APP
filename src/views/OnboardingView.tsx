@@ -3,10 +3,9 @@ import { Check } from 'lucide-react';
 import { BraiseMascot, SapiLogo } from '@/components/BraiseMascot';
 import { useApp } from '@/store';
 import { sfx } from '@/lib/sound';
-import { LEVELS, SUBJECTS } from '@/data';
+import { LEVELS, SUBJECTS, AVATARS } from '@/data';
 import type { Level } from '@/types';
 
-const AVATARS = ['🦊', '🐼', '🦉', '🐱', '🚀', '⭐'];
 const GOALS = ['15 min/jour', '30 min/jour', '1 heure/jour'];
 
 export function OnboardingView() {
