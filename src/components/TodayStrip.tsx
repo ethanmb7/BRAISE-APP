@@ -1,4 +1,5 @@
 import { Zap, Trophy } from 'lucide-react';
+import { StreakFlameIcon } from '@/components/StreakFlameIcon';
 
 interface TodayStripProps {
   streak: number;
@@ -59,8 +60,9 @@ export function TodayStrip({ streak, remaining, goalPct, dueCount, onContinue, o
       <div>
         {/* text-lg, not text-base: this counter is the app's central retention lever, it
             shouldn't render smaller than a deck card's subject name or the HUD's own numbers. */}
-        <b className="block font-display text-lg font-black leading-tight text-black">
-          Ta série : {streak} jour{streak > 1 ? 's' : ''} ! 🔥
+        <b className="flex items-center gap-1.5 font-display text-lg font-black leading-tight text-black">
+          Ta série : {streak} jour{streak > 1 ? 's' : ''} !
+          <StreakFlameIcon size={18} />
         </b>
         <p className="mt-1 text-sm font-bold text-black/80">{coaching}</p>
       </div>

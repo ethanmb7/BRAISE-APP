@@ -722,17 +722,9 @@ select {
   /* --ink, not --neo-ink — sits on the page background, which flips in dark mode. */
   color: var(--ink);
 }
-/* Rank cosmetics beyond the ring — Or/Légende only, each adding exactly one more layer so the
-   jump in visual richness across the ladder reads as real progression. */
-.aura-crown {
-  position: absolute;
-  top: -22px;
-  left: 50%;
-  transform: translateX(-50%) rotate(-6deg);
-  font-size: 2rem;
-  z-index: 2;
-  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.35));
-}
+/* Or's sparkle flourish — Légende used to add a second floating crown here too, on top of the
+   crown the medal badge already shows; one crown per screen is enough, so that cosmetic is
+   gone and this spot is Or-only now. */
 .aura-sparkle {
   position: absolute;
   color: #e8a317;

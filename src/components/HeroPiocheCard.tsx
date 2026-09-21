@@ -1,4 +1,5 @@
 import { Play } from 'lucide-react';
+import { StreakFlameIcon } from '@/components/StreakFlameIcon';
 
 interface HeroPiocheCardProps {
   /** Short, visible hookline (from `dailyHookLine()`) — carries the real personality/age tone;
@@ -103,8 +104,9 @@ export function HeroPiocheCard({
 
       {subjectName && (
         <div className="mb-1 mt-1">
-          <span className="whitespace-nowrap rounded-full border border-white/30 bg-black/15 px-2 py-0.5 text-[0.7rem] font-semibold text-white">
-            🔥 {subjectName}
+          <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-white/30 bg-black/15 px-2 py-0.5 text-[0.7rem] font-semibold text-white">
+            <StreakFlameIcon size={11} />
+            {subjectName}
           </span>
         </div>
       )}

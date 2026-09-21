@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Bell } from 'lucide-react';
 import { getRankInfo } from '@/lib/aura';
+import { RankIcon } from '@/components/RankIcon';
 
 interface HeaderHUDProps {
   avatar: string;
@@ -277,7 +278,7 @@ export function HeaderHUD({
             className="absolute -bottom-1 -right-1 flex h-[18px] w-[18px] items-center justify-center rounded-full border-2 border-white text-[0.62rem] leading-none shadow-[0_0_0_1px_#000]"
             style={{ background: `linear-gradient(135deg, ${rank.colorFrom}, ${rank.colorTo})` }}
           >
-            {rank.emoji}
+            <RankIcon rankId={rank.id} color="#fff" size={13} />
           </span>
         }
       >

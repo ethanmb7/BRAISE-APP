@@ -7,6 +7,8 @@ import { useOnlineStatus } from '@/lib/useOnlineStatus';
 import { BraiseMascot } from '@/components/BraiseMascot';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { SubjectIcon } from '@/components/SubjectIcon';
+import { RankIcon } from '@/components/RankIcon';
+import { StreakFlameIcon } from '@/components/StreakFlameIcon';
 import { getRankInfo, RANKS, computeSubjectMastery, type Rank, type SubjectMastery } from '@/lib/aura';
 import { FLASHCARDS, BADGES } from '@/data';
 
@@ -189,7 +191,9 @@ const AuraHeroScene = memo(function AuraHeroScene({
       <div className="aura-ring-frame" style={{ width: HERO_SIZE, height: HERO_SIZE }}>
         <div className="aura-ring-inner" style={{ borderColor: rank.colorFrom }}>
           <div className="aura-hero-avatar">
-            {rank.id === 'legende' && <span className="aura-crown">👑</span>}
+            {/* Légende used to double up its crown — one floating here, one on the medal badge
+                below. The medal is the single crown now; this spot keeps only the sparkle
+                flourish, still reserved for Or. */}
             {rank.id === 'or' && (
               <>
                 <span className="aura-sparkle s1">✦</span>
@@ -205,7 +209,7 @@ const AuraHeroScene = memo(function AuraHeroScene({
           aria-label={`${streak} jour${streak > 1 ? 's' : ''} de suite${freezeDanger ? ' · série à risque' : ''}`}
         >
           <span className="aura-streak-flame" aria-hidden="true">
-            🔥
+            <StreakFlameIcon size={17} />
           </span>
           <span className="aura-streak-count" aria-hidden="true">
             {animatedStreak}
@@ -217,7 +221,7 @@ const AuraHeroScene = memo(function AuraHeroScene({
           </span>
         </div>
         <div className="aura-hero-medal" aria-hidden="true">
-          {rank.emoji}
+          <RankIcon rankId={rank.id} color={rank.colorFrom} size={24} />
         </div>
       </div>
       <span className="aura-hero-rankname">{rank.name.toUpperCase()}</span>
@@ -270,7 +274,7 @@ const RankRail = memo(function RankRail({
               role="listitem"
               aria-label={`${r.name}, ${r.min} XP${tier === 'done' ? ', débloqué' : tier === 'locked' ? ', verrouillé' : ', rang actuel'}`}
             >
-              {tier === 'locked' ? '🔒' : r.emoji}
+              <RankIcon rankId={r.id} color={r.colorFrom} locked={tier === 'locked'} size={tier === 'current' ? 24 : 20} />
             </div>
           );
         })}
@@ -346,7 +350,7 @@ const BadgeBridge = memo(function BadgeBridge({
   return (
     <button type="button" className="badge-bridge" onClick={onOpen}>
       <span className="badge-bridge-icon" aria-hidden="true">
-        🏅
+        <RankIcon rankId="or" color="#ffd166" size={18} />
       </span>
       <span className="badge-bridge-text">
         {unlocked}/{total} badges débloqués

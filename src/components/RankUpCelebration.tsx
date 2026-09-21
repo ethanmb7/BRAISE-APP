@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { motion } from 'framer-motion';
 import { BraiseMascot } from './BraiseMascot';
+import { RankIcon } from './RankIcon';
 import { RANKS, type Rank } from '@/lib/aura';
 
 interface RankUpCelebrationProps {
@@ -154,10 +155,14 @@ export function RankUpCelebration({
             initial={{ y: -24, opacity: 0, scale: 0.7 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             transition={{ type: 'spring', stiffness: 300, damping: 16, delay: 0.62 }}
-            className={`relative z-10 rounded-full border-[2.5px] border-black px-5 py-2 text-base font-black text-black shadow-[3px_3px_0px_0px_#000] ${compact ? 'mt-2' : 'mt-3'}`}
+            className={`relative z-10 flex items-center gap-1.5 rounded-full border-[2.5px] border-black px-5 py-2 text-base font-black text-black shadow-[3px_3px_0px_0px_#000] ${compact ? 'mt-2' : 'mt-3'}`}
             style={{ background: `linear-gradient(135deg, ${toRank.colorFrom}, ${toRank.colorTo})` }}
           >
-            {toRank.emoji} {toRank.name.toUpperCase()}
+            {/* White fill, not the rank's own colour — the pill's background already IS that
+                colour, so a same-colour icon would vanish into it. White reads as an embossed
+                medallion on top instead. */}
+            <RankIcon rankId={toRank.id} color="#fff" size={20} />
+            {toRank.name.toUpperCase()}
           </motion.div>
 
           <motion.p
@@ -244,7 +249,7 @@ function RankJourney({ currentRankId, accent }: { currentRankId: string; accent:
               role="listitem"
               aria-label={`${r.name}${tier === 'done' ? ', débloqué' : tier === 'locked' ? ', verrouillé' : ', rang actuel'}`}
             >
-              {tier === 'locked' ? '🔒' : r.emoji}
+              <RankIcon rankId={r.id} color={r.colorFrom} locked={tier === 'locked'} size={tier === 'current' ? 24 : 20} />
             </div>
           );
         })}

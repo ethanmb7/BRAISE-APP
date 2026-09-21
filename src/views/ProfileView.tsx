@@ -2,6 +2,8 @@ import { Settings, ChevronRight, Check } from 'lucide-react';
 import { useApp, computeUnlockedBadges, countDoneChapters } from '@/store';
 import { sfx } from '@/lib/sound';
 import { TopBar } from '@/components/TopBar';
+import { StreakFlameIcon } from '@/components/StreakFlameIcon';
+import { BadgeIcon } from '@/components/BadgeIcon';
 import { BADGES, SUBJECTS } from '@/data';
 import type { Personality } from '@/types';
 
@@ -49,7 +51,9 @@ export function ProfileView() {
         <div className="profile-stats">
           <div className="pstat">
             <b>{state.streak}</b>
-            <span>jours 🔥</span>
+            <span className="flex items-center justify-center gap-1">
+              jours <StreakFlameIcon size={13} />
+            </span>
           </div>
           <div className="pstat">
             <b>{state.xp}</b>
@@ -96,7 +100,7 @@ export function ProfileView() {
             return (
             <div className={`badge ${unlocked ? '' : 'locked'}`} key={b.id}>
               <div className="ring" style={unlocked ? { background: '#eff3ff' } : {}}>
-                {b.emoji}
+                <BadgeIcon badgeId={b.id} size={26} />
               </div>
               <span>{b.name}</span>
               <span className="cond">{b.cond}</span>
