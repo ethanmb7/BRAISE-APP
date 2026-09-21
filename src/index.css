@@ -746,52 +746,6 @@ select {
   0%, 100% { opacity: 0.2; transform: scale(0.8); }
   50% { opacity: 1; transform: scale(1.15); }
 }
-/* --- PrideStats — down to one stat: best combo, the only pure-skill signal on the page. Same
-   chip chrome regardless of how many children it holds — flex:1 fills the row whether there's
-   one or two. --- */
-.pride-stats {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-.pride-stat {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--paper);
-  border: 2px solid #000;
-  border-radius: 14px;
-  box-shadow: 3px 3px 0 #000;
-  padding: 12px 14px;
-}
-.pride-stat-icon {
-  font-size: 1.4rem;
-  line-height: 1;
-  flex-shrink: 0;
-}
-.pride-stat-text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-.pride-stat-value {
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 800;
-  font-size: 1.12rem;
-  line-height: 1.2;
-  /* --ink, not --neo-ink — the chip's own background is --paper, which flips in dark mode. */
-  color: var(--ink);
-}
-.pride-stat-label {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  color: var(--ink-soft);
-}
-
 /* --- RankRail — every rank visible at once on a single always-on progress rail, season-pass
    style. Replaces the tabs + swipeable carousel (and the accordion before that): nothing is
    hidden behind a tap, a swipe, or an expand. Carries its own caption now — "1 556 XP jusqu'à
@@ -991,9 +945,8 @@ select {
   text-align: center;
 }
 
-/* --- BadgeBridge — the one link between Aura and Profil's own badge grid. Same paper-card
-   chrome as PrideStats, and the same gold-medallion icon construction as .aura-share-icon
-   below, since both are "here's a trophy" moments. --- */
+/* --- BadgeBridge — the one link between Aura and Profil's own badge grid. Same gold-medallion
+   icon construction as .aura-share-icon below, since both are "here's a trophy" moments. --- */
 .badge-bridge {
   display: flex;
   align-items: center;

@@ -29,13 +29,6 @@ const heroPop = {
   hidden: { opacity: 0, scale: 0.72, y: 8 },
   show: { opacity: 1, scale: 1, y: 0, transition: { type: 'spring', stiffness: 260, damping: 18 } as const },
 };
-// A punchier, spring-driven pop reserved for the pride stats — a toy/HUD counter feel rather
-// than the calm premium reveal used for the season-pass rail.
-const popItem = {
-  hidden: { opacity: 0, y: 10, scale: 0.85 },
-  show: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 380, damping: 20 } as const },
-};
-
 // Counts a displayed number up to its target over `duration`ms using a single rAF loop —
 // cheap, touches nothing but a text node, cancels cleanly on unmount or if the target changes
 // mid-flight. Every reward number on this screen uses it so a change reads as a small win
@@ -138,9 +131,6 @@ export function ProfilAuraView() {
             progression, un seul bloc au lieu de deux qui se répétaient. */}
         <motion.div variants={staggerItem}>
           <RankRail currentRankId={current.id} rank={current} pct={pct} next={next} xp={state.xp} />
-        </motion.div>
-        <motion.div variants={popItem}>
-          <PrideStats bestCombo={state.bestCombo} />
         </motion.div>
 
         {/* Extension du Pilier 2 : seule section reliée à une vraie donnée pédagogique ET
@@ -289,29 +279,6 @@ const RankRail = memo(function RankRail({
   );
 });
 
-// Down to one stat: best combo, the only pure-skill signal on the page (distinct from streak/
-// rank, which track time invested, and from the mastery grid, which tracks learning outcome).
-// "Précision" and then "Cartes maîtrisées" both sat here before getting cut in review — a raw
-// accuracy percentage read as a grade, and a mastered-card total just restated what the mastery
-// grid below already shows in more useful, per-subject detail. A single stat still earns a full
-// card (same chrome as before, just one child instead of two — flex:1 fills the row on its own).
-const PrideStats = memo(function PrideStats({ bestCombo }: { bestCombo: number }) {
-  const animCombo = useCountUp(bestCombo);
-  return (
-    <div className="pride-stats" role="list">
-      <div className="pride-stat" role="listitem" aria-label={`Combo maximum : ${bestCombo}`}>
-        <span className="pride-stat-icon" aria-hidden="true">
-          ⚡
-        </span>
-        <span className="pride-stat-text" aria-hidden="true">
-          <span className="pride-stat-value">×{animCombo}</span>
-          <span className="pride-stat-label">Combo max</span>
-        </span>
-      </div>
-    </div>
-  );
-});
-
 // Same subject the Accueil grid uses, kept in one place so both screens shorten it identically.
 const SHORT_SUBJECT_NAME: Record<string, string> = { maths: 'Maths' };
 
@@ -405,8 +372,6 @@ function ProfilAuraSkeleton() {
 
       <Skeleton width={180} height={18} radius={999} style={{ margin: '18px auto 12px' }} />
       <Skeleton width="100%" height={44} radius={999} style={{ marginBottom: 16 }} />
-
-      <Skeleton width="100%" height={62} radius={14} style={{ marginBottom: 16 }} />
 
       <Skeleton width="100%" height={54} radius={999} style={{ marginTop: 16 }} />
     </div>
