@@ -190,6 +190,54 @@ export function feynmanInvite(ctx: VoiceCtx, topic: string): string {
   });
 }
 
+/** Braise's take on the Profil page — real rank/streak/badge facts, never a generic filler line.
+ *  Branches on streak (active or not) so the reaction actually changes with what's true right
+ *  now, giving a real reason to check back instead of a static caption. */
+export function profileReactionLine(
+  ctx: VoiceCtx,
+  facts: { rankName: string; streak: number; badgesUnlocked: number; badgesTotal: number }
+): string {
+  const { rankName, streak, badgesUnlocked, badgesTotal } = facts;
+  if (streak > 0) {
+    return byCombo(ctx, {
+      'chill-college': [
+        `${rankName}, ${streak} jour${streak > 1 ? 's' : ''} de suite, ${badgesUnlocked}/${badgesTotal} badges. Tu construis un truc solide.`,
+        `Série de ${streak} jour${streak > 1 ? 's' : ''} en cours, rang ${rankName}. J'suis fan de la régularité.`,
+      ],
+      'chill-lycee': [
+        `Rang ${rankName}, ${streak} jour${streak > 1 ? 's' : ''} d'affilée. La régularité paie, continue.`,
+        `${badgesUnlocked}/${badgesTotal} badges, série de ${streak}. Beau parcours jusqu'ici.`,
+      ],
+      'savage-college': [
+        `${streak} jour${streak > 1 ? 's' : ''} de suite et rang ${rankName}. Ok, je suis un peu impressionné.`,
+        `${rankName}, série de ${streak}. T'as pas lâché, respect.`,
+      ],
+      'savage-lycee': [
+        `Rang ${rankName}, ${streak} jour${streak > 1 ? 's' : ''} de suite. Le bac commence à avoir peur.`,
+        `${badgesUnlocked}/${badgesTotal} badges, série de ${streak} jours. Pas mal pour quelqu'un qui prétend s'en ficher.`,
+      ],
+    });
+  }
+  return byCombo(ctx, {
+    'chill-college': [
+      `Rang ${rankName}, ${badgesUnlocked}/${badgesTotal} badges. Une petite série et ce profil devient encore plus stylé.`,
+      `${rankName} avec ${badgesUnlocked}/${badgesTotal} badges déjà en poche. Prêt pour une nouvelle série ?`,
+    ],
+    'chill-lycee': [
+      `Rang ${rankName}, ${badgesUnlocked}/${badgesTotal} badges au compteur. Une série active et le tableau serait complet.`,
+      `${badgesUnlocked}/${badgesTotal} badges, rang ${rankName}. Il manque juste une série en cours.`,
+    ],
+    'savage-college': [
+      `${rankName}, ${badgesUnlocked}/${badgesTotal} badges, zéro série active. On peut faire mieux, non ?`,
+      `Rang ${rankName} mais aucune série en cours. Le profil est bon, l'assiduité un peu moins.`,
+    ],
+    'savage-lycee': [
+      `${rankName}, ${badgesUnlocked}/${badgesTotal} badges, mais aucune série active. Dommage, le reste est propre.`,
+      `Rang ${rankName} sans série en cours. T'as le niveau, il manque la régularité.`,
+    ],
+  });
+}
+
 /** Personalized advice on "Ton Aura", based on the student's actual weakest chapter (if any). */
 export function progressAdvice(ctx: VoiceCtx, weakSubject?: string, weakTopic?: string): string {
   if (weakSubject && weakTopic) {

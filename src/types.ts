@@ -101,6 +101,9 @@ export type UserProfile = {
   subjects: string[];
   avatar: string;
   personality: Personality;
+  /** Real timestamp set once, at the end of onboarding — undefined for any account that existed
+   *  before this field did, since a guessed backdated value would be a fabricated one. */
+  joinedAt?: number;
 };
 
 export type AppState = {

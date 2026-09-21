@@ -2913,6 +2913,39 @@ select {
   color: var(--ink-soft);
   font-size: 0.82rem;
 }
+.profile-joined {
+  color: var(--ink-soft);
+  font-size: 0.7rem;
+  margin-top: 2px;
+  opacity: 0.8;
+}
+
+/* Braise's take — real rank/série/badge facts run through the same tone system as the rest of
+   the app (braiseVoice.ts), the one place on this page where Braise actually says something
+   instead of just showing cold numbers. Same card treatment as everywhere else. */
+.profile-braise-take {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--paper);
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  box-shadow: 3px 3px 0 var(--neo-ink);
+}
+.profile-braise-take-icon {
+  flex-shrink: 0;
+  margin-top: -2px;
+}
+.profile-braise-take-text {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
 .profile-identity-edit {
   background: var(--paper);
   border: 2.5px solid var(--neo-ink);
@@ -3102,6 +3135,58 @@ select {
   font-size: 0.58rem;
   opacity: 0.75;
   margin-top: 1px;
+}
+
+/* Badge tiers — b1/b5 (série) and b2/b6 (XP) are already two thresholds of the same achievement
+   in the data (BADGE_TIERS in ProfileView.tsx); this is the first time that's shown visually,
+   à la Khan Academy's tiered badges, instead of 6 flat unrelated cards. */
+.profile-tier-groups {
+  margin-bottom: 16px;
+}
+.profile-tier-row {
+  margin-bottom: 16px;
+}
+.profile-tier-row:last-child {
+  margin-bottom: 0;
+}
+.profile-tier-title {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+.profile-tier-nodes {
+  display: flex;
+  align-items: center;
+}
+.profile-tier-node-wrap {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+.profile-tier-node-wrap .badge {
+  flex: 1;
+}
+.profile-tier-arrow {
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+  color: var(--ink-soft);
+  opacity: 0.5;
+  font-size: 0.95rem;
+  padding-bottom: 24px;
+}
+.profile-standalone-badges {
+  display: flex;
+  gap: 12px;
+  padding-bottom: 4px;
+}
+.profile-standalone-badges .badge {
+  flex: 1;
 }
 
 /* ===== Settings ===== */

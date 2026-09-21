@@ -40,6 +40,7 @@ export function OnboardingView() {
       subjects,
       avatar,
       personality: state.user.personality,
+      joinedAt: Date.now(),
     });
     setView('home');
   };

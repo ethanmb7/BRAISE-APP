@@ -11,6 +11,7 @@ import {
   getSeenBadgeIds,
   setSeenBadgeIds,
   hasBaselinedBadges,
+  recordBadgeUnlockedAt,
 } from '@/lib/celebrations';
 
 export type Celebration =
@@ -64,6 +65,7 @@ export function useMilestoneCelebrations(
       const seen = getSeenBadgeIds();
       const newlyUnlocked = unlockedIds.filter((id) => !seen.includes(id));
       newlyUnlocked.forEach((id) => {
+        recordBadgeUnlockedAt(id);
         const badge = BADGES.find((b) => b.id === id);
         if (badge) setQueue((q) => [...q, { type: 'badge', badge }]);
       });

@@ -4,6 +4,7 @@
 // "have we already shown this?" flag, not real progress data.
 const SEEN_RANK_KEY = 'sapie_seen_rank';
 const SEEN_BADGES_KEY = 'sapie_seen_badges';
+const BADGE_UNLOCKED_AT_KEY = 'sapie_badge_unlocked_at';
 
 export function getSeenRank(): string | null {
   try {
@@ -44,6 +45,30 @@ export function hasBaselinedBadges(): boolean {
 export function setSeenBadgeIds(ids: string[]): void {
   try {
     localStorage.setItem(SEEN_BADGES_KEY, JSON.stringify(ids));
+  } catch {
+    /* ignore quota errors */
+  }
+}
+
+// Real unlock dates, recorded only from here on — nothing timestamps *past* unlocks, so a badge
+// already earned before this existed stays dateless rather than getting a fabricated "unlocked
+// today". Written once, at the same moment a badge is first detected as newly unlocked
+// (useMilestoneCelebrations), never backdated or guessed.
+export function getBadgeUnlockedAtMap(): Record<string, number> {
+  try {
+    const raw = localStorage.getItem(BADGE_UNLOCKED_AT_KEY);
+    return raw ? (JSON.parse(raw) as Record<string, number>) : {};
+  } catch {
+    return {};
+  }
+}
+
+export function recordBadgeUnlockedAt(badgeId: string): void {
+  try {
+    const map = getBadgeUnlockedAtMap();
+    if (map[badgeId]) return;
+    map[badgeId] = Date.now();
+    localStorage.setItem(BADGE_UNLOCKED_AT_KEY, JSON.stringify(map));
   } catch {
     /* ignore quota errors */
   }
