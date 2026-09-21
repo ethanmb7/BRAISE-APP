@@ -889,19 +889,18 @@ select {
 
    It used to sit fully bare on the page background — every neighbour on this page (the rank
    rail's track, the badge bridge, the share button) has a defined edge of its own, so this was
-   the one section floating with no boundary at all, reading as misplaced next to them. An
-   outline frame gives it that same edge without turning it into a fourth solid white card —
-   no fill, no hard shadow, just the border — so it still reads as its own, lighter kind of
-   moment instead of flattening back into "stack of identical cards". */
+   the one section floating with no boundary at all. A first fix framed it with a thin, muted,
+   shadowless outline — technically a boundary, but that quiet grey line is the visual grammar
+   of an admin panel or a school handout, not this app's. Every other bordered shape here is
+   bold black + a hard offset shadow (that IS BRAISE's signature, not incidental styling), so
+   the frame uses that exact same construction — just with no fill, so it still reads as its
+   own lighter moment instead of a fourth solid card. A game-panel slot, not a form field. */
 .mastery-section {
   margin-bottom: 16px;
   padding: 16px 12px 14px;
-  /* --ink, not a fixed rgba(0,0,0,..) — that read fine in light mode and nearly vanished in
-     dark mode (a dark outline has no contrast against a dark background). --ink already flips
-     light/dark with the theme, so mixing it down to 18% keeps the same subtle-outline feel in
-     both. */
-  border: 2px solid color-mix(in srgb, var(--ink) 18%, transparent);
-  border-radius: 20px;
+  border: 2.5px solid #000;
+  border-radius: 22px;
+  box-shadow: 3px 3px 0 #000;
 }
 .mastery-grid {
   display: grid;
