@@ -104,10 +104,12 @@ export function ProfilAuraView() {
   const handleShareClose = useCallback(() => setShareOpen(false), []);
 
   // Tapping a subject medallion drops straight into that deck — a weak subject becomes
-  // something to act on immediately, not just a number to sit with.
+  // something to act on immediately, not just a number to sit with. Same sound+haptic pairing
+  // as handleShareOpen — every tap target on this page should feel the same under the thumb.
   const handleSubjectSelect = useCallback(
     (subjectId: string) => {
       sfx.tap(state.soundOn);
+      if (navigator.vibrate) navigator.vibrate(10);
       openSubject(subjectId);
     },
     [state.soundOn, openSubject]
@@ -118,6 +120,7 @@ export function ProfilAuraView() {
   // justify pointing there.
   const handleOpenBadges = useCallback(() => {
     sfx.tap(state.soundOn);
+    if (navigator.vibrate) navigator.vibrate(10);
     setView('profile');
   }, [state.soundOn, setView]);
 

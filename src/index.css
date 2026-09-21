@@ -971,6 +971,17 @@ select {
 .mastery-ring-wrap {
   position: relative;
 }
+/* A plain custom property doesn't interpolate on its own — without registering it, a value
+   change (e.g. --pct going 50 -> 62 after a review session) would just snap the conic-gradient
+   to its new arc instantly, the one animation-adjacent bug this page still had. Registering it
+   as a <number> makes the browser tween --pct itself frame-by-frame, so anything reading it
+   (the gradient below) animates along for free. Same easing curve as .rank-rail-line-fill, for
+   the same reason: it's the one "a value grew" motion language already used on this page. */
+@property --pct {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
 /* The ring fill is a conic-gradient read straight off --pct (0-100, set inline per subject) —
    the same "fraction of a circle" idea as any progress ring, just drawn in CSS instead of SVG.
    Unlike the Hero's ring (always 100% of its own colour, since it signals identity), this one
@@ -982,6 +993,7 @@ select {
   border: 2.5px solid #000;
   box-shadow: 2px 2px 0 #000;
   background: conic-gradient(var(--ring-color, #ccc) calc(var(--pct, 0) * 1%), rgba(21, 24, 33, 0.12) 0);
+  transition: --pct 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   align-items: center;
   justify-content: center;
