@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Settings, ChevronRight, Check, Pencil, X } from 'lucide-react';
 import { useApp, computeUnlockedBadges, countDoneChapters } from '@/store';
 import { sfx } from '@/lib/sound';
-import { getRankInfo } from '@/lib/aura';
+import { getRankInfo, badgeRemainingLabel } from '@/lib/aura';
 import { getAgeGroup, profileReactionLine } from '@/lib/braiseVoice';
 import { getBadgeUnlockedAtMap } from '@/lib/celebrations';
 import { TopBar } from '@/components/TopBar';
@@ -42,14 +42,29 @@ const staggerItem = {
   show: { opacity: 1, y: 0, transition: { duration: 0.32, ease: [0.16, 1, 0.3, 1] as const } },
 };
 
-function BadgeTile({ badge, unlocked, unlockedAt }: { badge: Badge; unlocked: boolean; unlockedAt?: number }) {
+function BadgeTile({
+  badge,
+  unlocked,
+  unlockedAt,
+  remainingLabel,
+}: {
+  badge: Badge;
+  unlocked: boolean;
+  unlockedAt?: number;
+  remainingLabel?: string | null;
+}) {
+  const condText = unlocked
+    ? unlockedAt
+      ? `Débloqué le ${formatShortDate(unlockedAt)}`
+      : badge.cond
+    : (remainingLabel ?? badge.cond);
   return (
     <div className={`badge ${unlocked ? '' : 'locked'}`}>
       <div className="ring" style={unlocked ? { background: '#eff3ff' } : {}}>
         <BadgeIcon badgeId={badge.id} size={26} />
       </div>
       <span>{badge.name}</span>
-      <span className="cond">{unlocked && unlockedAt ? `Débloqué le ${formatShortDate(unlockedAt)}` : badge.cond}</span>
+      <span className="cond">{condText}</span>
     </div>
   );
 }
@@ -83,6 +98,10 @@ export function ProfileView() {
 
   const subjectsCount = state.user.subjects.length;
   const chaptersDone = countDoneChapters(state.completedChapters);
+  // Distinct from "cartes maîtrisées" (shown on Aura) — this is raw effort, every card ever
+  // opened in Réviser, mastered or not. Real apps show volume and mastery as two separate
+  // numbers; until now this page only ever showed the second one.
+  const cardsSeenCount = Object.keys(state.cardReviews).length;
   const badgeUnlocked = computeUnlockedBadges(state);
   const badgeUnlockedCount = Object.values(badgeUnlocked).filter(Boolean).length;
   const badgeUnlockedAt = useMemo(() => getBadgeUnlockedAtMap(), [badgeUnlocked]);
@@ -205,6 +224,21 @@ export function ProfileView() {
             </span>
           </div>
           <div className="pstat">
+            <b>{cardsSeenCount}</b>
+            <span className="flex items-center justify-center gap-1">
+              cartes vues
+              <svg width="11" height="11" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M12 6.5 C10.3 5 7.7 4.7 5 5.6 L5 18.1 C7.7 17.2 10.3 17.5 12 19 C13.7 17.5 16.3 17.2 19 18.1 L19 5.6 C16.3 4.7 13.7 5 12 6.5 Z"
+                  fill="#818cf8"
+                  stroke="#151821"
+                  strokeWidth="1.7"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+          </div>
+          <div className="pstat">
             <b>{chaptersDone}</b>
             <span>chapitres</span>
           </div>
@@ -252,7 +286,12 @@ export function ProfileView() {
                     const badge = BADGES.find((b) => b.id === id)!;
                     return (
                       <div className="profile-tier-node-wrap" key={id}>
-                        <BadgeTile badge={badge} unlocked={badgeUnlocked[id]} unlockedAt={badgeUnlockedAt[id]} />
+                        <BadgeTile
+                          badge={badge}
+                          unlocked={badgeUnlocked[id]}
+                          unlockedAt={badgeUnlockedAt[id]}
+                          remainingLabel={badgeRemainingLabel(id, { streak: state.streak, xp: state.xp })}
+                        />
                         {i === 0 && <span className="profile-tier-arrow" aria-hidden="true">→</span>}
                       </div>
                     );

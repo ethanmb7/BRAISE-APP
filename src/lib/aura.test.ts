@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getRankInfo, computeSubjectMastery, countMasteredCards, nextBadgeHint, RANKS } from '@/lib/aura';
+import { getRankInfo, computeSubjectMastery, countMasteredCards, nextBadgeHint, badgeRemainingLabel, RANKS } from '@/lib/aura';
 import type { CardReview } from '@/types';
 
 function review(repetitions: number): CardReview {
@@ -123,5 +123,26 @@ describe('nextBadgeHint', () => {
   it('returns null once every badge is unlocked', () => {
     const unlocked = { b1: true, b2: true, b3: true, b4: true, b5: true, b6: true };
     expect(nextBadgeHint({ streak: 30, xp: 5000 }, unlocked)).toBeNull();
+  });
+});
+
+describe('badgeRemainingLabel', () => {
+  it('computes remaining days for a streak badge', () => {
+    expect(badgeRemainingLabel('b1', { streak: 1, xp: 0 })).toBe('Encore 2 jours');
+    expect(badgeRemainingLabel('b5', { streak: 6, xp: 0 })).toBe('Encore 1 jour');
+  });
+
+  it('computes remaining XP for an XP badge', () => {
+    expect(badgeRemainingLabel('b2', { streak: 0, xp: 40 })).toBe('Encore 60 XP');
+    expect(badgeRemainingLabel('b6', { streak: 0, xp: 999 })).toBe('Encore 1 XP');
+  });
+
+  it('never reports 0 or negative remaining, even past the threshold', () => {
+    expect(badgeRemainingLabel('b1', { streak: 10, xp: 0 })).toBe('Encore 1 jour');
+  });
+
+  it('returns null for badges with no numeric threshold (b3/b4)', () => {
+    expect(badgeRemainingLabel('b3', { streak: 0, xp: 0 })).toBeNull();
+    expect(badgeRemainingLabel('b4', { streak: 0, xp: 0 })).toBeNull();
   });
 });

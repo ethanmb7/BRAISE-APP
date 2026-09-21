@@ -76,6 +76,28 @@ export function countMasteredCards(cardReviews: Record<string, CardReview>): num
 
 export type BadgeHint = { badgeId: string; label: string };
 
+// The 4 numeric badges' real thresholds, in the order nextBadgeHint has always checked them —
+// shared by nextBadgeHint (which badge to feature) and badgeRemainingLabel (what to print on any
+// one locked badge's own tile), so the two can never quote different numbers for the same badge.
+const BADGE_THRESHOLDS: Record<string, { kind: 'streak' | 'xp'; value: number }> = {
+  b1: { kind: 'streak', value: 3 },
+  b5: { kind: 'streak', value: 7 },
+  b2: { kind: 'xp', value: 100 },
+  b6: { kind: 'xp', value: 1000 },
+};
+const NUMERIC_BADGE_IDS = ['b1', 'b5', 'b2', 'b6'];
+
+// "Encore 4 jours" / "Encore 850 XP" for one specific numeric badge — null for b3/b4, which have
+// no partial progress to report honestly. Used on each locked badge tile in Profil, not just the
+// single closest one nextBadgeHint picks for the Aura bridge.
+export function badgeRemainingLabel(badgeId: string, s: { streak: number; xp: number }): string | null {
+  const t = BADGE_THRESHOLDS[badgeId];
+  if (!t) return null;
+  const current = t.kind === 'streak' ? s.streak : s.xp;
+  const remaining = Math.max(1, t.value - current);
+  return t.kind === 'streak' ? `Encore ${remaining} jour${remaining > 1 ? 's' : ''}` : `Encore ${remaining} XP`;
+}
+
 // Picks the single locked badge that's honestly closest to unlocking, so the badge bridge gives
 // a reason to act now instead of just a static count. Streak/XP thresholds are comparable as "%
 // of the way there" even though their units differ (days vs. XP), which lets a 2-day gap and a
@@ -87,23 +109,12 @@ export function nextBadgeHint(
   unlocked: Record<string, boolean>
 ): BadgeHint | null {
   const cond = (id: string) => BADGES.find((b) => b.id === id)?.cond ?? '';
-  const numeric: { badgeId: string; frac: number; label: string }[] = [];
-  if (!unlocked.b1) {
-    const remaining = Math.max(1, 3 - s.streak);
-    numeric.push({ badgeId: 'b1', frac: remaining / 3, label: `Encore ${remaining} jour${remaining > 1 ? 's' : ''} → ${cond('b1')}` });
-  }
-  if (!unlocked.b5) {
-    const remaining = Math.max(1, 7 - s.streak);
-    numeric.push({ badgeId: 'b5', frac: remaining / 7, label: `Encore ${remaining} jour${remaining > 1 ? 's' : ''} → ${cond('b5')}` });
-  }
-  if (!unlocked.b2) {
-    const remaining = Math.max(1, 100 - s.xp);
-    numeric.push({ badgeId: 'b2', frac: remaining / 100, label: `Encore ${remaining} XP → ${cond('b2')}` });
-  }
-  if (!unlocked.b6) {
-    const remaining = Math.max(1, 1000 - s.xp);
-    numeric.push({ badgeId: 'b6', frac: remaining / 1000, label: `Encore ${remaining} XP → ${cond('b6')}` });
-  }
+  const numeric = NUMERIC_BADGE_IDS.filter((id) => !unlocked[id]).map((id) => {
+    const t = BADGE_THRESHOLDS[id];
+    const current = t.kind === 'streak' ? s.streak : s.xp;
+    const remaining = Math.max(1, t.value - current);
+    return { badgeId: id, frac: remaining / t.value, label: `${badgeRemainingLabel(id, s)} → ${cond(id)}` };
+  });
   if (numeric.length > 0) {
     numeric.sort((a, b) => a.frac - b.frac);
     return { badgeId: numeric[0].badgeId, label: numeric[0].label };
