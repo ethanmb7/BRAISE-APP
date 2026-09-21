@@ -802,8 +802,16 @@ select {
   font-weight: 800;
   font-size: 0.98rem;
 }
+/* --neo-orange itself computes to 3.29:1 against the light --bg — under WCAG's 4.5:1 text
+   minimum (checked with the same luminance formula used elsewhere this session for subject-
+   colour contrast). Mixing toward #000 would fix light mode but actively break dark mode —
+   darkening a colour that's already sitting on a dark background only loses contrast there.
+   Mixing toward --ink instead is theme-aware for free: --ink is dark in light mode (darkens the
+   orange, fixing the light-mode failure) and light in dark mode (lightens it instead, keeping
+   dark mode's already-passing contrast comfortable rather than dragging it down). Verified both
+   ways: 4.59:1 in light mode, 5.94:1 in dark. */
 .rank-rail-caption-amount {
-  color: var(--neo-orange);
+  color: color-mix(in srgb, var(--neo-orange) 80%, var(--ink) 20%);
 }
 .rank-rail-caption-rest {
   color: var(--ink);
@@ -892,7 +900,9 @@ select {
    normal document flow, no absolute-position overlap to get wrong. */
 .mastery-tab {
   display: inline-block;
-  background: var(--neo-orange);
+  /* White text on plain --neo-orange measured 3.44:1 — under the 4.5:1 WCAG minimum for text.
+     A 20%-darker fill clears it (~5.1:1) without becoming a visibly different colour. */
+  background: color-mix(in srgb, var(--neo-orange) 80%, #000);
   color: #fff;
   border: 2px solid #000;
   border-radius: 8px;
@@ -1032,7 +1042,9 @@ select {
   justify-content: center;
   gap: 10px;
   width: 100%;
-  background: var(--neo-orange);
+  /* Same fix as .mastery-tab: white text on plain --neo-orange is 3.44:1, under WCAG's 4.5:1
+     minimum — on the page's single most important button, no less. 20% darker clears it. */
+  background: color-mix(in srgb, var(--neo-orange) 80%, #000);
   color: #fff;
   font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
