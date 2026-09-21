@@ -2866,53 +2866,6 @@ select {
   box-shadow: 2px 2px 0 #000;
 }
 
-/* Avatar + name used to be permanently locked in from onboarding — nowhere in the app could
-   change them again. Tapping the avatar now opens an inline editor reusing the same AVATARS set
-   onboarding picks from (src/data.ts), so the two pickers can never show different options. */
-.profile-identity {
-  text-align: center;
-  margin-bottom: 22px;
-}
-.profile-avatar {
-  position: relative;
-  width: 76px;
-  height: 76px;
-  border-radius: 50%;
-  background: var(--paper);
-  border: 2.5px solid var(--neo-ink);
-  box-shadow: 3px 3px 0 var(--neo-ink);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 12px;
-  font-size: 2.2rem;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-.profile-avatar:active {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 var(--neo-ink);
-}
-.profile-avatar-edit {
-  position: absolute;
-  bottom: -2px;
-  right: -2px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--neo-orange);
-  color: #fff;
-  border: 2px solid var(--neo-ink);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.profile-name {
-  font-size: 1.3rem;
-}
-.profile-sub {
-  color: var(--ink-soft);
-  font-size: 0.82rem;
-}
 .profile-joined {
   color: var(--ink-soft);
   font-size: 0.7rem;
@@ -2920,30 +2873,233 @@ select {
   opacity: 0.8;
 }
 
-/* Braise's take — real rank/série/badge facts run through the same tone system as the rest of
-   the app (braiseVoice.ts), the one place on this page where Braise actually says something
-   instead of just showing cold numbers. Same card treatment as everywhere else. */
-.profile-braise-take {
+/* ===== Hero card — one focal point (bold border, hard shadow, the real per-rank gradient),
+   everything else in this view stays quiet by comparison. Same discipline as Aura's own hero:
+   avatar first, one big number, then small supporting facts. Colours are set inline per-rank
+   (rank.colorFrom/colorTo) since they're real data, not fixed like the rest of this file's
+   palette. */
+.profile-hero-card {
+  position: relative;
+  border: 3px solid #000;
+  border-radius: 24px;
+  box-shadow: 5px 5px 0 #000;
+  overflow: hidden;
+  background: var(--paper);
+  margin-bottom: 16px;
+}
+.profile-hero-banner {
+  position: relative;
+  height: 104px;
+  overflow: hidden;
+}
+.profile-hero-banner::before {
+  content: '';
+  position: absolute;
+  inset: -40% -10%;
+  background: repeating-linear-gradient(58deg, rgba(255, 255, 255, 0.18) 0 8px, transparent 8px 24px);
+  transform: rotate(-3deg);
+}
+.profile-hero-rank-pill {
+  position: absolute;
+  top: 8px;
+  right: 8px;
   display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--neo-ink);
+  color: #fff;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 5px 9px;
+  border-radius: 999px;
+  border: 1.5px solid #000;
+}
+.profile-hero-body {
+  position: relative;
+  padding: 0 18px 20px;
+  margin-top: -40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.profile-hero-avatar-stage {
+  position: relative;
+  width: 88px;
+  height: 88px;
+}
+.profile-hero-avatar-glow {
+  position: absolute;
+  inset: -22px;
+  border-radius: 50%;
+  filter: blur(14px);
+  pointer-events: none;
+}
+.profile-hero-avatar-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+}
+.profile-hero-avatar {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 3px solid #000;
+  box-shadow: 3px 3px 0 #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 42px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.profile-hero-avatar:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000;
+}
+.profile-hero-edit-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--neo-orange);
+  border: 2px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+.profile-hero-name {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 1.16rem;
+  margin-top: 12px;
+}
+.profile-hero-bubble {
+  position: relative;
+  display: flex;
+  gap: 8px;
   align-items: flex-start;
-  gap: 10px;
+  background: color-mix(in srgb, var(--neo-orange) 12%, var(--paper));
+  border: 2px solid #000;
+  border-radius: 14px;
+  padding: 10px 12px;
+  margin-top: 12px;
+}
+.profile-hero-bubble::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 24px;
+  width: 13px;
+  height: 13px;
+  background: color-mix(in srgb, var(--neo-orange) 12%, var(--paper));
+  border-left: 2px solid #000;
+  border-top: 2px solid #000;
+  transform: rotate(45deg);
+}
+.profile-hero-bubble-icon {
+  flex-shrink: 0;
+}
+.profile-hero-bubble p {
+  margin: 0;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--ink);
+}
+.profile-hero-num {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 2.3rem;
+  line-height: 1;
+  margin-top: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.profile-hero-lbl {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
+.profile-hero-mini-row {
+  display: flex;
+  gap: 24px;
+  margin-top: 16px;
+}
+.profile-hero-mini {
+  text-align: center;
+}
+.profile-hero-mini b {
+  display: block;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 1.02rem;
+  font-variant-numeric: tabular-nums;
+}
+.profile-hero-mini span {
+  font-size: 0.6rem;
+  color: var(--ink-soft);
+}
+
+.profile-badges-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   background: var(--paper);
   border: 2.5px solid var(--neo-ink);
   border-radius: 16px;
-  padding: 14px 16px;
-  margin-bottom: 18px;
+  padding: 12px 16px;
   box-shadow: 3px 3px 0 var(--neo-ink);
+  margin-bottom: 16px;
 }
-.profile-braise-take-icon {
-  flex-shrink: 0;
-  margin-top: -2px;
-}
-.profile-braise-take-text {
+.profile-badges-line span {
   font-family: 'Baloo 2', sans-serif;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.76rem;
   color: var(--ink);
-  line-height: 1.4;
+}
+.profile-badges-dots {
+  display: flex;
+  gap: 4px;
+}
+.profile-badges-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.4px solid var(--neo-ink);
+}
+
+.profile-hero-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  text-align: center;
+  background: color-mix(in srgb, var(--neo-orange) 80%, #000);
+  color: #fff;
+  border: 2.5px solid var(--neo-ink);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  border-radius: 16px;
+  padding: 14px;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 0.86rem;
+  margin-bottom: 22px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.profile-hero-cta:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--neo-ink);
 }
 
 .profile-identity-edit {
@@ -3076,33 +3232,6 @@ select {
   gap: 10px;
 }
 
-.profile-stats {
-  display: grid;
-  /* 2x2, not 3+1 or a cramped 4-across — "cartes vues" added a 4th stat (volume, distinct from
-     the "chapitres" completion count) and 4 numbers read more clearly in a square than squeezed
-     into one row or left lopsided with an empty cell. */
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  margin-bottom: 22px;
-}
-.pstat {
-  background: var(--paper);
-  border: 2.5px solid var(--neo-ink);
-  border-radius: 12px;
-  padding: 12px 4px;
-  text-align: center;
-  box-shadow: 3px 3px 0 var(--neo-ink);
-}
-.pstat b {
-  display: block;
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 1.05rem;
-  color: var(--ink);
-}
-.pstat span {
-  font-size: 0.62rem;
-  color: var(--ink-soft);
-}
 .badges {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

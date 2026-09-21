@@ -1,17 +1,18 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Settings, ChevronRight, Check, Pencil, X } from 'lucide-react';
+import { Settings, ChevronRight, Check, Pencil, X, Share2 } from 'lucide-react';
 import { useApp, computeUnlockedBadges, countDoneChapters } from '@/store';
 import { sfx } from '@/lib/sound';
-import { getRankInfo, badgeRemainingLabel } from '@/lib/aura';
+import { getRankInfo, badgeRemainingLabel, countMasteredCards } from '@/lib/aura';
 import { getAgeGroup, profileReactionLine } from '@/lib/braiseVoice';
 import { getBadgeUnlockedAtMap } from '@/lib/celebrations';
 import { TopBar } from '@/components/TopBar';
-import { StreakFlameIcon } from '@/components/StreakFlameIcon';
 import { BadgeIcon } from '@/components/BadgeIcon';
+import { RankIcon } from '@/components/RankIcon';
 import { SubjectIcon } from '@/components/SubjectIcon';
 import { BraiseMascot } from '@/components/BraiseMascot';
-import { BADGES, SUBJECTS, AVATARS } from '@/data';
+import { ShareAuraModal } from '@/components/ShareAuraModal';
+import { BADGES, SUBJECTS, AVATARS, FLASHCARDS } from '@/data';
 import type { Badge, Personality } from '@/types';
 
 const PERSONAS: { id: Personality; title: string; sub: string }[] = [
@@ -28,6 +29,18 @@ const BADGE_TIERS: { title: string; ids: [string, string] }[] = [
   { title: 'XP', ids: ['b2', 'b6'] },
 ];
 const STANDALONE_BADGE_IDS = ['b3', 'b4'];
+
+// Same accent per badge as BadgeIcon's own fill colours (flame orange, bolt gold, book indigo,
+// snowflake cyan) — the summary dots read as a shrunk version of the real icons below them,
+// not an unrelated colour code.
+const BADGE_DOT_COLORS: Record<string, string> = {
+  b1: '#ff4500',
+  b5: '#ff4500',
+  b2: '#ffc700',
+  b6: '#ffc700',
+  b3: '#818cf8',
+  b4: '#7dd3fc',
+};
 
 function formatShortDate(ts: number): string {
   return new Date(ts).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
@@ -95,6 +108,7 @@ export function ProfileView() {
   const [editingIdentity, setEditingIdentity] = useState(false);
   const [draftName, setDraftName] = useState(state.user.name);
   const [draftAvatar, setDraftAvatar] = useState(state.user.avatar);
+  const [shareOpen, setShareOpen] = useState(false);
 
   const subjectsCount = state.user.subjects.length;
   const chaptersDone = countDoneChapters(state.completedChapters);
@@ -105,7 +119,19 @@ export function ProfileView() {
   const badgeUnlocked = computeUnlockedBadges(state);
   const badgeUnlockedCount = Object.values(badgeUnlocked).filter(Boolean).length;
   const badgeUnlockedAt = useMemo(() => getBadgeUnlockedAtMap(), [badgeUnlocked]);
-  const rankName = getRankInfo(state.xp).current.name;
+  const rank = getRankInfo(state.xp).current;
+  const rankName = rank.name;
+
+  // Same derivation as Aura's own share button — real distinct-subjects-reviewed count, not a
+  // second, possibly-diverging computation of "how many subjects".
+  const reviewedSubjectsCount = useMemo(
+    () =>
+      new Set(
+        Object.keys(state.cardReviews).map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)
+      ).size,
+    [state.cardReviews]
+  );
+  const masteredCards = useMemo(() => countMasteredCards(state.cardReviews), [state.cardReviews]);
 
   // Memoized on the real facts it depends on, not re-rolled on every render (e.g. opening the
   // identity editor or toggling a subject chip) — only changes when something Braise would
@@ -140,24 +166,73 @@ export function ProfileView() {
     setUser({ ...state.user, subjects: next });
   };
 
+  const handleShareOpen = () => {
+    sfx.tap(state.soundOn);
+    if (navigator.vibrate) navigator.vibrate(10);
+    setShareOpen(true);
+  };
+  const handleShareClose = () => setShareOpen(false);
+
   return (
     <div>
       <TopBar title="Profil" onBack={() => setView(state.tab)} />
       <motion.div className="view is-active" variants={staggerContainer} initial="hidden" animate="show">
-        {/* Avatar + name */}
         {!editingIdentity ? (
-          <motion.div className="profile-identity" variants={staggerItem}>
-            <button type="button" className="profile-avatar" onClick={openIdentityEdit} aria-label="Modifier ton avatar et ton prénom">
-              {state.user.avatar}
-              <span className="profile-avatar-edit" aria-hidden="true">
-                <Pencil size={11} />
-              </span>
-            </button>
-            <h2 className="profile-name">{state.user.name}</h2>
-            <p className="profile-sub">
-              {state.user.levelLabel} · {state.user.goal}
-            </p>
-            {state.user.joinedAt && <p className="profile-joined">Membre depuis le {formatShortDate(state.user.joinedAt)}</p>}
+          <motion.div className="profile-hero-card" variants={staggerItem}>
+            <div className="profile-hero-banner" style={{ background: `linear-gradient(125deg, ${rank.colorFrom}, ${rank.colorTo})` }}>
+              <div className="profile-hero-rank-pill">
+                <RankIcon rankId={rank.id} color={rank.colorFrom} size={14} />
+                {rank.name}
+              </div>
+            </div>
+            <div className="profile-hero-body">
+              <div className="profile-hero-avatar-stage">
+                <div
+                  className="profile-hero-avatar-glow"
+                  style={{ background: `radial-gradient(circle, ${rank.colorTo}80, transparent 70%)` }}
+                />
+                <div
+                  className="profile-hero-avatar-ring"
+                  style={{ background: `conic-gradient(${rank.colorFrom}, ${rank.colorTo}, ${rank.colorFrom})` }}
+                />
+                <button type="button" className="profile-hero-avatar" onClick={openIdentityEdit} aria-label="Modifier ton avatar et ton prénom">
+                  {state.user.avatar}
+                  <span className="profile-hero-edit-badge" aria-hidden="true">
+                    <Pencil size={11} />
+                  </span>
+                </button>
+              </div>
+              <h2 className="profile-hero-name">{state.user.name}</h2>
+              {state.user.joinedAt && <p className="profile-joined">Membre depuis le {formatShortDate(state.user.joinedAt)}</p>}
+
+              {/* Braise's take — real facts (rank/série/badges), never generic filler; changes
+                  when they actually change, so there's a real reason to come back and see what
+                  he says now. */}
+              <div className="profile-hero-bubble">
+                <span className="profile-hero-bubble-icon" aria-hidden="true">
+                  <BraiseMascot size={26} mood={state.streak > 0 ? 'proud' : 'happy'} />
+                </span>
+                <p>{braiseTake}</p>
+              </div>
+
+              <div className="profile-hero-num">{state.xp}</div>
+              <div className="profile-hero-lbl">XP</div>
+
+              <div className="profile-hero-mini-row">
+                <div className="profile-hero-mini">
+                  <b>{state.streak}</b>
+                  <span>jours</span>
+                </div>
+                <div className="profile-hero-mini">
+                  <b>{cardsSeenCount}</b>
+                  <span>cartes</span>
+                </div>
+                <div className="profile-hero-mini">
+                  <b>{chaptersDone}</b>
+                  <span>{chaptersDone > 1 ? 'chapitres' : 'chapitre'}</span>
+                </div>
+              </div>
+            </div>
           </motion.div>
         ) : (
           <div className="profile-identity-edit">
@@ -197,52 +272,27 @@ export function ProfileView() {
           </div>
         )}
 
-        {/* Braise's take — real facts (rank/série/badges), never generic filler; changes when
-            they actually change, so there's a real reason to come back and see what he says now. */}
-        <motion.div className="profile-braise-take" variants={staggerItem}>
-          <span className="profile-braise-take-icon" aria-hidden="true">
-            <BraiseMascot size={34} mood={state.streak > 0 ? 'proud' : 'happy'} />
+        {/* Quick glance at the badge count, in the same dot-per-badge language as the full grid
+            below — a reason to scroll down, not a replacement for it. */}
+        <motion.div className="profile-badges-line" variants={staggerItem}>
+          <span>
+            {badgeUnlockedCount}/{BADGES.length} badges débloqués
           </span>
-          <p className="profile-braise-take-text">{braiseTake}</p>
+          <div className="profile-badges-dots">
+            {BADGES.map((b) => (
+              <span
+                key={b.id}
+                className="profile-badges-dot"
+                style={{ background: badgeUnlocked[b.id] ? BADGE_DOT_COLORS[b.id] : 'var(--paper)' }}
+              />
+            ))}
+          </div>
         </motion.div>
 
-        {/* Stats */}
-        <motion.div className="profile-stats" variants={staggerItem}>
-          <div className="pstat">
-            <b>{state.streak}</b>
-            <span className="flex items-center justify-center gap-1">
-              jours <StreakFlameIcon size={13} />
-            </span>
-          </div>
-          <div className="pstat">
-            <b>{state.xp}</b>
-            <span className="flex items-center justify-center gap-1">
-              XP
-              <svg width="11" height="11" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M13 1.5 3.5 13.8h6.2l-1 8.7L19.5 9h-6.4l1.2-7.5Z" fill="#ffc700" stroke="#151821" strokeWidth="1.7" strokeLinejoin="round" />
-              </svg>
-            </span>
-          </div>
-          <div className="pstat">
-            <b>{cardsSeenCount}</b>
-            <span className="flex items-center justify-center gap-1">
-              cartes vues
-              <svg width="11" height="11" viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  d="M12 6.5 C10.3 5 7.7 4.7 5 5.6 L5 18.1 C7.7 17.2 10.3 17.5 12 19 C13.7 17.5 16.3 17.2 19 18.1 L19 5.6 C16.3 4.7 13.7 5 12 6.5 Z"
-                  fill="#818cf8"
-                  stroke="#151821"
-                  strokeWidth="1.7"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </span>
-          </div>
-          <div className="pstat">
-            <b>{chaptersDone}</b>
-            <span>chapitres</span>
-          </div>
-        </motion.div>
+        <motion.button type="button" className="profile-hero-cta" onClick={handleShareOpen} variants={staggerItem}>
+          <Share2 size={16} />
+          Partager mon profil
+        </motion.button>
 
         {/* Personality */}
         <motion.div variants={staggerItem}>
@@ -345,6 +395,17 @@ export function ProfileView() {
           </button>
         </motion.div>
       </motion.div>
+
+      {shareOpen && (
+        <ShareAuraModal
+          rank={rank}
+          streak={state.streak}
+          xp={state.xp}
+          subjectsCount={reviewedSubjectsCount}
+          masteredCards={masteredCards}
+          onClose={handleShareClose}
+        />
+      )}
     </div>
   );
 }
