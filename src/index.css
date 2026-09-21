@@ -901,6 +901,16 @@ select {
   border: 2.5px solid #000;
   border-radius: 22px;
   box-shadow: 3px 3px 0 #000;
+  /* The frame closed the "no boundary" gap, but it also made the blank space around 6 small
+     rings more obvious than it was on a borderless background — a real, empty-feeling side
+     effect, not just a style note. Same dot-grid technique Réviser already paints behind its
+     flashcards (.flash-stage-dots), just recoloured off --ink (a fixed white reads on Réviser's
+     saturated per-subject backgrounds; this frame sits on the neutral, theme-reactive page
+     background, so the dots need to flip with it too). A game-board texture, not a school
+     handout's blank margin. Background painting already clips to the border-radius curve, so
+     no extra overflow:hidden is needed to keep it inside the rounded corners. */
+  background-image: radial-gradient(color-mix(in srgb, var(--ink) 14%, transparent) 1.5px, transparent 1.5px);
+  background-size: 22px 22px;
 }
 .mastery-grid {
   display: grid;
@@ -968,8 +978,11 @@ select {
   align-items: center;
   justify-content: center;
 }
-/* Pinned to the ring's own edge, same corner-badge construction as .aura-hero-medal — a tiny
-   echo of the Hero's own rank medal, not a new badge shape. */
+/* Pinned to the ring's own edge like .aura-hero-medal, but a small squared tag now, not a
+   pill — the Hero ring, the rank-rail nodes and this ring are already three rounds in a row;
+   one more circular badge on top of them was the page tipping fully into "everything is round",
+   losing the squarer, game-card energy the rest of the app has. Reuses the exact radius Home's
+   own "Niv. X" deck tag already uses, rather than inventing a new shape from scratch. */
 .mastery-pct-badge {
   position: absolute;
   bottom: -4px;
@@ -982,7 +995,7 @@ select {
   justify-content: center;
   background: #fff;
   border: 1.5px solid #000;
-  border-radius: 999px;
+  border-radius: 8px;
   box-shadow: 1px 1px 0 #000;
   font-family: 'IBM Plex Mono', monospace;
   font-weight: 700;
