@@ -710,7 +710,6 @@ function SwipeDeck({
                             tag: feedback.tag,
                             text: feedback.text,
                             xp: feedback.xp,
-                            combo,
                             speaking,
                             onListen: () => handleListen(card.a),
                           }
@@ -1033,6 +1032,14 @@ function SwipeCard({
       // Draggable before AND after the verdict — post-verdict drags advance instead of judging
       // (see handleDragEnd). Only the typing beat is off-limits.
       drag={!typing && !flying}
+      // Commits to whichever axis the gesture starts on and holds it for the rest of that
+      // drag, instead of letting x and y drift together — a swipe that starts slightly
+      // diagonal used to blend the verdict tilt/colour-wash (driven by x) with the up-swipe
+      // check (driven by y), reading as "mushy" rather than a clean, single-direction swipe.
+      // It also means handleDragEnd's own vertical/horizontal branches see a cleaner signal:
+      // whichever axis is locked stays near 0 on the other, so the two checks can't both
+      // nearly-fire on the same ambiguous diagonal release.
+      dragDirectionLock
       // 0.55 = the physical "resistance": at 1 the card would track the finger 1:1 with no
       // give, at 0 it wouldn't move past the origin at all.
       dragElastic={0.55}

@@ -81,8 +81,6 @@ export type ResultProps = {
   tag: string;
   text: string;
   xp: number;
-  /** Current streak after this verdict — shown as a chip in the verdict bar from ×2. */
-  combo: number;
   speaking: boolean;
   onListen: () => void;
 };
@@ -178,6 +176,14 @@ export function AnswerCard({
     );
   }
 
+  // A long real answer (measured: the longest in data.ts, Pythagoras' theorem, overflowed the
+  // card's reserved space by 23px on a 375×812 screen with nothing else even competing for
+  // room — worse on a shorter phone) stepping down a size class is the single biggest lever on
+  // that overflow: this one paragraph was close to a fifth of the card's total height on the
+  // measured worst case. 90 characters is roughly "this is running past two short lines."
+  const claimIsLong = claim.length > 90;
+  const truthIsLong = truth.length > 90;
+
   return (
     <motion.div
       className={`${CARD} relative px-5 py-5 text-left transition-[border-color,box-shadow] duration-300 ${verdictClass}`}
@@ -186,7 +192,7 @@ export function AnswerCard({
       style={{ transformOrigin: 'top center' }}
     >
       {/* Verdict bar: a reserved header slot INSIDE the card — never a sticker over the
-          neighbouring card. Chips: the verdict, the XP won, the streak from ×2. */}
+          neighbouring card. Chips: the verdict, the XP won. */}
       {judged && result && <VerdictBar {...result} />}
 
       {judged && wasLie ? (
@@ -226,13 +232,13 @@ export function AnswerCard({
             <span className="inline-block rounded-md bg-black px-2 py-0.5 font-mono text-[0.62rem] font-bold uppercase tracking-[0.08em] text-white">
               En vrai
             </span>
-            <p className="mt-2 font-sans text-[1.3rem] font-bold leading-snug text-black">
+            <p className={`mt-2 font-sans font-bold text-black ${truthIsLong ? 'text-[1.1rem] leading-tight' : 'text-[1.3rem] leading-snug'}`}>
               <RichText text={truth} markClass={HIGHLIGHT} strongClass={STRONG} />
             </p>
           </motion.div>
         </>
       ) : (
-        <p className="font-sans text-[1.3rem] font-bold leading-snug text-black">
+        <p className={`font-sans font-bold text-black ${claimIsLong ? 'text-[1.1rem] leading-tight' : 'text-[1.3rem] leading-snug'}`}>
           <RichText text={claim} markClass={HIGHLIGHT} strongClass={STRONG} />
         </p>
       )}
@@ -320,7 +326,7 @@ function DareBadge({ prompt, color }: { prompt: string; color: string }) {
 /** The verdict as a row of chips at the top of the card, in its own slot. Each chip is the
  *  app's sticker (border + hard shadow + a glossy inner edge); they pop in one after another
  *  with spring overshoot, like a real reward landing rather than a UI element fading in. */
-function VerdictBar({ verdict, tag, xp, combo }: ResultProps) {
+function VerdictBar({ verdict, tag, xp }: ResultProps) {
   const win = verdict === 'win';
   const chip =
     'rounded-xl border-2 border-black px-2.5 py-1 font-display text-[0.72rem] font-black uppercase tracking-wide shadow-[2px_2px_0_#000,inset_0_1px_0_rgba(255,255,255,0.55)]';
@@ -330,26 +336,14 @@ function VerdictBar({ verdict, tag, xp, combo }: ResultProps) {
     transition: { duration: 0.4, delay },
   });
   return (
-    // Two deliberate rows, not one row that overflows into a second — `ml-auto` inside a
-    // `flex-wrap` row used to push the streak chip onto its own line ONLY at narrow widths,
-    // landing it stranded at the far right with a big gap to its left, never centred or
-    // designed for. Giving it its own row unconditionally (whenever it's shown) makes that the
-    // one and only layout, at every width, instead of an accident of how much the first row
-    // happened to fit.
-    <div className="mb-3 border-b-2 border-dashed border-black/15 pb-3" aria-live="polite">
-      <div className="flex flex-wrap items-center gap-2">
-        <motion.span className={`${chip} ${win ? 'bg-[var(--mint)] text-black' : 'bg-[var(--coral-2)] text-white'}`} {...pop(0.08)}>
-          {tag}
-        </motion.span>
-        {xp > 0 && <XpChip xp={xp} chip={chip} />}
-      </div>
-      {win && combo >= 2 && (
-        <div className="mt-2 flex justify-end">
-          <motion.span className={`${chip} ${combo >= 3 ? 'bg-[var(--neo-orange)] text-white' : 'bg-white text-black'}`} {...pop(0.34)}>
-            🔥 {combo >= 3 ? `En chauffant ×${combo}` : `×${combo}`}
-          </motion.span>
-        </div>
-      )}
+    // No streak chip here anymore — it duplicated the header's own persistent .rev-combo pill
+    // (always on screen, judged or not) for zero information gain, at the cost of a whole extra
+    // row exactly on the cards most likely to already be tall (a long correction, mid-streak).
+    <div className="mb-3 flex flex-wrap items-center gap-2 border-b-2 border-dashed border-black/15 pb-3" aria-live="polite">
+      <motion.span className={`${chip} ${win ? 'bg-[var(--mint)] text-black' : 'bg-[var(--coral-2)] text-white'}`} {...pop(0.08)}>
+        {tag}
+      </motion.span>
+      {xp > 0 && <XpChip xp={xp} chip={chip} />}
     </div>
   );
 }

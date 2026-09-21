@@ -1582,7 +1582,12 @@ select {
   align-items: center;
   text-align: center;
   cursor: grab;
-  touch-action: pan-y;
+  /* `none`, not `pan-y` — this card drags in BOTH directions via JS (horizontal for the
+     verdict, vertical-up to arm the joker), and `pan-y` was telling the browser "vertical
+     touch is yours to pan with," fighting the vertical drag on real touch devices instead of
+     handing the whole gesture to framer-motion. `none` gives JS sole ownership of every
+     direction, on every platform, the same way this behaves in mouse-driven desktop testing. */
+  touch-action: none;
   user-select: none;
   perspective: 1000px;
   overflow: hidden;
@@ -1595,7 +1600,15 @@ select {
 }
 /* Fills exactly the space between header and dock (both reserved by .flashcard's padding).
    Scrolls internally only for the rare card that doesn't fit; the bottom fade is that "there's
-   more" affordance. */
+   more" affordance. `touch-action: none`, matching .flashcard: this is where a finger actually
+   lands (it's most of the visible card), and its own default (`auto`) would let the browser
+   claim the touch for its own scroll before the parent's drag ever saw it — the reason a real
+   swipe could feel like it "doesn't work" even though the exact same gesture works fine with a
+   mouse in desktop testing. Trade-off, made on purpose: a card that overflows and needs this
+   scroll loses touch-scrolling specifically (mouse wheel still works; the dock's own buttons
+   are always the fallback) — accepted because the swipe is the primary interaction of the
+   whole screen and overflow is now the rare case the font-size and layout fixes elsewhere
+   target directly, not the common one. */
 .fc-scroll {
   position: relative;
   flex: 1;
@@ -1605,6 +1618,7 @@ select {
   flex-direction: column;
   align-items: center;
   overflow-y: auto;
+  touch-action: none;
   padding: 0 22px 12px;
   mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent 100%);
   -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent 100%);
