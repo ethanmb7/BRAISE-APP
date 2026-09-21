@@ -95,6 +95,7 @@ export function AnswerCard({
   judged,
   verdict,
   prompt,
+  subjectColor,
   tutorial = false,
   result,
 }: {
@@ -106,10 +107,14 @@ export function AnswerCard({
   wasLie: boolean;
   judged: boolean;
   verdict: Verdict;
-  /** Braise's dare ("Je dis vrai ou je raconte n'importe quoi ?"), shown as a comic sticker
-   *  encastré in this card's footer until a verdict lands — the instruction lives with the
-   *  thing it's about. */
+  /** Braise's dare — "am I bluffing or not?" — shown as this card's footer until a verdict
+   *  lands. This is a bluff-calling game, not a quiz: the prompt is Braise daring the player to
+   *  catch him out, not a neutral instruction, so it gets the same treatment as every other
+   *  badge in the game (subject colour, border, hard shadow) rather than reading as a caption. */
   prompt: string;
+  /** Same colour as this card's own subject tile, so the dare badge reads as part of the same
+   *  object instead of a disconnected grey caption. */
+  subjectColor: string;
   /** First card ever: the footer slot shows the swipe gesture instead of the prompt. */
   tutorial?: boolean;
   /** Once judged: the result strip rendered as this card's footer. */
@@ -237,12 +242,7 @@ export function AnswerCard({
       ) : tutorial ? (
         <TutorialHint />
       ) : (
-        // The amorce, as a flat chip at the bottom of the card — Braise's own voice (not
-        // uppercase monospace instructions), in the system's own flat construction (not a
-        // tilted, tailed sticker — nothing else on this card rotates or grows a tail either).
-        <div className="prompt-sticker mt-5">
-          <p className="font-display text-[0.86rem] font-bold leading-snug text-black">{prompt}</p>
-        </div>
+        <DareBadge prompt={prompt} color={subjectColor} />
       )}
     </motion.div>
   );
@@ -267,6 +267,32 @@ function TutorialHint() {
         Carré →
       </span>
     </div>
+  );
+}
+
+/** Braise's dare, as a real badge — this is a bluff-calling game (Intox ou Carré), not a
+ *  quiz, so the prompt is a taunt from the character, not a neutral instruction, and gets the
+ *  same construction every other badge in the game gets: a colour, a border, a hard shadow,
+ *  a spring pop on arrival. The subject's own colour (the same one on this card's icon tile)
+ *  ties it back to the card as one object instead of a disconnected grey caption — black text
+ *  throughout (every subject colour here is ≥4.5:1 against black, checked against the palette
+ *  in data.ts; several fail white). 👀 leads instead of a generic "challenge" glyph (⚡/🎯):
+ *  the game is "is he lying", not "beat the clock" — the icon should read as suspicion, not
+ *  generic game energy, and it has to say that on both the chill and savage voice. */
+function DareBadge({ prompt, color }: { prompt: string; color: string }) {
+  return (
+    <motion.div
+      className="mt-5 inline-flex items-center gap-2 rounded-xl border-[2.5px] border-black px-3 py-2 shadow-[3px_3px_0_#000,inset_0_1px_0_rgba(255,255,255,0.5)]"
+      style={{ background: color }}
+      initial={{ opacity: 0, scale: 0.6, y: -6 }}
+      animate={{ opacity: 1, scale: [0.6, 1.12, 1], y: 0 }}
+      transition={{ duration: 0.4, delay: 0.15 }}
+    >
+      <span aria-hidden="true" className="text-base leading-none">
+        👀
+      </span>
+      <p className="font-display text-[0.86rem] font-bold leading-snug text-black">{prompt}</p>
+    </motion.div>
   );
 }
 

@@ -695,6 +695,7 @@ function SwipeDeck({
                     judged={judged}
                     verdict={judged ? (wasCorrect ? 'win' : 'miss') : null}
                     prompt={prompt}
+                    subjectColor={subject?.color ?? 'var(--sun)'}
                     tutorial={showTutorial}
                     result={
                       judged && feedback

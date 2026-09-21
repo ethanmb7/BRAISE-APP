@@ -1621,18 +1621,6 @@ select {
   pointer-events: none;
   user-select: none;
 }
-/* The amorce as a plain flat chip, in the app's own construction (border + hard shadow, square
-   corners, dead level) — a tilted speech-bubble-with-tail read as "comic sticker" against a
-   system where nothing else rotates or grows a tail (the cards, the verdict chips, the
-   TutorialHint chips either side of it are all dead flat). No exception here either now. */
-.prompt-sticker {
-  display: inline-block;
-  background: var(--rev-paper);
-  border: 2.5px solid #000;
-  border-radius: 12px;
-  padding: 8px 14px;
-  box-shadow: 3px 3px 0 #000;
-}
 /* KaTeX renders its own glyph colors via currentColor for the base symbols, so this just
    makes sure the formula reads in whatever ink color its surrounding bubble/line already
    uses (dark ink in the paper bubble, white in the reveal line) instead of KaTeX's own
