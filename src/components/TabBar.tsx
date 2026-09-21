@@ -22,7 +22,11 @@ const TABS: { id: TabId; label: string; icon: typeof Home }[] = [
 export function TabBar({ active, onChange }: Props) {
   return (
     <nav
-      className="absolute inset-x-4 z-40 flex items-center rounded-2xl border-[2.5px] border-black bg-[var(--paper)]/80 p-1.5 shadow-[4px_4px_0_#000] backdrop-blur-xl"
+      // backdrop-blur-md (12px), not -xl (24px): this bar is wide (the biggest single blur
+      // surface on screen, bigger than any of the header pills) and mounted on nearly every
+      // screen — a real cost to trim as a precaution, never measured on real low-end hardware
+      // from here. Still reads as glass at 12px, just a lighter kernel to compute per frame.
+      className="absolute inset-x-4 z-40 flex items-center rounded-2xl border-[2.5px] border-black bg-[var(--paper)]/80 p-1.5 shadow-[4px_4px_0_#000] backdrop-blur-md"
       style={{ bottom: 'calc(12px + env(safe-area-inset-bottom, 0px))' }}
       aria-label="Navigation principale"
     >

@@ -1375,8 +1375,14 @@ select {
   justify-content: center;
   border-radius: 50%;
   background: rgba(250, 248, 243, 0.78);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  /* 8px, not the original 14px — this + the header's other two glass pills + the tab dock's
+     own blur are up to four independent backdrop-filter layers on screen at once during a
+     session, and backdrop-filter is one of the more GPU-expensive CSS properties on low-end
+     Android hardware. Never benchmarked on real hardware from here (no device access), so this
+     is a precaution, not a measured fix — a smaller kernel is real savings per layer with a
+     visual difference that's hard to see on a pill this size anyway. */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 2.5px solid #000;
   color: #000;
   box-shadow: 3px 3px 0 #000;
@@ -1411,8 +1417,8 @@ select {
   height: 12px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   border: 2.5px solid #000;
   box-shadow: 3px 3px 0 #000;
   overflow: hidden;
@@ -1449,8 +1455,8 @@ select {
   border-radius: 999px;
   padding: 0 11px;
   background: rgba(250, 248, 243, 0.78);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 2.5px solid #000;
   color: #000;
   box-shadow: 3px 3px 0 #000;

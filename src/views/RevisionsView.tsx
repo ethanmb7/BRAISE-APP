@@ -481,6 +481,12 @@ function SwipeDeck({
         // buzz a hot combo gives on its own.
         if (useSuper && navigator.vibrate) navigator.vibrate([30, 40, 60]);
         else if (next >= 3 && navigator.vibrate) navigator.vibrate(40);
+        // Layered on top of sfx.correct's own chime, not instead of it — the rest of the app
+        // already has a distinct sound for exactly this moment (Home's own streak, a lesson's
+        // streak) and Réviser's combo, its whole core mechanic, never called it. Same ≥3
+        // threshold as the header pill's `.is-hot` — the sound and the visual agree on what
+        // counts as "hot" instead of the streak being silent no matter how long it runs.
+        if (next >= 3) sfx.streak(soundOn);
         return next;
       });
     } else {

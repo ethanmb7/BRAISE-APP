@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import { BraiseMascot } from '@/components/BraiseMascot';
+import { useApp } from '@/store';
+import { sfx } from '@/lib/sound';
 
 type Slide =
   | { key: 'cards'; bg: 'ink'; title: string; sub: string }
@@ -48,11 +50,22 @@ export function BraiseRecap({
     { key: 'cta', bg: 'paper' },
   ];
 
+  const { state } = useApp();
   const [i, setI] = useState(0);
   const slide = slides[i];
   const isLast = i === slides.length - 1;
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
   const precision = reviewed > 0 ? Math.round(((reviewed - wrongCount) / reviewed) * 100) : 0;
+
+  // The session's own payoff moment — the biggest celebration in the whole screen — played no
+  // sound at all: every other "you finished something" beat in the app (a lesson, onboarding)
+  // already uses sfx.complete for exactly this, Réviser's recap just never called it. Once per
+  // mount only (BraiseRecap remounts fresh each session via SwipeDeck's key, so this can't
+  // replay on a re-render).
+  useEffect(() => {
+    sfx.complete(state.soundOn);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (isLast) return;
