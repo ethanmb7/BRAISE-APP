@@ -315,32 +315,35 @@ const SubjectMasteryGrid = memo(function SubjectMasteryGrid({
   onSelect: (id: string) => void;
 }) {
   return (
-    <div className="mastery-section">
-      <span className="aura-section-label">Maîtrise par matière</span>
-      <div className="mastery-grid" role="list">
-        {subjects.map((s) => (
-          <button
-            key={s.id}
-            type="button"
-            className="mastery-tile"
-            role="listitem"
-            onClick={() => onSelect(s.id)}
-            aria-label={`${s.name} : ${s.started ? `${s.pct}% maîtrisé` : 'pas encore commencé'} — réviser cette matière`}
-          >
-            <span className="mastery-ring-wrap">
-              <span
-                className={`mastery-ring ${s.started ? '' : 'is-empty'}`}
-                style={{ '--ring-color': s.color, '--pct': s.pct } as CSSProperties}
-              >
-                <span className="mastery-ring-inner">
-                  <SubjectIcon subjectId={s.id} color={s.started ? s.color : 'rgba(21,24,33,0.35)'} size={26} />
+    <div className="mastery-section-wrap">
+      <span className="mastery-section-shadow mastery-cut-corner" aria-hidden="true" />
+      <div className="mastery-section mastery-cut-corner">
+        <span className="mastery-tab">Maîtrise par matière</span>
+        <div className="mastery-grid" role="list">
+          {subjects.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              className="mastery-tile"
+              role="listitem"
+              onClick={() => onSelect(s.id)}
+              aria-label={`${s.name} : ${s.started ? `${s.pct}% maîtrisé` : 'pas encore commencé'} — réviser cette matière`}
+            >
+              <span className="mastery-ring-wrap">
+                <span
+                  className={`mastery-ring ${s.started ? '' : 'is-empty'}`}
+                  style={{ '--ring-color': s.color, '--pct': s.pct } as CSSProperties}
+                >
+                  <span className="mastery-ring-inner">
+                    <SubjectIcon subjectId={s.id} color={s.started ? s.color : 'rgba(21,24,33,0.35)'} size={26} />
+                  </span>
                 </span>
+                {s.started && <span className="mastery-pct-badge">{s.pct}%</span>}
               </span>
-              {s.started && <span className="mastery-pct-badge">{s.pct}%</span>}
-            </span>
-            <span className="mastery-name">{SHORT_SUBJECT_NAME[s.id] ?? s.name}</span>
-          </button>
-        ))}
+              <span className="mastery-name">{SHORT_SUBJECT_NAME[s.id] ?? s.name}</span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
