@@ -1,3 +1,6 @@
+import { SUBJECTS, FLASHCARDS } from '@/data';
+import type { CardReview } from '@/types';
+
 export type Rank = {
   id: string;
   name: string;
@@ -46,5 +49,32 @@ export function deriveWeekActivity(streak: number, dailyGoalMet: boolean): boole
     if (daysAgo === 0) return dailyGoalMet;
     const offset = daysAgo - (dailyGoalMet ? 0 : 1);
     return offset >= 0 && offset < streak;
+  });
+}
+
+export type SubjectMastery = {
+  id: string;
+  name: string;
+  emoji: string;
+  color: string;
+  pct: number;
+  started: boolean;
+};
+
+// A card only counts as "acquise" once it's cleared the SM-2 learning phase (recalled
+// correctly at least twice in a row), not merely seen once — repetitions=1 just means "shown",
+// not "known". Subjects with zero reviewed cards are flagged `started: false` rather than
+// given a 0% score: "0%" reads as "tried and failed", "pas commencé" reads as what's actually
+// true — the player hasn't touched that subject in Réviser yet.
+const MASTERED_AT_REPETITIONS = 2;
+
+export function computeSubjectMastery(cardReviews: Record<string, CardReview>): SubjectMastery[] {
+  return SUBJECTS.map((s) => {
+    const subjectCardIds = FLASHCARDS.filter((c) => c.subject === s.id).map((c) => c.id);
+    const reviewed = subjectCardIds.filter((id) => cardReviews[id]);
+    const mastered = reviewed.filter((id) => cardReviews[id].repetitions >= MASTERED_AT_REPETITIONS);
+    const started = reviewed.length > 0;
+    const pct = started ? Math.round((mastered.length / reviewed.length) * 100) : 0;
+    return { id: s.id, name: s.name, emoji: s.emoji, color: s.color, pct, started };
   });
 }

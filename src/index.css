@@ -878,6 +878,137 @@ select {
   50% { transform: scale(1.08); }
 }
 
+/* --- ActivityCalendar / SubjectMasteryCard — extension of PrideStats: same card chrome
+   (--paper, 2px border, 14px radius, 3px shadow) as the two stat chips right above them, just
+   full-width instead of split in half, so the page doesn't introduce a fourth card language. --- */
+.activity-cal,
+.subject-mastery-card {
+  background: var(--paper);
+  border: 2px solid #000;
+  border-radius: 14px;
+  box-shadow: 3px 3px 0 #000;
+  padding: 12px 14px 14px;
+  margin-bottom: 10px;
+}
+.activity-cal-eyebrow {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  margin-bottom: 10px;
+}
+.activity-cal-row {
+  display: flex;
+  justify-content: space-between;
+}
+.activity-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+/* Same dashed/muted vocabulary as .rank-rail-node.is-locked — "not there yet" reads identically
+   everywhere on this page. */
+.activity-day-dot {
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  border: 2px dashed rgba(21, 24, 33, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  line-height: 1;
+}
+.activity-day-dot.is-active {
+  border: 2px solid #000;
+  background: var(--neo-orange);
+  box-shadow: 1.5px 1.5px 0 #000;
+}
+.activity-day-dot.is-today {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+.activity-day-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+/* --- SubjectMasteryCard — reuses the Accueil deck grid's own icon-tile + progress-bar
+   vocabulary (white circle, colored glyph, black-filled bar) rather than inventing a new one,
+   just laid out as compact rows instead of a 2-up card grid. --- */
+.subject-mastery-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.subject-mastery-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.subject-mastery-icon {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  border: 2px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+}
+.subject-mastery-icon.is-empty {
+  border-style: dashed;
+  border-color: rgba(21, 24, 33, 0.35);
+  opacity: 0.55;
+}
+/* Fixed width, but wraps rather than truncates with an ellipsis — same rule as the Accueil
+   deck cards: real subject names (Mathématiques, Physique-Chimie) never get cut off mid-word. */
+.subject-mastery-name {
+  flex-shrink: 0;
+  width: 92px;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 0.74rem;
+  line-height: 1.15;
+  color: var(--ink);
+}
+.subject-mastery-bar {
+  flex: 1;
+  height: 10px;
+  border-radius: 999px;
+  border: 2px solid #000;
+  background: rgba(21, 24, 33, 0.08);
+  overflow: hidden;
+}
+.subject-mastery-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.subject-mastery-pct {
+  flex-shrink: 0;
+  width: 36px;
+  text-align: right;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 0.78rem;
+  color: var(--ink);
+}
+.subject-mastery-empty {
+  flex: 1;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--ink-soft);
+  opacity: 0.7;
+}
+
 /* --- Share CTA — the single primary action on the screen, so it's the loudest element on
    the page after the mascot itself: full width, vivid, its own hard shadow, plus a shine
    sweep to keep it feeling alive rather than static. --- */

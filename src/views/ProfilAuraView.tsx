@@ -6,7 +6,7 @@ import { sfx } from '@/lib/sound';
 import { useOnlineStatus } from '@/lib/useOnlineStatus';
 import { BraiseMascot } from '@/components/BraiseMascot';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
-import { getRankInfo, RANKS, type Rank } from '@/lib/aura';
+import { getRankInfo, RANKS, deriveWeekActivity, computeSubjectMastery, type Rank, type SubjectMastery } from '@/lib/aura';
 import { FLASHCARDS } from '@/data';
 
 // Diameter of the hero ring frame — the single largest element on the page, on purpose.
@@ -77,6 +77,12 @@ export function ProfilAuraView() {
     return { subjectsCount: subjectsSeen.size, precision };
   }, [state.cardReviews]);
 
+  const subjectMastery = useMemo(() => computeSubjectMastery(state.cardReviews), [state.cardReviews]);
+  const weekActivity = useMemo(
+    () => deriveWeekActivity(state.streak, state.dailyGoalMet),
+    [state.streak, state.dailyGoalMet]
+  );
+
   const handleShareOpen = useCallback(() => {
     sfx.tap(state.soundOn);
     if (navigator.vibrate) navigator.vibrate(10);
@@ -116,6 +122,16 @@ export function ProfilAuraView() {
         </motion.div>
         <motion.div variants={popItem}>
           <PrideStats bestCombo={state.bestCombo} precision={stats.precision} />
+        </motion.div>
+
+        {/* Extension du Pilier 2 : mêmes signaux de rétention/maîtrise, en plus détaillé.
+            Classées par densité de lecture croissante — le calendrier se lit d'un regard,
+            la maîtrise par matière demande de parcourir plusieurs lignes. */}
+        <motion.div variants={staggerItem}>
+          <ActivityCalendar days={weekActivity} />
+        </motion.div>
+        <motion.div variants={staggerItem}>
+          <SubjectMasteryCard subjects={subjectMastery} />
         </motion.div>
 
         {/* Pillar 3 — Le Flex social : l'action de fin de scène. */}
@@ -284,6 +300,80 @@ const PrideStats = memo(function PrideStats({ bestCombo, precision }: { bestComb
           <span className="pride-stat-value">{animPrecision}%</span>
           <span className="pride-stat-label">Précision</span>
         </span>
+      </div>
+    </div>
+  );
+});
+
+// French day-of-week initials, indexed the way Date#getDay() already returns (0=Dimanche).
+const DOW_LETTERS = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
+
+// A 7-day consistency strip — same dashed/muted "not there yet" language as a locked rank
+// node, same filled/flame language as the streak badge on the Hero, so "actif" and "verrouillé"
+// read identically everywhere on the page instead of inventing a third visual vocabulary.
+const ActivityCalendar = memo(function ActivityCalendar({ days }: { days: boolean[] }) {
+  const todayDow = new Date().getDay();
+  return (
+    <div className="activity-cal">
+      <span className="activity-cal-eyebrow">Cette semaine</span>
+      <div className="activity-cal-row" role="list" aria-label="Activité des 7 derniers jours">
+        {days.map((active, i) => {
+          const daysAgo = 6 - i;
+          const isToday = daysAgo === 0;
+          const dow = ((todayDow - daysAgo) % 7 + 7) % 7;
+          return (
+            <div key={i} className="activity-day" role="listitem">
+              <span
+                className={`activity-day-dot ${active ? 'is-active' : ''} ${isToday ? 'is-today' : ''}`}
+                aria-hidden="true"
+              >
+                {active ? '🔥' : ''}
+              </span>
+              <span className="activity-day-label">
+                {DOW_LETTERS[dow]}
+                <span className="sr-only">
+                  {isToday ? "aujourd'hui" : ''}, {active ? 'jour actif' : 'pas d’activité'}
+                </span>
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+});
+
+// Per-subject mastery — the one signal Réviser's own data (SM-2 repetitions per card) could
+// already answer but nothing on the page surfaced: "où est-ce que je suis vraiment solide".
+// Fixed subject order (same as Accueil's deck grid), never sorted by score — sorting weakest-
+// first would read as the app calling out what's bad, which isn't this app's voice.
+const SubjectMasteryCard = memo(function SubjectMasteryCard({ subjects }: { subjects: SubjectMastery[] }) {
+  return (
+    <div className="subject-mastery-card">
+      <span className="activity-cal-eyebrow">Maîtrise par matière</span>
+      <div className="subject-mastery-list" role="list">
+        {subjects.map((s) => (
+          <div key={s.id} className="subject-mastery-row" role="listitem" aria-label={`${s.name} : ${s.started ? `${s.pct}% maîtrisé` : 'pas encore commencé'}`}>
+            <span
+              className={`subject-mastery-icon ${s.started ? '' : 'is-empty'}`}
+              style={s.started ? { background: s.color } : undefined}
+              aria-hidden="true"
+            >
+              {s.emoji}
+            </span>
+            <span className="subject-mastery-name">{s.name}</span>
+            {s.started ? (
+              <>
+                <div className="subject-mastery-bar">
+                  <div className="subject-mastery-bar-fill" style={{ width: `${s.pct}%`, background: s.color }} />
+                </div>
+                <span className="subject-mastery-pct">{s.pct}%</span>
+              </>
+            ) : (
+              <span className="subject-mastery-empty">Pas commencé</span>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
