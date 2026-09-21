@@ -576,8 +576,14 @@ select {
    margins only consume the space left over after normal-flow siblings are laid out). Auto
    margins rather than justify-content:center specifically: the latter clips the top of the
    content above the scroll start once it overflows a short viewport, auto margins degrade to 0
-   and the page just scrolls normally from the top instead. */
-.aura-view {
+   and the page just scrolls normally from the top instead.
+
+   .view.aura-view.is-active, not .aura-view alone: this page is also given `.view.is-active`
+   (the shared per-page-visibility rule other views use too), which sets its own `display:block`
+   at two-class specificity — a bare one-class `.aura-view` rule loses that fight regardless of
+   source order, which is exactly why this silently never took effect the first time. Three
+   classes here beats it outright instead of relying on being declared later in the file. */
+.view.aura-view.is-active {
   display: flex;
   flex-direction: column;
   min-height: 100%;
@@ -879,10 +885,23 @@ select {
 /* --- SubjectMasteryGrid — reuses the page's OWN signature shape (the Hero's double-ring
    medallion) at a fraction of the size, once per subject, rather than a bulletin-scolaire row
    of icon+name+%-bar. Same construction as .aura-ring-frame/.aura-ring-inner: a black-bordered
-   circle with a colored ring, framing the subject glyph. Bare on the page background (no card
-   chrome) so it reads as a colorful, game-like moment, not another neutral stat panel. --- */
+   circle with a colored ring, framing the subject glyph.
+
+   It used to sit fully bare on the page background — every neighbour on this page (the rank
+   rail's track, the badge bridge, the share button) has a defined edge of its own, so this was
+   the one section floating with no boundary at all, reading as misplaced next to them. An
+   outline frame gives it that same edge without turning it into a fourth solid white card —
+   no fill, no hard shadow, just the border — so it still reads as its own, lighter kind of
+   moment instead of flattening back into "stack of identical cards". */
 .mastery-section {
   margin-bottom: 16px;
+  padding: 16px 12px 14px;
+  /* --ink, not a fixed rgba(0,0,0,..) — that read fine in light mode and nearly vanished in
+     dark mode (a dark outline has no contrast against a dark background). --ink already flips
+     light/dark with the theme, so mixing it down to 18% keeps the same subtle-outline feel in
+     both. */
+  border: 2px solid color-mix(in srgb, var(--ink) 18%, transparent);
+  border-radius: 20px;
 }
 .mastery-grid {
   display: grid;
