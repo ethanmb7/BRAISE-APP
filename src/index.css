@@ -947,78 +947,43 @@ select {
 .mastery-tile:active {
   transform: translateY(1px);
 }
-.mastery-ring-wrap {
+/* A fanned hand of 4 abstract card-slots, filled left-to-right by real mastered/total progress
+   — the one version of "how am I doing in this subject" that isn't borrowed from another app's
+   gauge/bar/radar language, because cards are literally what this app's own mechanic already
+   is. Fixed at 4 slots regardless of a subject's real card count (same abstraction the old ring
+   used at 0-100°, just card-shaped) — the real grounding lives in .mastery-count below it. */
+.mastery-stack {
   position: relative;
+  width: 64px;
+  height: 52px;
+  display: block;
 }
-/* A plain custom property doesn't interpolate on its own — without registering it, a value
-   change (e.g. --pct going 50 -> 62 after a review session) would just snap the conic-gradient
-   to its new arc instantly, the one animation-adjacent bug this page still had. Registering it
-   as a <number> makes the browser tween --pct itself frame-by-frame, so anything reading it
-   (the gradient below) animates along for free. Same easing curve as .rank-rail-line-fill, for
-   the same reason: it's the one "a value grew" motion language already used on this page. */
-@property --pct {
-  syntax: '<number>';
-  inherits: false;
-  initial-value: 0;
-}
-/* The ring fill is a conic-gradient read straight off --pct (0-100, set inline per subject) —
-   the same "fraction of a circle" idea as any progress ring, just drawn in CSS instead of SVG.
-   Unlike the Hero's ring (always 100% of its own colour, since it signals identity), this one
-   is a genuine fractional arc, since it signals a measured mastery score. */
-.mastery-ring {
-  width: 74px;
-  height: 74px;
-  border-radius: 50%;
-  border: 2.5px solid #000;
-  box-shadow: 2px 2px 0 #000;
-  background: conic-gradient(var(--ring-color, #ccc) calc(var(--pct, 0) * 1%), rgba(21, 24, 33, 0.12) 0);
-  transition: --pct 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-/* Same dashed/muted vocabulary as .rank-rail-node.is-locked and .activity-day-dot — "not there
-   yet" reads identically everywhere on this page. No pct badge is rendered for this state
-   either (see the component), so an untouched subject never shows a discouraging "0%". */
-.mastery-ring.is-empty {
-  background: transparent;
-  border-style: dashed;
-  border-color: rgba(21, 24, 33, 0.35);
-  box-shadow: none;
-  opacity: 0.55;
-}
-.mastery-ring-inner {
-  width: calc(100% - 13px);
-  height: calc(100% - 13px);
-  border-radius: 50%;
+.mastery-card {
+  position: absolute;
+  bottom: 0;
+  width: 26px;
+  height: 36px;
+  border-radius: 5px;
+  border: 2px solid #000;
   background: var(--paper);
   display: flex;
   align-items: center;
   justify-content: center;
 }
-/* Pinned to the ring's own edge like .aura-hero-medal, but a small squared tag now, not a
-   pill — the Hero ring, the rank-rail nodes and this ring are already three rounds in a row;
-   one more circular badge on top of them was the page tipping fully into "everything is round",
-   losing the squarer, game-card energy the rest of the app has. Reuses the exact radius Home's
-   own "Niv. X" deck tag already uses, rather than inventing a new shape from scratch. */
-.mastery-pct-badge {
-  position: absolute;
-  bottom: -4px;
-  right: -6px;
-  min-width: 24px;
-  height: 18px;
-  padding: 0 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-  border: 1.5px solid #000;
-  border-radius: 8px;
-  box-shadow: 1px 1px 0 #000;
-  font-family: 'IBM Plex Mono', monospace;
-  font-weight: 700;
-  font-size: 0.56rem;
-  color: var(--neo-ink);
+.mastery-card:nth-child(1) { left: 2px; transform: rotate(-9deg); z-index: 1; }
+.mastery-card:nth-child(2) { left: 15px; bottom: 2px; transform: rotate(-3deg); z-index: 2; }
+.mastery-card:nth-child(3) { left: 27px; bottom: 3px; transform: rotate(3deg); z-index: 3; }
+.mastery-card:nth-child(4) { left: 38px; bottom: 4px; transform: rotate(9deg); z-index: 4; }
+.mastery-card.is-filled {
+  box-shadow: 1.5px 1.5px 0 #000;
+}
+/* Same dashed/muted vocabulary as .rank-rail-node.is-locked and .activity-day-dot — "not there
+   yet" reads identically everywhere on this page. */
+.mastery-card.is-empty {
+  border-style: dashed;
+  border-color: rgba(21, 24, 33, 0.35);
+  background: transparent;
+  opacity: 0.6;
 }
 .mastery-name {
   font-family: 'Baloo 2', sans-serif;
@@ -1027,6 +992,14 @@ select {
   line-height: 1.15;
   color: var(--ink);
   text-align: center;
+}
+/* The real count, not a percentage — "3/6 cartes" can't be inflated the way "100%" could by
+   only ever reviewing the one easy card in a six-card deck. */
+.mastery-count {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: var(--ink-soft);
 }
 
 /* --- BadgeBridge — the one link between Aura and Profil's own badge grid. Same gold-medallion

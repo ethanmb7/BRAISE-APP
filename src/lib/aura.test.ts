@@ -49,7 +49,8 @@ describe('computeSubjectMastery', () => {
     const rows = computeSubjectMastery({});
     const maths = rows.find((r) => r.id === 'maths')!;
     expect(maths.started).toBe(false);
-    expect(maths.pct).toBe(0);
+    expect(maths.masteredCount).toBe(0);
+    expect(maths.totalCount).toBe(6); // real maths deck: fc1, fc2, fc3, fc9, fc10, fc11
   });
 
   it('only counts a card as mastered once it clears the SM-2 learning phase (repetitions >= 2)', () => {
@@ -64,14 +65,22 @@ describe('computeSubjectMastery', () => {
     });
     const maths = rows.find((r) => r.id === 'maths')!;
     expect(maths.started).toBe(true);
-    expect(maths.pct).toBe(50); // 3 of 6 mastered
+    expect(maths.masteredCount).toBe(3);
+    expect(maths.totalCount).toBe(6);
+  });
+
+  it('counts mastered against the subject\'s real total, not just what was reviewed — a single mastered card out of a 6-card deck is 1/6, never a fabricated 100%', () => {
+    const rows = computeSubjectMastery({ fc1: review(2) });
+    const maths = rows.find((r) => r.id === 'maths')!;
+    expect(maths.masteredCount).toBe(1);
+    expect(maths.totalCount).toBe(6);
   });
 
   it('treats a card seen once (repetitions 1) as started but not mastered', () => {
     const rows = computeSubjectMastery({ fc1: review(1) });
     const maths = rows.find((r) => r.id === 'maths')!;
     expect(maths.started).toBe(true);
-    expect(maths.pct).toBe(0);
+    expect(maths.masteredCount).toBe(0);
   });
 
   it('returns one row per subject, in SUBJECTS order, regardless of review data', () => {

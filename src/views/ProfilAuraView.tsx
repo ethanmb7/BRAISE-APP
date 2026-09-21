@@ -300,13 +300,16 @@ const SHORT_SUBJECT_NAME: Record<string, string> = { maths: 'Maths' };
 
 // Per-subject mastery — the one signal Réviser's own data (SM-2 repetitions per card) could
 // already answer but nothing on the page surfaced: "où est-ce que je suis vraiment solide".
-// Deliberately NOT a bulletin-scolaire row (icon + name + linear % bar) — that form reads as a
-// report card no matter what copy sits next to it. Instead it reuses the page's own signature
-// shape: the Hero's double-ring medallion, shrunk down and repeated once per subject, filled by
-// mastery instead of by rank. Same visual family as the one moment on this page that already
-// works, not a new grammar. Tapping a medallion opens that subject directly — a weak subject is
-// something to act on, not a static number to sit with. Fixed subject order (same as Accueil's
-// deck grid), never sorted by score, so a weak subject is never singled out by position.
+// Went through a ring-medallion phase (echoing the Hero) before this — visually consistent, but
+// a borrowed-from-elsewhere metaphor (gauges, HUD bars, radar charts) on an app whose actual
+// mechanic already has one built in: cards. A fanned stack of 4 abstract card-slots, filled
+// left-to-right by real mastered/total progress, is the one version of this idea that isn't
+// borrowed from another app or another game genre — it's literally what happens in Réviser.
+// The label underneath is the real count ("3/6 cartes"), not a percentage: a percentage used to
+// let one mastered card out of six read as "100%" just because it was the only one reviewed.
+// Tapping a stack opens that subject directly — a weak subject is something to act on, not a
+// static number to sit with. Fixed subject order (same as Accueil's deck grid), never sorted by
+// score, so a weak subject is never singled out by position.
 const SubjectMasteryGrid = memo(function SubjectMasteryGrid({
   subjects,
   onSelect,
@@ -320,29 +323,40 @@ const SubjectMasteryGrid = memo(function SubjectMasteryGrid({
       <div className="mastery-section mastery-cut-corner">
         <span className="mastery-tab">Maîtrise par matière</span>
         <div className="mastery-grid" role="list">
-          {subjects.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              className="mastery-tile"
-              role="listitem"
-              onClick={() => onSelect(s.id)}
-              aria-label={`${s.name} : ${s.started ? `${s.pct}% maîtrisé` : 'pas encore commencé'} — réviser cette matière`}
-            >
-              <span className="mastery-ring-wrap">
-                <span
-                  className={`mastery-ring ${s.started ? '' : 'is-empty'}`}
-                  style={{ '--ring-color': s.color, '--pct': s.pct } as CSSProperties}
-                >
-                  <span className="mastery-ring-inner">
-                    <SubjectIcon subjectId={s.id} color={s.started ? s.color : 'rgba(21,24,33,0.35)'} size={26} />
-                  </span>
+          {subjects.map((s) => {
+            const filled = s.totalCount > 0 ? Math.round((s.masteredCount / s.totalCount) * 4) : 0;
+            return (
+              <button
+                key={s.id}
+                type="button"
+                className="mastery-tile"
+                role="listitem"
+                onClick={() => onSelect(s.id)}
+                aria-label={`${s.name} : ${s.masteredCount} carte${s.masteredCount > 1 ? 's' : ''} maîtrisée${s.masteredCount > 1 ? 's' : ''} sur ${s.totalCount} — réviser cette matière`}
+              >
+                <span className="mastery-stack">
+                  {[0, 1, 2, 3].map((i) => {
+                    const isFilled = i < filled;
+                    return (
+                      <span
+                        key={i}
+                        className={`mastery-card ${isFilled ? 'is-filled' : 'is-empty'}`}
+                        style={isFilled ? ({ background: s.color } as CSSProperties) : undefined}
+                      >
+                        {i === 3 && (
+                          <SubjectIcon subjectId={s.id} color={isFilled ? '#fff' : 'rgba(21,24,33,0.35)'} size={16} />
+                        )}
+                      </span>
+                    );
+                  })}
                 </span>
-                {s.started && <span className="mastery-pct-badge">{s.pct}%</span>}
-              </span>
-              <span className="mastery-name">{SHORT_SUBJECT_NAME[s.id] ?? s.name}</span>
-            </button>
-          ))}
+                <span className="mastery-name">{SHORT_SUBJECT_NAME[s.id] ?? s.name}</span>
+                <span className="mastery-count">
+                  {s.masteredCount}/{s.totalCount} cartes
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>

@@ -41,7 +41,8 @@ export type SubjectMastery = {
   name: string;
   emoji: string;
   color: string;
-  pct: number;
+  masteredCount: number;
+  totalCount: number;
   started: boolean;
 };
 
@@ -52,13 +53,16 @@ export type SubjectMastery = {
 // true — the player hasn't touched that subject in Réviser yet.
 const MASTERED_AT_REPETITIONS = 2;
 
+// Used to return a percentage of *reviewed* cards mastered — which quietly rewarded only ever
+// reviewing the easy cards you already knew (one card, mastered once, read as "100%"). Absolute
+// counts against the subject's real total ("3/6 cartes") can't be inflated that way and give
+// the card-stack visual something concrete to fan out, not an abstract fill percentage.
 export function computeSubjectMastery(cardReviews: Record<string, CardReview>): SubjectMastery[] {
   return SUBJECTS.map((s) => {
     const subjectCardIds = FLASHCARDS.filter((c) => c.subject === s.id).map((c) => c.id);
     const reviewed = subjectCardIds.filter((id) => cardReviews[id]);
-    const mastered = reviewed.filter((id) => cardReviews[id].repetitions >= MASTERED_AT_REPETITIONS);
+    const mastered = subjectCardIds.filter((id) => cardReviews[id] && cardReviews[id].repetitions >= MASTERED_AT_REPETITIONS);
     const started = reviewed.length > 0;
-    const pct = started ? Math.round((mastered.length / reviewed.length) * 100) : 0;
-    return { id: s.id, name: s.name, emoji: s.emoji, color: s.color, pct, started };
+    return { id: s.id, name: s.name, emoji: s.emoji, color: s.color, masteredCount: mastered.length, totalCount: subjectCardIds.length, started };
   });
 }
