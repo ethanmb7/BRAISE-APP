@@ -6,6 +6,7 @@ import { sfx } from '@/lib/sound';
 import { useOnlineStatus } from '@/lib/useOnlineStatus';
 import { BraiseMascot } from '@/components/BraiseMascot';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
+import { SubjectIcon } from '@/components/SubjectIcon';
 import { getRankInfo, RANKS, deriveWeekActivity, computeSubjectMastery, type Rank, type SubjectMastery } from '@/lib/aura';
 import { FLASHCARDS } from '@/data';
 
@@ -62,7 +63,7 @@ function useCountUp(target: number, duration = 700): number {
 }
 
 export function ProfilAuraView() {
-  const { state, loaded } = useApp();
+  const { state, loaded, openSubject } = useApp();
   const isOnline = useOnlineStatus();
   const [shareOpen, setShareOpen] = useState(false);
   const { current, next, pct } = getRankInfo(state.xp);
@@ -90,6 +91,16 @@ export function ProfilAuraView() {
   }, [state.soundOn]);
 
   const handleShareClose = useCallback(() => setShareOpen(false), []);
+
+  // Tapping a subject medallion drops straight into that deck — a weak subject becomes
+  // something to act on immediately, not just a number to sit with.
+  const handleSubjectSelect = useCallback(
+    (subjectId: string) => {
+      sfx.tap(state.soundOn);
+      openSubject(subjectId);
+    },
+    [state.soundOn, openSubject]
+  );
 
   if (!loaded) {
     return <ProfilAuraSkeleton />;
@@ -131,7 +142,7 @@ export function ProfilAuraView() {
           <ActivityCalendar days={weekActivity} />
         </motion.div>
         <motion.div variants={staggerItem}>
-          <SubjectMasteryCard subjects={subjectMastery} />
+          <SubjectMasteryGrid subjects={subjectMastery} onSelect={handleSubjectSelect} />
         </motion.div>
 
         {/* Pillar 3 — Le Flex social : l'action de fin de scène. */}
@@ -315,7 +326,7 @@ const ActivityCalendar = memo(function ActivityCalendar({ days }: { days: boolea
   const todayDow = new Date().getDay();
   return (
     <div className="activity-cal">
-      <span className="activity-cal-eyebrow">Cette semaine</span>
+      <span className="aura-section-label">Cette semaine</span>
       <div className="activity-cal-row" role="list" aria-label="Activité des 7 derniers jours">
         {days.map((active, i) => {
           const daysAgo = 6 - i;
@@ -343,36 +354,51 @@ const ActivityCalendar = memo(function ActivityCalendar({ days }: { days: boolea
   );
 });
 
+// Same subject the Accueil grid uses, kept in one place so both screens shorten it identically.
+const SHORT_SUBJECT_NAME: Record<string, string> = { maths: 'Maths' };
+
 // Per-subject mastery — the one signal Réviser's own data (SM-2 repetitions per card) could
 // already answer but nothing on the page surfaced: "où est-ce que je suis vraiment solide".
-// Fixed subject order (same as Accueil's deck grid), never sorted by score — sorting weakest-
-// first would read as the app calling out what's bad, which isn't this app's voice.
-const SubjectMasteryCard = memo(function SubjectMasteryCard({ subjects }: { subjects: SubjectMastery[] }) {
+// Deliberately NOT a bulletin-scolaire row (icon + name + linear % bar) — that form reads as a
+// report card no matter what copy sits next to it. Instead it reuses the page's own signature
+// shape: the Hero's double-ring medallion, shrunk down and repeated once per subject, filled by
+// mastery instead of by rank. Same visual family as the one moment on this page that already
+// works, not a new grammar. Tapping a medallion opens that subject directly — a weak subject is
+// something to act on, not a static number to sit with. Fixed subject order (same as Accueil's
+// deck grid), never sorted by score, so a weak subject is never singled out by position.
+const SubjectMasteryGrid = memo(function SubjectMasteryGrid({
+  subjects,
+  onSelect,
+}: {
+  subjects: SubjectMastery[];
+  onSelect: (id: string) => void;
+}) {
   return (
-    <div className="subject-mastery-card">
-      <span className="activity-cal-eyebrow">Maîtrise par matière</span>
-      <div className="subject-mastery-list" role="list">
+    <div className="mastery-section">
+      <span className="aura-section-label">Maîtrise par matière</span>
+      <div className="mastery-grid" role="list">
         {subjects.map((s) => (
-          <div key={s.id} className="subject-mastery-row" role="listitem" aria-label={`${s.name} : ${s.started ? `${s.pct}% maîtrisé` : 'pas encore commencé'}`}>
-            <span
-              className={`subject-mastery-icon ${s.started ? '' : 'is-empty'}`}
-              style={s.started ? { background: s.color } : undefined}
-              aria-hidden="true"
-            >
-              {s.emoji}
+          <button
+            key={s.id}
+            type="button"
+            className="mastery-tile"
+            role="listitem"
+            onClick={() => onSelect(s.id)}
+            aria-label={`${s.name} : ${s.started ? `${s.pct}% maîtrisé` : 'pas encore commencé'} — réviser cette matière`}
+          >
+            <span className="mastery-ring-wrap">
+              <span
+                className={`mastery-ring ${s.started ? '' : 'is-empty'}`}
+                style={{ '--ring-color': s.color, '--pct': s.pct } as CSSProperties}
+              >
+                <span className="mastery-ring-inner">
+                  <SubjectIcon subjectId={s.id} color={s.started ? s.color : 'rgba(21,24,33,0.35)'} size={26} />
+                </span>
+              </span>
+              {s.started && <span className="mastery-pct-badge">{s.pct}%</span>}
             </span>
-            <span className="subject-mastery-name">{s.name}</span>
-            {s.started ? (
-              <>
-                <div className="subject-mastery-bar">
-                  <div className="subject-mastery-bar-fill" style={{ width: `${s.pct}%`, background: s.color }} />
-                </div>
-                <span className="subject-mastery-pct">{s.pct}%</span>
-              </>
-            ) : (
-              <span className="subject-mastery-empty">Pas commencé</span>
-            )}
-          </div>
+            <span className="mastery-name">{SHORT_SUBJECT_NAME[s.id] ?? s.name}</span>
+          </button>
         ))}
       </div>
     </div>
