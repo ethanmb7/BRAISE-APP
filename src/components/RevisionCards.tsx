@@ -1,5 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
-import { motion, useAnimationControls } from 'framer-motion';
+import { motion, AnimatePresence, useAnimationControls } from 'framer-motion';
 import { Volume2 } from 'lucide-react';
 import { RichText } from '@/components/RichText';
 import { BraiseMascot } from '@/components/BraiseMascot';
@@ -237,13 +237,25 @@ export function AnswerCard({
         </p>
       )}
 
-      {judged && result ? (
-        <ResultStrip {...result} />
-      ) : tutorial ? (
-        <TutorialHint />
-      ) : (
-        <DareBadge prompt={prompt} color={subjectColor} />
-      )}
+      {/* `wait`: the three footer states are very different heights (a short pill vs. a full
+          avatar+text+button row) — letting the entering one lay out while the exiting one is
+          still in flow would jump the card's height, and `popLayout` (the usual fix for that)
+          needs every child to forward a ref, which plain function components returning a
+          motion.div don't do for free. `wait` sidesteps that: the exiting state fully finishes
+          before the next one starts, guaranteeing they're never both in flow at once. Every
+          other beat in this verdict moment is choreographed (the strike, the truth unfolding,
+          the chips popping in) — this swap used to be the one hard cut in the sequence: the
+          dare badge just vanished the instant `judged` flipped, because a plain ternary has no
+          exit to play. Now all three states get one. */}
+      <AnimatePresence mode="wait" initial={false}>
+        {judged && result ? (
+          <ResultStrip key="result" {...result} />
+        ) : tutorial ? (
+          <TutorialHint key="tutorial" />
+        ) : (
+          <DareBadge key="dare" prompt={prompt} color={subjectColor} />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
@@ -252,7 +264,11 @@ export function AnswerCard({
  *  over the card. The hand sways between the two directions. */
 function TutorialHint() {
   return (
-    <div className="mt-4 flex items-center justify-between gap-3 border-t-2 border-dashed border-black/15 pt-3" aria-hidden="true">
+    <motion.div
+      className="mt-4 flex items-center justify-between gap-3 border-t-2 border-dashed border-black/15 pt-3"
+      aria-hidden="true"
+      exit={{ opacity: 0, y: -4, transition: { duration: 0.16 } }}
+    >
       <span className="rounded-xl border-2 border-black bg-[var(--coral)] px-2.5 py-1 font-display text-[0.72rem] font-black uppercase tracking-wide text-white shadow-[2px_2px_0_#000]">
         ← Intox
       </span>
@@ -266,7 +282,7 @@ function TutorialHint() {
       <span className="rounded-xl border-2 border-black bg-[var(--mint)] px-2.5 py-1 font-display text-[0.72rem] font-black uppercase tracking-wide text-black shadow-[2px_2px_0_#000]">
         Carré →
       </span>
-    </div>
+    </motion.div>
   );
 }
 
@@ -282,16 +298,21 @@ function TutorialHint() {
 function DareBadge({ prompt, color }: { prompt: string; color: string }) {
   return (
     <motion.div
-      className="mt-5 inline-flex items-center gap-2 rounded-xl border-[2.5px] border-black px-3 py-2 shadow-[3px_3px_0_#000,inset_0_1px_0_rgba(255,255,255,0.5)]"
+      // `items-start`, not `items-center`: the longer prompt variants wrap to two lines at
+      // narrow widths, and a centred emoji floats disconnected in the gap between both lines
+      // once that happens. Top-aligned reads correctly whether it wraps or not — on a single
+      // line it sits exactly where centring would have put it anyway.
+      className="mt-5 inline-flex items-start gap-2 rounded-xl border-[2.5px] border-black px-3 py-2 shadow-[3px_3px_0_#000,inset_0_1px_0_rgba(255,255,255,0.5)]"
       style={{ background: color }}
       initial={{ opacity: 0, scale: 0.6, y: -6 }}
       animate={{ opacity: 1, scale: [0.6, 1.12, 1], y: 0 }}
+      exit={{ opacity: 0, scale: 0.7, y: -4, transition: { duration: 0.16 } }}
       transition={{ duration: 0.4, delay: 0.15 }}
     >
-      <span aria-hidden="true" className="text-base leading-none">
+      <span aria-hidden="true" className="mt-0.5 text-base leading-none">
         👀
       </span>
-      <p className="font-display text-[0.86rem] font-bold leading-snug text-black">{prompt}</p>
+      <p className="font-display text-[0.84rem] font-bold leading-snug text-black">{prompt}</p>
     </motion.div>
   );
 }
@@ -363,6 +384,7 @@ function ResultStrip({ verdict, text, speaking, onListen }: ResultProps) {
       className="mt-4 border-t-2 border-dashed border-black/20 pt-3"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -4, transition: { duration: 0.16 } }}
       transition={{ ...SPRING, delay: 0.12 }}
     >
       <div className="flex items-start gap-3">
