@@ -1,5 +1,6 @@
-import { Zap, Trophy } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import { StreakFlameIcon } from '@/components/StreakFlameIcon';
+import { TrophyIcon } from '@/components/TrophyIcon';
 
 interface TodayStripProps {
   streak: number;
@@ -102,7 +103,7 @@ export function TodayStrip({ streak, remaining, goalPct, dueCount, onContinue, o
             className="absolute inset-0 translate-y-[2px] rounded-xl border-2 border-black bg-black/60"
           />
           <span className="relative flex items-center justify-center gap-1.5 rounded-xl border-2 border-black bg-white px-3 py-2 text-sm font-black text-black transition-transform duration-100 group-active:translate-y-[2px]">
-            <Trophy size={14} />
+            <TrophyIcon size={16} />
             Partager ma série
           </span>
         </button>

@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight, Trophy, WifiOff } from 'lucide-react';
+import { ChevronRight, WifiOff } from 'lucide-react';
 import { useApp, computeUnlockedBadges } from '@/store';
 import { sfx } from '@/lib/sound';
 import { useOnlineStatus } from '@/lib/useOnlineStatus';
@@ -9,6 +9,7 @@ import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { SubjectIcon } from '@/components/SubjectIcon';
 import { RankIcon } from '@/components/RankIcon';
 import { StreakFlameIcon } from '@/components/StreakFlameIcon';
+import { TrophyIcon } from '@/components/TrophyIcon';
 import { getRankInfo, RANKS, computeSubjectMastery, type Rank, type SubjectMastery } from '@/lib/aura';
 import { FLASHCARDS, BADGES } from '@/data';
 
@@ -148,7 +149,7 @@ export function ProfilAuraView() {
         <motion.div variants={staggerItem}>
           <button className="aura-share-cta" onClick={handleShareOpen}>
             <span className="aura-share-icon" aria-hidden="true">
-              <Trophy size={18} />
+              <TrophyIcon size={19} />
             </span>
             Partager mon Aura
           </button>
