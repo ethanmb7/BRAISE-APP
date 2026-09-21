@@ -1,14 +1,22 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, WifiOff } from 'lucide-react';
-import { useApp } from '@/store';
+import { ChevronRight, Trophy, WifiOff } from 'lucide-react';
+import { useApp, computeUnlockedBadges } from '@/store';
 import { sfx } from '@/lib/sound';
 import { useOnlineStatus } from '@/lib/useOnlineStatus';
 import { BraiseMascot } from '@/components/BraiseMascot';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { SubjectIcon } from '@/components/SubjectIcon';
-import { getRankInfo, RANKS, deriveWeekActivity, computeSubjectMastery, type Rank, type SubjectMastery } from '@/lib/aura';
-import { FLASHCARDS } from '@/data';
+import {
+  getRankInfo,
+  RANKS,
+  deriveWeekActivity,
+  computeSubjectMastery,
+  countMasteredCards,
+  type Rank,
+  type SubjectMastery,
+} from '@/lib/aura';
+import { FLASHCARDS, BADGES } from '@/data';
 
 // Diameter of the hero ring frame — the single largest element on the page, on purpose.
 const HERO_SIZE = 180;
@@ -63,7 +71,7 @@ function useCountUp(target: number, duration = 700): number {
 }
 
 export function ProfilAuraView() {
-  const { state, loaded, openSubject } = useApp();
+  const { state, loaded, openSubject, setView } = useApp();
   const isOnline = useOnlineStatus();
   const [shareOpen, setShareOpen] = useState(false);
   const { current, next, pct } = getRankInfo(state.xp);
@@ -73,15 +81,18 @@ export function ProfilAuraView() {
     const subjectsSeen = new Set(
       reviewedIds.map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)
     );
-    const sureCount = reviewedIds.filter((id) => state.cardReviews[id].lastConfidence === 'sure').length;
-    const precision = reviewedIds.length > 0 ? Math.round((sureCount / reviewedIds.length) * 100) : 0;
-    return { subjectsCount: subjectsSeen.size, precision };
+    return { subjectsCount: subjectsSeen.size };
   }, [state.cardReviews]);
 
   const subjectMastery = useMemo(() => computeSubjectMastery(state.cardReviews), [state.cardReviews]);
+  const masteredCount = useMemo(() => countMasteredCards(state.cardReviews), [state.cardReviews]);
   const weekActivity = useMemo(
     () => deriveWeekActivity(state.streak, state.dailyGoalMet),
     [state.streak, state.dailyGoalMet]
+  );
+  const unlockedBadgeCount = useMemo(
+    () => Object.values(computeUnlockedBadges(state)).filter(Boolean).length,
+    [state]
   );
 
   const handleShareOpen = useCallback(() => {
@@ -101,6 +112,14 @@ export function ProfilAuraView() {
     },
     [state.soundOn, openSubject]
   );
+
+  // The one bridge between this page and Profil's own badge grid — Aura never duplicates the
+  // full grid, just enough of a trophy signal (a count, always true, no unlock-date needed) to
+  // justify pointing there.
+  const handleOpenBadges = useCallback(() => {
+    sfx.tap(state.soundOn);
+    setView('profile');
+  }, [state.soundOn, setView]);
 
   if (!loaded) {
     return <ProfilAuraSkeleton />;
@@ -132,7 +151,7 @@ export function ProfilAuraView() {
           <RankRail currentRankId={current.id} rank={current} pct={pct} />
         </motion.div>
         <motion.div variants={popItem}>
-          <PrideStats bestCombo={state.bestCombo} precision={stats.precision} />
+          <PrideStats bestCombo={state.bestCombo} masteredCount={masteredCount} />
         </motion.div>
 
         {/* Extension du Pilier 2 : mêmes signaux de rétention/maîtrise, en plus détaillé.
@@ -145,7 +164,10 @@ export function ProfilAuraView() {
           <SubjectMasteryGrid subjects={subjectMastery} onSelect={handleSubjectSelect} />
         </motion.div>
 
-        {/* Pillar 3 — Le Flex social : l'action de fin de scène. */}
+        {/* Pillar 3 — Le Flex social : le pont vers Profil, puis l'action de fin de scène. */}
+        <motion.div variants={staggerItem}>
+          <BadgeBridge unlocked={unlockedBadgeCount} total={BADGES.length} onOpen={handleOpenBadges} />
+        </motion.div>
         <motion.div variants={staggerItem}>
           <button className="aura-share-cta" onClick={handleShareOpen}>
             <span className="aura-share-icon" aria-hidden="true">
@@ -284,14 +306,17 @@ const RankRail = memo(function RankRail({
   );
 });
 
-// Only two stats survive the cull: best combo and accuracy — both are pure mastery/pride
-// signals tied to what the player actually does in a review session. Streak moved into the
-// Hero (it's an emotional/urgency signal, not a mastery one) and the 7-day heatmap is gone
-// entirely — the streak number already says "how consistent am I" more directly than a row of
-// dots ever did, so keeping both was redundant, not reinforcing.
-const PrideStats = memo(function PrideStats({ bestCombo, precision }: { bestCombo: number; precision: number }) {
+// Only two stats survive the cull: best combo and cards mastered — both are pure mastery/pride
+// signals that can only ever go up. "Précision" (a global accuracy %) used to sit here and got
+// cut in review: a raw percentage reads as a grade, exactly the bulletin-scolaire trap the
+// mastery grid below already had to be redesigned out of. Cards mastered is the same underlying
+// criterion as that grid, just summed into one flex number instead of split by subject. Streak
+// moved into the Hero (it's an emotional/urgency signal, not a mastery one) and the 7-day
+// heatmap is gone entirely — the streak number already says "how consistent am I" more directly
+// than a row of dots ever did, so keeping both was redundant, not reinforcing.
+const PrideStats = memo(function PrideStats({ bestCombo, masteredCount }: { bestCombo: number; masteredCount: number }) {
   const animCombo = useCountUp(bestCombo);
-  const animPrecision = useCountUp(precision);
+  const animMastered = useCountUp(masteredCount);
   return (
     <div className="pride-stats" role="list">
       <div className="pride-stat" role="listitem" aria-label={`Combo maximum : ${bestCombo}`}>
@@ -303,13 +328,13 @@ const PrideStats = memo(function PrideStats({ bestCombo, precision }: { bestComb
           <span className="pride-stat-label">Combo max</span>
         </span>
       </div>
-      <div className="pride-stat" role="listitem" aria-label={`Précision globale : ${precision}%`}>
+      <div className="pride-stat" role="listitem" aria-label={`${masteredCount} cartes maîtrisées`}>
         <span className="pride-stat-icon" aria-hidden="true">
-          🎯
+          🃏
         </span>
         <span className="pride-stat-text" aria-hidden="true">
-          <span className="pride-stat-value">{animPrecision}%</span>
-          <span className="pride-stat-label">Précision</span>
+          <span className="pride-stat-value">{animMastered}</span>
+          <span className="pride-stat-label">Cartes maîtrisées</span>
         </span>
       </div>
     </div>
@@ -402,6 +427,32 @@ const SubjectMasteryGrid = memo(function SubjectMasteryGrid({
         ))}
       </div>
     </div>
+  );
+});
+
+// The one bridge between Aura and Profil's own badge grid. Deliberately just a count, never
+// "ton dernier badge" — nothing in AppState timestamps when a badge unlocked, so claiming a
+// "most recent" one would be a fabricated claim, not a real one. A count is honest and still a
+// real trophy signal, and it primes the share moment right below it.
+const BadgeBridge = memo(function BadgeBridge({
+  unlocked,
+  total,
+  onOpen,
+}: {
+  unlocked: number;
+  total: number;
+  onOpen: () => void;
+}) {
+  return (
+    <button type="button" className="badge-bridge" onClick={onOpen}>
+      <span className="badge-bridge-icon" aria-hidden="true">
+        🏅
+      </span>
+      <span className="badge-bridge-text">
+        {unlocked}/{total} badges débloqués
+      </span>
+      <ChevronRight size={18} className="badge-bridge-chevron" aria-hidden="true" />
+    </button>
   );
 });
 

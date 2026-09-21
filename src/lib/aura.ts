@@ -78,3 +78,11 @@ export function computeSubjectMastery(cardReviews: Record<string, CardReview>): 
     return { id: s.id, name: s.name, emoji: s.emoji, color: s.color, pct, started };
   });
 }
+
+// The aggregate the mastery grid's own rings already imply, surfaced as one plain count — a
+// number that can only ever grow, unlike a "précision" percentage that reads as a grade. Same
+// mastered/reviewed criterion as computeSubjectMastery, just summed across every subject rather
+// than split by one.
+export function countMasteredCards(cardReviews: Record<string, CardReview>): number {
+  return Object.values(cardReviews).filter((r) => r.repetitions >= MASTERED_AT_REPETITIONS).length;
+}
