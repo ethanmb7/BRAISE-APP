@@ -604,12 +604,6 @@ select {
   background: rgba(21, 24, 33, 0.12);
   animation: skeletonPulse 1.3s ease-in-out infinite;
 }
-.skeleton-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
 
 /* --- AuraHeroScene — a double-ring medallion (black structural border + rank-tinted inner
    ring) framing the mascot, with two corner badges: streak top-left (emotional/urgency) and
@@ -749,29 +743,13 @@ select {
   0%, 100% { opacity: 0.2; transform: scale(0.8); }
   50% { opacity: 1; transform: scale(1.15); }
 }
-/* --- NextRankCallout — the season pass's headline: the single next reward, framed as a short
-   distance ("1 556 XP jusqu'à Légende") rather than a cumulative total. Anticipation over
-   bookkeeping — this is the one place progression maths lives on the page. --- */
-.season-eyebrow {
-  text-align: center;
-  margin: 0 0 12px;
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 800;
-  font-size: 0.98rem;
-}
-.season-eyebrow-amount {
-  color: var(--neo-orange);
-}
-.season-eyebrow-rest {
-  color: var(--ink);
-}
-
-/* --- PrideStats — only two survive the cull: best combo and accuracy, both pure mastery/pride
-   signals. Wider chips than a 4-up row allowed, so each carries an icon + a real text column
-   instead of a cramped stack. --- */
+/* --- PrideStats — down to one stat: best combo, the only pure-skill signal on the page. Same
+   chip chrome regardless of how many children it holds — flex:1 fills the row whether there's
+   one or two. --- */
 .pride-stats {
   display: flex;
   gap: 10px;
+  margin-bottom: 18px;
 }
 .pride-stat {
   flex: 1;
@@ -813,9 +791,24 @@ select {
 
 /* --- RankRail — every rank visible at once on a single always-on progress rail, season-pass
    style. Replaces the tabs + swipeable carousel (and the accordion before that): nothing is
-   hidden behind a tap, a swipe, or an expand. --- */
+   hidden behind a tap, a swipe, or an expand. Carries its own caption now — "1 556 XP jusqu'à
+   Légende" used to be a standalone NextRankCallout block above the rail; same progression
+   story, so it's one component, not two. --- */
 .rank-rail {
   margin-bottom: 18px;
+}
+.rank-rail-caption {
+  text-align: center;
+  margin: 0 0 12px;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 0.98rem;
+}
+.rank-rail-caption-amount {
+  color: var(--neo-orange);
+}
+.rank-rail-caption-rest {
+  color: var(--ink);
 }
 .rank-rail-track {
   position: relative;
@@ -878,22 +871,8 @@ select {
   50% { transform: scale(1.08); }
 }
 
-/* --- ActivityCalendar — extension of PrideStats: same card chrome (--paper, 2px border,
-   14px radius, 3px shadow) as the two stat chips right above it, just full-width instead of
-   split in half. SubjectMasteryGrid (below) deliberately does NOT share this card chrome — it
-   sits bare on the page background so two card-shaped blocks in a row don't flatten the page's
-   rhythm right after the Hero. --- */
-.activity-cal {
-  background: var(--paper);
-  border: 2px solid #000;
-  border-radius: 14px;
-  box-shadow: 3px 3px 0 #000;
-  padding: 12px 14px 14px;
-  margin-bottom: 10px;
-}
-/* Shared section label — same treatment wherever a block on this page needs a small caption
-   above it (the weekly calendar, the mastery grid), so they read as one family of "extra
-   detail" sections rather than each inventing its own heading style. */
+/* Section label — same treatment wherever a block on this page needs a small caption above it
+   (currently just the mastery grid). */
 .aura-section-label {
   display: block;
   font-family: 'IBM Plex Mono', monospace;
@@ -903,44 +882,6 @@ select {
   letter-spacing: 0.04em;
   color: var(--ink-soft);
   margin-bottom: 10px;
-}
-.activity-cal-row {
-  display: flex;
-  justify-content: space-between;
-}
-.activity-day {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-/* Same dashed/muted vocabulary as .rank-rail-node.is-locked — "not there yet" reads identically
-   everywhere on this page. */
-.activity-day-dot {
-  width: 27px;
-  height: 27px;
-  border-radius: 50%;
-  border: 2px dashed rgba(21, 24, 33, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.82rem;
-  line-height: 1;
-}
-.activity-day-dot.is-active {
-  border: 2px solid #000;
-  background: var(--neo-orange);
-  box-shadow: 1.5px 1.5px 0 #000;
-}
-.activity-day-dot.is-today {
-  outline: 2px solid var(--ink);
-  outline-offset: 2px;
-}
-.activity-day-label {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.62rem;
-  font-weight: 600;
-  color: var(--ink-soft);
 }
 
 /* --- SubjectMasteryGrid — reuses the page's OWN signature shape (the Hero's double-ring
@@ -1048,9 +989,8 @@ select {
 }
 
 /* --- BadgeBridge — the one link between Aura and Profil's own badge grid. Same paper-card
-   chrome as PrideStats/ActivityCalendar (continuity with the rest of the "detail" sections),
-   and the same gold-medallion icon construction as .aura-share-icon below, since both are
-   "here's a trophy" moments. --- */
+   chrome as PrideStats, and the same gold-medallion icon construction as .aura-share-icon
+   below, since both are "here's a trophy" moments. --- */
 .badge-bridge {
   display: flex;
   align-items: center;

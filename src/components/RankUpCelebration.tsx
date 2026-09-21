@@ -169,10 +169,10 @@ export function RankUpCelebration({
             {message}
           </motion.p>
 
-          {/* Same "distance to the next reward" hook as "Ton Aura" (ProfilAuraView's
-              NextRankCallout) — proven there to create anticipation better than a cumulative
-              total. The single highest-attention screen in the app was the one place that cut
-              straight to a dead end instead of pointing forward. */}
+          {/* Same "distance to the next reward" hook as "Ton Aura" (ProfilAuraView's RankRail
+              caption) — proven there to create anticipation better than a cumulative total. The
+              single highest-attention screen in the app was the one place that cut straight to
+              a dead end instead of pointing forward. */}
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

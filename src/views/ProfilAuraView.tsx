@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronRight, Trophy, WifiOff } from 'lucide-react';
 import { useApp, computeUnlockedBadges } from '@/store';
@@ -7,15 +7,7 @@ import { useOnlineStatus } from '@/lib/useOnlineStatus';
 import { BraiseMascot } from '@/components/BraiseMascot';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { SubjectIcon } from '@/components/SubjectIcon';
-import {
-  getRankInfo,
-  RANKS,
-  deriveWeekActivity,
-  computeSubjectMastery,
-  countMasteredCards,
-  type Rank,
-  type SubjectMastery,
-} from '@/lib/aura';
+import { getRankInfo, RANKS, computeSubjectMastery, type Rank, type SubjectMastery } from '@/lib/aura';
 import { FLASHCARDS, BADGES } from '@/data';
 
 // Diameter of the hero ring frame — the single largest element on the page, on purpose.
@@ -85,11 +77,6 @@ export function ProfilAuraView() {
   }, [state.cardReviews]);
 
   const subjectMastery = useMemo(() => computeSubjectMastery(state.cardReviews), [state.cardReviews]);
-  const masteredCount = useMemo(() => countMasteredCards(state.cardReviews), [state.cardReviews]);
-  const weekActivity = useMemo(
-    () => deriveWeekActivity(state.streak, state.dailyGoalMet),
-    [state.streak, state.dailyGoalMet]
-  );
   const unlockedBadgeCount = useMemo(
     () => Object.values(computeUnlockedBadges(state)).filter(Boolean).length,
     [state]
@@ -146,23 +133,18 @@ export function ProfilAuraView() {
         </motion.div>
 
         {/* Pillar 2 — Contrat de rétention : tout le calcul de progression vit ici, et
-            uniquement les métriques qui nourrissent la fierté ou l'envie de revenir. */}
+            uniquement les métriques qui nourrissent la fierté ou l'envie de revenir. Le "X XP
+            jusqu'à Y" vit maintenant comme légende du rail lui-même — même histoire de
+            progression, un seul bloc au lieu de deux qui se répétaient. */}
         <motion.div variants={staggerItem}>
-          <NextRankCallout next={next} xp={state.xp} />
-        </motion.div>
-        <motion.div variants={staggerItem}>
-          <RankRail currentRankId={current.id} rank={current} pct={pct} />
+          <RankRail currentRankId={current.id} rank={current} pct={pct} next={next} xp={state.xp} />
         </motion.div>
         <motion.div variants={popItem}>
-          <PrideStats bestCombo={state.bestCombo} masteredCount={masteredCount} />
+          <PrideStats bestCombo={state.bestCombo} />
         </motion.div>
 
-        {/* Extension du Pilier 2 : mêmes signaux de rétention/maîtrise, en plus détaillé.
-            Classées par densité de lecture croissante — le calendrier se lit d'un regard,
-            la maîtrise par matière demande de parcourir plusieurs lignes. */}
-        <motion.div variants={staggerItem}>
-          <ActivityCalendar days={weekActivity} />
-        </motion.div>
+        {/* Extension du Pilier 2 : seule section reliée à une vraie donnée pédagogique ET
+            actionnable (on tape, on révise) — ce qui justifie sa place ici. */}
         <motion.div variants={staggerItem}>
           <SubjectMasteryGrid subjects={subjectMastery} onSelect={handleSubjectSelect} />
         </motion.div>
@@ -253,39 +235,37 @@ const AuraHeroScene = memo(function AuraHeroScene({
   );
 });
 
-// The season-pass headline: the single next reward, framed as a short distance rather than a
-// cumulative total — "1 556 XP jusqu'à Légende" creates anticipation the way "5444 / 7000"
-// never did, and it's the one place on the page progression math actually lives.
-const NextRankCallout = memo(function NextRankCallout({ next, xp }: { next: Rank | null; xp: number }) {
-  return (
-    <div className="season-eyebrow">
-      {next ? (
-        <>
-          <span className="season-eyebrow-amount">{next.min - xp} XP</span>
-          <span className="season-eyebrow-rest"> jusqu'à {next.name}</span>
-        </>
-      ) : (
-        <span className="season-eyebrow-amount">Rang maximum atteint</span>
-      )}
-    </div>
-  );
-});
-
 // Every rank visible at once on a single always-on progress rail, season-pass style. Nothing
 // is hidden behind a tap, a swipe, or an expand — the entire ladder is legible in one glance.
+// Carries its own caption now (used to be a standalone NextRankCallout block above it) — "1 556
+// XP jusqu'à Légende" and the rail are the same story, so they're one component, not two.
 const RankRail = memo(function RankRail({
   currentRankId,
   rank,
   pct,
+  next,
+  xp,
 }: {
   currentRankId: string;
   rank: Rank;
   pct: number;
+  next: Rank | null;
+  xp: number;
 }) {
   const currentIdx = RANKS.findIndex((r) => r.id === currentRankId);
   const overallPct = ((currentIdx + pct / 100) / (RANKS.length - 1)) * 100;
   return (
     <div className="rank-rail" role="list" aria-label="Les 5 rangs">
+      <div className="rank-rail-caption">
+        {next ? (
+          <>
+            <span className="rank-rail-caption-amount">{next.min - xp} XP</span>
+            <span className="rank-rail-caption-rest"> jusqu'à {next.name}</span>
+          </>
+        ) : (
+          <span className="rank-rail-caption-amount">Rang maximum atteint</span>
+        )}
+      </div>
       <div className="rank-rail-track">
         <div className="rank-rail-line">
           <div className="rank-rail-line-fill" style={{ width: `${overallPct}%` }} />
@@ -309,17 +289,14 @@ const RankRail = memo(function RankRail({
   );
 });
 
-// Only two stats survive the cull: best combo and cards mastered — both are pure mastery/pride
-// signals that can only ever go up. "Précision" (a global accuracy %) used to sit here and got
-// cut in review: a raw percentage reads as a grade, exactly the bulletin-scolaire trap the
-// mastery grid below already had to be redesigned out of. Cards mastered is the same underlying
-// criterion as that grid, just summed into one flex number instead of split by subject. Streak
-// moved into the Hero (it's an emotional/urgency signal, not a mastery one) and the 7-day
-// heatmap is gone entirely — the streak number already says "how consistent am I" more directly
-// than a row of dots ever did, so keeping both was redundant, not reinforcing.
-const PrideStats = memo(function PrideStats({ bestCombo, masteredCount }: { bestCombo: number; masteredCount: number }) {
+// Down to one stat: best combo, the only pure-skill signal on the page (distinct from streak/
+// rank, which track time invested, and from the mastery grid, which tracks learning outcome).
+// "Précision" and then "Cartes maîtrisées" both sat here before getting cut in review — a raw
+// accuracy percentage read as a grade, and a mastered-card total just restated what the mastery
+// grid below already shows in more useful, per-subject detail. A single stat still earns a full
+// card (same chrome as before, just one child instead of two — flex:1 fills the row on its own).
+const PrideStats = memo(function PrideStats({ bestCombo }: { bestCombo: number }) {
   const animCombo = useCountUp(bestCombo);
-  const animMastered = useCountUp(masteredCount);
   return (
     <div className="pride-stats" role="list">
       <div className="pride-stat" role="listitem" aria-label={`Combo maximum : ${bestCombo}`}>
@@ -330,53 +307,6 @@ const PrideStats = memo(function PrideStats({ bestCombo, masteredCount }: { best
           <span className="pride-stat-value">×{animCombo}</span>
           <span className="pride-stat-label">Combo max</span>
         </span>
-      </div>
-      <div className="pride-stat" role="listitem" aria-label={`${masteredCount} cartes maîtrisées`}>
-        <span className="pride-stat-icon" aria-hidden="true">
-          🃏
-        </span>
-        <span className="pride-stat-text" aria-hidden="true">
-          <span className="pride-stat-value">{animMastered}</span>
-          <span className="pride-stat-label">Cartes maîtrisées</span>
-        </span>
-      </div>
-    </div>
-  );
-});
-
-// French day-of-week initials, indexed the way Date#getDay() already returns (0=Dimanche).
-const DOW_LETTERS = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
-
-// A 7-day consistency strip — same dashed/muted "not there yet" language as a locked rank
-// node, same filled/flame language as the streak badge on the Hero, so "actif" and "verrouillé"
-// read identically everywhere on the page instead of inventing a third visual vocabulary.
-const ActivityCalendar = memo(function ActivityCalendar({ days }: { days: boolean[] }) {
-  const todayDow = new Date().getDay();
-  return (
-    <div className="activity-cal">
-      <span className="aura-section-label">Cette semaine</span>
-      <div className="activity-cal-row" role="list" aria-label="Activité des 7 derniers jours">
-        {days.map((active, i) => {
-          const daysAgo = 6 - i;
-          const isToday = daysAgo === 0;
-          const dow = ((todayDow - daysAgo) % 7 + 7) % 7;
-          return (
-            <div key={i} className="activity-day" role="listitem">
-              <span
-                className={`activity-day-dot ${active ? 'is-active' : ''} ${isToday ? 'is-today' : ''}`}
-                aria-hidden="true"
-              >
-                {active ? '🔥' : ''}
-              </span>
-              <span className="activity-day-label">
-                {DOW_LETTERS[dow]}
-                <span className="sr-only">
-                  {isToday ? "aujourd'hui" : ''}, {active ? 'jour actif' : 'pas d’activité'}
-                </span>
-              </span>
-            </div>
-          );
-        })}
       </div>
     </div>
   );
@@ -463,10 +393,6 @@ function Skeleton({ width, height, radius = 8, style }: { width: string | number
   return <div className="skeleton-block" style={{ width, height, borderRadius: radius, ...style }} />;
 }
 
-function SkeletonRow({ children }: { children: ReactNode }) {
-  return <div className="skeleton-row">{children}</div>;
-}
-
 function ProfilAuraSkeleton() {
   return (
     <div className="view is-active aura-view aura-hud" aria-busy="true" aria-label="Chargement de ton Aura">
@@ -480,11 +406,7 @@ function ProfilAuraSkeleton() {
       <Skeleton width={180} height={18} radius={999} style={{ margin: '18px auto 12px' }} />
       <Skeleton width="100%" height={44} radius={999} style={{ marginBottom: 16 }} />
 
-      <SkeletonRow>
-        {Array.from({ length: 2 }).map((_, i) => (
-          <Skeleton key={i} width="100%" height={62} radius={14} style={{ flex: 1 }} />
-        ))}
-      </SkeletonRow>
+      <Skeleton width="100%" height={62} radius={14} style={{ marginBottom: 16 }} />
 
       <Skeleton width="100%" height={54} radius={999} style={{ marginTop: 16 }} />
     </div>

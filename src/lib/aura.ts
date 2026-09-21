@@ -36,22 +36,6 @@ export function getRankInfo(xp: number): { current: Rank; next: Rank | null; idx
   return { current, next, idx, pct };
 }
 
-// Reconstructs which of the last 7 calendar days were "active" purely from the two signals
-// the store actually tracks — current streak length and whether today's goal is already met.
-// There is no per-day activity log to read from (CardReview only keeps a scheduling
-// timestamp, not a review-history log), so this is a derivation from the one signal that IS
-// trustworthy, not a fabricated history: if the streak is N days and today doesn't count yet,
-// the N most recent PRIOR days must be the active run; if today already counts, today is the
-// most recent day of that same run.
-export function deriveWeekActivity(streak: number, dailyGoalMet: boolean): boolean[] {
-  return Array.from({ length: 7 }, (_, i) => {
-    const daysAgo = 6 - i; // i=0 -> 6 days ago ... i=6 -> today
-    if (daysAgo === 0) return dailyGoalMet;
-    const offset = daysAgo - (dailyGoalMet ? 0 : 1);
-    return offset >= 0 && offset < streak;
-  });
-}
-
 export type SubjectMastery = {
   id: string;
   name: string;
@@ -77,12 +61,4 @@ export function computeSubjectMastery(cardReviews: Record<string, CardReview>): 
     const pct = started ? Math.round((mastered.length / reviewed.length) * 100) : 0;
     return { id: s.id, name: s.name, emoji: s.emoji, color: s.color, pct, started };
   });
-}
-
-// The aggregate the mastery grid's own rings already imply, surfaced as one plain count — a
-// number that can only ever grow, unlike a "précision" percentage that reads as a grade. Same
-// mastered/reviewed criterion as computeSubjectMastery, just summed across every subject rather
-// than split by one.
-export function countMasteredCards(cardReviews: Record<string, CardReview>): number {
-  return Object.values(cardReviews).filter((r) => r.repetitions >= MASTERED_AT_REPETITIONS).length;
 }
