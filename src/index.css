@@ -1020,11 +1020,23 @@ select {
 }
 .badge-bridge-text {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
   text-align: left;
+}
+.badge-bridge-hint {
   font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 0.86rem;
   color: var(--ink);
+  line-height: 1.2;
+}
+.badge-bridge-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--ink-soft);
 }
 .badge-bridge-chevron {
   flex-shrink: 0;

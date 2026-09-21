@@ -1,4 +1,4 @@
-import { SUBJECTS, FLASHCARDS } from '@/data';
+import { SUBJECTS, FLASHCARDS, BADGES } from '@/data';
 import type { CardReview } from '@/types';
 
 export type Rank = {
@@ -65,4 +65,50 @@ export function computeSubjectMastery(cardReviews: Record<string, CardReview>): 
     const started = reviewed.length > 0;
     return { id: s.id, name: s.name, emoji: s.emoji, color: s.color, masteredCount: mastered.length, totalCount: subjectCardIds.length, started };
   });
+}
+
+// Total mastered cards across every subject — used by the share card as a fallback stat when
+// the streak is 0 (see ShareAuraModal): a "0 JOURS" chip on a card meant to be shared is a bad
+// look, this is a real number to show instead, never fabricated.
+export function countMasteredCards(cardReviews: Record<string, CardReview>): number {
+  return Object.values(cardReviews).filter((r) => r.repetitions >= MASTERED_AT_REPETITIONS).length;
+}
+
+export type BadgeHint = { badgeId: string; label: string };
+
+// Picks the single locked badge that's honestly closest to unlocking, so the badge bridge gives
+// a reason to act now instead of just a static count. Streak/XP thresholds are comparable as "%
+// of the way there" even though their units differ (days vs. XP), which lets a 2-day gap and a
+// 300 XP gap be ranked fairly against each other. b3 ("finis un chapitre") and b4 ("utilise un
+// gel") have no partial progress to report — surfaced only once no numeric badge is left locked,
+// and never with a fabricated remaining amount.
+export function nextBadgeHint(
+  s: { streak: number; xp: number },
+  unlocked: Record<string, boolean>
+): BadgeHint | null {
+  const cond = (id: string) => BADGES.find((b) => b.id === id)?.cond ?? '';
+  const numeric: { badgeId: string; frac: number; label: string }[] = [];
+  if (!unlocked.b1) {
+    const remaining = Math.max(1, 3 - s.streak);
+    numeric.push({ badgeId: 'b1', frac: remaining / 3, label: `Encore ${remaining} jour${remaining > 1 ? 's' : ''} → ${cond('b1')}` });
+  }
+  if (!unlocked.b5) {
+    const remaining = Math.max(1, 7 - s.streak);
+    numeric.push({ badgeId: 'b5', frac: remaining / 7, label: `Encore ${remaining} jour${remaining > 1 ? 's' : ''} → ${cond('b5')}` });
+  }
+  if (!unlocked.b2) {
+    const remaining = Math.max(1, 100 - s.xp);
+    numeric.push({ badgeId: 'b2', frac: remaining / 100, label: `Encore ${remaining} XP → ${cond('b2')}` });
+  }
+  if (!unlocked.b6) {
+    const remaining = Math.max(1, 1000 - s.xp);
+    numeric.push({ badgeId: 'b6', frac: remaining / 1000, label: `Encore ${remaining} XP → ${cond('b6')}` });
+  }
+  if (numeric.length > 0) {
+    numeric.sort((a, b) => a.frac - b.frac);
+    return { badgeId: numeric[0].badgeId, label: numeric[0].label };
+  }
+  if (!unlocked.b3) return { badgeId: 'b3', label: cond('b3') };
+  if (!unlocked.b4) return { badgeId: 'b4', label: cond('b4') };
+  return null;
 }

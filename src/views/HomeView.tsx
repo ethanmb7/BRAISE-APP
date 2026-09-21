@@ -12,7 +12,7 @@ import { TodayStrip } from '@/components/TodayStrip';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { SUBJECTS, FLASHCARDS } from '@/data';
 import { dailyPickLine, dailyHookLine, getAgeGroup } from '@/lib/braiseVoice';
-import { getRankInfo } from '@/lib/aura';
+import { getRankInfo, countMasteredCards } from '@/lib/aura';
 import type { Level, Subject, Chapter } from '@/types';
 
 // Same choreography language as Ton Aura: a calm stagger fade for each block.
@@ -152,6 +152,7 @@ export function HomeView() {
   const subjectsCount = new Set(
     Object.keys(state.cardReviews).map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)
   ).size;
+  const masteredCards = countMasteredCards(state.cardReviews);
   const rank = getRankInfo(state.xp).current;
 
   return (
@@ -258,6 +259,7 @@ export function HomeView() {
           streak={state.streak}
           xp={state.xp}
           subjectsCount={subjectsCount}
+          masteredCards={masteredCards}
           onClose={() => setShareOpen(false)}
         />
       )}

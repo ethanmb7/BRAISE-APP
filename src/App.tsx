@@ -7,7 +7,7 @@ import { RankUpCelebration } from '@/components/RankUpCelebration';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { useMilestoneCelebrations } from '@/lib/useMilestoneCelebrations';
 import { rankUpLine, getAgeGroup } from '@/lib/braiseVoice';
-import { getRankInfo } from '@/lib/aura';
+import { getRankInfo, countMasteredCards } from '@/lib/aura';
 import { FLASHCARDS } from '@/data';
 import { OnboardingView } from '@/views/OnboardingView';
 import { HomeView } from '@/views/HomeView';
@@ -102,6 +102,7 @@ function Screen() {
               Object.keys(state.cardReviews).map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)
             ).size
           }
+          masteredCards={countMasteredCards(state.cardReviews)}
           onClose={() => setShareOpen(false)}
         />
       )}

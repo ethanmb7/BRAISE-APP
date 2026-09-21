@@ -10,7 +10,16 @@ import { SubjectIcon } from '@/components/SubjectIcon';
 import { RankIcon } from '@/components/RankIcon';
 import { StreakFlameIcon } from '@/components/StreakFlameIcon';
 import { TrophyIcon } from '@/components/TrophyIcon';
-import { getRankInfo, RANKS, computeSubjectMastery, type Rank, type SubjectMastery } from '@/lib/aura';
+import {
+  getRankInfo,
+  RANKS,
+  computeSubjectMastery,
+  countMasteredCards,
+  nextBadgeHint,
+  type Rank,
+  type SubjectMastery,
+} from '@/lib/aura';
+import { BadgeIcon } from '@/components/BadgeIcon';
 import { FLASHCARDS, BADGES } from '@/data';
 
 // Diameter of the hero ring frame — the single largest element on the page, on purpose.
@@ -69,14 +78,13 @@ export function ProfilAuraView() {
     const subjectsSeen = new Set(
       reviewedIds.map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)
     );
-    return { subjectsCount: subjectsSeen.size };
+    return { subjectsCount: subjectsSeen.size, masteredCards: countMasteredCards(state.cardReviews) };
   }, [state.cardReviews]);
 
   const subjectMastery = useMemo(() => computeSubjectMastery(state.cardReviews), [state.cardReviews]);
-  const unlockedBadgeCount = useMemo(
-    () => Object.values(computeUnlockedBadges(state)).filter(Boolean).length,
-    [state]
-  );
+  const unlockedBadges = useMemo(() => computeUnlockedBadges(state), [state]);
+  const unlockedBadgeCount = useMemo(() => Object.values(unlockedBadges).filter(Boolean).length, [unlockedBadges]);
+  const badgeHint = useMemo(() => nextBadgeHint(state, unlockedBadges), [state, unlockedBadges]);
 
   const handleShareOpen = useCallback(() => {
     sfx.tap(state.soundOn);
@@ -144,7 +152,7 @@ export function ProfilAuraView() {
 
         {/* Pillar 3 — Le Flex social : le pont vers Profil, puis l'action de fin de scène. */}
         <motion.div variants={staggerItem}>
-          <BadgeBridge unlocked={unlockedBadgeCount} total={BADGES.length} onOpen={handleOpenBadges} />
+          <BadgeBridge unlocked={unlockedBadgeCount} total={BADGES.length} hint={badgeHint} onOpen={handleOpenBadges} />
         </motion.div>
         <motion.div variants={staggerItem}>
           <button className="aura-share-cta" onClick={handleShareOpen}>
@@ -162,6 +170,7 @@ export function ProfilAuraView() {
           streak={state.streak}
           xp={state.xp}
           subjectsCount={stats.subjectsCount}
+          masteredCards={stats.masteredCards}
           onClose={handleShareClose}
         />
       )}
@@ -363,26 +372,32 @@ const SubjectMasteryGrid = memo(function SubjectMasteryGrid({
   );
 });
 
-// The one bridge between Aura and Profil's own badge grid. Deliberately just a count, never
-// "ton dernier badge" — nothing in AppState timestamps when a badge unlocked, so claiming a
-// "most recent" one would be a fabricated claim, not a real one. A count is honest and still a
-// real trophy signal, and it primes the share moment right below it.
+// The one bridge between Aura and Profil's own badge grid. Never "ton dernier badge" — nothing
+// in AppState timestamps when a badge unlocked, so claiming a "most recent" one would be a
+// fabricated claim, not a real one. `hint` is the honest alternative: the single locked badge
+// closest to unlocking (see nextBadgeHint in aura.ts), computed from real streak/XP/chapter
+// state, giving a reason to act now instead of a flat count with no momentum signal.
 const BadgeBridge = memo(function BadgeBridge({
   unlocked,
   total,
+  hint,
   onOpen,
 }: {
   unlocked: number;
   total: number;
+  hint: { badgeId: string; label: string } | null;
   onOpen: () => void;
 }) {
   return (
     <button type="button" className="badge-bridge" onClick={onOpen}>
       <span className="badge-bridge-icon" aria-hidden="true">
-        <RankIcon rankId="or" color="#ffd166" size={18} />
+        {hint ? <BadgeIcon badgeId={hint.badgeId} size={18} /> : <RankIcon rankId="or" color="#ffd166" size={18} />}
       </span>
       <span className="badge-bridge-text">
-        {unlocked}/{total} badges débloqués
+        <span className="badge-bridge-hint">{hint ? hint.label : 'Tous tes badges sont débloqués !'}</span>
+        <span className="badge-bridge-sub">
+          {unlocked}/{total} badges débloqués
+        </span>
       </span>
       <ChevronRight size={18} className="badge-bridge-chevron" aria-hidden="true" />
     </button>

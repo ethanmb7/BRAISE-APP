@@ -21,12 +21,14 @@ export function ShareAuraModal({
   streak,
   xp,
   subjectsCount,
+  masteredCards,
   onClose,
 }: {
   rank: Rank;
   streak: number;
   xp: number;
   subjectsCount: number;
+  masteredCards: number;
   onClose: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -41,7 +43,7 @@ export function ShareAuraModal({
     // resolves catches that without any visible flicker — it's the same pixels, just crisper.
     document.fonts?.ready?.then(() => draw());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rank.id, streak, xp, subjectsCount]);
+  }, [rank.id, streak, xp, subjectsCount, masteredCards]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -111,12 +113,21 @@ export function ShareAuraModal({
 
     // Stat chips — same flame/bolt/book vocabulary as the rest of the app (streak flame, XP
     // bolt, subject book) instead of the generic ⭐🔥📚 platform glyphs.
+    //
+    // A "0 JOURS" chip in the middle slot of a card built to be shared reads as "this person
+    // just quit", the opposite of what a share card is for — so when the streak is 0, that slot
+    // shows mastered cards instead (a real, non-zero-looking number whenever there's anything to
+    // show at all) rather than featuring the one stat that's currently a zero.
     const chipY = panelY + 700;
     const chipGap = 28;
     const chipW = (panelW - 120 - chipGap * 2) / 3;
     const chipX0 = panelX + 60;
     statChip(ctx, chipX0, chipY, chipW, 240, '#c4b5fd', drawBoltIcon, `${xp}`, 'XP TOTAL');
-    statChip(ctx, chipX0 + chipW + chipGap, chipY, chipW, 240, '#ffd166', drawFlameIcon, `${streak}`, 'JOURS');
+    if (streak > 0) {
+      statChip(ctx, chipX0 + chipW + chipGap, chipY, chipW, 240, '#ffd166', drawFlameIcon, `${streak}`, 'JOURS');
+    } else {
+      statChip(ctx, chipX0 + chipW + chipGap, chipY, chipW, 240, '#ffd166', drawCheckIcon, `${masteredCards}`, 'CARTES SUES');
+    }
     statChip(ctx, chipX0 + (chipW + chipGap) * 2, chipY, chipW, 240, '#a7f3d0', drawBookIcon, `${subjectsCount}`, 'MATIÈRES');
 
     // CTA bar — a text/wordmark badge rather than a fake QR code: a QR that isn't wired to a
@@ -399,6 +410,24 @@ function drawBookIcon(ctx: CanvasRenderingContext2D, x: number, y: number, size:
     fillStrokePath(ctx, BOOK_SPINE_D, undefined, INK, 1.2);
     fillStrokePath(ctx, BOOK_HL_L_D, undefined, '#fff', 0.9, 0.7);
     fillStrokePath(ctx, BOOK_HL_R_D, undefined, '#fff', 0.9, 0.7);
+  });
+}
+
+// Same filled-circle-with-checkmark motif already used for a completed lesson node on a subject's
+// own path view — reused here for "cartes maîtrisées" so the share card's stand-in for the
+// streak chip (when streak is 0) still reads as an established "done" signal, not a new symbol.
+const CHECK_D = 'M7 12.5 L10.3 16 L17.5 8';
+
+function drawCheckIcon(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
+  withIconBox(ctx, x, y, size, 24, () => {
+    ctx.beginPath();
+    ctx.arc(12, 12, 10.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#4ade80';
+    ctx.fill();
+    ctx.lineWidth = 1.7;
+    ctx.strokeStyle = INK;
+    ctx.stroke();
+    fillStrokePath(ctx, CHECK_D, undefined, '#fff', 2.4);
   });
 }
 
