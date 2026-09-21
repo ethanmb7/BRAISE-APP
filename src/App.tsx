@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AppProvider, useApp } from '@/store';
 import { TabBar } from '@/components/TabBar';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BraiseMascot } from '@/components/BraiseMascot';
 import { RankUpCelebration } from '@/components/RankUpCelebration';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
@@ -44,15 +45,22 @@ function Screen() {
   return (
     <div className={`app-shell ${state.darkMode ? 'dark' : ''} ${state.dyslexiaMode ? 'dyslexia-mode' : ''}`}>
       <div className="app-content">
-        {state.view === 'onboarding' && <OnboardingView />}
-        {state.view === 'home' && <HomeView />}
-        {state.view === 'revisions' && <RevisionsView />}
-        {state.view === 'progres' && <ProfilAuraView />}
-        {state.view === 'subject' && <SubjectView />}
-        {state.view === 'lesson' && <LessonView />}
-        {state.view === 'complete' && <CompleteView />}
-        {state.view === 'profile' && <ProfileView />}
-        {state.view === 'settings' && <SettingsView />}
+        {/* `key={state.view}`: this is what makes the boundary self-healing on navigation — a
+            crash on one view sets its internal hasError, and switching to any other view (via
+            the tab bar, which lives outside this boundary and stays clickable, or the
+            fallback's own "Retour à l'accueil") changes the key, which remounts a fresh
+            boundary for wherever the player lands instead of carrying the old error forward. */}
+        <ErrorBoundary key={state.view} onGoHome={() => setTab('home')}>
+          {state.view === 'onboarding' && <OnboardingView />}
+          {state.view === 'home' && <HomeView />}
+          {state.view === 'revisions' && <RevisionsView />}
+          {state.view === 'progres' && <ProfilAuraView />}
+          {state.view === 'subject' && <SubjectView />}
+          {state.view === 'lesson' && <LessonView />}
+          {state.view === 'complete' && <CompleteView />}
+          {state.view === 'profile' && <ProfileView />}
+          {state.view === 'settings' && <SettingsView />}
+        </ErrorBoundary>
       </div>
 
       {showTabBar && <TabBar active={state.tab} onChange={setTab} />}
