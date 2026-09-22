@@ -5,6 +5,7 @@
 const SEEN_RANK_KEY = 'sapie_seen_rank';
 const SEEN_BADGES_KEY = 'sapie_seen_badges';
 const BADGE_UNLOCKED_AT_KEY = 'sapie_badge_unlocked_at';
+const INTOX_DISMISSED_COUNT_KEY = 'sapie_intox_dismissed_count';
 
 export function getSeenRank(): string | null {
   try {
@@ -69,6 +70,26 @@ export function recordBadgeUnlockedAt(badgeId: string): void {
     if (map[badgeId]) return;
     map[badgeId] = Date.now();
     localStorage.setItem(BADGE_UNLOCKED_AT_KEY, JSON.stringify(map));
+  } catch {
+    /* ignore quota errors */
+  }
+}
+
+// "Mes INTOX" (Accueil) dismissed at a given real missed-card count — not a permanent
+// "never show again": the banner reappears the moment the real count climbs past whatever was
+// dismissed, since that's a genuinely new fact (a card you hadn't missed before, missed now).
+export function getIntoxDismissedCount(): number {
+  try {
+    const raw = localStorage.getItem(INTOX_DISMISSED_COUNT_KEY);
+    return raw ? Number(raw) : 0;
+  } catch {
+    return 0;
+  }
+}
+
+export function setIntoxDismissedCount(count: number): void {
+  try {
+    localStorage.setItem(INTOX_DISMISSED_COUNT_KEY, String(count));
   } catch {
     /* ignore quota errors */
   }

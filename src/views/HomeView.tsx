@@ -14,6 +14,7 @@ import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { SUBJECTS, FLASHCARDS } from '@/data';
 import { dailyPickLine, getAgeGroup } from '@/lib/braiseVoice';
 import { getRankInfo, countMasteredCards } from '@/lib/aura';
+import { getIntoxDismissedCount, setIntoxDismissedCount } from '@/lib/celebrations';
 import type { Level, Subject, Chapter } from '@/types';
 
 // Same choreography language as Ton Aura: a calm stagger fade for each block.
@@ -31,6 +32,7 @@ export function HomeView() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [bump, setBump] = useState<'streak' | 'xp' | 'freeze' | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
+  const [intoxDismissedCount, setIntoxDismissedCountState] = useState(getIntoxDismissedCount);
   // Toggling a freeze used to be silent beyond the pill's own colour swap (cyan/amber) — no
   // confirmation that the tap actually registered or what it just did. This is the same
   // "combo-toast" pattern already used in RevisionsView (see .freeze-toast in index.css, which
@@ -109,6 +111,14 @@ export function HomeView() {
   // Real count of cards whose last swipe-judge verdict was wrong — reviewCard() writes
   // 'not-sure' on an incorrect judgment (RevisionsView), never anything invented here.
   const missedCardsCount = Object.values(state.cardReviews).filter((r) => r.lastConfidence === 'not-sure').length;
+  // Dismissing the banner hides it at the count it was dismissed at — it reappears the moment a
+  // NEW card gets missed and the real count climbs past that, not gone for good.
+  const showIntoxBanner = missedCardsCount > intoxDismissedCount;
+  const handleDismissIntox = () => {
+    sfx.tap(state.soundOn);
+    setIntoxDismissedCount(missedCardsCount);
+    setIntoxDismissedCountState(missedCardsCount);
+  };
 
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
   const bubbleLine =
@@ -209,7 +219,7 @@ export function HomeView() {
             />
           </motion.div>
 
-          {missedCardsCount > 0 && (
+          {showIntoxBanner && (
             <motion.div variants={staggerItem}>
               <MissedCardsBanner
                 count={missedCardsCount}
@@ -217,6 +227,7 @@ export function HomeView() {
                   sfx.tap(state.soundOn);
                   setTab('revisions');
                 }}
+                onDismiss={handleDismissIntox}
               />
             </motion.div>
           )}
