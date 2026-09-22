@@ -3118,6 +3118,7 @@ select {
   margin-bottom: 14px;
 }
 .profile-avatar-option {
+  position: relative;
   width: 42px;
   height: 42px;
   border-radius: 12px;
@@ -3131,6 +3132,31 @@ select {
 .profile-avatar-option.is-selected {
   background: #eff3ff;
   border-color: var(--neo-blue);
+}
+.profile-avatar-option.is-locked {
+  opacity: 0.4;
+  filter: grayscale(0.6);
+}
+.profile-avatar-option-lock {
+  /* RankIcon's locked padlock (#c7cbd4 body, dark stroke) was drawn for a light circle behind
+     it, same as the rank rail's own locked nodes — a dark badge here would swallow its dark
+     shackle stroke, so this stays light/white rather than matching the edit-badge's dark fill. */
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1.5px solid var(--neo-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.profile-avatar-unlock-hint {
+  font-size: 0.66rem;
+  color: var(--ink-soft);
+  margin: -4px 0 12px;
 }
 .profile-name-input {
   width: 100%;

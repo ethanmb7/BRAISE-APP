@@ -98,23 +98,27 @@ export function OnboardingView() {
           Choisis ton avatar
         </div>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 'auto' }}>
-          {AVATARS.map((a) => (
+          {/* Only the always-free avatars here — a brand-new account is rank Bronze by
+              definition, so every rank-gated one (see data.ts) would show locked on day one.
+              Nothing rewarding about a wall of padlocks before the app has even started; those
+              stay a real thing to discover later, from Profil. */}
+          {AVATARS.filter((a) => !a.minRankId).map((a) => (
             <button
-              key={a}
+              key={a.emoji}
               onClick={() => {
                 sfx.tap(state.soundOn);
-                setAvatar(a);
+                setAvatar(a.emoji);
               }}
               style={{
                 width: 42,
                 height: 42,
                 borderRadius: 12,
                 fontSize: '1.3rem',
-                background: avatar === a ? 'var(--blue-pale)' : 'var(--paper)',
-                border: `2px solid ${avatar === a ? 'var(--blue)' : 'var(--line)'}`,
+                background: avatar === a.emoji ? 'var(--blue-pale)' : 'var(--paper)',
+                border: `2px solid ${avatar === a.emoji ? 'var(--blue)' : 'var(--line)'}`,
               }}
             >
-              {a}
+              {a.emoji}
             </button>
           ))}
         </div>

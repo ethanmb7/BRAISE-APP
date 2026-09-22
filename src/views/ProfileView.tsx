@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Settings, ChevronRight, Check, Pencil, X, Share2 } from 'lucide-react';
 import { useApp, computeUnlockedBadges, countDoneChapters } from '@/store';
 import { sfx } from '@/lib/sound';
-import { getRankInfo, badgeRemainingLabel, countMasteredCards } from '@/lib/aura';
+import { getRankInfo, badgeRemainingLabel, countMasteredCards, RANKS } from '@/lib/aura';
 import { getAgeGroup, profileReactionLine } from '@/lib/braiseVoice';
 import { getBadgeUnlockedAtMap } from '@/lib/celebrations';
 import { TopBar } from '@/components/TopBar';
@@ -41,6 +41,15 @@ const BADGE_DOT_COLORS: Record<string, string> = {
   b3: '#818cf8',
   b4: '#7dd3fc',
 };
+
+// Same rank-index comparison RankRail already uses (ProfilAuraView.tsx) — a rank-gated avatar
+// unlocks the moment the account reaches that rank or any higher one, never re-locks later.
+function isAvatarUnlocked(minRankId: string | undefined, currentRankId: string): boolean {
+  if (!minRankId) return true;
+  const minIdx = RANKS.findIndex((r) => r.id === minRankId);
+  const currentIdx = RANKS.findIndex((r) => r.id === currentRankId);
+  return currentIdx >= minIdx;
+}
 
 function formatShortDate(ts: number): string {
   return new Date(ts).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
@@ -237,21 +246,42 @@ export function ProfileView() {
         ) : (
           <div className="profile-identity-edit">
             <div className="profile-avatar-picker">
-              {AVATARS.map((a) => (
-                <button
-                  key={a}
-                  type="button"
-                  className={`profile-avatar-option ${draftAvatar === a ? 'is-selected' : ''}`}
-                  onClick={() => {
-                    sfx.tap(state.soundOn);
-                    setDraftAvatar(a);
-                  }}
-                  aria-label={`Choisir l'avatar ${a}`}
-                >
-                  {a}
-                </button>
-              ))}
+              {AVATARS.map((a) => {
+                const unlocked = isAvatarUnlocked(a.minRankId, rank.id);
+                const requiredRank = a.minRankId ? RANKS.find((r) => r.id === a.minRankId) : null;
+                return (
+                  <button
+                    key={a.emoji}
+                    type="button"
+                    className={`profile-avatar-option ${draftAvatar === a.emoji ? 'is-selected' : ''} ${unlocked ? '' : 'is-locked'}`}
+                    onClick={() => {
+                      if (!unlocked) return;
+                      sfx.tap(state.soundOn);
+                      setDraftAvatar(a.emoji);
+                    }}
+                    disabled={!unlocked}
+                    aria-label={unlocked ? `Choisir l'avatar ${a.emoji}` : `Avatar verrouillé — débloqué au rang ${requiredRank?.name}`}
+                  >
+                    {a.emoji}
+                    {!unlocked && (
+                      <span className="profile-avatar-option-lock" aria-hidden="true">
+                        <RankIcon rankId="" color="" locked size={11} />
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
+            {(() => {
+              const nextLockedAvatar = AVATARS.find((a) => a.minRankId && !isAvatarUnlocked(a.minRankId, rank.id));
+              if (!nextLockedAvatar) return null;
+              const requiredRank = RANKS.find((r) => r.id === nextLockedAvatar.minRankId);
+              return (
+                <p className="profile-avatar-unlock-hint">
+                  {nextLockedAvatar.emoji} débloqué au rang {requiredRank?.name}
+                </p>
+              );
+            })()}
             <input
               type="text"
               className="profile-name-input"
