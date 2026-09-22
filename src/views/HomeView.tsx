@@ -7,6 +7,7 @@ import { fireConfetti } from '@/lib/confetti';
 import { LevelSheet } from '@/components/LevelSheet';
 import { HeaderHUD } from '@/components/HeaderHUD';
 import { HeroPiocheCard } from '@/components/HeroPiocheCard';
+import { MissedCardsBanner } from '@/components/MissedCardsBanner';
 import { SubjectDecks } from '@/components/SubjectDecks';
 import { TodayStrip } from '@/components/TodayStrip';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
@@ -105,6 +106,9 @@ export function HomeView() {
   const currentChapterCardCount = currentChapter
     ? FLASHCARDS.filter((c) => c.chapterId === currentChapter.id).length
     : 0;
+  // Real count of cards whose last swipe-judge verdict was wrong — reviewCard() writes
+  // 'not-sure' on an incorrect judgment (RevisionsView), never anything invented here.
+  const missedCardsCount = Object.values(state.cardReviews).filter((r) => r.lastConfidence === 'not-sure').length;
 
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
   const bubbleLine =
@@ -205,6 +209,18 @@ export function HomeView() {
             />
           </motion.div>
 
+          {missedCardsCount > 0 && (
+            <motion.div variants={staggerItem}>
+              <MissedCardsBanner
+                count={missedCardsCount}
+                onOpen={() => {
+                  sfx.tap(state.soundOn);
+                  setTab('revisions');
+                }}
+              />
+            </motion.div>
+          )}
+
           <motion.div variants={staggerItem}>
             <TodayStrip
               streak={state.streak}
@@ -212,6 +228,7 @@ export function HomeView() {
               remaining={remainingToGoal(state)}
               goalPct={computeGoalPct(state)}
               dueCount={dueCount}
+              freezes={state.freezes}
               onContinue={() => {
                 sfx.tap(state.soundOn);
                 setTab('revisions');

@@ -1,6 +1,7 @@
-import { Zap, Star } from 'lucide-react';
+import { Zap, Star, Clock, PartyPopper } from 'lucide-react';
 import { StreakFlameIcon } from '@/components/StreakFlameIcon';
 import { TrophyIcon } from '@/components/TrophyIcon';
+import { SnowflakeIcon } from '@/components/SnowflakeIcon';
 
 const WEEKDAY_LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
@@ -20,6 +21,9 @@ interface TodayStripProps {
    *  to give an honest "something real to do" once today's goal is already met, never a
    *  fabricated bonus tier. */
   dueCount: number;
+  /** Real freeze count (state.freezes) — shown here too, next to the streak it protects, not
+   *  just in the header HUD; both real, both the same number. */
+  freezes: number;
   /** Navigates to the real Réviser tab — only rendered as a button when dueCount > 0, so it's
    *  never a dead click. */
   onContinue: () => void;
@@ -44,7 +48,7 @@ interface TodayStripProps {
 // multiplier anywhere in the XP math, and a button that claims one without doing it would be a
 // worse trust break than the dead end it replaces. If dueCount is also 0, no button renders —
 // there's genuinely nothing left to do today.
-export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount, onContinue, onShare }: TodayStripProps) {
+export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount, freezes, onContinue, onShare }: TodayStripProps) {
   const isEvening = new Date().getHours() >= 19;
   const atRisk = remaining > 0 && isEvening;
   const goalMet = remaining <= 0;
@@ -65,57 +69,78 @@ export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount,
   // state (goal not yet met, or met but still with due cards to review) keeps the full card.
   const allDone = goalMet && dueCount === 0;
 
-  const coaching = atRisk
-    ? `⏰ Encore ${remaining} carte${remaining > 1 ? 's' : ''} ce soir pour garder ta série !`
+  const coachingText = atRisk
+    ? `Encore ${remaining} carte${remaining > 1 ? 's' : ''} ce soir pour garder ta série !`
     : remaining > 0
       ? `Plus que ${remaining} carte${remaining > 1 ? 's' : ''} pour valider ta Braise !`
-      : 'Objectif du jour dans la poche ! 🎉';
+      : 'Objectif du jour dans la poche !';
 
   return (
-    <div
-      className={`relative rounded-2xl border-[2.5px] border-black bg-amber-400 shadow-[3px_3px_0px_0px_#000] ${allDone ? 'p-3' : 'p-4'}`}
-    >
+    <div className={`relative rounded-2xl border-[2.5px] border-black bg-white shadow-[3px_3px_0px_0px_#000] ${allDone ? 'p-3' : 'p-4'}`}>
       <div>
-        {/* text-lg, not text-base: this counter is the app's central retention lever, it
-            shouldn't render smaller than a deck card's subject name or the HUD's own numbers. */}
-        <b className="flex items-center gap-1.5 font-display text-lg font-black leading-tight text-black">
-          Ta série : {streak} jour{streak > 1 ? 's' : ''} !
-          <StreakFlameIcon size={18} />
-        </b>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-3">
+            <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border-2 border-black bg-[#FF6B35]">
+              <StreakFlameIcon size={20} />
+            </span>
+            <div>
+              {/* text-xl, not text-lg: this counter is the app's central retention lever, it
+                  shouldn't render smaller than a deck card's subject name or the HUD's own
+                  numbers. */}
+              <b className="block font-display text-xl font-black leading-tight text-black">
+                {streak} jour{streak > 1 ? 's' : ''}
+              </b>
+              <span className="text-xs font-bold text-black/50">de série en cours</span>
+            </div>
+          </div>
+          {/* Real freeze count — same value the header HUD already shows, next to the streak it
+              protects this time, not duplicated data. */}
+          <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full border-2 border-black bg-blue-600 px-2.5 py-1 text-sm font-black text-white">
+            <SnowflakeIcon size={14} />
+            {freezes}
+          </span>
+        </div>
 
-        {/* Rounded squares, not circles — and today's cell is a solid fill, not a white-and-
-            outline treatment like every other cell: the one real state the reference photo
-            actually showed (today, goal already met) reads as filled and distinct from the rest
-            of the row. The photo's own card was white, so it could fill that cell amber; this
-            card already IS amber-400 — filling the cell the same colour would make it invisible
-            (verified: 1.0:1, i.e. no contrast at all), so the fill is the app's dark ink instead,
-            which pops against amber-400 at 10.6:1 either way. */}
-        <div className="mt-2.5 flex justify-between gap-1">
+        {/* One bordered box per day (letter + marker both inside), not a letter floating below
+            a separate icon circle. Today's cell and any already-banked day both get a solid
+            fill distinct from the plain white/grey "nothing yet" cells — green for a day already
+            behind you, amber for today. White text needed real darkening to stay legible:
+            emerald-500 measured 2.5:1 for white text, emerald-700 clears it at 5.5:1. */}
+        <div className="mt-3 flex justify-between gap-1">
           {weekCells.map((cell, i) => (
-            <div key={i} className="flex flex-col items-center gap-1">
+            <div
+              key={i}
+              className={`flex h-[60px] flex-1 flex-col items-center justify-between rounded-xl border-2 py-1.5 ${
+                cell.kind === 'done-past'
+                  ? 'border-black bg-emerald-700'
+                  : cell.kind === 'done-today'
+                    ? 'border-black bg-amber-400'
+                    : cell.kind === 'pending-today'
+                      ? 'border-dashed border-black/40 bg-white'
+                      : 'border-black/25 bg-white'
+              }`}
+            >
               <span
-                className={`flex h-8 w-8 items-center justify-center rounded-lg border-2 border-black ${
-                  cell.kind === 'done-past'
-                    ? 'bg-white'
-                    : cell.kind === 'done-today'
-                      ? 'bg-[#151821]'
-                      : cell.kind === 'pending-today'
-                        ? 'border-dashed bg-white/50'
-                        : 'border-black/25 bg-white/50'
+                className={`text-[0.68rem] font-black ${
+                  cell.kind === 'done-past' ? 'text-white' : cell.kind === 'done-today' ? 'text-black' : 'text-black/40'
                 }`}
               >
-                {cell.kind === 'done-past' && <StreakFlameIcon size={13} />}
-                {cell.kind === 'done-today' && <Star size={13} fill="#FDC800" color="#FDC800" />}
-                {(cell.kind === 'pending-today' || cell.kind === 'empty') && (
-                  <span className="h-1 w-1 rounded-full bg-black/30" aria-hidden="true" />
-                )}
+                {cell.letter}
               </span>
-              <span className="text-[0.62rem] font-bold text-black/60">{cell.letter}</span>
+              {cell.kind === 'done-past' && <StreakFlameIcon size={14} />}
+              {cell.kind === 'done-today' && <Star size={14} fill="#151821" color="#151821" />}
+              {(cell.kind === 'pending-today' || cell.kind === 'empty') && (
+                <span className="h-1 w-1 rounded-full bg-black/25" aria-hidden="true" />
+              )}
             </div>
           ))}
         </div>
 
-        <p className="mt-2 text-sm font-bold text-black/80">{coaching}</p>
+        <p className="mt-3 flex items-center gap-1.5 text-sm font-bold text-black/70">
+          {atRisk && <Clock size={15} className="flex-shrink-0" />}
+          {!atRisk && remaining <= 0 && <PartyPopper size={15} className="flex-shrink-0" />}
+          {coachingText}
+        </p>
       </div>
 
       {!allDone && (
