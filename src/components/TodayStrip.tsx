@@ -98,8 +98,10 @@ export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount,
             </div>
           </div>
           {/* Real freeze count — same value the header HUD already shows, next to the streak it
-              protects this time, not duplicated data. */}
-          <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full border-2 border-black bg-blue-600 px-2.5 py-1 text-sm font-black text-white shadow-[2px_2px_0px_0px_#000]">
+              protects this time, not duplicated data. Colour matches HeaderHUD's own freeze pill
+              exactly (cyan-400 face, dark text) rather than an unrelated blue this app never
+              actually uses for "gel" anywhere else. */}
+          <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full border-2 border-black bg-cyan-400 px-2.5 py-1 text-sm font-black text-[#151821] shadow-[2px_2px_0px_0px_#000]">
             <SnowflakeIcon size={14} />
             {freezes}
           </span>
