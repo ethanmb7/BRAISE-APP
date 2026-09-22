@@ -308,6 +308,68 @@ export function strongSubjectLine(ctx: VoiceCtx, subjectName: string, masteredCo
   });
 }
 
+// BraiseRecap (Réviser's end-of-session screen) was the one real gap found when auditing where
+// the tone system should apply but didn't: every line on it was hardcoded, completely ignoring
+// personality/age, even though the session leading up to it (quizCorrect/quizWrong/verdictTag)
+// is fully tone-branched — the one screen every Réviser session actually ends on suddenly went
+// generic right at the payoff moment.
+
+/** BraiseRecap's "cards" slide — reacts to whether the session was flawless (0 wrong) or not. */
+export function recapCardsLine(ctx: VoiceCtx, wrongCount: number): string {
+  if (wrongCount === 0) {
+    return byCombo(ctx, {
+      'chill-college': ['Sans-faute, direct !', 'Zéro erreur, trop fort.'],
+      'chill-lycee': ['Sans-faute. Du solide.', 'Zéro erreur, bien joué.'],
+      'savage-college': ['Sans-faute ? Ok là je suis bluffé.', 'Zéro erreur. Suspect, mais bravo.'],
+      'savage-lycee': ['Sans-faute. Le bac peut trembler.', "Zéro erreur, même moi j'avoue."],
+    });
+  }
+  return byCombo(ctx, {
+    'chill-college': ['Pas grave, on progresse.', 'Ça arrive à tout le monde, continue.'],
+    'chill-lycee': ["Pas de souci, c'est comme ça qu'on apprend.", 'Ça arrive, on garde le rythme.'],
+    'savage-college': ["Bon, personne n'est parfait. Sauf moi.", 'Quelques loupés, on efface et on repart.'],
+    'savage-lycee': ["Y'a du déchet, mais on avance.", "Pas parfait, mais t'as pas lâché."],
+  });
+}
+
+/** BraiseRecap's "combo" slide — reacts to the real max combo streak that session. */
+export function recapComboLine(ctx: VoiceCtx, maxCombo: number): string {
+  if (maxCombo >= 4) {
+    return byCombo(ctx, {
+      'chill-college': ['INARRÊTABLE.', 'T\'ÉTAIS EN FEU.'],
+      'chill-lycee': ['INARRÊTABLE.', 'DU LOURD.'],
+      'savage-college': ['OK LÀ J\'AVOUE.', 'MÊME MOI J\'AI EU PEUR.'],
+      'savage-lycee': ['LE BAC A TREMBLÉ.', 'INARRÊTABLE, ÇA FAIT PEUR.'],
+    });
+  }
+  return byCombo(ctx, {
+    'chill-college': ['EN FEU.', 'BEAU RYTHME.'],
+    'chill-lycee': ['EN FEU.', 'SOLIDE ENCHAÎNEMENT.'],
+    'savage-college': ['PAS MAL.', 'ÇA VA, ÇA VA.'],
+    'savage-lycee': ['CORRECT.', 'ON A VU MIEUX, ON A VU PIRE.'],
+  });
+}
+
+/** BraiseRecap's final trophy card — title + closing line. "Série", not "streak": the rest of
+ *  the app (TodayStrip, Profil) never uses the English loanword, this line shouldn't be the one
+ *  exception. */
+export function recapTrophyLine(ctx: VoiceCtx): { title: string; sub: string } {
+  return {
+    title: byCombo(ctx, {
+      'chill-college': ["C'EST DANS LA POCHE.", 'SESSION VALIDÉE.'],
+      'chill-lycee': ["C'EST DANS LA POCHE.", 'SESSION BOUCLÉE.'],
+      'savage-college': ["BON, C'EST FAIT.", "VOILÀ, C'EST RÉGLÉ."],
+      'savage-lycee': ["C'EST PLIÉ.", 'ENCORE UNE DE FAITE.'],
+    }),
+    sub: byCombo(ctx, {
+      'chill-college': ["Reviens demain, ta série t'attend.", 'À demain pour la suite !'],
+      'chill-lycee': ["Reviens demain, ta série t'attend.", 'Rendez-vous demain pour continuer.'],
+      'savage-college': ['Demain, même heure. Je compte les jours.', 'Reviens demain, sinon je le saurai.'],
+      'savage-lycee': ['Demain, sans excuse.', 'Reviens demain — ta série te surveille.'],
+    }),
+  };
+}
+
 /** Extra instructions appended to the Mistral system prompt so free-text chat matches the chosen tone. */
 export function toneSystemPrompt(ctx: VoiceCtx): string {
   const ageLine =

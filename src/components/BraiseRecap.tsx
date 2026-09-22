@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import { BraiseMascot } from '@/components/BraiseMascot';
 import { useApp } from '@/store';
 import { sfx } from '@/lib/sound';
+import { getAgeGroup, recapCardsLine, recapComboLine, recapTrophyLine } from '@/lib/braiseVoice';
 
 type Slide =
   | { key: 'cards'; bg: 'ink'; title: string; sub: string }
@@ -31,26 +32,35 @@ export function BraiseRecap({
   onRestart: () => void;
   onGoHome: () => void;
 }) {
+  const { state } = useApp();
+  // Same tone system every other Braise line in the app already uses — this screen was the one
+  // real gap found auditing where it should apply but didn't (see the comment on recapCardsLine
+  // in braiseVoice.ts).
+  const voiceCtx = useMemo(
+    () => ({ personality: state.user.personality, age: getAgeGroup(state.user.level) }),
+    [state.user.personality, state.user.level]
+  );
+  const trophy = useMemo(() => recapTrophyLine(voiceCtx), [voiceCtx]);
+
   const slides: Slide[] = [
     {
       key: 'cards',
       bg: 'ink',
       title: `${reviewed} CARTE${reviewed > 1 ? 'S' : ''}. ${wrongCount === 0 ? '0 ERREUR.' : `${wrongCount} ERREUR${wrongCount > 1 ? 'S' : ''}.`}`,
-      sub: wrongCount === 0 ? 'Sans-faute. Direct.' : 'Pas grave, on progresse.',
+      sub: recapCardsLine(voiceCtx, wrongCount),
     },
     ...(maxCombo >= 2
       ? ([{
           key: 'combo',
           bg: 'orange',
           title: `COMBO ×${maxCombo}`,
-          sub: maxCombo >= 4 ? 'INARRÊTABLE.' : 'EN FEU.',
+          sub: recapComboLine(voiceCtx, maxCombo),
         }] as Slide[])
       : []),
     { key: 'xp', bg: 'mint', xpTarget: xpEarned },
     { key: 'cta', bg: 'paper' },
   ];
 
-  const { state } = useApp();
   const [i, setI] = useState(0);
   const slide = slides[i];
   const isLast = i === slides.length - 1;
@@ -112,8 +122,8 @@ export function BraiseRecap({
               <X size={18} />
             </button>
             <BraiseMascot size={104} mood="cool" className="recap-trophy-mascot" />
-            <div className="recap-title on-light">C'EST DANS LA POCHE.</div>
-            <div className="recap-sub on-light">Reviens demain, ta streak t'attend.</div>
+            <div className="recap-title on-light">{trophy.title}</div>
+            <div className="recap-sub on-light">{trophy.sub}</div>
             <div className="recap-stat-row">
               <div className="recap-stat-chip">
                 <span className="recap-stat-icon">⭐</span>
