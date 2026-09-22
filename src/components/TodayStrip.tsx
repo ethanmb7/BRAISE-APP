@@ -110,11 +110,14 @@ export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount,
             fill distinct from the plain white/grey "nothing yet" cells — green for a day already
             behind you, amber for today. White text needed real darkening to stay legible:
             emerald-500 measured 2.5:1 for white text, emerald-700 clears it at 5.5:1. */}
+        {/* Height was 60px, noticeably taller than wide at real phone widths (~45px cells on a
+            375px screen) — blockier than the reference's near-square cells. 46px brings it back
+            close to square there. */}
         <div className="mt-3 flex justify-between gap-1">
           {weekCells.map((cell, i) => (
             <div
               key={i}
-              className={`flex h-[60px] flex-1 flex-col items-center justify-between rounded-xl border-2 py-1.5 ${
+              className={`flex h-[46px] flex-1 flex-col items-center justify-between rounded-lg border-2 py-1 ${
                 cell.kind === 'done-past'
                   ? 'border-black bg-emerald-700'
                   : cell.kind === 'done-today'
@@ -125,14 +128,14 @@ export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount,
               }`}
             >
               <span
-                className={`text-[0.68rem] font-black ${
+                className={`text-[0.6rem] font-black ${
                   cell.kind === 'done-past' ? 'text-white' : cell.kind === 'done-today' ? 'text-black' : 'text-black/40'
                 }`}
               >
                 {cell.letter}
               </span>
-              {cell.kind === 'done-past' && <StreakFlameIcon size={14} />}
-              {cell.kind === 'done-today' && <Star size={14} fill="#151821" color="#151821" />}
+              {cell.kind === 'done-past' && <StreakFlameIcon size={11} />}
+              {cell.kind === 'done-today' && <Star size={11} fill="#151821" color="#151821" />}
               {(cell.kind === 'pending-today' || cell.kind === 'empty') && (
                 <span className="h-1 w-1 rounded-full bg-black/25" aria-hidden="true" />
               )}
