@@ -56,6 +56,10 @@ export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount,
   // than that, so a streak longer than "days so far this week" just runs off the start of the
   // strip instead of guessing at a previous week). `streak` counts days BEFORE today (see prop
   // doc); today's own cell reads `dailyGoalMet` directly rather than being folded into the count.
+  // A reference version of this logic marked every day before today as "done" whenever streak >
+  // 0, regardless of the real streak length — a streak of 1 on a Friday would show four false
+  // "done" days. Kept the real count-based version instead: a day only lights up if it's
+  // actually inside the real streak.
   const todayIdx = (new Date().getDay() + 6) % 7;
   const weekCells = WEEKDAY_LETTERS.map((letter, i) => {
     const offset = todayIdx - i;
@@ -80,8 +84,8 @@ export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount,
       <div>
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border-2 border-black bg-[#FF6B35]">
-              <StreakFlameIcon size={20} />
+            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border-[3px] border-black bg-[#FF6B35] shadow-[2px_2px_0px_0px_#000]">
+              <StreakFlameIcon size={17} />
             </span>
             <div>
               {/* text-xl, not text-lg: this counter is the app's central retention lever, it
@@ -95,7 +99,7 @@ export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount,
           </div>
           {/* Real freeze count — same value the header HUD already shows, next to the streak it
               protects this time, not duplicated data. */}
-          <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full border-2 border-black bg-blue-600 px-2.5 py-1 text-sm font-black text-white">
+          <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full border-2 border-black bg-blue-600 px-2.5 py-1 text-sm font-black text-white shadow-[2px_2px_0px_0px_#000]">
             <SnowflakeIcon size={14} />
             {freezes}
           </span>
