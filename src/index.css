@@ -3445,6 +3445,25 @@ select {
 .braise-mascot .braise-smile {
   transform-origin: 50% 55%;
 }
+/* A real, considered addition, not just "make it move" — inspired by Duolingo's Duo, whose idle
+   state reads as alive specifically because of small, irregular eye movement (blinking), not
+   because the whole body bounces. The existing mood system already moves the body/flame (float,
+   wobble, proud bounce...); nothing ever touched the eyes outside the one sleepy-droop case. This
+   blink runs underneath every mood as its own base layer — quick and infrequent (a ~250ms close
+   once every ~4.2s, eyes open the rest of the time), the same rhythm a real blink has: present,
+   but never the thing you consciously notice. `.mood-sleepy .braise-eyes` is more specific and
+   correctly overrides this — a slow droop is that mood's own real eye behaviour, it shouldn't
+   also blink on top of it. `mood="cool"` never renders the eyes group at all, so nothing to
+   conflict with there either. 4.2s (not the 2.8s/1.4s/4s other moods already use) is deliberate:
+   a period that doesn't line up with the body's own float/bounce cycle reads as a natural,
+   independent motion instead of everything pulsing in the same lockstep. */
+.braise-mascot .braise-eyes {
+  animation: braiseBlink 4.2s ease-in-out infinite;
+}
+@keyframes braiseBlink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.08); }
+}
 
 /* Happy: gentle float + flicker */
 .mood-happy {

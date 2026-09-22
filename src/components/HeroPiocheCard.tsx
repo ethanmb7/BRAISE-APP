@@ -38,29 +38,25 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
   };
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border-[2.5px] border-black bg-[color-mix(in_srgb,var(--neo-orange)_80%,#000)] p-4 shadow-[3px_3px_0px_0px_#000]">
+    <div className="relative overflow-hidden rounded-2xl border-[2.5px] border-black bg-[#FF6B35] p-4 shadow-[3px_3px_0px_0px_#000]">
       <div aria-hidden="true" className="pointer-events-none absolute -right-6 -top-6 h-16 w-16 rounded-full bg-[#FDC800]" />
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 rounded-2xl"
-        style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.08) 0px, rgba(255,255,255,0) 20px)' }}
+        style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0) 20px)' }}
       />
 
       <div className="relative flex items-center gap-3">
         <div className="h-14 w-14 flex-shrink-0">
-          <BraiseMascot size={56} mood="happy" />
+          <BraiseMascot size={56} mood="proud" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-[0.7rem] font-black uppercase tracking-wide text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]">
-            Pioche du jour
-          </p>
-          <h2 className="truncate font-display text-lg font-black leading-tight text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]">
-            {chapterTitle}
-          </h2>
-          {/* Full-opacity white, not white/90: this exact card background already measured
-              white/90 at 4.40:1 here — under the 4.5:1 floor for normal text, the same class of
-              failure this component's own history already found once on white/75. */}
-          <p className="mt-1 truncate text-[0.78rem] font-semibold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]">
+          {/* Dark ink, not white — #FF6B35 is light enough that white measures 2.84:1 here (a
+              hard AA failure), while dark ink measures 6.25:1. No text-shadow either: that was
+              compensating for low contrast on the old darker card, this one doesn't need it. */}
+          <p className="text-[0.7rem] font-black uppercase tracking-wide text-[#151821]">Pioche du jour</p>
+          <h2 className="truncate font-display text-lg font-black leading-tight text-[#151821]">{chapterTitle}</h2>
+          <p className="mt-1 truncate text-[0.78rem] font-semibold text-[#151821]">
             {duration} min · {cardCount} carte{cardCount > 1 ? 's' : ''}
             {subjectName ? ` · ${subjectName}` : ''}
           </p>
