@@ -74,6 +74,57 @@ export function countMasteredCards(cardReviews: Record<string, CardReview>): num
   return Object.values(cardReviews).filter((r) => r.repetitions >= MASTERED_AT_REPETITIONS).length;
 }
 
+export type BraiseInsight =
+  | { kind: 'struggling'; topic: string; subjectName: string; repetitions: number }
+  | { kind: 'strong-subject'; subjectName: string; subjectEmoji: string; masteredCount: number; totalCount: number };
+
+// "Attempted at least twice and still not confident" — one pass isn't friction, it's just the
+// first time you've seen it. Two-plus real attempts without landing on "sûre" is a genuine
+// pattern, not noise.
+const STRUGGLE_MIN_REPETITIONS = 2;
+// A subject needs a real deck size before "half mastered" means anything — mastering 1/1 card
+// isn't a signal worth naming.
+const STRONG_SUBJECT_MIN_CARDS = 3;
+const STRONG_SUBJECT_MIN_RATIO = 0.5;
+
+// "Ce que Braise a remarqué" (Aura) — one real, specific observation mined from the student's own
+// review history (Réviser's actual SM-2 state: repetitions, lastConfidence), never a templated
+// line with invented numbers. Struggling takes priority over a strength: noticing real friction
+// and offering to help is closer to what a pote would actually open with than a compliment.
+// Returns null — rendered as nothing, not a placeholder nudge — when there isn't yet enough real
+// signal to say anything true and specific (a brand-new account, too few reviews). No third
+// "reviews better in the evening"-style insight exists here on purpose: AppState has no per-review
+// timestamp history, only cardReviews' current SM-2 snapshot and a single `nextReviewAt`, so a
+// time-of-day claim would have to be invented rather than computed.
+export function computeBraiseInsight(cardReviews: Record<string, CardReview>): BraiseInsight | null {
+  let worst: { topic: string; subjectName: string; repetitions: number } | null = null;
+  for (const card of FLASHCARDS) {
+    const review = cardReviews[card.id];
+    if (!review || review.lastConfidence === 'sure' || review.repetitions < STRUGGLE_MIN_REPETITIONS) continue;
+    if (!worst || review.repetitions > worst.repetitions) {
+      const subjectName = SUBJECTS.find((s) => s.id === card.subject)?.name ?? card.subject;
+      worst = { topic: card.topic, subjectName, repetitions: review.repetitions };
+    }
+  }
+  if (worst) return { kind: 'struggling', ...worst };
+
+  let best: SubjectMastery | null = null;
+  let bestRatio = 0;
+  for (const s of computeSubjectMastery(cardReviews)) {
+    if (s.totalCount < STRONG_SUBJECT_MIN_CARDS) continue;
+    const ratio = s.masteredCount / s.totalCount;
+    if (ratio >= STRONG_SUBJECT_MIN_RATIO && ratio > bestRatio) {
+      best = s;
+      bestRatio = ratio;
+    }
+  }
+  if (best) {
+    return { kind: 'strong-subject', subjectName: best.name, subjectEmoji: best.emoji, masteredCount: best.masteredCount, totalCount: best.totalCount };
+  }
+
+  return null;
+}
+
 export type BadgeHint = { badgeId: string; label: string };
 
 // The 4 numeric badges' real thresholds, in the order nextBadgeHint has always checked them —

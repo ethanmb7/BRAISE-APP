@@ -16,10 +16,13 @@ import {
   RANKS,
   computeSubjectMastery,
   countMasteredCards,
+  computeBraiseInsight,
   nextBadgeHint,
   type Rank,
   type SubjectMastery,
+  type BraiseInsight,
 } from '@/lib/aura';
+import { getAgeGroup, progressAdvice, strongSubjectLine } from '@/lib/braiseVoice';
 import { BadgeIcon } from '@/components/BadgeIcon';
 import { FLASHCARDS, BADGES } from '@/data';
 
@@ -55,6 +58,19 @@ export function ProfilAuraView() {
     );
     return { subjectsCount: subjectsSeen.size, masteredCards: countMasteredCards(state.cardReviews) };
   }, [state.cardReviews]);
+
+  // "Ce que Braise a remarqué" — real observation mined from Réviser's own SM-2 state
+  // (computeBraiseInsight), phrased through the existing tone system so it matches every other
+  // Braise line in the app instead of inventing new copy. null (too little real history yet)
+  // renders nothing — see BraiseInsightCard below.
+  const insight = useMemo(() => computeBraiseInsight(state.cardReviews), [state.cardReviews]);
+  const insightLine = useMemo(() => {
+    if (!insight) return null;
+    const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
+    return insight.kind === 'struggling'
+      ? progressAdvice(voiceCtx, insight.subjectName, insight.topic)
+      : strongSubjectLine(voiceCtx, insight.subjectName, insight.masteredCount, insight.totalCount);
+  }, [insight, state.user.personality, state.user.level]);
 
   const subjectMastery = useMemo(() => computeSubjectMastery(state.cardReviews), [state.cardReviews]);
   const unlockedBadges = useMemo(() => computeUnlockedBadges(state), [state]);
@@ -118,6 +134,17 @@ export function ProfilAuraView() {
         <motion.div variants={staggerItem}>
           <RankRail currentRankId={current.id} rank={current} pct={pct} next={next} xp={state.xp} />
         </motion.div>
+
+        {/* "Ce que Braise a remarqué" juste avant la grille qu'elle commente (jamais avant le rail
+            de rang, qui parle d'XP — un sujet différent) : l'observation et la preuve qui la
+            soutient doivent rester voisines, pas séparées par un bloc sans rapport. Ne s'affiche
+            pas du tout tant qu'il n'y a pas de vraie observation à faire (voir insight/insightLine
+            plus haut) plutôt qu'une relance vide. */}
+        {insight && insightLine && (
+          <motion.div variants={staggerItem}>
+            <BraiseInsightCard insight={insight} line={insightLine} />
+          </motion.div>
+        )}
 
         {/* Extension du Pilier 2 : seule section reliée à une vraie donnée pédagogique ET
             actionnable (on tape, on révise) — ce qui justifie sa place ici. */}
@@ -222,6 +249,26 @@ const AuraHeroScene = memo(function AuraHeroScene({
         </div>
       </div>
       <span className="aura-hero-rankname">{rank.name.toUpperCase()}</span>
+    </div>
+  );
+});
+
+// "Ce que Braise a remarqué" — one real, specific observation (never a template with invented
+// numbers, see computeBraiseInsight in aura.ts), in the same voice system every other Braise line
+// in the app already uses. `hesitant` for a real weak point (the same mood the mascot already
+// wears for "not sure yet" moments elsewhere) reads as genuine concern, not a scolding; `proud`
+// for a real strength is the same mood the rank-up celebration uses. Never rendered when there's
+// nothing true yet to say — the caller (ProfilAuraView) only mounts this when insight is non-null.
+const BraiseInsightCard = memo(function BraiseInsightCard({ insight, line }: { insight: BraiseInsight; line: string }) {
+  return (
+    <div className="braise-insight">
+      <span className="braise-insight-tab">Ce que Braise a remarqué</span>
+      <div className="braise-insight-body">
+        <div className="braise-insight-mascot" aria-hidden="true">
+          <BraiseMascot size={44} mood={insight.kind === 'struggling' ? 'hesitant' : 'proud'} />
+        </div>
+        <p className="braise-insight-line">{line}</p>
+      </div>
     </div>
   );
 });

@@ -295,6 +295,19 @@ export function progressAdvice(ctx: VoiceCtx, weakSubject?: string, weakTopic?: 
   });
 }
 
+/** "Ce que Braise a remarqué" (Ton Aura) — the positive counterpart to progressAdvice's weak-point
+ *  branch, only ever called with a real subject the student has actually mastered at least half of
+ *  (see computeBraiseInsight in aura.ts) — never a generic "bravo", always the real subject name
+ *  and the real "X/Y cartes" count. */
+export function strongSubjectLine(ctx: VoiceCtx, subjectName: string, masteredCount: number, totalCount: number): string {
+  return byCombo(ctx, {
+    'chill-college': [`En ${subjectName}, t'es solide : ${masteredCount}/${totalCount} cartes maîtrisées. Ça se voit que ça rentre.`],
+    'chill-lycee': [`${subjectName} : ${masteredCount}/${totalCount} cartes maîtrisées. Cette matière-là, tu la tiens.`],
+    'savage-college': [`${masteredCount}/${totalCount} cartes maîtrisées en ${subjectName}. Ok, là je suis obligé d'admettre que tu gères.`],
+    'savage-lycee': [`${subjectName}, ${masteredCount}/${totalCount} cartes. C'est le genre de matière où tu peux plus jouer la modestie.`],
+  });
+}
+
 /** Extra instructions appended to the Mistral system prompt so free-text chat matches the chosen tone. */
 export function toneSystemPrompt(ctx: VoiceCtx): string {
   const ageLine =
