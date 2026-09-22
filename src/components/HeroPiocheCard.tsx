@@ -1,9 +1,11 @@
-import { Play } from 'lucide-react';
+import { Play, Clock, Layers } from 'lucide-react';
 import { StreakFlameIcon } from '@/components/StreakFlameIcon';
+import { BraiseMascot } from '@/components/BraiseMascot';
 
 interface HeroPiocheCardProps {
   /** Short, visible hookline (from `dailyHookLine()`) — carries the real personality/age tone;
-   *  never repeats chapterTitle/subjectName since those already have their own slots below. */
+   *  now a caption under the title rather than the top label, so the real Braise voice survives
+   *  the redesign instead of being displaced by the static "PIOCHE DU JOUR" section tag. */
   hookLine: string;
   /** Fuller sentence (from `dailyPickLine()`) announced to screen readers only — folds the
    *  hookline, chapter and subject into one flowing sentence instead of three separate DOM
@@ -11,39 +13,43 @@ interface HeroPiocheCardProps {
   bubbleLine: string;
   subjectName?: string;
   chapterTitle: string;
+  /** The real chapter's own `duration` field (data.ts) — minutes, never a guessed number. */
+  duration: number;
+  /** Real count of FLASHCARDS tagged with this chapter's id — not a fixed session size; every
+   *  chapter has its own real deck. */
+  cardCount: number;
   onStart: () => void;
 }
 
-// Fifth pass on the validated base (indigo card, amber CTA, top-right mascot):
-//
-// - The blurred glow behind the mascot (two soft radial layers) got flagged twice now as a
-//   smudge against the page's light grey background, even after being shrunk to the mascot's
-//   own footprint — a blur-based glow on a light backdrop just doesn't read as "light source"
-//   the way it does on a dark card. Dropped entirely. The vector `drop-shadow` filter that
-//   replaced it got dropped too — its offset silhouette traced the flame's own teardrop shape,
-//   reading as an unwanted dark halo rather than depth. The mascot's own 2.5px SVG stroke is
-//   the only outline now; it floats and breaks out over the card's top border on its own.
-// - Card keeps its flat, uniform #5865F2 (a dark gradient there was a separate bug fixed a few
-//   passes ago) — "gloss" is a thin inset highlight layered into the box-shadow, not a bg change.
-// - Every animated layer (CTA idle pulse, mascot hover react) lives on its own wrapper element,
-//   never stacked with Tailwind's `active:`/`group-hover:` transform utilities on the SAME
-//   node — that conflict (a CSS `animation` silently overwriting a utility's `transform` every
-//   frame) already bit the mascot once this session.
-// - Trimmed to essentials: the reinforce tag, the XP capsule and the "Fast Session" pill all
-//   competed for attention with the one thing that matters — starting. "Je pioche !" keeps the
-//   real draw mechanic (HomeView seeds a daily pick) in three words instead of four.
-// - Hierarchy between the hookline and the title comes from weight (font-semibold vs
-//   font-black), not opacity: white text on #5865F2 already sits at 4.61:1, the floor for normal
-//   text — dropping the hookline to white/75 measured at 3.32:1, a real AA failure, not a
-//   stylistic nuance. Full-opacity white stays the only safe choice on this background.
-// - The top sheen is a hard-stopped gradient (0 to transparent by 20px), not a soft half-card
-//   wash — it reads as a beveled edge catching light without reaching down into the padding box
-//   where the text sits, so it can't erode the contrast margin that's already tight.
+// Sixth pass — rebuilt around a reference the user supplied directly (first a photo, then the
+// actual component source that produced it), redone on real data rather than copied verbatim:
+// - The reference's STATS array was hardcoded — "2 min · 10 cartes · +50 XP" for every session,
+//   every chapter. Neither "10 cartes" nor "+50 XP" exists in this app's data model as a
+//   constant: every chapter has its own real flashcard count (FLASHCARDS filtered by chapterId),
+//   and there is no fixed per-session XP reward (base 15/card in Réviser, doubled by the joker —
+//   never a flat number promised before answering a single card). Real duration + real card
+//   count stay, styled as the reference's bordered white pills; the XP stat is dropped rather
+//   than invented.
+// - Title/subtitle: the reference used static marketing copy ("Ta session express" / "Révise
+//   maintenant, gagne le jackpot XP.") for every single chapter. Kept the real chapterTitle as
+//   the headline instead — it already tells you exactly what you're about to study, which a
+//   generic line can't — with the real personalised hookLine (dailyHookLine, personality+age
+//   aware) as the caption under it, not discarded for generic copy.
+// - Card background moved from flat indigo (#5865F2) to the app's own real orange —
+//   color-mix(neo-orange 80%, #000), the exact same darken-by-20% already used on .profile-tag
+//   elsewhere: white text on raw --neo-orange measures 3.44:1 (a real AA failure at normal size),
+//   this same fix clears it to 5.1:1.
+// - The floating mascot is back (the reference brought it back too, large, overlapping the top
+//   edge) but as the real BraiseMascot component — not a new invented character — so it already
+//   carries the account's real rank colour/decoration (the same crown/gem/wing accents Profil
+//   and the rank-up celebration use), rather than a flat orange placeholder flame.
 export function HeroPiocheCard({
   hookLine,
   bubbleLine,
   subjectName,
   chapterTitle,
+  duration,
+  cardCount,
   onStart,
 }: HeroPiocheCardProps) {
   const handleStart = () => {
@@ -52,72 +58,60 @@ export function HeroPiocheCard({
   };
 
   return (
-    <div className="group relative overflow-visible rounded-2xl border-[2.5px] border-black bg-[#5865F2] p-4 shadow-[3px_3px_0px_0px_#000]">
+    <div className="relative overflow-visible rounded-2xl border-[2.5px] border-black bg-[color-mix(in_srgb,var(--neo-orange)_80%,#000)] p-4 shadow-[3px_3px_0px_0px_#000]">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-5 -top-6 h-24 w-24 rounded-full bg-[#FDC800]"
+      />
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 rounded-2xl"
         style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.08) 0px, rgba(255,255,255,0) 20px)' }}
       />
-      <div className="tw-float-pop pointer-events-none absolute -right-2 -top-3 z-20 h-20 w-20">
-        <div className="h-full w-full -rotate-6 transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">
-          <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M50 8 C 60 25, 71 31, 71 52 C 71 69, 61 80, 50 80 C 39 80, 29 69, 29 52 C 29 35, 40 31, 44 20 C 46 14, 48 10, 50 8 Z"
-              fill="#FF4500"
-              stroke="#151821"
-              strokeWidth="2.5"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M50 24 C 55 35, 63 39, 63 53 C 63 64, 57 72, 50 72 C 43 72, 37 64, 37 53 C 37 42, 44 39, 46 32 C 47 28, 49 26, 50 24 Z"
-              fill="#FF9A3D"
-              stroke="#151821"
-              strokeWidth="1.5"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M50 39 C 53 46, 57 48, 57 57 C 57 63, 53 67, 50 67 C 47 67, 43 63, 43 57 C 43 50, 48 48, 48 43 C 49 41, 49 40, 50 39 Z"
-              fill="#FFD84B"
-              stroke="#151821"
-              strokeWidth="1.2"
-              strokeLinejoin="round"
-            />
-            <circle cx="41.5" cy="54" r="4.4" fill="#151821" />
-            <circle cx="58.5" cy="54" r="4.4" fill="#151821" />
-            <circle cx="43" cy="52.4" r="1.5" fill="#fff" />
-            <circle cx="60" cy="52.4" r="1.5" fill="#fff" />
-            <path d="M42 62 Q 50 70, 58 62" stroke="#151821" strokeWidth="2.8" strokeLinecap="round" fill="none" />
-            <ellipse cx="41" cy="30" rx="5" ry="8" fill="#fff" opacity="0.35" transform="rotate(-18 41 30)" />
-          </svg>
+
+      <div className="relative flex items-start justify-between">
+        <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-black bg-[#151821] px-2.5 py-1 font-display text-[0.68rem] font-black uppercase tracking-wide text-white shadow-[2px_2px_0px_0px_#000]">
+          <StreakFlameIcon size={12} />
+          Pioche du jour
+        </span>
+        <div className="-mr-1 -mt-3 h-[70px] w-[70px] flex-shrink-0">
+          <BraiseMascot size={70} mood="proud" />
         </div>
       </div>
 
-      <div className="max-w-[76%]">
-        <p className="mb-0.5 truncate text-xs font-semibold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]">
-          {hookLine}
-        </p>
+      <div className="relative mt-2 max-w-[82%]">
         <h2 className="truncate font-display text-lg font-black leading-tight text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]">
           {chapterTitle}
         </h2>
+        <p className="mt-0.5 truncate text-xs font-semibold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]">
+          {hookLine}
+        </p>
       </div>
       <span className="sr-only">{bubbleLine}</span>
 
-      {subjectName && (
-        <div className="mb-1 mt-1">
-          <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-white/30 bg-black/15 px-2 py-0.5 text-[0.7rem] font-semibold text-white">
-            <StreakFlameIcon size={11} />
+      <div className="relative mt-2.5 flex flex-wrap items-center gap-1.5">
+        {subjectName && (
+          <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border-[2.5px] border-black bg-white px-2.5 py-1 text-[0.72rem] font-black text-black shadow-[2px_2px_0px_0px_#000]">
             {subjectName}
           </span>
-        </div>
-      )}
+        )}
+        <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border-[2.5px] border-black bg-white px-2.5 py-1 text-[0.72rem] font-black text-black shadow-[2px_2px_0px_0px_#000]">
+          <Clock size={13} className="text-[color-mix(in_srgb,var(--neo-orange)_80%,#000)]" />
+          {duration} min
+        </span>
+        <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border-[2.5px] border-black bg-white px-2.5 py-1 text-[0.72rem] font-black text-black shadow-[2px_2px_0px_0px_#000]">
+          <Layers size={13} className="text-[color-mix(in_srgb,var(--neo-orange)_80%,#000)]" />
+          {cardCount} carte{cardCount > 1 ? 's' : ''}
+        </span>
+      </div>
 
-      <div className="tw-cta-pulse">
+      <div className="tw-cta-pulse relative mt-3">
         <button
           onClick={handleStart}
-          className="tw-shimmer flex w-full items-center justify-center gap-1.5 rounded-full border-[2.5px] border-black bg-gradient-to-b from-[#FFE066] to-[#FDC800] px-3.5 py-3 font-display text-sm font-black text-black shadow-[3px_3px_0px_0px_#000] transition-all active:translate-y-1 active:scale-95 active:shadow-none"
+          className="tw-shimmer flex w-full items-center justify-center gap-1.5 rounded-full border-[2.5px] border-black bg-white px-3.5 py-3 font-display text-sm font-black text-black shadow-[3px_3px_0px_0px_#000] transition-all active:translate-y-1 active:scale-95 active:shadow-none"
         >
           <Play size={15} />
-          Je pioche !
+          GO !
         </button>
       </div>
     </div>

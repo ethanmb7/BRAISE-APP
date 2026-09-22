@@ -1,9 +1,16 @@
-import { Zap } from 'lucide-react';
+import { Zap, Star } from 'lucide-react';
 import { StreakFlameIcon } from '@/components/StreakFlameIcon';
 import { TrophyIcon } from '@/components/TrophyIcon';
 
+const WEEKDAY_LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+
 interface TodayStripProps {
   streak: number;
+  /** Whether today's goal is already met — the one signal that tells the week strip whether
+   *  today's own cell is secured (flame + star) or still open (outline). `streak` itself is
+   *  read as "consecutive days before today", matching the coaching copy below it (which always
+   *  talks about today's goal as not yet banked even when streak > 0). */
+  dailyGoalMet: boolean;
   /** From `remainingToGoal` in store.tsx — real "cards-equivalent" left to hit today's goal,
    *  same weighting as the gauge percentage. 0 once the goal is met. */
   remaining: number;
@@ -37,10 +44,20 @@ interface TodayStripProps {
 // multiplier anywhere in the XP math, and a button that claims one without doing it would be a
 // worse trust break than the dead end it replaces. If dueCount is also 0, no button renders —
 // there's genuinely nothing left to do today.
-export function TodayStrip({ streak, remaining, goalPct, dueCount, onContinue, onShare }: TodayStripProps) {
+export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount, onContinue, onShare }: TodayStripProps) {
   const isEvening = new Date().getHours() >= 19;
   const atRisk = remaining > 0 && isEvening;
   const goalMet = remaining <= 0;
+  // Real 7-day window (Monday-first, current calendar week only — never reaches back further
+  // than that, so a streak longer than "days so far this week" just runs off the start of the
+  // strip instead of guessing at a previous week). `streak` counts days BEFORE today (see prop
+  // doc); today's own cell reads `dailyGoalMet` directly rather than being folded into the count.
+  const todayIdx = (new Date().getDay() + 6) % 7;
+  const weekCells = WEEKDAY_LETTERS.map((letter, i) => {
+    const offset = todayIdx - i;
+    const kind = offset === 0 ? (dailyGoalMet ? 'done-today' : 'pending-today') : offset > 0 && offset <= streak ? 'done-past' : 'empty';
+    return { letter, kind };
+  });
   // Nothing left at all today — the one state where this card's usual job (urgency copy plus a
   // gauge worth watching) is already finished. A gauge frozen at 100% doesn't tell you anything
   // new at that point, so the padding and the gauge built for "here's your progress, here's
@@ -65,7 +82,30 @@ export function TodayStrip({ streak, remaining, goalPct, dueCount, onContinue, o
           Ta série : {streak} jour{streak > 1 ? 's' : ''} !
           <StreakFlameIcon size={18} />
         </b>
-        <p className="mt-1 text-sm font-bold text-black/80">{coaching}</p>
+
+        <div className="mt-2.5 flex justify-between gap-1">
+          {weekCells.map((cell, i) => (
+            <div key={i} className="flex flex-col items-center gap-1">
+              <span
+                className={`flex h-7 w-7 items-center justify-center rounded-full border-2 border-black ${
+                  cell.kind === 'done-past'
+                    ? 'bg-white'
+                    : cell.kind === 'done-today'
+                      ? 'bg-white'
+                      : cell.kind === 'pending-today'
+                        ? 'border-dashed bg-amber-400/40'
+                        : 'border-black/25 bg-amber-400/40'
+                }`}
+              >
+                {cell.kind === 'done-past' && <StreakFlameIcon size={13} />}
+                {cell.kind === 'done-today' && <Star size={13} fill="#151821" color="#151821" />}
+              </span>
+              <span className="text-[0.62rem] font-bold text-black/60">{cell.letter}</span>
+            </div>
+          ))}
+        </div>
+
+        <p className="mt-2 text-sm font-bold text-black/80">{coaching}</p>
       </div>
 
       {!allDone && (

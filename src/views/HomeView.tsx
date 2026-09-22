@@ -100,6 +100,11 @@ export function HomeView() {
   const dailyPick = priorityChapters.length > 0 ? priorityChapters[hash % priorityChapters.length] : null;
   const currentSubject = dailyPick?.subject;
   const currentChapter = dailyPick?.chapter;
+  // Real per-chapter deck size (FLASHCARDS filtered by chapterId) — the card used to show a
+  // fixed "10 cartes" for every chapter; every chapter actually has its own real count.
+  const currentChapterCardCount = currentChapter
+    ? FLASHCARDS.filter((c) => c.chapterId === currentChapter.id).length
+    : 0;
 
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
   const hookLine = dailyHookLine(voiceCtx, state.user.name);
@@ -193,6 +198,8 @@ export function HomeView() {
               bubbleLine={bubbleLine}
               subjectName={currentSubject?.name}
               chapterTitle={currentChapter?.title ?? 'Leçon du jour'}
+              duration={currentChapter?.duration ?? 0}
+              cardCount={currentChapterCardCount}
               onStart={() => {
                 sfx.whoosh(state.soundOn);
                 if (currentSubject && currentChapter) openSubject(currentSubject.id, currentChapter.id);
@@ -203,6 +210,7 @@ export function HomeView() {
           <motion.div variants={staggerItem}>
             <TodayStrip
               streak={state.streak}
+              dailyGoalMet={state.dailyGoalMet}
               remaining={remainingToGoal(state)}
               goalPct={computeGoalPct(state)}
               dueCount={dueCount}
