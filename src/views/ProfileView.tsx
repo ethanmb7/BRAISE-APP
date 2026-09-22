@@ -259,7 +259,14 @@ export function ProfileView() {
               autoFocus
             />
             <div className="profile-identity-actions">
-              <button type="button" className="profile-identity-cancel" onClick={() => setEditingIdentity(false)}>
+              <button
+                type="button"
+                className="profile-identity-cancel"
+                onClick={() => {
+                  sfx.tap(state.soundOn);
+                  setEditingIdentity(false);
+                }}
+              >
                 <X size={15} /> Annuler
               </button>
               <button type="button" className="profile-identity-save" onClick={saveIdentity}>
