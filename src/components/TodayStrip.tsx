@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Zap, Star } from 'lucide-react';
+import { Zap, Star, Clock, PartyPopper } from 'lucide-react';
 import { StreakFlameIcon } from '@/components/StreakFlameIcon';
 import { TrophyIcon } from '@/components/TrophyIcon';
 import { SnowflakeIcon } from '@/components/SnowflakeIcon';
-import { BraiseMascot } from '@/components/BraiseMascot';
 import { fireMicroConfetti } from '@/lib/confetti';
 import { useCountUp } from '@/lib/useCountUp';
 
@@ -54,13 +53,13 @@ interface TodayStripProps {
 // worse trust break than the dead end it replaces. If dueCount is also 0, no button renders —
 // there's genuinely nothing left to do today.
 //
-// This pass fixes the gap an audit of the whole Accueil screen found: every real number here was
-// honest, but nothing had any life in it — no Braise anywhere in the card, the streak count just
-// swapped text instead of counting up (every other reward number on Aura/Profil already uses
-// useCountUp), and the one truly significant real-time event — today's cell flipping from
-// pending to done — happened with zero acknowledgment on the card itself (HomeView's own
-// fireConfetti() fires the same moment, but as a generic full-screen burst with no anchor to this
-// card at all).
+// This pass fixes part of a gap an audit of the whole Accueil screen found: every real number
+// here was honest, but nothing had any life in it. The streak count now counts up instead of
+// swapping text silently (every other reward number on Aura/Profil already uses useCountUp), and
+// the one truly significant real-time event — today's cell flipping from pending to done — now
+// gets a real local pop + a micro-confetti burst anchored on this card, not just HomeView's own
+// generic full-screen fireConfetti() with no anchor to it. A BraiseMascot in the coaching line was
+// tried here too and pulled back out — didn't read well at this size next to the copy.
 export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount, freezes, onContinue, onShare }: TodayStripProps) {
   const reducedMotion = useReducedMotion();
   const animatedStreak = useCountUp(streak);
@@ -114,11 +113,6 @@ export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount,
     : remaining > 0
       ? `Plus que ${remaining} carte${remaining > 1 ? 's' : ''} pour valider ta Braise !`
       : 'Objectif du jour dans la poche !';
-
-  // Real reactions to the same three real states the coaching line already branches on —
-  // `hesitant`/`eager`/`proud` all already exist on BraiseMascot for exactly these situations,
-  // no new mood needed.
-  const coachMood = atRisk ? 'hesitant' : remaining > 0 ? 'eager' : 'proud';
 
   return (
     <div className={`relative rounded-2xl border-[2.5px] border-black bg-white shadow-[3px_3px_0px_0px_#000] ${allDone ? 'p-3' : 'p-4'}`}>
@@ -198,10 +192,9 @@ export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount,
           ))}
         </div>
 
-        <p className="mt-3 flex items-center gap-2 text-sm font-bold text-black/70">
-          <span className="flex-shrink-0">
-            <BraiseMascot size={22} mood={coachMood} />
-          </span>
+        <p className="mt-3 flex items-center gap-1.5 text-sm font-bold text-black/70">
+          {atRisk && <Clock size={15} className="flex-shrink-0" />}
+          {!atRisk && remaining <= 0 && <PartyPopper size={15} className="flex-shrink-0" />}
           {coachingText}
         </p>
       </div>
