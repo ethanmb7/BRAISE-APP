@@ -3054,18 +3054,30 @@ select {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
   background: var(--paper);
   border: 2.5px solid var(--neo-ink);
   border-radius: 16px;
   padding: 12px 16px;
   box-shadow: 3px 3px 0 var(--neo-ink);
   margin-bottom: 16px;
+  font-family: inherit;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.profile-badges-line:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--neo-ink);
 }
 .profile-badges-line span {
   font-family: 'Baloo 2', sans-serif;
   font-weight: 700;
   font-size: 0.76rem;
   color: var(--ink);
+}
+.profile-badges-line-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 .profile-badges-dots {
   display: flex;

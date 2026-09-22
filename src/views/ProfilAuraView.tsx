@@ -1,9 +1,10 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { memo, useCallback, useMemo, useState, type CSSProperties } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronRight, WifiOff } from 'lucide-react';
 import { useApp, computeUnlockedBadges } from '@/store';
 import { sfx } from '@/lib/sound';
 import { useOnlineStatus } from '@/lib/useOnlineStatus';
+import { useCountUp } from '@/lib/useCountUp';
 import { BraiseMascot } from '@/components/BraiseMascot';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { SubjectIcon } from '@/components/SubjectIcon';
@@ -41,32 +42,6 @@ const heroPop = {
   hidden: { opacity: 0, scale: 0.72, y: 8 },
   show: { opacity: 1, scale: 1, y: 0, transition: { type: 'spring', stiffness: 260, damping: 18 } as const },
 };
-// Counts a displayed number up to its target over `duration`ms using a single rAF loop —
-// cheap, touches nothing but a text node, cancels cleanly on unmount or if the target changes
-// mid-flight. Every reward number on this screen uses it so a change reads as a small win
-// instead of a silent text swap.
-function useCountUp(target: number, duration = 700): number {
-  const [value, setValue] = useState(0);
-  const valueRef = useRef(0);
-  useEffect(() => {
-    const from = valueRef.current;
-    if (from === target) return;
-    let rafId: number;
-    const start = performance.now();
-    const tick = (now: number) => {
-      const t = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - t, 3);
-      const next = Math.round(from + (target - from) * eased);
-      valueRef.current = next;
-      setValue(next);
-      if (t < 1) rafId = requestAnimationFrame(tick);
-    };
-    rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
-  }, [target, duration]);
-  return value;
-}
-
 export function ProfilAuraView() {
   const { state, loaded, openSubject, setView } = useApp();
   const isOnline = useOnlineStatus();

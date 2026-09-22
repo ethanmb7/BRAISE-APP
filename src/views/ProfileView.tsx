@@ -4,6 +4,7 @@ import { Settings, ChevronRight, Check, Pencil, X, Share2 } from 'lucide-react';
 import { useApp, computeUnlockedBadges, countDoneChapters } from '@/store';
 import { sfx } from '@/lib/sound';
 import { getRankInfo, badgeRemainingLabel, countMasteredCards, RANKS } from '@/lib/aura';
+import { useCountUp } from '@/lib/useCountUp';
 import { getAgeGroup, profileReactionLine } from '@/lib/braiseVoice';
 import { getBadgeUnlockedAtMap } from '@/lib/celebrations';
 import { TopBar } from '@/components/TopBar';
@@ -129,6 +130,7 @@ export function ProfileView() {
   const badgeUnlockedCount = Object.values(badgeUnlocked).filter(Boolean).length;
   const badgeUnlockedAt = useMemo(() => getBadgeUnlockedAtMap(), [badgeUnlocked]);
   const rank = getRankInfo(state.xp).current;
+  const animatedXp = useCountUp(state.xp);
   const rankName = rank.name;
 
   // Same derivation as Aura's own share button — real distinct-subjects-reviewed count, not a
@@ -224,7 +226,7 @@ export function ProfileView() {
                 <p>{braiseTake}</p>
               </div>
 
-              <div className="profile-hero-num">{state.xp}</div>
+              <div className="profile-hero-num">{animatedXp}</div>
               <div className="profile-hero-lbl">XP</div>
 
               <div className="profile-hero-mini-row">
@@ -303,21 +305,32 @@ export function ProfileView() {
         )}
 
         {/* Quick glance at the badge count, in the same dot-per-badge language as the full grid
-            below — a reason to scroll down, not a replacement for it. */}
-        <motion.div className="profile-badges-line" variants={staggerItem}>
+            below — now a real jump to it, not just a claim in a code comment. */}
+        <motion.button
+          type="button"
+          className="profile-badges-line"
+          variants={staggerItem}
+          onClick={() => {
+            sfx.tap(state.soundOn);
+            document.getElementById('profile-badges-detail')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
+        >
           <span>
             {badgeUnlockedCount}/{BADGES.length} badges débloqués
           </span>
-          <div className="profile-badges-dots">
-            {BADGES.map((b) => (
-              <span
-                key={b.id}
-                className="profile-badges-dot"
-                style={{ background: badgeUnlocked[b.id] ? BADGE_DOT_COLORS[b.id] : 'var(--paper)' }}
-              />
-            ))}
+          <div className="profile-badges-line-right">
+            <div className="profile-badges-dots">
+              {BADGES.map((b) => (
+                <span
+                  key={b.id}
+                  className="profile-badges-dot"
+                  style={{ background: badgeUnlocked[b.id] ? BADGE_DOT_COLORS[b.id] : 'var(--paper)' }}
+                />
+              ))}
+            </div>
+            <ChevronRight size={16} color="var(--ink-soft)" />
           </div>
-        </motion.div>
+        </motion.button>
 
         <motion.button type="button" className="profile-hero-cta" onClick={handleShareOpen} variants={staggerItem}>
           <Share2 size={16} />
@@ -355,7 +368,7 @@ export function ProfileView() {
 
         {/* Badges — b1/b5 and b2/b6 grouped as tiers of one achievement (see BADGE_TIERS above)
             instead of 6 unrelated flat cards; real unlock dates once available. */}
-        <motion.div variants={staggerItem}>
+        <motion.div id="profile-badges-detail" variants={staggerItem}>
           <span className="profile-tag">Mes badges</span>
           <div className="profile-tier-groups">
             {BADGE_TIERS.map((group) => (
