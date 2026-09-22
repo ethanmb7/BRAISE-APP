@@ -44,7 +44,7 @@ const staggerItem = {
 };
 
 export function ProfileView() {
-  const { state, setView, setPersonality, setUser } = useApp();
+  const { state, setView, setTab, setPersonality, setUser } = useApp();
   const [editingIdentity, setEditingIdentity] = useState(false);
   const [draftName, setDraftName] = useState(state.user.name);
   const [draftAvatar, setDraftAvatar] = useState(state.user.avatar);
@@ -61,6 +61,12 @@ export function ProfileView() {
   const badgeUnlockedAt = useMemo(() => getBadgeUnlockedAtMap(), [badgeUnlocked]);
   const rankInfo = getRankInfo(state.xp);
   const rank = rankInfo.current;
+  // A 12%-full bar and a 96%-full bar read as the same "in progress" state today — no
+  // different treatment for the stretch where anticipation is actually highest. Real games and
+  // Duolingo both intensify near a threshold; this mirrors that with data already computed
+  // (rankInfo.pct), not a new mechanic. Foreshadows the NEXT rank's own colour (not the current
+  // one) — a preview of what's about to unlock, the same idea as the badge timeline's ghost node.
+  const isAlmostThere = Boolean(rankInfo.next) && rankInfo.pct >= 90;
   const animatedXp = useCountUp(state.xp);
   const rankName = rank.name;
 
@@ -160,12 +166,29 @@ export function ProfileView() {
 
               {/* Braise's take — real facts (rank/série/badges), never generic filler; changes
                   when they actually change, so there's a real reason to come back and see what
-                  he says now. */}
+                  he says now. `sleepy` at streak 0 (not `happy`) — resting and waiting for you,
+                  never disappointed; the copy in profileReactionLine was rewritten to match
+                  (always ends on an open door, never a flat diss). The "reprendre" link is the
+                  actual door: a real jump into Révisions, not just a line with nowhere to go. */}
               <div className="profile-hero-bubble">
                 <span className="profile-hero-bubble-icon" aria-hidden="true">
-                  <BraiseMascot size={26} mood={state.streak > 0 ? 'proud' : 'happy'} />
+                  <BraiseMascot size={26} mood={state.streak > 0 ? 'proud' : 'sleepy'} />
                 </span>
-                <p>{braiseTake}</p>
+                <div>
+                  <p>{braiseTake}</p>
+                  {state.streak === 0 && (
+                    <button
+                      type="button"
+                      className="profile-hero-bubble-cta"
+                      onClick={() => {
+                        sfx.tap(state.soundOn);
+                        setTab('revisions');
+                      }}
+                    >
+                      Réviser une carte →
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div className="profile-hero-num">{animatedXp}</div>
@@ -253,20 +276,38 @@ export function ProfileView() {
           <div
             className="uni-row progress-row stacked"
             style={{
-              background: state.darkMode
-                ? `linear-gradient(120deg, ${rank.colorFrom}1a, ${rank.colorTo}0f)`
-                : `linear-gradient(120deg, ${rank.colorFrom}59, ${rank.colorTo}1f)`,
+              background: isAlmostThere
+                ? state.darkMode
+                  ? `linear-gradient(120deg, ${rankInfo.next!.colorFrom}26, ${rankInfo.next!.colorTo}14)`
+                  : `linear-gradient(120deg, ${rankInfo.next!.colorFrom}73, ${rankInfo.next!.colorTo}2b)`
+                : state.darkMode
+                  ? `linear-gradient(120deg, ${rank.colorFrom}1a, ${rank.colorTo}0f)`
+                  : `linear-gradient(120deg, ${rank.colorFrom}59, ${rank.colorTo}1f)`,
             }}
           >
             <div className="rank-progress">
               <div className="rank-progress-head">
-                <b>{rankInfo.next ? `${rank.name} → ${rankInfo.next.name}` : `${rank.name} — rang maximum`}</b>
+                <b>
+                  {rankInfo.next ? `${rank.name} → ${rankInfo.next.name}` : `${rank.name} — rang maximum`}
+                  {isAlmostThere && (
+                    <span
+                      className="rank-progress-almost"
+                      style={{ background: `${rankInfo.next!.colorTo}38`, borderColor: rankInfo.next!.colorTo }}
+                    >
+                      Presque !
+                    </span>
+                  )}
+                </b>
                 <span>{rankInfo.next ? `${rankInfo.next.min - state.xp} XP restants` : 'Atteint'}</span>
               </div>
               <div className="rank-progress-track">
                 <div
                   className="rank-progress-fill"
-                  style={{ width: `${rankInfo.pct}%`, background: `linear-gradient(90deg, ${rank.colorFrom}, ${rank.colorTo})` }}
+                  style={{
+                    width: `${rankInfo.pct}%`,
+                    background: `linear-gradient(90deg, ${rank.colorFrom}, ${rank.colorTo})`,
+                    boxShadow: isAlmostThere ? `0 0 8px ${rankInfo.next!.colorTo}80` : 'none',
+                  }}
                 />
               </div>
             </div>

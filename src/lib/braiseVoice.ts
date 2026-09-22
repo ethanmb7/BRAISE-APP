@@ -251,22 +251,28 @@ export function profileReactionLine(
       ],
     });
   }
+  // Streak at 0 used to close on a judgment with nowhere to go ("Dommage, le reste est
+  // propre.") — real feedback: it read as a diss, not a friend. Every line here still states
+  // the real fact (no active streak) but always ends on an open door, never a closed one; the
+  // savage tone keeps its edge without losing the exit. Pairs with BraiseMascot's `sleepy` mood
+  // (already built, just never wired to this state) and a real "reprendre" action in the UI —
+  // resting, not disappointed.
   return byCombo(ctx, {
     'chill-college': [
-      `Rang ${rankName}, ${badgesUnlocked}/${badgesTotal} badges. Une petite série et ce profil devient encore plus stylé.`,
+      `Rang ${rankName}, ${badgesUnlocked}/${badgesTotal} badges. Une carte suffit pour relancer une série.`,
       `${rankName} avec ${badgesUnlocked}/${badgesTotal} badges déjà en poche. Prêt pour une nouvelle série ?`,
     ],
     'chill-lycee': [
-      `Rang ${rankName}, ${badgesUnlocked}/${badgesTotal} badges au compteur. Une série active et le tableau serait complet.`,
-      `${badgesUnlocked}/${badgesTotal} badges, rang ${rankName}. Il manque juste une série en cours.`,
+      `Rang ${rankName}, ${badgesUnlocked}/${badgesTotal} badges au compteur. Une carte suffit pour relancer une série.`,
+      `${badgesUnlocked}/${badgesTotal} badges, rang ${rankName}. Une série de plus et le tableau est complet.`,
     ],
     'savage-college': [
-      `${rankName}, ${badgesUnlocked}/${badgesTotal} badges, zéro série active. On peut faire mieux, non ?`,
-      `Rang ${rankName} mais aucune série en cours. Le profil est bon, l'assiduité un peu moins.`,
+      `${rankName}, ${badgesUnlocked}/${badgesTotal} badges, aucune série en cours. Une carte, et on repart.`,
+      `Rang ${rankName}, zéro série active. Une carte suffit pour la relancer.`,
     ],
     'savage-lycee': [
-      `${rankName}, ${badgesUnlocked}/${badgesTotal} badges, mais aucune série active. Dommage, le reste est propre.`,
-      `Rang ${rankName} sans série en cours. T'as le niveau, il manque la régularité.`,
+      `${rankName}, ${badgesUnlocked}/${badgesTotal} badges, aucune série active. Une carte, et c'est reparti.`,
+      `Rang ${rankName} sans série en cours. T'as le niveau — une carte pour la relancer.`,
     ],
   });
 }
