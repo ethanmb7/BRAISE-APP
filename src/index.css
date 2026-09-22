@@ -3545,6 +3545,14 @@ select {
   0% { transform: scale(1) rotate(-1deg); }
   100% { transform: scale(1.04, 0.98) rotate(1.5deg); }
 }
+/* Ta série's own flame badge, reusing this same keyframe rather than inventing a new one — it
+   had zero idle motion, the first thing the eye lands on in that card being completely static
+   next to everything else this session has given real life. */
+.streak-badge-flame {
+  display: flex;
+  animation: flameFlicker 1.2s ease-in-out infinite alternate;
+  transform-origin: 50% 60%;
+}
 
 /* Eager: a beckoning side-to-side rock, not `proud`'s big vertical bounce — "come on, let's go"
    rather than "look what I just did". Built for the daily pioche card, the one place Braise is

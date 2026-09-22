@@ -53,13 +53,17 @@ interface TodayStripProps {
 // worse trust break than the dead end it replaces. If dueCount is also 0, no button renders —
 // there's genuinely nothing left to do today.
 //
-// This pass fixes part of a gap an audit of the whole Accueil screen found: every real number
-// here was honest, but nothing had any life in it. The streak count now counts up instead of
-// swapping text silently (every other reward number on Aura/Profil already uses useCountUp), and
-// the one truly significant real-time event — today's cell flipping from pending to done — now
-// gets a real local pop + a micro-confetti burst anchored on this card, not just HomeView's own
-// generic full-screen fireConfetti() with no anchor to it. A BraiseMascot in the coaching line was
-// tried here too and pulled back out — didn't read well at this size next to the copy.
+// This pass (and the next one) fixed a gap an audit of the whole Accueil screen found: every
+// real number here was honest, but nothing had any life in it. The streak count now counts up
+// instead of swapping text silently (every other reward number on Aura/Profil already uses
+// useCountUp); the one truly significant real-time event — today's cell flipping from pending to
+// done — gets a real local pop + a micro-confetti burst anchored on this card, not just
+// HomeView's own generic full-screen fireConfetti() with no anchor to it; the flame badge now has
+// real idle motion (reusing the same flameFlicker keyframe BraiseMascot's own flame layers
+// already use, not a new animation); and the gauge intensifies with the same "Presque !" glow
+// Profil's rank-progress bar already does near a real completion threshold. A BraiseMascot in the
+// coaching line was tried here too and pulled back out — didn't read well at this size next to
+// the copy.
 export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount, freezes, onContinue, onShare }: TodayStripProps) {
   const reducedMotion = useReducedMotion();
   const animatedStreak = useCountUp(streak);
@@ -108,6 +112,13 @@ export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount,
   // state (goal not yet met, or met but still with due cards to review) keeps the full card.
   const allDone = goalMet && dueCount === 0;
 
+  // Same "Presque !" intensification Profil's own rank-progress bar already does near a real
+  // threshold (rankInfo.pct >= 90) — a 12%-full gauge and a 96%-full gauge read as the same
+  // "in progress" state otherwise, no different treatment for the stretch where anticipation is
+  // actually highest. Not applied while atRisk: that state already has its own urgent red, a
+  // second glow on top would just be visual noise competing with it.
+  const almostThere = !goalMet && !atRisk && goalPct >= 85;
+
   const coachingText = atRisk
     ? `Encore ${remaining} carte${remaining > 1 ? 's' : ''} ce soir pour garder ta série !`
     : remaining > 0
@@ -120,7 +131,9 @@ export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount,
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-3">
             <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border-[3px] border-black bg-[#FF6B35] shadow-[2px_2px_0px_0px_#000]">
-              <StreakFlameIcon size={17} />
+              <span className="streak-badge-flame">
+                <StreakFlameIcon size={17} />
+              </span>
             </span>
             <div>
               {/* text-xl, not text-lg: this counter is the app's central retention lever, it
@@ -203,7 +216,7 @@ export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount,
         <div className="mt-3 h-3.5 rounded-full border border-black bg-black/70 p-0.5">
           <div
             className={`h-full rounded-full transition-[width,background-color] duration-500 ${atRisk ? 'bg-red-400' : 'bg-emerald-400'}`}
-            style={{ width: `${goalPct}%` }}
+            style={{ width: `${goalPct}%`, boxShadow: almostThere ? '0 0 8px #10b98180' : 'none' }}
           />
         </div>
       )}
