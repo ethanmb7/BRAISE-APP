@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { Play } from 'lucide-react';
 import { SubjectIcon } from './SubjectIcon';
 
@@ -22,7 +23,12 @@ interface SubjectDecksProps {
 // Full-saturation card face (not a pastel tint) to match the HUD's own vividness. Title and
 // chapter label use pure #000, not text-slate-900 or --neo-ink — both measured a hair too light
 // and drop francais/anglais below 4.5:1 AA on their own saturated backgrounds; #000 clears every
-// subject at >=4.7:1. Same bevel base/face press mechanic as HeaderHUD. The
+// subject at >=4.7:1. Same bevel base/face press mechanic as HeaderHUD, but the face's own press
+// is a real spring now (was a flat `transition-transform` CSS press) — this is the single most
+// frequent tap in the whole app (choosing a subject, every session) and it was the one surface
+// with zero physical weight next to Réviser's spring-driven cards and the Pioche du jour's chest.
+// Sound+haptic were already real here (goToChapter → sfx.tap, which fires haptic(8) unconditionally
+// even with sound off) — only the press *feel* itself was missing, not the feedback loop. The
 // bottom row is normal flow, never absolutely positioned, so nothing can ever overlap.
 export function SubjectDecks({ items, onSelect }: SubjectDecksProps) {
   return (
@@ -34,9 +40,11 @@ export function SubjectDecks({ items, onSelect }: SubjectDecksProps) {
             className="absolute inset-0 translate-y-[3px] rounded-2xl border-[2.5px] border-black"
             style={{ background: `color-mix(in srgb, ${item.color} 70%, #000)` }}
           />
-          <span
-            className="relative flex h-full flex-col gap-2.5 rounded-2xl border-[2.5px] border-black p-4 shadow-[3px_3px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[3px] group-active:shadow-none"
+          <motion.span
+            className="relative flex h-full flex-col gap-2.5 rounded-2xl border-[2.5px] border-black p-4 shadow-[3px_3px_0px_0px_#000] group-active:shadow-none"
             style={{ background: item.color }}
+            whileTap={{ y: 3, scale: 0.98 }}
+            transition={{ type: 'spring', stiffness: 500, damping: 22 }}
           >
             <div className="flex items-center justify-between">
               <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border-2 border-black bg-white shadow-[1.5px_1.5px_0px_0px_#000]">
@@ -79,7 +87,7 @@ export function SubjectDecks({ items, onSelect }: SubjectDecksProps) {
                 </span>
               </div>
             </div>
-          </span>
+          </motion.span>
         </button>
       ))}
     </div>
