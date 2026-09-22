@@ -85,7 +85,8 @@ function Screen() {
           ageGroup={getAgeGroup(state.user.level)}
           message={rankUpLine(
             { personality: state.user.personality, age: getAgeGroup(state.user.level) },
-            celebration.toRank.name
+            celebration.toRank.name,
+            celebration.toRank.id
           )}
           onDismiss={dismiss}
           onShare={() => setShareOpen(true)}

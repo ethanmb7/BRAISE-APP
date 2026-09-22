@@ -75,10 +75,43 @@ export function dailyHookLine(ctx: VoiceCtx, userName: string): string {
   });
 }
 
+// Same 3 ranks that unlock a new avatar option on Profil (see AVATARS in data.ts) — kept here
+// too rather than importing it, since data.ts's minRankId is per-avatar-emoji plumbing and this
+// only needs "what unlocks at this rank", a much smaller fact.
+const AVATAR_UNLOCK_BY_RANK: Record<string, string> = {
+  or: 'un dragon',
+  platine: 'un lion',
+  legende: 'une licorne',
+};
+
 /** The line under Braise's transformation when a real rank threshold (getRankInfo) is crossed —
  *  same tone system as everywhere else, so the app's one big celebratory moment doesn't suddenly
- *  drop into generic copy. */
-export function rankUpLine(ctx: VoiceCtx, rankName: string): string {
+ *  drop into generic copy. Ranks that also unlock a new avatar (rankId, optional) say so here —
+ *  without this, the moment a dragon/lion/unicorn actually becomes available went completely
+ *  unannounced, so nobody who doesn't already think to reopen the avatar picker would ever find
+ *  out it exists. */
+export function rankUpLine(ctx: VoiceCtx, rankName: string, rankId?: string): string {
+  const avatarUnlock = rankId ? AVATAR_UNLOCK_BY_RANK[rankId] : undefined;
+  if (avatarUnlock) {
+    return byCombo(ctx, {
+      'chill-college': [
+        `Nouveau rang débloqué : ${rankName} ! Et ${avatarUnlock} pour ton avatar en bonus.`,
+        `Tu passes ${rankName} ! Va vite jeter un œil à ton avatar, ${avatarUnlock} t'attend.`,
+      ],
+      'chill-lycee': [
+        `Rang ${rankName} débloqué, avec ${avatarUnlock} pour ton avatar en prime.`,
+        `Nouveau rang : ${rankName}. Ton avatar vient de gagner ${avatarUnlock}.`,
+      ],
+      'savage-college': [
+        `${rankName} débloqué, et ${avatarUnlock} avec. Même moi je suis impressionné.`,
+        `Rang ${rankName}. Ton avatar récupère ${avatarUnlock} au passage.`,
+      ],
+      'savage-lycee': [
+        `Rang ${rankName}. Le classement tremble, et ton avatar aussi — ${avatarUnlock} t'attend.`,
+        `${rankName} débloqué. Ton avatar gagne ${avatarUnlock}, le bac recule encore d'un pas.`,
+      ],
+    });
+  }
   return byCombo(ctx, {
     'chill-college': [`Nouveau rang débloqué : ${rankName} ! Trop fort.`, `Tu passes ${rankName} ! Continue comme ça.`],
     'chill-lycee': [`Rang ${rankName} débloqué. Beau parcours.`, `Nouveau rang : ${rankName}. Bien joué.`],
