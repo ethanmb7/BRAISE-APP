@@ -1,7 +1,11 @@
 import { useApp } from '@/store';
 import { getRankInfo } from '@/lib/aura';
 
-type Mood = 'happy' | 'hesitant' | 'proud' | 'sleepy' | 'cool' | 'frozen';
+// `eager` is new: a beckoning side-to-side rock, not `proud`'s big vertical bounce. `proud` is
+// the right tense for "you just did something" (a rank-up, a badge) — wrong tense for a card
+// whose whole job is inviting you to start something you haven't done yet. Built for the daily
+// pioche card specifically, real enough elsewhere to keep as a real mood, not a one-off hack.
+type Mood = 'happy' | 'hesitant' | 'proud' | 'sleepy' | 'cool' | 'frozen' | 'eager';
 
 type Props = { size?: number; className?: string; mood?: Mood; rankId?: string };
 
@@ -12,6 +16,7 @@ const MOOD_CLASS: Record<Mood, string> = {
   sleepy: 'mood-sleepy',
   cool: 'mood-proud',
   frozen: 'mood-frozen',
+  eager: 'mood-eager',
 };
 
 // Per-rank flame palette, [outer, middle, inner] — reusing hex values already established

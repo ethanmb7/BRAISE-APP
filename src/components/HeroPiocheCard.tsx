@@ -48,15 +48,21 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
 
       <div className="relative flex items-center gap-3">
         <div className="h-14 w-14 flex-shrink-0">
-          <BraiseMascot size={56} mood="proud" />
+          <BraiseMascot size={56} mood="eager" />
         </div>
         <div className="min-w-0 flex-1">
           {/* Dark ink, not white — #FF6B35 is light enough that white measures 2.84:1 here (a
               hard AA failure), while dark ink measures 6.25:1. No text-shadow either: that was
-              compensating for low contrast on the old darker card, this one doesn't need it. */}
-          <p className="text-[0.7rem] font-black uppercase tracking-wide text-[#151821]">Pioche du jour</p>
+              compensating for low contrast on the old darker card, this one doesn't need it.
+              Three real fonts, not one accidental one: font-mono for the eyebrow (the same IBM
+              Plex Mono every other small-caps label already uses — Profil's tags, the rank pill,
+              badge captions), font-display (Baloo 2) for the title, font-sans (IBM Plex Sans)
+              for the stats line. Before this, the eyebrow and stats line had no font class at
+              all and silently fell back to the browser default — invisible on its own, but a
+              real third, uncontrolled typeface sitting next to two deliberate ones. */}
+          <p className="font-mono text-[0.7rem] font-black uppercase tracking-wide text-[#151821]">Pioche du jour</p>
           <h2 className="truncate font-display text-lg font-black leading-tight text-[#151821]">{chapterTitle}</h2>
-          <p className="mt-1 truncate text-[0.78rem] font-semibold text-[#151821]">
+          <p className="mt-1 truncate font-sans text-[0.78rem] font-semibold text-[#151821]">
             {duration} min · {cardCount} carte{cardCount > 1 ? 's' : ''}
             {subjectName ? ` · ${subjectName}` : ''}
           </p>

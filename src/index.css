@@ -3481,6 +3481,22 @@ select {
   100% { transform: scale(1.04, 0.98) rotate(1.5deg); }
 }
 
+/* Eager: a beckoning side-to-side rock, not `proud`'s big vertical bounce — "come on, let's go"
+   rather than "look what I just did". Built for the daily pioche card, the one place Braise is
+   inviting an action rather than reacting to one already taken. Faster flicker (1.1s vs happy's
+   1.2s) to match the quicker rock. */
+.mood-eager {
+  animation: braiseEager 1.6s ease-in-out infinite;
+}
+.mood-eager .flame-outer {
+  animation: flameFlicker 1.1s ease-in-out infinite alternate;
+}
+@keyframes braiseEager {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  25% { transform: rotate(-6deg) translateY(-2px); }
+  75% { transform: rotate(6deg) translateY(-2px); }
+}
+
 /* Hesitant: wobble + slight shrink */
 .mood-hesitant {
   animation: braiseWobble 1.6s ease-in-out infinite;
