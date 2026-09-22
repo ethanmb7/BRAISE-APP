@@ -1,7 +1,12 @@
-import { Zap, Star, Clock, PartyPopper } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { Zap, Star } from 'lucide-react';
 import { StreakFlameIcon } from '@/components/StreakFlameIcon';
 import { TrophyIcon } from '@/components/TrophyIcon';
 import { SnowflakeIcon } from '@/components/SnowflakeIcon';
+import { BraiseMascot } from '@/components/BraiseMascot';
+import { fireMicroConfetti } from '@/lib/confetti';
+import { useCountUp } from '@/lib/useCountUp';
 
 const WEEKDAY_LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
@@ -48,7 +53,17 @@ interface TodayStripProps {
 // multiplier anywhere in the XP math, and a button that claims one without doing it would be a
 // worse trust break than the dead end it replaces. If dueCount is also 0, no button renders —
 // there's genuinely nothing left to do today.
+//
+// This pass fixes the gap an audit of the whole Accueil screen found: every real number here was
+// honest, but nothing had any life in it — no Braise anywhere in the card, the streak count just
+// swapped text instead of counting up (every other reward number on Aura/Profil already uses
+// useCountUp), and the one truly significant real-time event — today's cell flipping from
+// pending to done — happened with zero acknowledgment on the card itself (HomeView's own
+// fireConfetti() fires the same moment, but as a generic full-screen burst with no anchor to this
+// card at all).
 export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount, freezes, onContinue, onShare }: TodayStripProps) {
+  const reducedMotion = useReducedMotion();
+  const animatedStreak = useCountUp(streak);
   const isEvening = new Date().getHours() >= 19;
   const atRisk = remaining > 0 && isEvening;
   const goalMet = remaining <= 0;
@@ -66,6 +81,27 @@ export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount,
     const kind = offset === 0 ? (dailyGoalMet ? 'done-today' : 'pending-today') : offset > 0 && offset <= streak ? 'done-past' : 'empty';
     return { letter, kind };
   });
+
+  // The exact moment today's cell flips from pending to done — gives it a real, local pop
+  // instead of relying purely on the page-wide confetti to carry the whole "you did it" read.
+  const [justBanked, setJustBanked] = useState(false);
+  const prevGoalMet = useRef(dailyGoalMet);
+  useEffect(() => {
+    if (dailyGoalMet && !prevGoalMet.current) {
+      setJustBanked(true);
+      if (!reducedMotion) {
+        // Hand-picked, not measured — an approximation of where this card's week strip sits on
+        // a real phone viewport, same "approximate over exact" call RevisionsView already makes
+        // for fireMicroConfetti's own origin.
+        fireMicroConfetti(0.15 + ((todayIdx + 0.5) / 7) * 0.7, 0.34);
+      }
+      const t = setTimeout(() => setJustBanked(false), 700);
+      prevGoalMet.current = dailyGoalMet;
+      return () => clearTimeout(t);
+    }
+    prevGoalMet.current = dailyGoalMet;
+  }, [dailyGoalMet, reducedMotion, todayIdx]);
+
   // Nothing left at all today — the one state where this card's usual job (urgency copy plus a
   // gauge worth watching) is already finished. A gauge frozen at 100% doesn't tell you anything
   // new at that point, so the padding and the gauge built for "here's your progress, here's
@@ -79,6 +115,11 @@ export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount,
       ? `Plus que ${remaining} carte${remaining > 1 ? 's' : ''} pour valider ta Braise !`
       : 'Objectif du jour dans la poche !';
 
+  // Real reactions to the same three real states the coaching line already branches on —
+  // `hesitant`/`eager`/`proud` all already exist on BraiseMascot for exactly these situations,
+  // no new mood needed.
+  const coachMood = atRisk ? 'hesitant' : remaining > 0 ? 'eager' : 'proud';
+
   return (
     <div className={`relative rounded-2xl border-[2.5px] border-black bg-white shadow-[3px_3px_0px_0px_#000] ${allDone ? 'p-3' : 'p-4'}`}>
       <div>
@@ -90,9 +131,11 @@ export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount,
             <div>
               {/* text-xl, not text-lg: this counter is the app's central retention lever, it
                   shouldn't render smaller than a deck card's subject name or the HUD's own
-                  numbers. */}
+                  numbers. Counts up like every other reward number on Aura/Profil (useCountUp) —
+                  used to just swap text silently, the one significant number on this card with
+                  no sense of having been earned. */}
               <b className="block font-display text-xl font-black leading-tight text-black">
-                {streak} jour{streak > 1 ? 's' : ''}
+                {animatedStreak} jour{animatedStreak > 1 ? 's' : ''}
               </b>
               <span className="text-xs font-bold text-black/50">de série en cours</span>
             </div>
@@ -117,8 +160,18 @@ export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount,
             close to square there. */}
         <div className="mt-3 flex justify-between gap-1">
           {weekCells.map((cell, i) => (
-            <div
+            <motion.div
               key={i}
+              animate={
+                justBanked && cell.kind === 'done-today'
+                  ? { scale: [1, 1.32, 0.94, 1.06, 1] }
+                  : { scale: 1 }
+              }
+              transition={
+                justBanked && cell.kind === 'done-today'
+                  ? { duration: 0.6, times: [0, 0.35, 0.55, 0.8, 1], ease: 'easeOut' }
+                  : { duration: 0.15 }
+              }
               className={`flex h-[46px] flex-1 flex-col items-center justify-between rounded-lg border-2 py-1 ${
                 cell.kind === 'done-past'
                   ? 'border-black bg-emerald-700'
@@ -141,13 +194,14 @@ export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount,
               {(cell.kind === 'pending-today' || cell.kind === 'empty') && (
                 <span className="h-1 w-1 rounded-full bg-black/25" aria-hidden="true" />
               )}
-            </div>
+            </motion.div>
           ))}
         </div>
 
-        <p className="mt-3 flex items-center gap-1.5 text-sm font-bold text-black/70">
-          {atRisk && <Clock size={15} className="flex-shrink-0" />}
-          {!atRisk && remaining <= 0 && <PartyPopper size={15} className="flex-shrink-0" />}
+        <p className="mt-3 flex items-center gap-2 text-sm font-bold text-black/70">
+          <span className="flex-shrink-0">
+            <BraiseMascot size={22} mood={coachMood} />
+          </span>
           {coachingText}
         </p>
       </div>
