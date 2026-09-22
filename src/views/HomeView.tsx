@@ -11,7 +11,7 @@ import { SubjectDecks } from '@/components/SubjectDecks';
 import { TodayStrip } from '@/components/TodayStrip';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { SUBJECTS, FLASHCARDS } from '@/data';
-import { dailyPickLine, dailyHookLine, getAgeGroup } from '@/lib/braiseVoice';
+import { dailyPickLine, getAgeGroup } from '@/lib/braiseVoice';
 import { getRankInfo, countMasteredCards } from '@/lib/aura';
 import type { Level, Subject, Chapter } from '@/types';
 
@@ -107,7 +107,6 @@ export function HomeView() {
     : 0;
 
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
-  const hookLine = dailyHookLine(voiceCtx, state.user.name);
   const bubbleLine =
     currentSubject && currentChapter
       ? dailyPickLine(voiceCtx, state.user.name, currentSubject.name, currentChapter.title)
@@ -194,7 +193,6 @@ export function HomeView() {
 
           <motion.div variants={staggerItem}>
             <HeroPiocheCard
-              hookLine={hookLine}
               bubbleLine={bubbleLine}
               subjectName={currentSubject?.name}
               chapterTitle={currentChapter?.title ?? 'Leçon du jour'}

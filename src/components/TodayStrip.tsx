@@ -83,22 +83,32 @@ export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount,
           <StreakFlameIcon size={18} />
         </b>
 
+        {/* Rounded squares, not circles — and today's cell is a solid fill, not a white-and-
+            outline treatment like every other cell: the one real state the reference photo
+            actually showed (today, goal already met) reads as filled and distinct from the rest
+            of the row. The photo's own card was white, so it could fill that cell amber; this
+            card already IS amber-400 — filling the cell the same colour would make it invisible
+            (verified: 1.0:1, i.e. no contrast at all), so the fill is the app's dark ink instead,
+            which pops against amber-400 at 10.6:1 either way. */}
         <div className="mt-2.5 flex justify-between gap-1">
           {weekCells.map((cell, i) => (
             <div key={i} className="flex flex-col items-center gap-1">
               <span
-                className={`flex h-7 w-7 items-center justify-center rounded-full border-2 border-black ${
+                className={`flex h-8 w-8 items-center justify-center rounded-lg border-2 border-black ${
                   cell.kind === 'done-past'
                     ? 'bg-white'
                     : cell.kind === 'done-today'
-                      ? 'bg-white'
+                      ? 'bg-[#151821]'
                       : cell.kind === 'pending-today'
-                        ? 'border-dashed bg-amber-400/40'
-                        : 'border-black/25 bg-amber-400/40'
+                        ? 'border-dashed bg-white/50'
+                        : 'border-black/25 bg-white/50'
                 }`}
               >
                 {cell.kind === 'done-past' && <StreakFlameIcon size={13} />}
-                {cell.kind === 'done-today' && <Star size={13} fill="#151821" color="#151821" />}
+                {cell.kind === 'done-today' && <Star size={13} fill="#FDC800" color="#FDC800" />}
+                {(cell.kind === 'pending-today' || cell.kind === 'empty') && (
+                  <span className="h-1 w-1 rounded-full bg-black/30" aria-hidden="true" />
+                )}
               </span>
               <span className="text-[0.62rem] font-bold text-black/60">{cell.letter}</span>
             </div>

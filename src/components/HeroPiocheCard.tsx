@@ -1,15 +1,11 @@
-import { Play, Clock, Layers } from 'lucide-react';
-import { StreakFlameIcon } from '@/components/StreakFlameIcon';
+import { Play } from 'lucide-react';
 import { BraiseMascot } from '@/components/BraiseMascot';
 
 interface HeroPiocheCardProps {
-  /** Short, visible hookline (from `dailyHookLine()`) — carries the real personality/age tone;
-   *  now a caption under the title rather than the top label, so the real Braise voice survives
-   *  the redesign instead of being displaced by the static "PIOCHE DU JOUR" section tag. */
-  hookLine: string;
   /** Fuller sentence (from `dailyPickLine()`) announced to screen readers only — folds the
-   *  hookline, chapter and subject into one flowing sentence instead of three separate DOM
-   *  fragments read one after another. */
+   *  personalised hook, chapter and subject into one flowing sentence for anyone using a screen
+   *  reader, even though (per the photo reference below) none of that shows as its own visible
+   *  line anymore. */
   bubbleLine: string;
   subjectName?: string;
   chapterTitle: string;
@@ -21,89 +17,56 @@ interface HeroPiocheCardProps {
   onStart: () => void;
 }
 
-// Sixth pass — rebuilt around a reference the user supplied directly (first a photo, then the
-// actual component source that produced it), redone on real data rather than copied verbatim:
-// - The reference's STATS array was hardcoded — "2 min · 10 cartes · +50 XP" for every session,
-//   every chapter. Neither "10 cartes" nor "+50 XP" exists in this app's data model as a
-//   constant: every chapter has its own real flashcard count (FLASHCARDS filtered by chapterId),
-//   and there is no fixed per-session XP reward (base 15/card in Réviser, doubled by the joker —
-//   never a flat number promised before answering a single card). Real duration + real card
-//   count stay, styled as the reference's bordered white pills; the XP stat is dropped rather
-//   than invented.
-// - Title/subtitle: the reference used static marketing copy ("Ta session express" / "Révise
-//   maintenant, gagne le jackpot XP.") for every single chapter. Kept the real chapterTitle as
-//   the headline instead — it already tells you exactly what you're about to study, which a
-//   generic line can't — with the real personalised hookLine (dailyHookLine, personality+age
-//   aware) as the caption under it, not discarded for generic copy.
-// - Card background moved from flat indigo (#5865F2) to the app's own real orange —
-//   color-mix(neo-orange 80%, #000), the exact same darken-by-20% already used on .profile-tag
-//   elsewhere: white text on raw --neo-orange measures 3.44:1 (a real AA failure at normal size),
-//   this same fix clears it to 5.1:1.
-// - The floating mascot is back (the reference brought it back too, large, overlapping the top
-//   edge) but as the real BraiseMascot component — not a new invented character — so it already
-//   carries the account's real rank colour/decoration (the same crown/gem/wing accents Profil
-//   and the rank-up celebration use), rather than a flat orange placeholder flame.
-export function HeroPiocheCard({
-  hookLine,
-  bubbleLine,
-  subjectName,
-  chapterTitle,
-  duration,
-  cardCount,
-  onStart,
-}: HeroPiocheCardProps) {
+// Seventh pass — the sixth pass matched a component the user pasted, not the photo they'd sent
+// first; told directly "analyse bien la photo, ce n'est pas la même chose" and it's a real,
+// specific gap, not a nuance: that source built a different card (giant mascot floating outside
+// the top-right corner, bordered pill stats, an eyebrow badge). The photo itself shows a plainer,
+// calmer card — mascot small and inline at the LEFT of the text block, eyebrow and the
+// duration/cards line both bare white text (no pill chrome at all), the sun a quiet sliver
+// clipped by the card's own corner rather than a large disc sitting on top of it. Matched that
+// directly this time. Two real-data swaps stay from the previous pass, for the same reasons as
+// before: the chapter's own real `duration`/flashcard count instead of a fixed "10 cartes · +50
+// XP" (neither number exists anywhere in this app — every chapter has its own deck, and there's
+// no flat per-session XP reward), and the real chapterTitle instead of a generic "Ta session
+// express" repeated for every chapter. The personalised hookLine that lived here in the last pass
+// is gone from view to match the photo's plainer 3-line stack — still reachable via bubbleLine,
+// just not rendered — since the photo genuinely doesn't have a 4th line.
+export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration, cardCount, onStart }: HeroPiocheCardProps) {
   const handleStart = () => {
     if ('vibrate' in navigator) navigator.vibrate(12);
     onStart();
   };
 
   return (
-    <div className="relative overflow-visible rounded-2xl border-[2.5px] border-black bg-[color-mix(in_srgb,var(--neo-orange)_80%,#000)] p-4 shadow-[3px_3px_0px_0px_#000]">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-5 -top-6 h-24 w-24 rounded-full bg-[#FDC800]"
-      />
+    <div className="relative overflow-hidden rounded-2xl border-[2.5px] border-black bg-[color-mix(in_srgb,var(--neo-orange)_80%,#000)] p-4 shadow-[3px_3px_0px_0px_#000]">
+      <div aria-hidden="true" className="pointer-events-none absolute -right-6 -top-6 h-16 w-16 rounded-full bg-[#FDC800]" />
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 rounded-2xl"
         style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.08) 0px, rgba(255,255,255,0) 20px)' }}
       />
 
-      <div className="relative flex items-start justify-between">
-        <span className="inline-flex items-center gap-1.5 rounded-full border-2 border-black bg-[#151821] px-2.5 py-1 font-display text-[0.68rem] font-black uppercase tracking-wide text-white shadow-[2px_2px_0px_0px_#000]">
-          <StreakFlameIcon size={12} />
-          Pioche du jour
-        </span>
-        <div className="-mr-1 -mt-3 h-[70px] w-[70px] flex-shrink-0">
-          <BraiseMascot size={70} mood="proud" />
+      <div className="relative flex items-center gap-3">
+        <div className="h-14 w-14 flex-shrink-0">
+          <BraiseMascot size={56} mood="happy" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-[0.7rem] font-black uppercase tracking-wide text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]">
+            Pioche du jour
+          </p>
+          <h2 className="truncate font-display text-lg font-black leading-tight text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]">
+            {chapterTitle}
+          </h2>
+          {/* Full-opacity white, not white/90: this exact card background already measured
+              white/90 at 4.40:1 here — under the 4.5:1 floor for normal text, the same class of
+              failure this component's own history already found once on white/75. */}
+          <p className="mt-1 truncate text-[0.78rem] font-semibold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]">
+            {duration} min · {cardCount} carte{cardCount > 1 ? 's' : ''}
+            {subjectName ? ` · ${subjectName}` : ''}
+          </p>
         </div>
       </div>
-
-      <div className="relative mt-2 max-w-[82%]">
-        <h2 className="truncate font-display text-lg font-black leading-tight text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]">
-          {chapterTitle}
-        </h2>
-        <p className="mt-0.5 truncate text-xs font-semibold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]">
-          {hookLine}
-        </p>
-      </div>
       <span className="sr-only">{bubbleLine}</span>
-
-      <div className="relative mt-2.5 flex flex-wrap items-center gap-1.5">
-        {subjectName && (
-          <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border-[2.5px] border-black bg-white px-2.5 py-1 text-[0.72rem] font-black text-black shadow-[2px_2px_0px_0px_#000]">
-            {subjectName}
-          </span>
-        )}
-        <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border-[2.5px] border-black bg-white px-2.5 py-1 text-[0.72rem] font-black text-black shadow-[2px_2px_0px_0px_#000]">
-          <Clock size={13} className="text-[color-mix(in_srgb,var(--neo-orange)_80%,#000)]" />
-          {duration} min
-        </span>
-        <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border-[2.5px] border-black bg-white px-2.5 py-1 text-[0.72rem] font-black text-black shadow-[2px_2px_0px_0px_#000]">
-          <Layers size={13} className="text-[color-mix(in_srgb,var(--neo-orange)_80%,#000)]" />
-          {cardCount} carte{cardCount > 1 ? 's' : ''}
-        </span>
-      </div>
 
       <div className="tw-cta-pulse relative mt-3">
         <button
