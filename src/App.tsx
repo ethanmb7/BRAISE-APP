@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AppProvider, useApp } from '@/store';
 import { TabBar } from '@/components/TabBar';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -31,6 +31,15 @@ function Screen() {
   // in its own glass layer, so it never competes with the verdict buttons for the thumb.
   const showTabBar = ['home', 'revisions', 'progres', 'profile'].includes(state.view);
 
+  // .app-content is one persistent scroll container reused across every view (see the
+  // key={state.view} comment below) — without this, a view left scrolled down (routine on
+  // short phone screens, where content overflows the fold sooner) hands that same offset to
+  // whatever's opened next, burying its top under the sticky topbar instead of starting clean.
+  const contentRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    contentRef.current?.scrollTo({ top: 0 });
+  }, [state.view]);
+
   if (!loaded) {
     return (
       <div className="app-shell">
@@ -44,7 +53,7 @@ function Screen() {
 
   return (
     <div className={`app-shell ${state.darkMode ? 'dark' : ''} ${state.dyslexiaMode ? 'dyslexia-mode' : ''}`}>
-      <div className="app-content">
+      <div className="app-content" ref={contentRef}>
         {/* `key={state.view}`: this is what makes the boundary self-healing on navigation — a
             crash on one view sets its internal hasError, and switching to any other view (via
             the tab bar, which lives outside this boundary and stays clickable, or the
