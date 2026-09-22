@@ -181,7 +181,11 @@ function ensureSession(s: AppState): Partial<AppState> {
 // real welcome gift (a resource handed to you, not a fabricated record of past use), same logic
 // game onboarding flows use for starting currency.
 const INITIAL: AppState = {
-  view: 'onboarding',
+  // Temporarily skips straight to 'home' — onboarding itself isn't being worked on right now, no
+  // need to click through it on every fresh session while iterating on the rest of the app.
+  // OnboardingView and its route in App.tsx are untouched; flip this back to 'onboarding' (or add
+  // a real "has the user finished onboarding before" check) when it's back in scope.
+  view: 'home',
   tab: 'home',
   user: DEFAULT_USER,
   streak: 0,
