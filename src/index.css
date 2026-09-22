@@ -2780,90 +2780,199 @@ select {
   letter-spacing: 0.03em;
 }
 
-/* ===== Personality picker ===== */
-.persona-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-.persona-card {
-  position: relative;
+/* ===== Profile ===== */
+/* Unified card — badges/ton de Braise/matières used to be three separately bordered+shadowed
+   blocks competing with the hero card for attention. Same "quiet" treatment as Strava's own
+   settings-style rows: one thin-bordered container, hairline dividers between rows, no
+   individual borders or shadows — that language stays reserved for the hero above. */
+.uni-card {
   background: var(--paper);
-  border: 2.5px solid var(--neo-ink);
+  border: 1.5px solid rgba(21, 24, 33, 0.2);
   border-radius: 18px;
-  padding: 16px 12px;
-  text-align: center;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.app-shell.dark .uni-card {
+  border-color: rgba(240, 238, 230, 0.16);
+}
+.uni-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 15px;
+  gap: 10px;
+}
+.uni-row + .uni-row {
+  border-top: 1px solid rgba(21, 24, 33, 0.12);
+}
+.app-shell.dark .uni-row + .uni-row {
+  border-top-color: rgba(240, 238, 230, 0.1);
+}
+.uni-row.stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 9px;
+}
+.uni-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.uni-row-label {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+}
+.uni-row-sub {
+  font-size: 0.62rem;
+  color: var(--ink-soft);
+}
+
+/* Progression row — the one row that gets a hair more presence than its siblings: a faint
+   rank-tinted wash (set inline from rank.colorFrom/colorTo, real per-rank data), never a
+   border — the "only the hero has a border" rule still holds inside this card too. */
+.rank-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+.rank-progress-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.rank-progress-head b {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 0.76rem;
+}
+.rank-progress-head span {
+  font-size: 0.6rem;
+  color: var(--ink-soft);
+  font-family: 'IBM Plex Mono', monospace;
+}
+.rank-progress-track {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(21, 24, 33, 0.1);
+  border: 2px solid #000;
+  overflow: hidden;
+}
+.app-shell.dark .rank-progress-track {
+  background: rgba(0, 0, 0, 0.35);
+}
+.rank-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+}
+
+/* Parcours — the single record of "what happened" (real getBadgeUnlockedAtMap dates), ending
+   in a dashed ghost node for what's next (real nextBadgeHint data, never fabricated). Replaces
+   the old badges-count dot row, which said the same "x/6" the timeline already shows. */
+.timeline-row {
+  display: flex;
+  padding: 2px;
+  width: 100%;
+}
+.timeline-item {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  box-shadow: 3px 3px 0 var(--neo-ink);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  gap: 5px;
+  position: relative;
 }
-.persona-card:active {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 var(--neo-ink);
-}
-.persona-card.is-active {
-  background: #eff3ff;
-  /* Fixed light background, so its text must stay fixed dark too — letting it inherit the
-     theme-reactive --ink (light in dark mode) would put light text on this same light blue,
-     the same class of bug the .app-shell colour fix above just surfaced and fixed everywhere
-     else. .persona-sub below needs the same override for the same reason. */
-  color: var(--neo-ink);
-}
-.persona-card.is-active .persona-sub {
-  color: rgba(21, 24, 33, 0.72);
-}
-.persona-emoji {
-  display: flex;
-  margin-bottom: 4px;
-}
-.persona-card b {
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 0.88rem;
-}
-.persona-sub {
-  font-size: 0.68rem;
-  color: var(--ink-soft);
-  line-height: 1.35;
-}
-.persona-check {
+.timeline-line {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 18px;
-  height: 18px;
+  top: 14px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: rgba(21, 24, 33, 0.2);
+  z-index: 0;
+}
+.app-shell.dark .timeline-line {
+  background: rgba(240, 238, 230, 0.16);
+}
+.timeline-dot {
+  position: relative;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: var(--neo-blue);
-  color: #fff;
+  border: 2px solid #000;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #fff;
+}
+.timeline-dot.ghost {
+  background: transparent;
+  border-style: dashed;
+  opacity: 0.55;
+  filter: grayscale(1);
+}
+.timeline-date {
+  font-size: 0.52rem;
+  color: var(--ink-soft);
+  font-family: 'IBM Plex Mono', monospace;
+  text-align: center;
+  line-height: 1.3;
+}
+.timeline-date.ghost {
+  font-weight: 700;
 }
 
-/* ===== Profile ===== */
-/* Same tag-pill treatment as Aura's "MAÎTRISE PAR MATIÈRE" (.mastery-tab) — this page's section
-   labels were still the plain small-caps .section-title shared with Settings/LessonView, the
-   one piece of the page that hadn't adopted Aura's visual language yet. Kept as its own class
-   rather than changing .section-title itself, since that class is shared with views this pass
-   never touched. Same WCAG fix as .mastery-tab: white text on plain --neo-orange is 3.44:1,
-   under the 4.5:1 minimum — darkened 20% clears it in both themes. */
-.profile-tag {
-  display: inline-block;
-  background: color-mix(in srgb, var(--neo-orange) 80%, #000);
-  color: #fff;
+/* Ton Braise — a segmented control instead of two full bordered+shadowed cards: choosing a
+   tone is a small preference, not a second identity card next to the hero. */
+.seg-track {
+  position: relative;
+  display: flex;
+  background: var(--bg);
   border: 2px solid #000;
-  border-radius: 8px;
-  padding: 4px 10px;
-  margin-bottom: 14px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.6rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  border-radius: 999px;
+  padding: 3px;
+  width: 128px;
+  flex-shrink: 0;
+}
+.seg-thumb {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 999px;
   box-shadow: 2px 2px 0 #000;
+  transition: left 0.2s ease;
+}
+.seg-thumb.is-right {
+  left: calc(50% + 0px);
+}
+.seg-opt {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  text-align: center;
+  padding: 9px 0;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 0.68rem;
+  color: var(--ink-soft);
+}
+/* Fixed white thumb behind the active label — same class of bug the app's own dark-mode pass
+   found on .persona-card.is-active: var(--ink) goes light in dark mode and would vanish on
+   this fixed-white pill. Hardcoded dark, on purpose, in both themes. */
+.seg-opt.is-active {
+  color: var(--neo-ink);
+}
+
+.uni-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .profile-joined {
@@ -3050,46 +3159,6 @@ select {
   color: var(--ink-soft);
 }
 
-.profile-badges-line {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  background: var(--paper);
-  border: 2.5px solid var(--neo-ink);
-  border-radius: 16px;
-  padding: 12px 16px;
-  box-shadow: 3px 3px 0 var(--neo-ink);
-  margin-bottom: 16px;
-  font-family: inherit;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-.profile-badges-line:active {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 var(--neo-ink);
-}
-.profile-badges-line span {
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 700;
-  font-size: 0.76rem;
-  color: var(--ink);
-}
-.profile-badges-line-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.profile-badges-dots {
-  display: flex;
-  gap: 4px;
-}
-.profile-badges-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  border: 1.4px solid var(--neo-ink);
-}
-
 .profile-hero-cta {
   display: flex;
   align-items: center;
@@ -3207,19 +3276,9 @@ select {
   color: #fff;
 }
 
-/* Subject chips — real toggles now (see ProfileView.tsx), so they get the same "act on me"
-   affordance as the onboarding chips they're based on, not a plain static list. */
-.profile-subjects-hint {
-  font-size: 0.72rem;
-  color: var(--ink-soft);
-  margin: -6px 0 10px;
-}
-.profile-subject-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 24px;
-}
+/* Subject chips — real toggles (see ProfileView.tsx), same "act on me" affordance as the
+   onboarding chips they're based on. Laid out via .uni-chips now (the unified card), not a
+   page-level wrapper. */
 .profile-subject-chip {
   display: inline-flex;
   align-items: center;
@@ -3268,95 +3327,6 @@ select {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.badges {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  padding-bottom: 4px;
-}
-.badge {
-  text-align: center;
-}
-.badge .ring {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  border: 2px solid var(--neo-ink);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.15rem;
-  margin: 0 auto 6px;
-}
-.badge.locked .ring {
-  background: var(--paper);
-  border: 2px dashed rgba(21, 24, 33, 0.35);
-  filter: grayscale(1);
-  opacity: 0.55;
-}
-.badge span {
-  font-size: 0.64rem;
-  color: var(--ink-soft);
-  display: block;
-}
-.badge .cond {
-  font-size: 0.58rem;
-  opacity: 0.75;
-  margin-top: 1px;
-}
-
-/* Badge tiers — b1/b5 (série) and b2/b6 (XP) are already two thresholds of the same achievement
-   in the data (BADGE_TIERS in ProfileView.tsx); this is the first time that's shown visually,
-   à la Khan Academy's tiered badges, instead of 6 flat unrelated cards. */
-.profile-tier-groups {
-  margin-bottom: 16px;
-}
-.profile-tier-row {
-  margin-bottom: 16px;
-}
-.profile-tier-row:last-child {
-  margin-bottom: 0;
-}
-.profile-tier-title {
-  display: block;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.62rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--ink-soft);
-  margin-bottom: 8px;
-}
-.profile-tier-nodes {
-  display: flex;
-  align-items: center;
-}
-.profile-tier-node-wrap {
-  display: flex;
-  align-items: center;
-  flex: 1;
-}
-.profile-tier-node-wrap .badge {
-  flex: 1;
-}
-.profile-tier-arrow {
-  flex-shrink: 0;
-  width: 24px;
-  text-align: center;
-  color: var(--ink-soft);
-  opacity: 0.5;
-  font-size: 0.95rem;
-  padding-bottom: 24px;
-}
-.profile-standalone-badges {
-  display: flex;
-  gap: 12px;
-  padding-bottom: 4px;
-}
-.profile-standalone-badges .badge {
-  flex: 1;
 }
 
 /* ===== Settings ===== */

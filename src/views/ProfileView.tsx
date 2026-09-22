@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Settings, ChevronRight, Check, Pencil, X, Share2 } from 'lucide-react';
 import { useApp, computeUnlockedBadges, countDoneChapters } from '@/store';
 import { sfx } from '@/lib/sound';
-import { getRankInfo, badgeRemainingLabel, countMasteredCards, RANKS } from '@/lib/aura';
+import { getRankInfo, badgeRemainingLabel, nextBadgeHint, countMasteredCards, RANKS } from '@/lib/aura';
 import { useCountUp } from '@/lib/useCountUp';
 import { getAgeGroup, profileReactionLine } from '@/lib/braiseVoice';
 import { getBadgeUnlockedAtMap } from '@/lib/celebrations';
@@ -14,34 +14,12 @@ import { SubjectIcon } from '@/components/SubjectIcon';
 import { BraiseMascot } from '@/components/BraiseMascot';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { BADGES, SUBJECTS, AVATARS, FLASHCARDS } from '@/data';
-import type { Badge, Personality } from '@/types';
+import type { Personality } from '@/types';
 
 const PERSONAS: { id: Personality; title: string; sub: string }[] = [
   { id: 'chill', title: 'Pote Chill', sub: 'Encourageant, doux, zéro pression.' },
   { id: 'savage', title: 'Coach Savage', sub: 'Second degré, piques amicales assumées.' },
 ];
-
-// b1/b5 (3j/7j de série) and b2/b6 (100/1000 XP) are already two tiers of the same achievement
-// in the underlying data — the badge grid just never showed that relationship, displaying all 6
-// as unrelated flat cards. Grouping them visually (à la Khan Academy's tiered badges) needed no
-// new data, just this pairing made explicit. b3/b4 have no second tier, so they stay standalone.
-const BADGE_TIERS: { title: string; ids: [string, string] }[] = [
-  { title: 'Série', ids: ['b1', 'b5'] },
-  { title: 'XP', ids: ['b2', 'b6'] },
-];
-const STANDALONE_BADGE_IDS = ['b3', 'b4'];
-
-// Same accent per badge as BadgeIcon's own fill colours (flame orange, bolt gold, book indigo,
-// snowflake cyan) — the summary dots read as a shrunk version of the real icons below them,
-// not an unrelated colour code.
-const BADGE_DOT_COLORS: Record<string, string> = {
-  b1: '#ff4500',
-  b5: '#ff4500',
-  b2: '#ffc700',
-  b6: '#ffc700',
-  b3: '#818cf8',
-  b4: '#7dd3fc',
-};
 
 // Same rank-index comparison RankRail already uses (ProfilAuraView.tsx) — a rank-gated avatar
 // unlocks the moment the account reaches that rank or any higher one, never re-locks later.
@@ -65,54 +43,6 @@ const staggerItem = {
   show: { opacity: 1, y: 0, transition: { duration: 0.32, ease: [0.16, 1, 0.3, 1] as const } },
 };
 
-function BadgeTile({
-  badge,
-  unlocked,
-  unlockedAt,
-  remainingLabel,
-}: {
-  badge: Badge;
-  unlocked: boolean;
-  unlockedAt?: number;
-  remainingLabel?: string | null;
-}) {
-  const condText = unlocked
-    ? unlockedAt
-      ? `Débloqué le ${formatShortDate(unlockedAt)}`
-      : badge.cond
-    : (remainingLabel ?? badge.cond);
-  return (
-    <div className={`badge ${unlocked ? '' : 'locked'}`}>
-      <div className="ring" style={unlocked ? { background: '#eff3ff' } : {}}>
-        <BadgeIcon badgeId={badge.id} size={26} />
-      </div>
-      <span>{badge.name}</span>
-      <span className="cond">{condText}</span>
-    </div>
-  );
-}
-
-// Last two raw platform glyphs (☕⚡) left on this page once badges/streak/XP were already
-// vectorial — same flat-fill + #151821-stroke construction as SubjectIcon/BadgeIcon. The bolt
-// reuses the exact path already established for XP/b2/b6 rather than drawing a new one.
-function PersonaIcon({ id }: { id: Personality }) {
-  if (id === 'savage') {
-    return (
-      <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M13 1.5 3.5 13.8h6.2l-1 8.7L19.5 9h-6.4l1.2-7.5Z" fill="#ffc700" stroke="#151821" strokeWidth="1.6" strokeLinejoin="round" />
-      </svg>
-    );
-  }
-  return (
-    <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M5 9 L19 9 L18 18 C17.8 19.6 16.5 20.5 15 20.5 L9 20.5 C7.5 20.5 6.2 19.6 6 18 Z" fill="#c9915a" stroke="#151821" strokeWidth="1.6" strokeLinejoin="round" />
-      <path d="M19 10.3 C22.2 10.3 22.2 15.8 19 15.8" fill="none" stroke="#151821" strokeWidth="1.6" strokeLinecap="round" />
-      <path d="M9.3 7 C8.8 6 9.3 5 8.8 4" fill="none" stroke="#151821" strokeWidth="1.2" strokeLinecap="round" opacity="0.6" />
-      <path d="M14.3 7 C13.8 6 14.3 5 13.8 4" fill="none" stroke="#151821" strokeWidth="1.2" strokeLinecap="round" opacity="0.6" />
-    </svg>
-  );
-}
-
 export function ProfileView() {
   const { state, setView, setPersonality, setUser } = useApp();
   const [editingIdentity, setEditingIdentity] = useState(false);
@@ -129,9 +59,21 @@ export function ProfileView() {
   const badgeUnlocked = computeUnlockedBadges(state);
   const badgeUnlockedCount = Object.values(badgeUnlocked).filter(Boolean).length;
   const badgeUnlockedAt = useMemo(() => getBadgeUnlockedAtMap(), [badgeUnlocked]);
-  const rank = getRankInfo(state.xp).current;
+  const rankInfo = getRankInfo(state.xp);
+  const rank = rankInfo.current;
   const animatedXp = useCountUp(state.xp);
   const rankName = rank.name;
+
+  // The unified card's "Parcours" row — the single record of what happened, oldest first.
+  // Badges unlocked before this session added real unlock-date tracking have no timestamp
+  // (never fabricated), so they sort first and render without a date instead of a fake one.
+  const unlockedBadgesSorted = useMemo(
+    () => BADGES.filter((b) => badgeUnlocked[b.id]).sort((a, b) => (badgeUnlockedAt[a.id] ?? 0) - (badgeUnlockedAt[b.id] ?? 0)),
+    [badgeUnlocked, badgeUnlockedAt]
+  );
+  // Same real "closest locked badge" data already used on Aura's own badge bridge — the
+  // timeline's dashed ghost node, never a fabricated "coming soon".
+  const nextHint = useMemo(() => nextBadgeHint({ streak: state.streak, xp: state.xp }, badgeUnlocked), [state.streak, state.xp, badgeUnlocked]);
 
   // Same derivation as Aura's own share button — real distinct-subjects-reviewed count, not a
   // second, possibly-diverging computation of "how many subjects".
@@ -304,128 +246,121 @@ export function ProfileView() {
           </div>
         )}
 
-        {/* Quick glance at the badge count, in the same dot-per-badge language as the full grid
-            below — now a real jump to it, not just a claim in a code comment. */}
-        <motion.button
-          type="button"
-          className="profile-badges-line"
-          variants={staggerItem}
-          onClick={() => {
-            sfx.tap(state.soundOn);
-            document.getElementById('profile-badges-detail')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }}
-        >
-          <span>
-            {badgeUnlockedCount}/{BADGES.length} badges débloqués
-          </span>
-          <div className="profile-badges-line-right">
-            <div className="profile-badges-dots">
-              {BADGES.map((b) => (
-                <span
-                  key={b.id}
-                  className="profile-badges-dot"
-                  style={{ background: badgeUnlocked[b.id] ? BADGE_DOT_COLORS[b.id] : 'var(--paper)' }}
+        {/* Unified card — badges/ton de Braise/matières as quiet settings-style rows instead of
+            three separately bordered+shadowed blocks. Only the hero above gets the bold-border
+            treatment; everything here stays deliberately calm by comparison. */}
+        <motion.div className="uni-card" variants={staggerItem}>
+          <div
+            className="uni-row progress-row stacked"
+            style={{
+              background: state.darkMode
+                ? `linear-gradient(120deg, ${rank.colorFrom}1a, ${rank.colorTo}0f)`
+                : `linear-gradient(120deg, ${rank.colorFrom}59, ${rank.colorTo}1f)`,
+            }}
+          >
+            <div className="rank-progress">
+              <div className="rank-progress-head">
+                <b>{rankInfo.next ? `${rank.name} → ${rankInfo.next.name}` : `${rank.name} — rang maximum`}</b>
+                <span>{rankInfo.next ? `${rankInfo.next.min - state.xp} XP restants` : 'Atteint'}</span>
+              </div>
+              <div className="rank-progress-track">
+                <div
+                  className="rank-progress-fill"
+                  style={{ width: `${rankInfo.pct}%`, background: `linear-gradient(90deg, ${rank.colorFrom}, ${rank.colorTo})` }}
                 />
+              </div>
+            </div>
+          </div>
+
+          {/* Parcours — the single record of what happened (real unlock dates), ending in a
+              dashed ghost node for what's next (real nextBadgeHint data). Replaces the old
+              badges-count dot row, which said the same "x/6" this already shows. */}
+          <div className="uni-row stacked">
+            <div className="uni-row-main">
+              <span className="uni-row-label">Parcours</span>
+              <span className="uni-row-sub">
+                {badgeUnlockedCount} badge{badgeUnlockedCount > 1 ? 's' : ''} débloqué{badgeUnlockedCount > 1 ? 's' : ''} sur {BADGES.length}
+              </span>
+            </div>
+            <div className="timeline-row">
+              {unlockedBadgesSorted.map((b) => (
+                <div className="timeline-item" key={b.id}>
+                  <div className="timeline-line" aria-hidden="true" />
+                  <div className="timeline-dot">
+                    <BadgeIcon badgeId={b.id} size={14} />
+                  </div>
+                  <span className="timeline-date">{badgeUnlockedAt[b.id] ? formatShortDate(badgeUnlockedAt[b.id]) : ''}</span>
+                </div>
+              ))}
+              {nextHint && (
+                <div className="timeline-item">
+                  <div className="timeline-line" aria-hidden="true" />
+                  <div className="timeline-dot ghost">
+                    <BadgeIcon badgeId={nextHint.badgeId} size={14} />
+                  </div>
+                  <span className="timeline-date ghost">
+                    {badgeRemainingLabel(nextHint.badgeId, { streak: state.streak, xp: state.xp }) ?? BADGES.find((b) => b.id === nextHint.badgeId)?.cond}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="uni-row">
+            <div className="uni-row-main">
+              <span className="uni-row-label">Ton Braise</span>
+              <span className="uni-row-sub">{PERSONAS.find((p) => p.id === state.user.personality)?.sub}</span>
+            </div>
+            <div className="seg-track">
+              <div className={`seg-thumb ${state.user.personality === 'savage' ? 'is-right' : ''}`} aria-hidden="true" />
+              {PERSONAS.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  className={`seg-opt ${state.user.personality === p.id ? 'is-active' : ''}`}
+                  onClick={() => {
+                    sfx.tap(state.soundOn);
+                    setPersonality(p.id);
+                  }}
+                  aria-pressed={state.user.personality === p.id}
+                >
+                  {p.id === 'chill' ? 'Chill' : 'Savage'}
+                </button>
               ))}
             </div>
-            <ChevronRight size={16} color="var(--ink-soft)" />
           </div>
-        </motion.button>
+
+          {/* Matières — real toggles, not a static recap: these picks weight which cards come up
+              more often in Réviser (see RevisionsView's priority scoring), so showing them as
+              inert text would hide a real effect from the one person it affects. */}
+          <div className="uni-row stacked">
+            <div className="uni-row-main">
+              <span className="uni-row-label">Mes matières ({subjectsCount})</span>
+              <span className="uni-row-sub">Favorisées pendant tes révisions — touche pour changer.</span>
+            </div>
+            <div className="uni-chips">
+              {SUBJECTS.map((s) => {
+                const active = state.user.subjects.includes(s.id);
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    className={`profile-subject-chip ${active ? 'is-active' : ''}`}
+                    onClick={() => toggleUserSubject(s.id)}
+                    aria-pressed={active}
+                  >
+                    <SubjectIcon subjectId={s.id} color={s.color} size={15} /> {s.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </motion.div>
 
         <motion.button type="button" className="profile-hero-cta" onClick={handleShareOpen} variants={staggerItem}>
           <Share2 size={16} />
           Partager mon profil
         </motion.button>
-
-        {/* Personality */}
-        <motion.div variants={staggerItem}>
-          <span className="profile-tag">Personnalité de Braise</span>
-          <div className="persona-grid">
-            {PERSONAS.map((p) => {
-              const active = state.user.personality === p.id;
-              return (
-                <button
-                  key={p.id}
-                  className={`persona-card ${active ? 'is-active' : ''}`}
-                  onClick={() => {
-                    sfx.tap(state.soundOn);
-                    setPersonality(p.id);
-                  }}
-                >
-                  {active && (
-                    <span className="persona-check">
-                      <Check size={11} />
-                    </span>
-                  )}
-                  <span className="persona-emoji"><PersonaIcon id={p.id} /></span>
-                  <b>{p.title}</b>
-                  <span className="persona-sub">{p.sub}</span>
-                </button>
-              );
-            })}
-          </div>
-        </motion.div>
-
-        {/* Badges — b1/b5 and b2/b6 grouped as tiers of one achievement (see BADGE_TIERS above)
-            instead of 6 unrelated flat cards; real unlock dates once available. */}
-        <motion.div id="profile-badges-detail" variants={staggerItem}>
-          <span className="profile-tag">Mes badges</span>
-          <div className="profile-tier-groups">
-            {BADGE_TIERS.map((group) => (
-              <div className="profile-tier-row" key={group.title}>
-                <span className="profile-tier-title">{group.title}</span>
-                <div className="profile-tier-nodes">
-                  {group.ids.map((id, i) => {
-                    const badge = BADGES.find((b) => b.id === id)!;
-                    return (
-                      <div className="profile-tier-node-wrap" key={id}>
-                        <BadgeTile
-                          badge={badge}
-                          unlocked={badgeUnlocked[id]}
-                          unlockedAt={badgeUnlockedAt[id]}
-                          remainingLabel={badgeRemainingLabel(id, { streak: state.streak, xp: state.xp })}
-                        />
-                        {i === 0 && <span className="profile-tier-arrow" aria-hidden="true">→</span>}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="profile-standalone-badges">
-            {STANDALONE_BADGE_IDS.map((id) => {
-              const badge = BADGES.find((b) => b.id === id)!;
-              return <BadgeTile key={id} badge={badge} unlocked={badgeUnlocked[id]} unlockedAt={badgeUnlockedAt[id]} />;
-            })}
-          </div>
-        </motion.div>
-
-        {/* Subjects — real toggles, not a static recap: these picks weight which cards come up
-            more often in Réviser (see RevisionsView's priority scoring), so showing them as
-            inert text would hide a real effect from the one person it affects. */}
-        <motion.div variants={staggerItem}>
-        <span className="profile-tag" style={{ marginTop: 20 }}>
-          Mes matières ({subjectsCount})
-        </span>
-        <p className="profile-subjects-hint">Favorisées pendant tes révisions — touche pour changer.</p>
-        <div className="profile-subject-chips">
-          {SUBJECTS.map((s) => {
-            const active = state.user.subjects.includes(s.id);
-            return (
-              <button
-                key={s.id}
-                type="button"
-                className={`profile-subject-chip ${active ? 'is-active' : ''}`}
-                onClick={() => toggleUserSubject(s.id)}
-                aria-pressed={active}
-              >
-                <SubjectIcon subjectId={s.id} color={s.color} size={15} /> {s.name}
-              </button>
-            );
-          })}
-        </div>
-        </motion.div>
 
         {/* Settings link */}
         <motion.div variants={staggerItem}>
