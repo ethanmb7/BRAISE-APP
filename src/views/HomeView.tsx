@@ -212,8 +212,8 @@ export function HomeView() {
               chapterTitle={currentChapter?.title ?? 'Leçon du jour'}
               duration={currentChapter?.duration ?? 0}
               cardCount={currentChapterCardCount}
+              soundOn={state.soundOn}
               onStart={() => {
-                sfx.whoosh(state.soundOn);
                 if (currentSubject && currentChapter) openSubject(currentSubject.id, currentChapter.id);
               }}
             />

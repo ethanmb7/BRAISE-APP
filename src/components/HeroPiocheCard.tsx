@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion, MotionConfig } from 'framer-motion';
+import { motion, MotionConfig } from 'framer-motion';
 import { Play } from 'lucide-react';
-import { BraiseInteractiveMascot } from '@/components/BraiseInteractiveMascot';
+import { BraiseChest } from '@/components/BraiseChest';
+import { sfx } from '@/lib/sound';
+import { getLastPiocheOpenDate, setLastPiocheOpenDate } from '@/lib/celebrations';
 
 interface HeroPiocheCardProps {
   /** Fuller sentence (from `dailyPickLine()`) announced to screen readers only — folds the
@@ -16,27 +18,27 @@ interface HeroPiocheCardProps {
   /** Real count of FLASHCARDS tagged with this chapter's id — not a fixed session size; every
    *  chapter has its own real deck. */
   cardCount: number;
+  soundOn: boolean;
   onStart: () => void;
 }
 
-// Ninth pass — Braise gets a real signature mechanic instead of just sitting next to the button.
-// She now acts on the card: an idle "poke" every ~4.6s (leans toward GO, taps at it, throws a few
-// sparks), a hyped reaction the instant a finger lands on the button (sunglasses, a joyful hop),
-// and on click she dives toward the button and disappears before the real navigation happens. All
-// of that lives in BraiseInteractiveMascot, built on moods BraiseMascot already has (`cool`,
-// `proud`) rather than new SVG states.
+// Eleventh pass — Braise's spot in the card is now a small chest (BraiseChest), built from the
+// "Le Choix de Braise" mockup review: she's clipped so only her head and a pickaxe (the literal
+// tool, punning on "pioche") ever cross above the chest's opening, never a full-body entrance. The
+// card's own rectangular frame stays completely static, same rule as every pass since the ninth —
+// only the chest and its contents move.
 //
-// Explicit constraint this pass: the card's own rectangular frame stays completely static — no
-// more card-wide breathing/press-squash motion.div (that was the previous pass's approach), and
-// (tenth pass) no more deck-sleeve peek behind it either — just one plain rectangle, like every
-// other card on Accueil. Only Braise and her sparks move now; the frame and the heat glow are
-// fixed, so all the "life" reads as her acting on a stable object, the way Duo acts on a static
-// lesson path rather than the path itself wobbling. The GO button keeps its own separate,
-// already-proven base+face bevel (untouched) for its own tap feedback — that's the button's own
-// native affordance, not "the frame" moving.
-export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration, cardCount, onStart }: HeroPiocheCardProps) {
+// The click fires the real audio/haptic sequence itself (sfx.chestOpen/chestOpenQuick, both new,
+// each internally timed to the chest's own beats — see BraiseChest's file header) rather than a
+// single whoosh at navigation time, and decides once, synchronously, whether this is the day's
+// first "pioche" open (full ~900ms ceremony) or a same-day reopen (abbreviated ~420ms) — read and
+// written here rather than lifted to HomeView because both the read and the write have to happen
+// at the exact instant of the click, before the animation choice is made; HomeView's onStart prop
+// only fires later, at the delayed navigation.
+export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration, cardCount, soundOn, onStart }: HeroPiocheCardProps) {
   const [hyped, setHyped] = useState(false);
   const [launching, setLaunching] = useState(false);
+  const [quick, setQuick] = useState(false);
   const launchTimer = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => () => {
@@ -47,20 +49,21 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
 
   const handleStart = () => {
     if (launching) return;
-    if ('vibrate' in navigator) navigator.vibrate(12);
+    const firstToday = getLastPiocheOpenDate() !== new Date().toDateString();
+    setLastPiocheOpenDate();
+    setQuick(!firstToday);
+    (firstToday ? sfx.chestOpen : sfx.chestOpenQuick)(soundOn);
     // The real navigation (onStart → openSubject) unmounts this component immediately, so it's
-    // delayed just long enough for Braise's dive (spring settle ~250-300ms, fade finishing ~300ms)
-    // to actually be seen — the satisfaction has to land before the screen changes.
+    // delayed just long enough for the chosen sequence to actually be seen before the screen
+    // changes — the full ceremony needs ~900ms to land, the abbreviated repeat only ~420ms.
     setLaunching(true);
-    launchTimer.current = setTimeout(onStart, 340);
+    launchTimer.current = setTimeout(onStart, firstToday ? 900 : 420);
   };
 
   return (
     <MotionConfig reducedMotion="user">
-      {/* One plain rectangle — the deck-sleeve peek from the previous pass is gone; every other
-          card on Accueil (TodayStrip, MissedCardsBanner) is a single flat card too, and stacking
-          extra rotated shapes behind just this one broke that consistency for no real gain now
-          that Braise herself is what carries the "alive" read. */}
+      {/* One plain rectangle — every other card on Accueil (TodayStrip, MissedCardsBanner) is a
+          single flat card too. Only the chest and its contents move. */}
       <div className="relative overflow-hidden rounded-2xl border-[2.5px] border-black bg-[#FF6B35] p-4 shadow-[3px_3px_0px_0px_#000]">
         {/* Intermittent heat glow near the sun sliver — a light effect, not the frame moving, so
             it stays even though the card itself is static. */}
@@ -79,7 +82,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
         />
 
         <div className="relative flex items-center gap-3">
-          <BraiseInteractiveMascot size={56} hyped={hyped} diving={launching} />
+          <BraiseChest size={56} hyped={hyped} diving={launching} quick={quick} />
           <div className="min-w-0 flex-1">
             {/* Dark ink, not white — #FF6B35 measures 2.84:1 for white text (a hard AA
                 failure), 6.25:1 for dark ink. Three real fonts: font-mono for the eyebrow
@@ -96,7 +99,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
         <span className="sr-only">{bubbleLine}</span>
 
         {/* Base+face bevel — untouched, the same mechanic SubjectDecks/HeaderHUD use everywhere
-            else on Accueil. Pointer events here drive `hyped` on Braise (hover for a mouse,
+            else on Accueil. Pointer events here drive `hyped` on the chest (hover for a mouse,
             pointerdown for a touch — the only reliable "finger's on it" signal on mobile). */}
         <div className="tw-cta-pulse group relative mt-3">
           <span aria-hidden="true" className="absolute inset-0 translate-y-[3px] rounded-full border-[2.5px] border-black bg-black" />
@@ -113,48 +116,8 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
             <Play size={15} />
             GO !
           </button>
-          <AnimatePresence>
-            {launching && (
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                <LaunchSparks />
-              </div>
-            )}
-          </AnimatePresence>
         </div>
       </div>
     </MotionConfig>
-  );
-}
-
-const SPARK_CLIP = 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)';
-
-// A quick directional whoosh from the button itself (mostly up/out, ~0.5s) — the point of impact
-// where Braise's own dive (BraiseInteractiveMascot) lands, not a duplicate of it. Kept local and
-// small rather than reusing RankUpCelebration's 360° radial Sparkles: that one reads as "a big
-// achievement just happened", this one has to read as "a card just left the deck".
-function LaunchSparks() {
-  const sparks = [
-    { x: -34, y: -46, delay: 0 },
-    { x: -14, y: -58, delay: 0.02 },
-    { x: 10, y: -60, delay: 0.04 },
-    { x: 32, y: -48, delay: 0.02 },
-    { x: -24, y: -30, delay: 0.06 },
-    { x: 26, y: -28, delay: 0.06 },
-    { x: 0, y: -66, delay: 0.01 },
-    { x: -44, y: -18, delay: 0.08 },
-  ];
-  return (
-    <>
-      {sparks.map((s, i) => (
-        <motion.span
-          key={i}
-          className="pointer-events-none absolute left-1/2 top-1/2 block h-2.5 w-2.5"
-          style={{ background: i % 2 === 0 ? '#FDC800' : '#fff', clipPath: SPARK_CLIP }}
-          initial={{ x: 0, y: 0, opacity: 0, scale: 0.3, rotate: 0 }}
-          animate={{ x: s.x, y: s.y, opacity: [0, 1, 0], scale: [0.3, 1, 0.4], rotate: 90 }}
-          transition={{ duration: 0.5, delay: s.delay, ease: 'easeOut' }}
-        />
-      ))}
-    </>
   );
 }

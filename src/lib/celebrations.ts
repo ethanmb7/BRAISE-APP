@@ -6,6 +6,7 @@ const SEEN_RANK_KEY = 'sapie_seen_rank';
 const SEEN_BADGES_KEY = 'sapie_seen_badges';
 const BADGE_UNLOCKED_AT_KEY = 'sapie_badge_unlocked_at';
 const INTOX_DISMISSED_COUNT_KEY = 'sapie_intox_dismissed_count';
+const LAST_PIOCHE_OPEN_KEY = 'sapie_last_pioche_open';
 
 export function getSeenRank(): string | null {
   try {
@@ -90,6 +91,27 @@ export function getIntoxDismissedCount(): number {
 export function setIntoxDismissedCount(count: number): void {
   try {
     localStorage.setItem(INTOX_DISMISSED_COUNT_KEY, String(count));
+  } catch {
+    /* ignore quota errors */
+  }
+}
+
+// Real calendar date (`toDateString()`, the same idiom store.tsx already uses for "today") of the
+// last time the Pioche du jour chest was actually opened — not a session flag, so it survives a
+// reload. Read+written synchronously at the moment of the click (HeroPiocheCard), before the
+// choreography decision is made, since the full ceremony only makes sense for the day's first
+// draw — replaying it on every reopen the same day would just be noise.
+export function getLastPiocheOpenDate(): string | null {
+  try {
+    return localStorage.getItem(LAST_PIOCHE_OPEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function setLastPiocheOpenDate(): void {
+  try {
+    localStorage.setItem(LAST_PIOCHE_OPEN_KEY, new Date().toDateString());
   } catch {
     /* ignore quota errors */
   }

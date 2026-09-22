@@ -94,6 +94,38 @@ export const sfx = {
     );
     haptic([10, 30, 20]);
   },
+  // Follows the chest's own 6-beat choreography (HeroPiocheCard/BraiseChest): a low creak at the
+  // anticipation squash, a sharp crack at the lid-pop, and a bright two-note "ding" at the
+  // dépassement overshoot — three distinct transients, not one flat cue, so the sound reads the
+  // same beats the animation does instead of just marking "something happened" once.
+  chestOpen: (on: boolean) => {
+    playTones(
+      [
+        { f: 180, d: 0.06, t: 'sawtooth' },
+        { f: 520, d: 0.08, t: 'square', delay: 0.12 },
+        { f: 1046, d: 0.16, t: 'sine', delay: 0.58 },
+        { f: 1568, d: 0.14, t: 'sine', delay: 0.6 },
+      ],
+      on
+    );
+    // Matches the same three moments: a light tap, a pause, a slightly stronger pop, a longer
+    // pause, then the "ding" pulse — one call, timed like the visual beats rather than one flat
+    // buzz for the whole ~900ms sequence.
+    haptic([10, 110, 14, 440, 18]);
+  },
+  // Abbreviated pair for a repeat "pioche" open later the same day (see getLastPiocheOpenDate) —
+  // the full ceremony is for the day's first draw; replaying it every time would just be noise by
+  // the third or fourth open.
+  chestOpenQuick: (on: boolean) => {
+    playTones(
+      [
+        { f: 480, d: 0.05, t: 'square' },
+        { f: 1200, d: 0.1, t: 'sine', delay: 0.13 },
+      ],
+      on
+    );
+    haptic([10, 70, 12]);
+  },
   whoosh: (on: boolean) => {
     if (!on) return;
     const c = getCtx();
