@@ -90,7 +90,11 @@ export const SUBJECTS: Subject[] = [
     color: '#6366F1',
     bg: '#EEF2FF',
     chapters: [
-      { id: 'a1', title: 'Present simple', status: 'current', mastery: 0, duration: 3 },
+      // duration = story slides (~22s) + checkpoint/quiz (~4 questions, ~20s each) + real card
+      // review (5 real cards tagged chapterId 'a1' below, ~25s each) ≈ 220s, rounded to 4 min —
+      // was 3 with only 1 real card behind it (Pioche du jour showed "3 min · 1 carte", a mismatch
+      // between the two numbers). Recalculate this if fc25/fc27-30 below ever change.
+      { id: 'a1', title: 'Present simple', status: 'current', mastery: 0, duration: 4 },
       { id: 'a2', title: 'Past simple', status: 'locked', mastery: 0, duration: 3 },
       { id: 'a3', title: 'Present perfect', status: 'locked', mastery: 0, duration: 4 },
       { id: 'a4', title: 'Modals & advice', status: 'locked', mastery: 0, duration: 4 },
@@ -123,8 +127,15 @@ export const FLASHCARDS: Flashcard[] = [
   { id: 'fc22', q: 'Que dit la loi d\'Ohm ?', a: '$U = R \\times I$ : la **tension** est égale à la ==résistance multipliée par l\'intensité==.', wrongA: '$U = R + I$ : la tension est égale à la résistance plus l\'intensité.', subject: 'physique', topic: 'Électricité', chapterId: 'p3', level: 'medium' },
   { id: 'fc23', q: 'Que devient l\'énergie lors d\'une transformation ?', a: 'Elle ==se transforme== en une autre forme (thermique, cinétique...) — elle **ne disparaît jamais**.', wrongA: 'Elle disparaît petit à petit à chaque transformation.', subject: 'physique', topic: 'Énergie', chapterId: 'p4', level: 'easy' },
   { id: 'fc24', q: 'Comment conjugue-t-on un verbe régulier au past simple en anglais ?', a: 'On ajoute **-ED** à la fin du verbe : "play" devient =="played"==.', wrongA: 'On ajoute -ING à la fin du verbe : "play" devient "playing".', subject: 'anglais', topic: 'Past simple', chapterId: 'a2', level: 'easy' },
-  { id: 'fc25', q: 'Quelle terminaison ajoute-t-on au verbe à la 3e personne du singulier au present simple ?', a: 'Un **S** : ==\"she likes\"==, \"he plays\".', wrongA: 'Un ED : "she liked", "he played".', subject: 'anglais', topic: 'Present simple', chapterId: 'a1', level: 'easy' },
+  { id: 'fc25', q: 'Quelle terminaison ajoute-t-on au verbe à la 3e personne du singulier au present simple ?', a: 'Un **S** : =="she likes"==, "he plays".', wrongA: 'Un ED : "she liked", "he played".', subject: 'anglais', topic: 'Present simple', chapterId: 'a1', level: 'easy' },
   { id: 'fc26', q: 'Quelle est la différence entre "must" et "should" en anglais ?', a: '"**Must**" exprime une ==obligation forte==, "should" n\'est qu\'un simple conseil.', wrongA: 'Les deux expriment exactement le même niveau d\'obligation.', subject: 'anglais', topic: 'Modals', chapterId: 'a4', level: 'medium' },
+  // fc27-fc30: real additional Present simple cards (chapterId 'a1') — was a single card (fc25)
+  // while its chapter's duration claimed 3 min, a mismatch Pioche du jour displayed honestly
+  // ("3 min · 1 carte") but that read as broken. See the duration comment on chapter 'a1' above.
+  { id: 'fc27', q: 'Comment forme-t-on la négation au present simple avec "she/he/it" ?', a: 'Avec **doesn\'t** + verbe de base : "She doesn\'t like coffee" — jamais de S sur le verbe après doesn\'t.', wrongA: 'Avec don\'t + verbe de base, comme pour tous les autres sujets : "She don\'t like coffee".', subject: 'anglais', topic: 'Present simple', chapterId: 'a1', level: 'medium' },
+  { id: 'fc28', q: 'Comment pose-t-on une question au present simple avec "you" ?', a: 'On commence par **Do** : "Do you like pizza?" — le verbe reste à sa forme de base.', wrongA: 'On inverse juste le sujet et le verbe, comme en français : "Like you pizza?".', subject: 'anglais', topic: 'Present simple', chapterId: 'a1', level: 'easy' },
+  { id: 'fc29', q: 'Où placer un adverbe de fréquence comme "always" ou "never" au present simple ?', a: '==Avant le verbe principal==, mais après "to be" : "She always arrives on time", "She is never late".', wrongA: 'Toujours en fin de phrase, après le verbe : "She arrives always on time".', subject: 'anglais', topic: 'Present simple', chapterId: 'a1', level: 'medium' },
+  { id: 'fc30', q: 'Comment conjugue-t-on "study" à la 3e personne du singulier au present simple ?', a: 'Le Y devient IE avant le S : =="she studies"==, jamais "she studys".', wrongA: 'On ajoute juste un S à la fin, comme les autres verbes : "she studys".', subject: 'anglais', topic: 'Present simple', chapterId: 'a1', level: 'hard' },
 ];
 
 export const BADGES: Badge[] = [
