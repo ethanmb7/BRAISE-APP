@@ -168,10 +168,10 @@ export function verdictTag(ctx: VoiceCtx, kind: 'carre' | 'super' | 'aie' | 'gri
   return byCombo(ctx, tables[kind]);
 }
 
-export function dailyPickLine(ctx: VoiceCtx, userName: string, subjectName: string, chapterTitle: string): string {
+export function dailyPickLine(ctx: VoiceCtx, userName: string, subjectName: string, chapterTitle: string, duration: number): string {
   return byCombo(ctx, {
-    'chill-college': [`Salut ${userName} ! Aujourd'hui, Braise a pioché "${chapterTitle}" (${subjectName}) pour toi. 3 min, zéro pression.`],
-    'chill-lycee': [`${userName}, pioche du jour : "${chapterTitle}" en ${subjectName}. 3 minutes, tranquille.`],
+    'chill-college': [`Salut ${userName} ! Aujourd'hui, Braise a pioché "${chapterTitle}" (${subjectName}) pour toi. ${duration} min, zéro pression.`],
+    'chill-lycee': [`${userName}, pioche du jour : "${chapterTitle}" en ${subjectName}. ${duration} minutes, tranquille.`],
     'savage-college': [`${userName}, le sort en a décidé : "${chapterTitle}" (${subjectName}). Tu peux pas fuir, désolé.`],
     'savage-lycee': [`${userName}, tirage au sort du jour : "${chapterTitle}" en ${subjectName}. Le hasard ne négocie pas.`],
   });

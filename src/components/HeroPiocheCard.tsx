@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, MotionConfig } from 'framer-motion';
-import { Play, Sparkles } from 'lucide-react';
+import { Clock3, Play, Sparkles, Trophy } from 'lucide-react';
 import { BraiseChest } from '@/components/BraiseChest';
 import { sfx } from '@/lib/sound';
 import { getLastPiocheOpenDate, setLastPiocheOpenDate } from '@/lib/celebrations';
@@ -13,6 +13,8 @@ interface HeroPiocheCardProps {
    *  stack, no 4th hook line). */
   bubbleLine: string;
   subjectName?: string;
+  /** A subject-owned colour used as a small identity signal, never as the CTA colour. */
+  subjectColor?: string;
   chapterTitle: string;
   /** The real chapter's own `duration` field (data.ts) — minutes, never a guessed number. */
   duration: number;
@@ -36,7 +38,7 @@ interface HeroPiocheCardProps {
 // written here rather than lifted to HomeView because both the read and the write have to happen
 // at the exact instant of the click, before the animation choice is made; HomeView's onStart prop
 // only fires later, at the delayed navigation.
-export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration, cardCount, soundOn, onStart }: HeroPiocheCardProps) {
+export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterTitle, duration, cardCount, soundOn, onStart }: HeroPiocheCardProps) {
   const [hyped, setHyped] = useState(false);
   const [launching, setLaunching] = useState(false);
   const [quick, setQuick] = useState(false);
@@ -147,22 +149,27 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
                 (same as every other small-caps label app-wide), font-display for the title,
                 font-sans for the stats line. */}
             <p className="flex items-center gap-1 font-mono text-[0.67rem] font-black uppercase tracking-wide text-[#151821]">
-              <Sparkles size={12} strokeWidth={3} /> {launching ? 'Mission trouvée !' : 'Braise a une mission'}
+              <Sparkles size={12} strokeWidth={3} /> {launching ? 'Mission trouvée !' : 'Pioche du jour'}
             </p>
-            <h2 className="truncate font-display text-xl font-black leading-tight text-[#151821]">{chapterTitle}</h2>
-            {/* "3 min · Histoire-Géo · 1 notion à débloquer" — duration first (the promise: this
-                is short), subject second, then the real card count relabelled as "notion(s)":
-                each flashcard already is one discrete, testable concept, so this isn't a new
-                number invented for the label, just the same cardCount already reaching screen
-                readers below, finally shown. No visible "Express" badge next to a number that
-                already says "3 min" — that was saying the same thing twice. */}
-            <p className="mt-1 font-sans text-[0.78rem] font-semibold leading-snug text-[#151821]">
-              {duration} min{subjectName ? ` · ${subjectName}` : ''} · {cardCount} notion{cardCount > 1 ? 's' : ''} à débloquer
-            </p>
+            <h2 className="line-clamp-2 font-display text-xl font-black leading-tight text-[#151821]">{chapterTitle}</h2>
+          </div>
+        </div>
+        <div className="relative mt-4 grid grid-cols-3 gap-2" aria-label="Les repères de ta mission">
+          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
+            <Clock3 size={15} strokeWidth={3} aria-hidden="true" />
+            <span className="font-mono text-[0.67rem] font-black text-[#151821]">{duration} MIN</span>
+          </div>
+          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
+            <span aria-hidden="true" className="h-3 w-3 flex-none rounded-full border-2 border-[#151821]" style={{ background: subjectColor ?? '#FDC800' }} />
+            <span className="truncate font-mono text-[0.67rem] font-black uppercase text-[#151821]">{subjectName ?? 'Mission'}</span>
+          </div>
+          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
+            <Trophy size={15} strokeWidth={3} aria-hidden="true" />
+            <span className="font-mono text-[0.67rem] font-black text-[#151821]">+50 AURA</span>
           </div>
         </div>
         <span className="sr-only">
-          {bubbleLine} Cette mission contient {cardCount} carte{cardCount > 1 ? 's' : ''}.
+          {bubbleLine} Cette mission contient {cardCount} carte{cardCount > 1 ? 's' : ''}, dure environ {duration} minutes et rapporte 50 points d'Aura à sa première validation.
         </span>
         {launching && <span className="sr-only" role="status">Braise révèle ta mission.</span>}
 

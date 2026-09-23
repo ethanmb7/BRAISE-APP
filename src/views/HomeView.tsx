@@ -117,7 +117,7 @@ export function HomeView() {
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
   const bubbleLine =
     currentSubject && currentChapter
-      ? dailyPickLine(voiceCtx, state.user.name, currentSubject.name, currentChapter.title)
+      ? dailyPickLine(voiceCtx, state.user.name, currentSubject.name, currentChapter.title, currentChapter.duration)
       : `${state.user.name}, série de ${state.streak} jours. On lâche rien !`;
 
   // Each card's "Niv." is the current chapter's real position in the subject's own sequence
@@ -169,7 +169,7 @@ export function HomeView() {
 
   return (
     <>
-      <div className="view is-active" style={{ paddingTop: 16 }}>
+      <div className="view is-active home-view" style={{ paddingTop: 16 }}>
         {!state.user.level && (
           <div className="setup-banner">Configure ton niveau pour des leçons sur mesure.</div>
         )}
@@ -198,19 +198,18 @@ export function HomeView() {
             />
           </motion.div>
 
-          <motion.div variants={staggerItem}>
+          <motion.div variants={staggerItem} className="home-mission-zone">
+            <span className="home-mission-orbit home-mission-orbit-one" aria-hidden="true" />
+            <span className="home-mission-orbit home-mission-orbit-two" aria-hidden="true" />
             <HeroPiocheCard
               bubbleLine={bubbleLine}
               subjectName={currentSubject?.name}
+              subjectColor={currentSubject?.color}
               chapterTitle={currentChapter?.title ?? 'Leçon du jour'}
               duration={currentChapter?.duration ?? 0}
               cardCount={currentChapterCardCount}
               soundOn={state.soundOn}
               onStart={() => {
-                // A daily ritual must deliver on its promise in one tap. Sending the player to
-                // the subject map here made "Je pioche" lead to a second choice before any
-                // learning started; the map remains available from the decks below, while the
-                // hero goes straight to the chapter Braise picked.
                 if (currentSubject && currentChapter) openLesson(currentSubject.id, currentChapter.id);
               }}
             />
@@ -249,8 +248,11 @@ export function HomeView() {
           )}
 
           <motion.div variants={staggerItem} className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="font-display text-base font-extrabold text-[var(--ink)]">Choisis une matière</span>
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <span className="font-mono text-[0.62rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">Quand tu veux aller plus loin</span>
+                <h2 className="font-display text-[1.15rem] font-extrabold leading-tight text-[var(--ink)]">Tes univers</h2>
+              </div>
               <span className="rounded-lg border border-black bg-[var(--neo-orange)] px-2 py-0.5 text-xs font-black text-white shadow-[1px_1px_0px_0px_#000]">
                 {SUBJECTS.length}
               </span>
@@ -277,11 +279,7 @@ export function HomeView() {
 
       {freezeToast && (
         <div key={freezeToast} className="freeze-toast">
-codex/analyser-et-ameliorer-l-application-braise-pvobf9
-          {freezeToast === 'on' ? '🧊 Gel activé : ta série est protégée.' : 'Gel de série désactivé'}
-=======
           {freezeToast === 'on' ? '🧊 Joker prêt : ta série est protégée.' : 'Joker de série désactivé'}
-main
         </div>
       )}
 
