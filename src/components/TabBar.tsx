@@ -1,4 +1,4 @@
-import { Home, Layers, TrendingUp, User } from 'lucide-react';
+import { BookOpen, CalendarDays, Layers, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { TabId } from '@/types';
 
@@ -7,11 +7,11 @@ type Props = {
   onChange: (tab: TabId) => void;
 };
 
-const TABS: { id: TabId; label: string; icon: typeof Home }[] = [
-  { id: 'home', label: 'Accueil', icon: Home },
+const TABS: { id: TabId; label: string; icon: typeof CalendarDays }[] = [
+  { id: 'home', label: 'Aujourd’hui', icon: CalendarDays },
+  { id: 'subjects', label: 'Matières', icon: BookOpen },
   { id: 'revisions', label: 'Réviser', icon: Layers },
-  { id: 'progres', label: 'Aura', icon: TrendingUp },
-  { id: 'profile', label: 'Profil', icon: User },
+  { id: 'profile', label: 'Moi', icon: User },
 ];
 
 // Calm floating navigation: it stays recognisably BRAISE through the orange active pill, but the
