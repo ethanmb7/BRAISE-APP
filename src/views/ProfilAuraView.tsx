@@ -7,7 +7,7 @@ import { useOnlineStatus } from '@/lib/useOnlineStatus';
 import { useCountUp } from '@/lib/useCountUp';
 import { BraiseMascot } from '@/components/BraiseMascot';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
-import { SubjectIcon } from '@/components/SubjectIcon';
+import { SubjectMasteryGrid } from '@/components/SubjectMasteryGrid';
 import { RankIcon } from '@/components/RankIcon';
 import { StreakFlameIcon } from '@/components/StreakFlameIcon';
 import { TrophyIcon } from '@/components/TrophyIcon';
@@ -19,7 +19,6 @@ import {
   computeBraiseInsight,
   nextBadgeHint,
   type Rank,
-  type SubjectMastery,
   type BraiseInsight,
 } from '@/lib/aura';
 import { getAgeGroup, progressAdvice, strongSubjectLine } from '@/lib/braiseVoice';
@@ -322,73 +321,6 @@ const RankRail = memo(function RankRail({
             </div>
           );
         })}
-      </div>
-    </div>
-  );
-});
-
-// Same subject the Accueil grid uses, kept in one place so both screens shorten it identically.
-const SHORT_SUBJECT_NAME: Record<string, string> = { maths: 'Maths' };
-
-// Per-subject mastery — the one signal Réviser's own data (SM-2 repetitions per card) could
-// already answer but nothing on the page surfaced: "où est-ce que je suis vraiment solide".
-// Went through a ring-medallion phase (echoing the Hero) before this — visually consistent, but
-// a borrowed-from-elsewhere metaphor (gauges, HUD bars, radar charts) on an app whose actual
-// mechanic already has one built in: cards. A fanned stack of 4 abstract card-slots, filled
-// left-to-right by real mastered/total progress, is the one version of this idea that isn't
-// borrowed from another app or another game genre — it's literally what happens in Réviser.
-// The label underneath is the real count ("3/6 cartes"), not a percentage: a percentage used to
-// let one mastered card out of six read as "100%" just because it was the only one reviewed.
-// Tapping a stack opens that subject directly — a weak subject is something to act on, not a
-// static number to sit with. Fixed subject order (same as Accueil's deck grid), never sorted by
-// score, so a weak subject is never singled out by position.
-const SubjectMasteryGrid = memo(function SubjectMasteryGrid({
-  subjects,
-  onSelect,
-}: {
-  subjects: SubjectMastery[];
-  onSelect: (id: string) => void;
-}) {
-  return (
-    <div className="mastery-section-wrap">
-      <div className="mastery-section">
-        <span className="mastery-tab">Maîtrise par matière</span>
-        <div className="mastery-grid" role="list">
-          {subjects.map((s) => {
-            const filled = s.totalCount > 0 ? Math.round((s.masteredCount / s.totalCount) * 4) : 0;
-            return (
-              <button
-                key={s.id}
-                type="button"
-                className="mastery-tile"
-                role="listitem"
-                onClick={() => onSelect(s.id)}
-                aria-label={`${s.name} : ${s.masteredCount} carte${s.masteredCount > 1 ? 's' : ''} maîtrisée${s.masteredCount > 1 ? 's' : ''} sur ${s.totalCount} — réviser cette matière`}
-              >
-                <span className="mastery-stack">
-                  {[0, 1, 2, 3].map((i) => {
-                    const isFilled = i < filled;
-                    return (
-                      <span
-                        key={i}
-                        className={`mastery-card ${isFilled ? 'is-filled' : 'is-empty'}`}
-                        style={isFilled ? ({ background: s.color } as CSSProperties) : undefined}
-                      >
-                        {i === 3 && (
-                          <SubjectIcon subjectId={s.id} color={isFilled ? '#fff' : 'rgba(21,24,33,0.35)'} size={16} />
-                        )}
-                      </span>
-                    );
-                  })}
-                </span>
-                <span className="mastery-name">{SHORT_SUBJECT_NAME[s.id] ?? s.name}</span>
-                <span className="mastery-count">
-                  {s.masteredCount}/{s.totalCount} cartes
-                </span>
-              </button>
-            );
-          })}
-        </div>
       </div>
     </div>
   );

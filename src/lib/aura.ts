@@ -149,6 +149,18 @@ export function badgeRemainingLabel(badgeId: string, s: { streak: number; xp: nu
   return t.kind === 'streak' ? `Encore ${remaining} jour${remaining > 1 ? 's' : ''}` : `Encore ${remaining} XP`;
 }
 
+// Real partial progress (0-100) toward a numeric badge's own threshold, so Profil's mission
+// board can draw an honest fill bar next to badgeRemainingLabel's honest text — same
+// BADGE_THRESHOLDS source, the two can never disagree. null for b3/b4: no partial progress
+// exists for "finis un chapitre" / "utilise un gel", and a made-up percentage would violate the
+// same no-fabrication rule badgeRemainingLabel already follows.
+export function badgeProgressPct(badgeId: string, s: { streak: number; xp: number }): number | null {
+  const t = BADGE_THRESHOLDS[badgeId];
+  if (!t) return null;
+  const current = t.kind === 'streak' ? s.streak : s.xp;
+  return Math.min(100, Math.round((current / t.value) * 100));
+}
+
 // Picks the single locked badge that's honestly closest to unlocking, so the badge bridge gives
 // a reason to act now instead of just a static count. Streak/XP thresholds are comparable as "%
 // of the way there" even though their units differ (days vs. XP), which lets a 2-day gap and a
