@@ -1,461 +1,101 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 import { motion } from 'framer-motion';
-import { Settings, ChevronRight, Check, Pencil, X, Share2, Target, Flame, BookOpen, Award } from 'lucide-react';
+import { Award, BookOpen, ChevronRight, Flame, Pencil, Settings, Share2, Sparkles, Target, X, Check } from 'lucide-react';
 import { useApp, computeUnlockedBadges, countDoneChapters } from '@/store';
 import { sfx } from '@/lib/sound';
-import { getRankInfo, badgeRemainingLabel, nextBadgeHint, countMasteredCards, RANKS } from '@/lib/aura';
+import { getRankInfo, countMasteredCards, nextBadgeHint, badgeRemainingLabel, RANKS } from '@/lib/aura';
 import { useCountUp } from '@/lib/useCountUp';
 import { getAgeGroup, profileReactionLine } from '@/lib/braiseVoice';
 import { getBadgeUnlockedAtMap } from '@/lib/celebrations';
 import { TopBar } from '@/components/TopBar';
-import { BadgeIcon } from '@/components/BadgeIcon';
-import { RankIcon } from '@/components/RankIcon';
-import { SubjectIcon } from '@/components/SubjectIcon';
 import { BraiseMascot } from '@/components/BraiseMascot';
+import { RankIcon } from '@/components/RankIcon';
+import { BadgeIcon } from '@/components/BadgeIcon';
+import { SubjectIcon } from '@/components/SubjectIcon';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { BADGES, SUBJECTS, AVATARS, FLASHCARDS } from '@/data';
 import type { Personality } from '@/types';
 
 const PERSONAS: { id: Personality; title: string; sub: string }[] = [
-  { id: 'chill', title: 'Pote Chill', sub: 'Encourageant, doux, zéro pression.' },
-  { id: 'savage', title: 'Coach Savage', sub: 'Second degré, piques amicales assumées.' },
+  { id: 'chill', title: 'Pote chill', sub: 'Encourageant, sans pression.' },
+  { id: 'savage', title: 'Coach savage', sub: 'Le petit kick quand il faut.' },
 ];
+const ease = [0.16, 1, 0.3, 1] as const;
+const listMotion = { hidden: {}, show: { transition: { staggerChildren: 0.07 } } };
+const itemMotion = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.3, ease } } };
 
-// Same rank-index comparison RankRail already uses (ProfilAuraView.tsx) — a rank-gated avatar
-// unlocks the moment the account reaches that rank or any higher one, never re-locks later.
-function isAvatarUnlocked(minRankId: string | undefined, currentRankId: string): boolean {
+function unlocked(minRankId: string | undefined, currentRankId: string) {
   if (!minRankId) return true;
-  const minIdx = RANKS.findIndex((r) => r.id === minRankId);
-  const currentIdx = RANKS.findIndex((r) => r.id === currentRankId);
-  return currentIdx >= minIdx;
+  return RANKS.findIndex((r) => r.id === currentRankId) >= RANKS.findIndex((r) => r.id === minRankId);
 }
-
-function formatShortDate(ts: number): string {
-  return new Date(ts).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-}
-
-const staggerContainer = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.08, delayChildren: 0.04 } },
-};
-const staggerItem = {
-  hidden: { opacity: 0, y: 14 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.32, ease: [0.16, 1, 0.3, 1] as const } },
-};
 
 export function ProfileView() {
   const { state, setView, setTab, setPersonality, setUser } = useApp();
-  const [editingIdentity, setEditingIdentity] = useState(false);
-  const [draftName, setDraftName] = useState(state.user.name);
-  const [draftAvatar, setDraftAvatar] = useState(state.user.avatar);
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(state.user.name);
+  const [avatar, setAvatar] = useState(state.user.avatar);
   const [shareOpen, setShareOpen] = useState(false);
-
-  const subjectsCount = state.user.subjects.length;
-  const chaptersDone = countDoneChapters(state.completedChapters);
-  // Distinct from "cartes maîtrisées" (shown on Aura) — this is raw effort, every card ever
-  // opened in Réviser, mastered or not. Real apps show volume and mastery as two separate
-  // numbers; until now this page only ever showed the second one.
-  const cardsSeenCount = Object.keys(state.cardReviews).length;
-  const badgeUnlocked = computeUnlockedBadges(state);
-  const badgeUnlockedCount = Object.values(badgeUnlocked).filter(Boolean).length;
-  const badgeUnlockedAt = useMemo(() => getBadgeUnlockedAtMap(), [badgeUnlocked]);
   const rankInfo = getRankInfo(state.xp);
   const rank = rankInfo.current;
-  // A 12%-full bar and a 96%-full bar read as the same "in progress" state today — no
-  // different treatment for the stretch where anticipation is actually highest. Real games and
-  // Duolingo both intensify near a threshold; this mirrors that with data already computed
-  // (rankInfo.pct), not a new mechanic. Foreshadows the NEXT rank's own colour (not the current
-  // one) — a preview of what's about to unlock, the same idea as the badge timeline's ghost node.
-  const isAlmostThere = Boolean(rankInfo.next) && rankInfo.pct >= 90;
-  const animatedXp = useCountUp(state.xp);
-  const rankName = rank.name;
+  const xp = useCountUp(state.xp);
+  const chaptersDone = countDoneChapters(state.completedChapters);
+  const cardsSeen = Object.keys(state.cardReviews).length;
+  const mastery = countMasteredCards(state.cardReviews);
+  const unlockedBadges = computeUnlockedBadges(state);
+  const badgeCount = Object.values(unlockedBadges).filter(Boolean).length;
+  const unlockedAt = useMemo(() => getBadgeUnlockedAtMap(), [unlockedBadges]);
+  const nextBadge = useMemo(() => nextBadgeHint(state, unlockedBadges), [state, unlockedBadges]);
+  const voice = useMemo(() => profileReactionLine({ personality: state.user.personality, age: getAgeGroup(state.user.level) }, { rankName: rank.name, streak: state.streak, badgesUnlocked: badgeCount, badgesTotal: BADGES.length }), [state.user.personality, state.user.level, rank.name, state.streak, badgeCount]);
+  const reviewedSubjects = new Set(Object.keys(state.cardReviews).map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)).size;
 
-  // The unified card's "Parcours" row — the single record of what happened, oldest first.
-  // Badges unlocked before this session added real unlock-date tracking have no timestamp
-  // (never fabricated), so they sort first and render without a date instead of a fake one.
-  const unlockedBadgesSorted = useMemo(
-    () => BADGES.filter((b) => badgeUnlocked[b.id]).sort((a, b) => (badgeUnlockedAt[a.id] ?? 0) - (badgeUnlockedAt[b.id] ?? 0)),
-    [badgeUnlocked, badgeUnlockedAt]
-  );
-  // Same real "closest locked badge" data already used on Aura's own badge bridge — the
-  // timeline's dashed ghost node, never a fabricated "coming soon".
-  const nextHint = useMemo(() => nextBadgeHint({ streak: state.streak, xp: state.xp }, badgeUnlocked), [state.streak, state.xp, badgeUnlocked]);
-
-  // Same derivation as Aura's own share button — real distinct-subjects-reviewed count, not a
-  // second, possibly-diverging computation of "how many subjects".
-  const reviewedSubjectsCount = useMemo(
-    () =>
-      new Set(
-        Object.keys(state.cardReviews).map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)
-      ).size,
-    [state.cardReviews]
-  );
-  const masteredCards = useMemo(() => countMasteredCards(state.cardReviews), [state.cardReviews]);
-
-  // Memoized on the real facts it depends on, not re-rolled on every render (e.g. opening the
-  // identity editor or toggling a subject chip) — only changes when something Braise would
-  // actually react to differently changes.
-  const braiseTake = useMemo(
-    () =>
-      profileReactionLine(
-        { personality: state.user.personality, age: getAgeGroup(state.user.level) },
-        { rankName, streak: state.streak, badgesUnlocked: badgeUnlockedCount, badgesTotal: BADGES.length }
-      ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state.user.personality, state.user.level, rankName, state.streak, badgeUnlockedCount]
-  );
-
-  const openIdentityEdit = () => {
-    sfx.tap(state.soundOn);
-    setDraftName(state.user.name);
-    setDraftAvatar(state.user.avatar);
-    setEditingIdentity(true);
-  };
-
-  const saveIdentity = () => {
-    sfx.tap(state.soundOn);
-    setUser({ ...state.user, name: draftName.trim() || state.user.name, avatar: draftAvatar });
-    setEditingIdentity(false);
-  };
-
-  const toggleUserSubject = (id: string) => {
-    sfx.tap(state.soundOn);
-    const has = state.user.subjects.includes(id);
-    const next = has ? state.user.subjects.filter((s) => s !== id) : [...state.user.subjects, id];
-    setUser({ ...state.user, subjects: next });
-  };
-
-  const handleShareOpen = () => {
-    sfx.tap(state.soundOn);
-    if (navigator.vibrate) navigator.vibrate(10);
-    setShareOpen(true);
-  };
-  const handleShareClose = () => setShareOpen(false);
+  const editProfile = () => { sfx.tap(state.soundOn); setName(state.user.name); setAvatar(state.user.avatar); setEditing(true); };
+  const saveProfile = () => { sfx.tap(state.soundOn); setUser({ ...state.user, name: name.trim() || state.user.name, avatar }); setEditing(false); };
+  const goReview = () => { sfx.tap(state.soundOn); setTab('revisions'); };
 
   return (
     <div>
       <TopBar title="Profil" onBack={() => setView(state.tab)} />
-      <motion.div className="view is-active" variants={staggerContainer} initial="hidden" animate="show">
-        {!editingIdentity ? (
-          <motion.div className="profile-hero-card" variants={staggerItem}>
-            <div className="profile-hero-banner" style={{ background: `linear-gradient(125deg, ${rank.colorFrom}, ${rank.colorTo})` }}>
-              <div className="profile-hero-rank-pill">
-                <RankIcon rankId={rank.id} color={rank.colorFrom} size={14} />
-                {rank.name}
-              </div>
-            </div>
-            <div className="profile-hero-body">
-              <div className="profile-hero-avatar-stage">
-                <div
-                  className="profile-hero-avatar-glow"
-                  style={{ background: `radial-gradient(circle, ${rank.colorTo}80, transparent 70%)` }}
-                />
-                <div
-                  className="profile-hero-avatar-ring"
-                  style={{ background: `conic-gradient(${rank.colorFrom}, ${rank.colorTo}, ${rank.colorFrom})` }}
-                />
-                <button type="button" className="profile-hero-avatar" onClick={openIdentityEdit} aria-label="Modifier ton avatar et ton prénom">
-                  {state.user.avatar}
-                  <span className="profile-hero-edit-badge" aria-hidden="true">
-                    <Pencil size={11} />
-                  </span>
-                </button>
-              </div>
-              <h2 className="profile-hero-name">{state.user.name}</h2>
-              {state.user.joinedAt && <p className="profile-joined">Membre depuis le {formatShortDate(state.user.joinedAt)}</p>}
-
-              {/* Braise's take — real facts (rank/série/badges), never generic filler; changes
-                  when they actually change, so there's a real reason to come back and see what
-                  he says now. `sleepy` at streak 0 (not `happy`) — resting and waiting for you,
-                  never disappointed; the copy in profileReactionLine was rewritten to match
-                  (always ends on an open door, never a flat diss). The "reprendre" link is the
-                  actual door: a real jump into Révisions, not just a line with nowhere to go. */}
-              <div className="profile-hero-bubble">
-                <span className="profile-hero-bubble-icon" aria-hidden="true">
-                  <BraiseMascot size={26} mood={state.streak > 0 ? 'proud' : 'sleepy'} />
-                </span>
-                <div>
-                  <p>{braiseTake}</p>
-                  {state.streak === 0 && (
-                    <button
-                      type="button"
-                      className="profile-hero-bubble-cta"
-                      onClick={() => {
-                        sfx.tap(state.soundOn);
-                        setTab('revisions');
-                      }}
-                    >
-                      Réviser une carte →
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <div className="profile-hero-num">{animatedXp}</div>
-              <div className="profile-hero-lbl">XP</div>
-
-              <div className="profile-hero-mini-row">
-                <div className="profile-hero-mini">
-                  <b>{state.streak}</b>
-                  <span>jours</span>
-                </div>
-                <div className="profile-hero-mini">
-                  <b>{cardsSeenCount}</b>
-                  <span>cartes</span>
-                </div>
-                <div className="profile-hero-mini">
-                  <b>{chaptersDone}</b>
-                  <span>{chaptersDone > 1 ? 'chapitres' : 'chapitre'}</span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        ) : (
-          <div className="profile-identity-edit">
-            <div className="profile-avatar-picker">
-              {AVATARS.map((a) => {
-                const unlocked = isAvatarUnlocked(a.minRankId, rank.id);
-                const requiredRank = a.minRankId ? RANKS.find((r) => r.id === a.minRankId) : null;
-                return (
-                  <button
-                    key={a.emoji}
-                    type="button"
-                    className={`profile-avatar-option ${draftAvatar === a.emoji ? 'is-selected' : ''} ${unlocked ? '' : 'is-locked'}`}
-                    onClick={() => {
-                      if (!unlocked) return;
-                      sfx.tap(state.soundOn);
-                      setDraftAvatar(a.emoji);
-                    }}
-                    disabled={!unlocked}
-                    aria-label={unlocked ? `Choisir l'avatar ${a.emoji}` : `Avatar verrouillé — débloqué au rang ${requiredRank?.name}`}
-                  >
-                    {a.emoji}
-                    {!unlocked && (
-                      <span className="profile-avatar-option-lock" aria-hidden="true">
-                        <RankIcon rankId="" color="" locked size={11} />
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-            {(() => {
-              const nextLockedAvatar = AVATARS.find((a) => a.minRankId && !isAvatarUnlocked(a.minRankId, rank.id));
-              if (!nextLockedAvatar) return null;
-              const requiredRank = RANKS.find((r) => r.id === nextLockedAvatar.minRankId);
-              return (
-                <p className="profile-avatar-unlock-hint">
-                  {nextLockedAvatar.emoji} débloqué au rang {requiredRank?.name}
-                </p>
-              );
-            })()}
-            <input
-              type="text"
-              className="profile-name-input"
-              value={draftName}
-              onChange={(e) => setDraftName(e.target.value)}
-              placeholder="Ton prénom"
-              maxLength={20}
-              autoFocus
-            />
-            <div className="profile-identity-actions">
-              <button
-                type="button"
-                className="profile-identity-cancel"
-                onClick={() => {
-                  sfx.tap(state.soundOn);
-                  setEditingIdentity(false);
-                }}
-              >
-                <X size={15} /> Annuler
-              </button>
-              <button type="button" className="profile-identity-save" onClick={saveIdentity}>
-                <Check size={15} /> Enregistrer
-              </button>
-            </div>
-          </div>
-        )}
-
-        <motion.section className="profile-command-center" variants={staggerItem} aria-label="Ton espace personnel">
-          <div className="profile-command-heading">
+      <motion.main className="view is-active profile-new" variants={listMotion} initial="hidden" animate="show">
+        <motion.section className="profile-new-hero" variants={itemMotion}>
+          <div className="profile-new-hero-top">
             <div>
-              <span className="profile-eyebrow">Ton coin à toi</span>
-              <h1>Ton mood du moment, c&apos;est quoi ?</h1>
-              <p>Ton énergie, tes badges et tes petites victoires réunis ici.</p>
+              <span className="profile-new-kicker">TON ESPACE</span>
+              <h1>{state.user.name}, t&apos;es dans le game.</h1>
+              <p>Tout ce qui te ressemble et te fait avancer, au même endroit.</p>
             </div>
-            <div className="profile-command-flame" aria-hidden="true"><BraiseMascot size={48} mood={state.streak > 0 ? 'proud' : 'sleepy'} /></div>
+            <button type="button" className="profile-new-edit" onClick={editProfile} aria-label="Modifier mon profil"><Pencil /></button>
           </div>
-
-          <div className="profile-weekly-mission">
-            <div className="profile-mission-icon" aria-hidden="true"><Target size={19} /></div>
-            <div className="profile-mission-copy">
-              <strong>Petit défi du jour</strong>
-              <span>{state.streak > 0 ? 'Un mini passage et ta série reste dans le game.' : 'Une première carte pour relancer la vibe.'}</span>
+          {editing ? (
+            <div className="profile-new-editor">
+              <div className="profile-avatar-picker">{AVATARS.map((a) => { const canUse = unlocked(a.minRankId, rank.id); return <button type="button" key={a.emoji} disabled={!canUse} className={`profile-avatar-option ${avatar === a.emoji ? 'is-selected' : ''} ${!canUse ? 'is-locked' : ''}`} onClick={() => canUse && setAvatar(a.emoji)}>{a.emoji}</button>; })}</div>
+              <input className="profile-name-input" value={name} onChange={(e) => setName(e.target.value)} maxLength={20} aria-label="Ton prénom" autoFocus />
+              <div className="profile-new-editor-actions"><button type="button" onClick={() => setEditing(false)}><X /> Annuler</button><button type="button" className="primary-action" onClick={saveProfile}><Check /> Garder ça</button></div>
             </div>
-            <button type="button" onClick={() => { sfx.tap(state.soundOn); setTab('revisions'); }}>Commencer <ChevronRight size={15} /></button>
-          </div>
-
-          <div className="profile-stat-grid">
-            <div className="profile-stat-card profile-stat-orange"><Flame size={18} /><strong>{state.streak}</strong><span>jours en feu</span></div>
-            <div className="profile-stat-card profile-stat-blue"><BookOpen size={18} /><strong>{cardsSeenCount}</strong><span>cartes explorées</span></div>
-            <div className="profile-stat-card profile-stat-violet"><Award size={18} /><strong>{badgeUnlockedCount}/{BADGES.length}</strong><span>badges débloqués</span></div>
-          </div>
+          ) : (
+            <div className="profile-new-identity">
+              <div className="profile-new-avatar" style={{ '--rank-color': rank.colorFrom } as CSSProperties}>{state.user.avatar}<span><RankIcon rankId={rank.id} color="#fff" size={13} /></span></div>
+              <div className="profile-new-identity-copy"><strong>{rank.name}</strong><span>{xp} XP · {state.streak} jour{state.streak > 1 ? 's' : ''} de série</span></div>
+              <div className="profile-new-voice"><BraiseMascot size={31} mood={state.streak ? 'proud' : 'sleepy'} /><p>{voice}</p></div>
+            </div>
+          )}
+          <div className="profile-new-xp"><div><span>Prochain niveau</span><strong>{rankInfo.next ? rankInfo.next.name : 'Rang max'}</strong></div><b>{rankInfo.next ? `${rankInfo.next.min - state.xp} XP` : 'Complet'}</b><div className="profile-new-progress"><span style={{ width: `${rankInfo.pct}%`, background: `linear-gradient(90deg, ${rank.colorFrom}, ${rank.colorTo})` }} /></div></div>
         </motion.section>
 
-        {/* Settings and personalisation live below the actionable dashboard. */}
-        <motion.div className="uni-card" variants={staggerItem}>
-          <div
-            className="uni-row progress-row stacked"
-            style={{
-              background: isAlmostThere
-                ? state.darkMode
-                  ? `linear-gradient(120deg, ${rankInfo.next!.colorFrom}26, ${rankInfo.next!.colorTo}14)`
-                  : `linear-gradient(120deg, ${rankInfo.next!.colorFrom}73, ${rankInfo.next!.colorTo}2b)`
-                : state.darkMode
-                  ? `linear-gradient(120deg, ${rank.colorFrom}1a, ${rank.colorTo}0f)`
-                  : `linear-gradient(120deg, ${rank.colorFrom}59, ${rank.colorTo}1f)`,
-            }}
-          >
-            <div className="rank-progress">
-              <div className="rank-progress-head">
-                <b>
-                  {rankInfo.next ? `${rank.name} → ${rankInfo.next.name}` : `${rank.name} — rang maximum`}
-                  {isAlmostThere && (
-                    <span
-                      className="rank-progress-almost"
-                      style={{ background: `${rankInfo.next!.colorTo}38`, borderColor: rankInfo.next!.colorTo }}
-                    >
-                      Presque !
-                    </span>
-                  )}
-                </b>
-                <span>{rankInfo.next ? `${rankInfo.next.min - state.xp} XP restants` : 'Atteint'}</span>
-              </div>
-              <div className="rank-progress-track">
-                <div
-                  className="rank-progress-fill"
-                  style={{
-                    width: `${rankInfo.pct}%`,
-                    background: `linear-gradient(90deg, ${rank.colorFrom}, ${rank.colorTo})`,
-                    boxShadow: isAlmostThere ? `0 0 8px ${rankInfo.next!.colorTo}80` : 'none',
-                  }}
-                />
-              </div>
-            </div>
-          </div>
+        <motion.section className="profile-new-stats" variants={itemMotion} aria-label="Mes repères"><div><Flame /><b>{state.streak}</b><span>série</span></div><div><BookOpen /><b>{cardsSeen}</b><span>cartes vues</span></div><div><Award /><b>{badgeCount}/{BADGES.length}</b><span>badges</span></div></motion.section>
 
-          {/* Parcours — the single record of what happened (real unlock dates), ending in a
-              dashed ghost node for what's next (real nextBadgeHint data). Replaces the old
-              badges-count dot row, which said the same "x/6" this already shows. */}
-          <div className="uni-row stacked">
-            <div className="uni-row-main">
-              <span className="uni-row-label">Tes moments forts</span>
-              <span className="uni-row-sub">
-                {badgeUnlockedCount} badge{badgeUnlockedCount > 1 ? 's' : ''} débloqué{badgeUnlockedCount > 1 ? 's' : ''} sur {BADGES.length}
-              </span>
-            </div>
-            <div className="timeline-row">
-              {unlockedBadgesSorted.map((b) => (
-                <div className="timeline-item" key={b.id}>
-                  <div className="timeline-line" aria-hidden="true" />
-                  <div className="timeline-dot">
-                    <BadgeIcon badgeId={b.id} size={14} />
-                  </div>
-                  <span className="timeline-date">{badgeUnlockedAt[b.id] ? formatShortDate(badgeUnlockedAt[b.id]) : ''}</span>
-                </div>
-              ))}
-              {nextHint && (
-                <div className="timeline-item">
-                  <div className="timeline-line" aria-hidden="true" />
-                  <div className="timeline-dot ghost">
-                    <BadgeIcon badgeId={nextHint.badgeId} size={14} />
-                  </div>
-                  <span className="timeline-date ghost">
-                    {badgeRemainingLabel(nextHint.badgeId, { streak: state.streak, xp: state.xp }) ?? BADGES.find((b) => b.id === nextHint.badgeId)?.cond}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
+        <motion.section className="profile-new-next" variants={itemMotion}><div className="profile-new-next-icon"><Target /></div><div><span>Le move du jour</span><strong>{state.streak ? 'Garde ta série en vie' : 'Relance ta série tranquille'}</strong><p>{state.streak ? 'Une mini session suffit pour rester lancé.' : 'Une carte, zéro pression. Juste pour repartir.'}</p></div><button type="button" onClick={goReview} aria-label="Commencer une session"><ChevronRight /></button></motion.section>
 
-          <div className="uni-row">
-            <div className="uni-row-main">
-              <span className="uni-row-label">Ton Braise</span>
-              <span className="uni-row-sub">{PERSONAS.find((p) => p.id === state.user.personality)?.sub}</span>
-            </div>
-            <div className="seg-track">
-              <div className={`seg-thumb ${state.user.personality === 'savage' ? 'is-right' : ''}`} aria-hidden="true" />
-              {PERSONAS.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  className={`seg-opt ${state.user.personality === p.id ? 'is-active' : ''}`}
-                  onClick={() => {
-                    sfx.tap(state.soundOn);
-                    setPersonality(p.id);
-                  }}
-                  aria-pressed={state.user.personality === p.id}
-                >
-                  {p.id === 'chill' ? 'Chill' : 'Savage'}
-                </button>
-              ))}
-            </div>
-          </div>
+        <motion.section className="profile-new-section" variants={itemMotion}><div className="profile-new-section-heading"><div><span className="profile-new-kicker">TES VICTOIRES</span><h2>Les moments où t&apos;as assuré</h2></div><span className="profile-new-count">{badgeCount}/{BADGES.length}</span></div><div className="profile-new-badges">{BADGES.map((badge) => <div className={`profile-new-badge ${unlockedBadges[badge.id] ? '' : 'is-muted'}`} key={badge.id}><BadgeIcon badgeId={badge.id} size={22} /><strong>{badge.name}</strong><small>{unlockedBadges[badge.id] ? (unlockedAt[badge.id] ? new Date(unlockedAt[badge.id]).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : 'Débloqué') : (nextBadge?.badgeId === badge.id ? badgeRemainingLabel(badge.id, state) ?? 'Bientôt' : 'À débloquer')}</small></div>)}</div></motion.section>
 
-          {/* Matières — real toggles, not a static recap: these picks weight which cards come up
-              more often in Réviser (see RevisionsView's priority scoring), so showing them as
-              inert text would hide a real effect from the one person it affects. */}
-          <div className="uni-row stacked">
-            <div className="uni-row-main">
-              <span className="uni-row-label">Mes matières ({subjectsCount})</span>
-              <span className="uni-row-sub">Favorisées pendant tes révisions — touche pour changer.</span>
-            </div>
-            <div className="uni-chips">
-              {SUBJECTS.map((s) => {
-                const active = state.user.subjects.includes(s.id);
-                return (
-                  <button
-                    key={s.id}
-                    type="button"
-                    className={`profile-subject-chip ${active ? 'is-active' : ''}`}
-                    onClick={() => toggleUserSubject(s.id)}
-                    aria-pressed={active}
-                  >
-                    <SubjectIcon subjectId={s.id} color={s.color} size={15} /> {s.name}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </motion.div>
+        <motion.section className="profile-new-section profile-new-preferences" variants={itemMotion}><div className="profile-new-section-heading"><div><span className="profile-new-kicker">À TA SAUCE</span><h2>Personnalise ton expérience</h2></div><Sparkles /></div><div className="profile-new-setting"><div><strong>Le ton de Braise</strong><span>{PERSONAS.find((p) => p.id === state.user.personality)?.sub}</span></div><div className="profile-new-toggle">{PERSONAS.map((p) => <button type="button" key={p.id} className={state.user.personality === p.id ? 'is-active' : ''} aria-pressed={state.user.personality === p.id} onClick={() => { sfx.tap(state.soundOn); setPersonality(p.id); }}>{p.title}</button>)}</div></div><div className="profile-new-setting profile-new-subjects"><div><strong>Mes matières</strong><span>Celles qui remontent dans tes révisions</span></div><div className="profile-new-subject-list">{SUBJECTS.map((subject) => { const active = state.user.subjects.includes(subject.id); return <button type="button" key={subject.id} className={active ? 'is-active' : ''} aria-pressed={active} onClick={() => setUser({ ...state.user, subjects: active ? state.user.subjects.filter((id) => id !== subject.id) : [...state.user.subjects, subject.id] })}><SubjectIcon subjectId={subject.id} color={subject.color} size={14} />{subject.name}</button>; })}</div></div></motion.section>
 
-        <motion.button type="button" className="profile-hero-cta" onClick={handleShareOpen} variants={staggerItem}>
-          <Share2 size={16} />
-          Partager mon profil
-        </motion.button>
-
-        {/* Settings link */}
-        <motion.div variants={staggerItem}>
-          <button type="button" className="profile-settings-link" onClick={() => { sfx.tap(state.soundOn); setView('settings'); }}>
-            <span className="profile-settings-link-label">
-              <Settings size={18} color="var(--ink-soft)" />
-              Paramètres
-            </span>
-            <ChevronRight size={18} color="var(--ink-soft)" />
-          </button>
-        </motion.div>
-      </motion.div>
-
-      {shareOpen && (
-        <ShareAuraModal
-          rank={rank}
-          streak={state.streak}
-          xp={state.xp}
-          subjectsCount={reviewedSubjectsCount}
-          masteredCards={masteredCards}
-          onClose={handleShareClose}
-        />
-      )}
+        <motion.div className="profile-new-footer-actions" variants={itemMotion}><button type="button" onClick={() => setShareOpen(true)}><Share2 /> Partager mon profil</button><button type="button" onClick={() => setView('settings')}><Settings /> Paramètres <ChevronRight /></button></motion.div>
+      </motion.main>
+      {shareOpen && <ShareAuraModal rank={rank} streak={state.streak} xp={state.xp} subjectsCount={reviewedSubjects} masteredCards={mastery} onClose={() => setShareOpen(false)} />}
     </div>
   );
 }
+
+export default ProfileView;
+
+Բ
