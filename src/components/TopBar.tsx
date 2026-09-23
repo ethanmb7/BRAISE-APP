@@ -8,14 +8,14 @@ type Props = {
 
 export function TopBar({ title, onBack, right }: Props) {
   return (
-    <div className="topbar">
+    <header className="topbar">
       {onBack && (
         <button className="topbar-back" onClick={onBack} aria-label="Retour">
           <ChevronLeft size={20} />
         </button>
       )}
-      <h1 style={{ flex: 1 }}>{title}</h1>
-      {right}
-    </div>
+      <h1 className="min-w-0 flex-1 truncate">{title}</h1>
+      {right && <div className="flex flex-shrink-0 items-center">{right}</div>}
+    </header>
   );
 }

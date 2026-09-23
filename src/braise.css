@@ -19,6 +19,14 @@
   --ink-soft: rgba(22, 33, 58, 0.72);
   --line: rgba(22, 33, 58, 0.1);
 
+  /* Product UI foundations — one geometry and elevation language for every screen. */
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --shadow-soft: 0 12px 32px rgba(22, 33, 58, 0.08);
+  --shadow-press: 3px 3px 0 var(--neo-ink);
+  --page-gutter: 18px;
+
   /* Accent palette — reserved for icons, tags, status colours and secondary UI (subject
      colours, correct/wrong feedback, badges). Never used for a primary CTA background. */
   --blue: #3b82f6;
@@ -175,7 +183,9 @@ select {
   max-height: 100vh;
   max-height: 100dvh;
   margin: 0 auto;
-  background: var(--bg);
+  background:
+    radial-gradient(circle at 50% -12%, color-mix(in srgb, var(--neo-orange) 9%, transparent), transparent 34%),
+    var(--bg);
   /* body's own `color: var(--ink)` (below) resolves once, against :root's light-mode --ink,
      because .app-shell.dark's override lives *below* body in the tree — a descendant's
      redefinition of a custom property never flows back up. Any element in here that inherits
@@ -192,8 +202,8 @@ select {
 }
 @media (min-width: 429px) {
   .app-shell {
-    border-radius: 0;
-    box-shadow: 0 0 60px -20px rgba(19, 33, 79, 0.3);
+    border-inline: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
+    box-shadow: 0 24px 80px -28px rgba(19, 33, 79, 0.28);
   }
 }
 
@@ -205,10 +215,8 @@ select {
 
 .app-content {
   flex: 1;
-  /* Trame de points très légère : donne de la matière au fond sans bruit, même langage que
-     le fond de l'écran Réviser. */
-  background-image: radial-gradient(rgba(21, 24, 33, 0.07) 1.1px, transparent 1.1px);
-  background-size: 22px 22px;
+  /* Reading surfaces stay quiet. Identity comes from the content and navigation, not wallpaper. */
+  background: transparent;
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -229,24 +237,37 @@ select {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px 20px 14px;
+  min-height: 64px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) var(--page-gutter) 10px;
   position: sticky;
   top: 0;
-  background: var(--bg);
-  z-index: 10;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
+  backdrop-filter: blur(16px) saturate(1.15);
+  -webkit-backdrop-filter: blur(16px) saturate(1.15);
+  z-index: 30;
 }
 .topbar h1 {
-  font-size: 1.25rem;
+  font-size: 1.28rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
 }
 .topbar-back {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
   background: var(--paper);
+  border: 1.5px solid color-mix(in srgb, var(--ink) 18%, transparent);
+  box-shadow: 0 3px 10px rgba(22, 33, 58, 0.07);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.topbar-back:active {
+  transform: scale(0.94);
+  box-shadow: none;
 }
 
 /* ===== Onboarding ===== */
@@ -2171,12 +2192,13 @@ select {
 
 /* ===== Progrès (suite) ===== */
 .section-title {
-  font-size: 0.76rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
   color: var(--ink-soft);
-  font-weight: 600;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin: 4px 0 10px;
+  letter-spacing: 0.08em;
+  margin: 6px 0 12px;
 }
 /* ===== Lesson ===== */
 .lesson-progress {
@@ -3676,25 +3698,31 @@ select {
 /* ===== Settings ===== */
 .settings-group {
   background: var(--paper);
-  border: 2px solid var(--neo-ink);
-  border-radius: 16px;
-  margin-bottom: 16px;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 14%, transparent);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 18px;
   overflow: hidden;
 }
 .settings-label {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.66rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-soft);
-  padding: 12px 16px 4px;
+  padding: 10px 4px 7px;
 }
 .settings-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 13px 16px;
-  font-size: 0.88rem;
-  border-top: 1.5px solid rgba(21, 24, 33, 0.15);
+  min-height: 60px;
+  gap: 14px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-weight: 650;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 9%, transparent);
 }
 .settings-row:first-of-type {
   border-top: none;
@@ -3702,6 +3730,32 @@ select {
 .settings-val {
   color: var(--ink-soft);
   font-size: 0.84rem;
+}
+.settings-row-main {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 11px;
+}
+.settings-row-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--neo-orange) 10%, var(--paper));
+  color: var(--neo-orange);
+}
+.settings-select {
+  max-width: 46%;
+  border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--ink-soft);
+  padding: 7px 9px;
+  font-size: 0.82rem;
+  font-weight: 650;
 }
 .switch {
   position: relative;
@@ -3989,7 +4043,7 @@ select {
 /* ===== Views ===== */
 .view {
   display: none;
-  padding: 4px 20px 30px;
+  padding: 8px var(--page-gutter) 32px;
 }
 .view.is-active {
   display: block;

@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, MotionConfig } from 'framer-motion';
+codex/analyser-l-application-7cezw4
+import { ArrowRight, Clock3, Layers3 } from 'lucide-react';
+=======
 codex/analyser-l-application-y53s8j
 import { ArrowRight, Clock3, Layers3 } from 'lucide-react';
 =======
 import { Clock3, Layers3, Play } from 'lucide-react';
+main
 main
 import { BraisePioche } from '@/components/BraisePioche';
 import { sfx } from '@/lib/sound';
@@ -95,7 +99,10 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
         // would finish — matching the shorter window here instead of leaving it visibly cut off.
         transition={{ duration: quick ? 0.22 : 0.5, ease: [0.16, 1, 0.3, 1] }}
       >
+codex/analyser-l-application-7cezw4
+=======
 codex/analyser-l-application-y53s8j
+main
         <div className="relative flex items-center justify-between gap-3">
           <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.1em] text-[#151821]">
             {launching ? 'Mission lancée' : 'Pioche du jour'}
@@ -106,8 +113,11 @@ codex/analyser-l-application-y53s8j
         </div>
 
         <div className="relative mt-2 flex items-center gap-3">
+codex/analyser-l-application-7cezw4
+=======
 =======
         <div className="relative flex items-center gap-3">
+main
 main
           <div className="relative flex h-[92px] w-[92px] flex-shrink-0 items-end justify-center">
             {/* A quiet, static stage separates Braise from the copy without adding another card.
@@ -123,7 +133,10 @@ main
                 failure), 6.25:1 for dark ink. Three real fonts: font-mono for the eyebrow
                 (same as every other small-caps label app-wide), font-display for the title,
                 font-sans for the stats line. */}
+codex/analyser-l-application-7cezw4
+=======
 codex/analyser-l-application-y53s8j
+main
             <p className="mb-1 flex items-center gap-1.5 text-[0.72rem] font-black text-[#151821]/75">
               <span aria-hidden="true" className="h-2.5 w-2.5 flex-none rounded-full border border-[#151821]" style={{ background: subjectColor ?? '#FDC800' }} />
               <span className="truncate">{subjectName ?? 'Mission du jour'}</span>
@@ -137,6 +150,8 @@ codex/analyser-l-application-y53s8j
                 <Layers3 size={14} strokeWidth={3} aria-hidden="true" /> {cardCount} CARTE{cardCount > 1 ? 'S' : ''}
               </span>
             </div>
+codex/analyser-l-application-7cezw4
+=======
 =======
             <div className="mb-1 flex items-center justify-between gap-2">
               <p className="font-mono text-[0.67rem] font-black uppercase tracking-wide text-[#151821]">
@@ -162,6 +177,7 @@ codex/analyser-l-application-y53s8j
               {cardCount} CARTE{cardCount > 1 ? 'S' : ''}
             </span>
 main
+main
           </div>
         </div>
         <span className="sr-only">
@@ -184,12 +200,17 @@ main
             disabled={launching}
             className="tw-shimmer relative flex min-h-12 w-full items-center justify-center gap-2 rounded-full border-[2.5px] border-black bg-[#FFF8EE] px-4 py-3 font-display text-[0.98rem] font-black text-black shadow-[3px_3px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[3px] group-active:shadow-none disabled:opacity-95"
           >
+codex/analyser-l-application-7cezw4
+            {launching ? 'C’EST PARTI…' : 'COMMENCER'}
+            <ArrowRight size={18} strokeWidth={3} aria-hidden="true" />
+=======
 codex/analyser-l-application-y53s8j
             {launching ? 'C’EST PARTI…' : 'COMMENCER'}
             <ArrowRight size={18} strokeWidth={3} aria-hidden="true" />
 =======
             <Play size={17} fill="currentColor" />
             {launching ? 'C’EST PARTI…' : 'COMMENCER'}
+main
 main
           </button>
         </div>

@@ -169,7 +169,7 @@ export function HomeView() {
 
   return (
     <>
-      <div className="view is-active home-view" style={{ paddingTop: 16 }}>
+      <div className="view is-active home-view pt-3">
         {!state.user.level && (
           <div className="setup-banner">Configure ton niveau pour des leçons sur mesure.</div>
         )}
