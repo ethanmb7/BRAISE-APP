@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, MotionConfig } from 'framer-motion';
-import { Clock3, Play, Sparkles, Trophy } from 'lucide-react';
+import { Clock3, Layers3, Play } from 'lucide-react';
 import { BraisePioche } from '@/components/BraisePioche';
 import { sfx } from '@/lib/sound';
 import { getLastPiocheOpenDate, setLastPiocheOpenDate } from '@/lib/celebrations';
@@ -25,11 +25,10 @@ interface HeroPiocheCardProps {
   onStart: () => void;
 }
 
-// Eleventh pass — Braise's spot in the card is now a small chest (BraiseChest), built from the
-// "Le Choix de Braise" mockup review: she's clipped so only her head and a pickaxe (the literal
-// tool, punning on "pioche") ever cross above the chest's opening, never a full-body entrance. The
-// card's own rectangular frame stays completely static, same rule as every pass since the ninth —
-// only the chest and its contents move.
+// The daily pick stays deliberately compact: Braise and the deck carry the identity, while the
+// frame itself remains a familiar utility card. The mission title, subject, duration and real card
+// count are the only primary signals; reward and ceremony stay secondary so opening Home never
+// feels like entering a crowded game lobby.
 //
 // The click fires the real audio/haptic sequence itself (sfx.chestOpen/chestOpenQuick, both new,
 // each internally timed to the chest's own beats — see BraiseChest's file header) rather than a
@@ -92,45 +91,6 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
         // would finish — matching the shorter window here instead of leaving it visibly cut off.
         transition={{ duration: quick ? 0.22 : 0.5, ease: [0.16, 1, 0.3, 1] }}
       >
-        {/* Intermittent heat glow near the sun sliver — a light effect, not the frame moving, so
-            it stays even though the card itself is static. */}
-        <motion.div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full"
-          style={{ background: 'radial-gradient(circle, #FFE9A8 0%, rgba(255,233,168,0) 70%)' }}
-          animate={{ opacity: [0.35, 0.85, 0.35], scale: [0.9, 1.15, 0.9] }}
-          transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <div aria-hidden="true" className="pointer-events-none absolute -right-6 -top-6 h-16 w-16 rounded-full bg-[#FDC800]" />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 rounded-2xl"
-          style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0) 20px)' }}
-        />
-
-        {/* The mission ticket is the one extra reveal beat after the chest pops. It is not a
-            second CTA or a new piece of information to read: it rises for a few frames behind
-            the static mission copy, making the opening feel like Braise has actually drawn a
-            ticket, then disappears into the hand-off light. */}
-        <motion.div
-          aria-hidden="true"
-          className="pointer-events-none absolute right-5 top-[58px] z-0 flex h-14 w-[116px] -rotate-6 flex-col justify-center rounded-lg border-2 border-[#151821] bg-[#FFF8EE] px-2 shadow-[3px_3px_0px_0px_#151821]"
-          initial={false}
-          animate={
-            launching
-              ? { opacity: [0, 1, 1, 0], y: [24, -10, -16, -26], rotate: [-6, -10, -8, -5], scale: [0.82, 1.02, 1, 1.06] }
-              : { opacity: 0, y: 24, rotate: -6, scale: 0.82 }
-          }
-          transition={
-            launching
-              ? { duration: quick ? 0.38 : 0.72, delay: quick ? 0.05 : 0.17, times: [0, 0.25, 0.68, 1], ease: [0.16, 1, 0.3, 1] }
-              : { duration: 0.1 }
-          }
-        >
-          <span className="font-mono text-[0.48rem] font-black tracking-[0.12em] text-[#7C2D12]">MISSION TROUVÉE</span>
-          <span className="mt-0.5 font-display text-[0.66rem] font-black leading-none text-[#151821]">C’est parti !</span>
-        </motion.div>
-
         <div className="relative flex items-center gap-3">
           <div className="relative flex h-[92px] w-[92px] flex-shrink-0 items-end justify-center">
             {/* One slow aura makes the chest feel warm and rare at rest. It wakes up only when
@@ -149,24 +109,29 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
                 failure), 6.25:1 for dark ink. Three real fonts: font-mono for the eyebrow
                 (same as every other small-caps label app-wide), font-display for the title,
                 font-sans for the stats line. */}
-            <p className="flex items-center gap-1 font-mono text-[0.67rem] font-black uppercase tracking-wide text-[#151821]">
-              <Sparkles size={12} strokeWidth={3} /> {launching ? 'Mission trouvée !' : 'Pioche du jour'}
-            </p>
+            <div className="mb-1 flex items-center justify-between gap-2">
+              <p className="font-mono text-[0.67rem] font-black uppercase tracking-wide text-[#151821]">
+                {launching ? 'Mission lancée' : 'Pioche du jour'}
+              </p>
+              <span className="whitespace-nowrap font-mono text-[0.61rem] font-black uppercase text-[#7C2D12]">+50 Aura</span>
+            </div>
             <h2 className="line-clamp-2 font-display text-xl font-black leading-tight text-[#151821]">{chapterTitle}</h2>
+            <p className="mt-1 flex items-center gap-1.5 text-[0.78rem] font-bold text-[#151821]/80">
+              <span aria-hidden="true" className="h-2.5 w-2.5 flex-none rounded-full border border-[#151821]" style={{ background: subjectColor ?? '#FDC800' }} />
+              <span className="truncate">{subjectName ?? 'Mission du jour'}</span>
+            </p>
           </div>
         </div>
-        <div className="relative mt-4 grid grid-cols-3 gap-2" aria-label="Les repères de ta mission">
-          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
+        <div className="relative mt-4 flex gap-2" aria-label="Les repères de ta mission">
+          <div className="flex min-w-0 items-center gap-1.5 rounded-full border-2 border-black/80 bg-[#FFF8EE] px-3 py-2">
             <Clock3 size={15} strokeWidth={3} aria-hidden="true" />
             <span className="font-mono text-[0.67rem] font-black text-[#151821]">{duration} MIN</span>
           </div>
-          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
-            <span aria-hidden="true" className="h-3 w-3 flex-none rounded-full border-2 border-[#151821]" style={{ background: subjectColor ?? '#FDC800' }} />
-            <span className="truncate font-mono text-[0.67rem] font-black uppercase text-[#151821]">{subjectName ?? 'Mission'}</span>
-          </div>
-          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
-            <Trophy size={15} strokeWidth={3} aria-hidden="true" />
-            <span className="font-mono text-[0.67rem] font-black text-[#151821]">+50 AURA</span>
+          <div className="flex min-w-0 items-center gap-1.5 rounded-full border-2 border-black/80 bg-[#FFF8EE] px-3 py-2">
+            <Layers3 size={15} strokeWidth={3} aria-hidden="true" />
+            <span className="font-mono text-[0.67rem] font-black text-[#151821]">
+              {cardCount} CARTE{cardCount > 1 ? 'S' : ''}
+            </span>
           </div>
         </div>
         <span className="sr-only">
@@ -191,7 +156,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
             className="tw-shimmer relative flex w-full items-center justify-center gap-1.5 rounded-full border-[2.5px] border-black bg-white px-3.5 py-3.5 font-display text-base font-black text-black shadow-[3px_3px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[3px] group-active:shadow-none disabled:opacity-95"
           >
             <Play size={17} fill="currentColor" />
-            JE PIOCHE !
+            {launching ? 'C’EST PARTI…' : 'COMMENCER'}
           </button>
         </div>
       </motion.section>
