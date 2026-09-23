@@ -1,257 +1,92 @@
-import { useEffect, useRef, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
-import { Zap, Star, Clock, PartyPopper } from 'lucide-react';
-import { StreakFlameIcon } from '@/components/StreakFlameIcon';
-import { TrophyIcon } from '@/components/TrophyIcon';
-import { SnowflakeIcon } from '@/components/SnowflakeIcon';
-import { fireMicroConfetti } from '@/lib/confetti';
-import { useCountUp } from '@/lib/useCountUp';
-
-const WEEKDAY_LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+import { ArrowRight, Check, Flame, Sparkles } from 'lucide-react';
 
 interface TodayStripProps {
+  /** Number of consecutive days completed before today. The detailed count remains available in
+   * the HUD; this quieter block only uses it to make the daily rhythm feel personal. */
   streak: number;
-  /** Whether today's goal is already met — the one signal that tells the week strip whether
-   *  today's own cell is secured (flame + star) or still open (outline). `streak` itself is
-   *  read as "consecutive days before today", matching the coaching copy below it (which always
-   *  talks about today's goal as not yet banked even when streak > 0). */
   dailyGoalMet: boolean;
-  /** From `remainingToGoal` in store.tsx — real "cards-equivalent" left to hit today's goal,
-   *  same weighting as the gauge percentage. 0 once the goal is met. */
+  /** Real card-equivalent activity remaining, derived from the same formula as the goal gauge. */
   remaining: number;
-  /** From `computeGoalPct` in store.tsx. */
   goalPct: number;
-  /** Real spaced-repetition due count (same value the HUD bell already shows) — used here only
-   *  to give an honest "something real to do" once today's goal is already met, never a
-   *  fabricated bonus tier. */
+  /** Real spaced-repetition cards currently due. */
   dueCount: number;
-  /** Real freeze count (state.freezes) — shown here too, next to the streak it protects, not
-   *  just in the header HUD; both real, both the same number. */
-  freezes: number;
-  /** Navigates to the real Réviser tab — only rendered as a button when dueCount > 0, so it's
-   *  never a dead click. */
   onContinue: () => void;
-  /** Opens the real ShareAuraModal (already built, already used from Ton Aura) — shown here only
-   *  when dueCount is also 0, i.e. there's genuinely nothing left to do: the moment of highest
-   *  real accomplishment is a better place for the one native sharing feature than a passive
-   *  "rien d'autre en attente" that used to just end the loop. */
   onShare: () => void;
 }
 
-// Amber neobrutalist card. Streak/remaining/dueCount are all real store values.
-//
-// "At risk" state (investor audit: the streak badge never signals urgency) — derived from two
-// real signals only: today's goal not yet met, and the real current hour past 19h. 19h is a
-// judgment call (evening wind-down for a collège/lycée schedule), not a hidden mechanic; past
-// that hour with the goal unmet, the copy and gauge colour turn urgent. No streak-loss penalty
-// is invented — the real freeze/streak rules already live in store.tsx, untouched.
-//
-// Post-goal state (investor audit: validating today's goal was a dead end) — once remaining
-// reaches 0, if there are still real due cards (`dueCount`), a real button navigates to Réviser
-// for real, unmultiplied XP per card. It's deliberately not framed as "Boost x2": there is no
-// multiplier anywhere in the XP math, and a button that claims one without doing it would be a
-// worse trust break than the dead end it replaces. If dueCount is also 0, no button renders —
-// there's genuinely nothing left to do today.
-//
-// This pass (and the next one) fixed a gap an audit of the whole Accueil screen found: every
-// real number here was honest, but nothing had any life in it. The streak count now counts up
-// instead of swapping text silently (every other reward number on Aura/Profil already uses
-// useCountUp); the one truly significant real-time event — today's cell flipping from pending to
-// done — gets a real local pop + a micro-confetti burst anchored on this card, not just
-// HomeView's own generic full-screen fireConfetti() with no anchor to it; the flame badge now has
-// real idle motion (reusing the same flameFlicker keyframe BraiseMascot's own flame layers
-// already use, not a new animation); and the gauge intensifies with the same "Presque !" glow
-// Profil's rank-progress bar already does near a real completion threshold. A BraiseMascot in the
-// coaching line was tried here too and pulled back out — didn't read well at this size next to
-// the copy.
-export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount, freezes, onContinue, onShare }: TodayStripProps) {
-  const reducedMotion = useReducedMotion();
-  const animatedStreak = useCountUp(streak);
-  const isEvening = new Date().getHours() >= 19;
-  const atRisk = remaining > 0 && isEvening;
-  const goalMet = remaining <= 0;
-  // Real 7-day window (Monday-first, current calendar week only — never reaches back further
-  // than that, so a streak longer than "days so far this week" just runs off the start of the
-  // strip instead of guessing at a previous week). `streak` counts days BEFORE today (see prop
-  // doc); today's own cell reads `dailyGoalMet` directly rather than being folded into the count.
-  // A reference version of this logic marked every day before today as "done" whenever streak >
-  // 0, regardless of the real streak length — a streak of 1 on a Friday would show four false
-  // "done" days. Kept the real count-based version instead: a day only lights up if it's
-  // actually inside the real streak.
-  const todayIdx = (new Date().getDay() + 6) % 7;
-  const weekCells = WEEKDAY_LETTERS.map((letter, i) => {
-    const offset = todayIdx - i;
-    const kind = offset === 0 ? (dailyGoalMet ? 'done-today' : 'pending-today') : offset > 0 && offset <= streak ? 'done-past' : 'empty';
-    return { letter, kind };
-  });
-
-  // The exact moment today's cell flips from pending to done — gives it a real, local pop
-  // instead of relying purely on the page-wide confetti to carry the whole "you did it" read.
-  const [justBanked, setJustBanked] = useState(false);
-  const prevGoalMet = useRef(dailyGoalMet);
-  useEffect(() => {
-    if (dailyGoalMet && !prevGoalMet.current) {
-      setJustBanked(true);
-      if (!reducedMotion) {
-        // Hand-picked, not measured — an approximation of where this card's week strip sits on
-        // a real phone viewport, same "approximate over exact" call RevisionsView already makes
-        // for fireMicroConfetti's own origin.
-        fireMicroConfetti(0.15 + ((todayIdx + 0.5) / 7) * 0.7, 0.34);
-      }
-      const t = setTimeout(() => setJustBanked(false), 700);
-      prevGoalMet.current = dailyGoalMet;
-      return () => clearTimeout(t);
-    }
-    prevGoalMet.current = dailyGoalMet;
-  }, [dailyGoalMet, reducedMotion, todayIdx]);
-
-  // Nothing left at all today — the one state where this card's usual job (urgency copy plus a
-  // gauge worth watching) is already finished. A gauge frozen at 100% doesn't tell you anything
-  // new at that point, so the padding and the gauge built for "here's your progress, here's
-  // what's left" become empty weight once there's genuinely nothing left to track. Every other
-  // state (goal not yet met, or met but still with due cards to review) keeps the full card.
+/**
+ * A deliberately quiet companion to the Pioche, not a second dashboard card. The old component
+ * repeated the HUD's streak and freeze controls, a seven-day calendar, an urgency state and a
+ * second large CTA. That made the student decide between two competing "main" areas immediately
+ * after landing on Accueil. This strip now has one job: situate today's mission and, only once
+ * the daily goal is complete, offer the next real action.
+ */
+export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount, onContinue, onShare }: TodayStripProps) {
+  const goalMet = dailyGoalMet || remaining === 0;
   const allDone = goalMet && dueCount === 0;
-
-  // Same "Presque !" intensification Profil's own rank-progress bar already does near a real
-  // threshold (rankInfo.pct >= 90) — a 12%-full gauge and a 96%-full gauge read as the same
-  // "in progress" state otherwise, no different treatment for the stretch where anticipation is
-  // actually highest. Not applied while atRisk: that state already has its own urgent red, a
-  // second glow on top would just be visual noise competing with it.
-  const almostThere = !goalMet && !atRisk && goalPct >= 85;
-
-  const coachingText = atRisk
-    ? `Encore ${remaining} carte${remaining > 1 ? 's' : ''} ce soir pour garder ta série !`
-    : remaining > 0
-      ? `Plus que ${remaining} carte${remaining > 1 ? 's' : ''} pour valider ta Braise !`
-      : 'Objectif du jour dans la poche !';
+  const progressLabel = goalMet ? 'Objectif du jour validé' : `${goalPct}% de ton objectif du jour`;
+  const rhythmLine = goalMet
+    ? streak > 0
+      ? `Belle régularité : ta série continue.`
+      : `Ton objectif du jour est validé.`
+    : `Encore ${remaining} étape${remaining > 1 ? 's' : ''} pour boucler ta journée.`;
 
   return (
-    <div className={`relative rounded-2xl border-[2.5px] border-black bg-white shadow-[3px_3px_0px_0px_#000] ${allDone ? 'p-3' : 'p-4'}`}>
-      <div>
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border-[3px] border-black bg-[#FF6B35] shadow-[2px_2px_0px_0px_#000]">
-              <span className="streak-badge-flame">
-                <StreakFlameIcon size={17} />
-              </span>
-            </span>
-            <div>
-              {/* text-xl, not text-lg: this counter is the app's central retention lever, it
-                  shouldn't render smaller than a deck card's subject name or the HUD's own
-                  numbers. Counts up like every other reward number on Aura/Profil (useCountUp) —
-                  used to just swap text silently, the one significant number on this card with
-                  no sense of having been earned. */}
-              <b className="block font-display text-xl font-black leading-tight text-black">
-                {animatedStreak} jour{animatedStreak > 1 ? 's' : ''}
-              </b>
-              <span className="text-xs font-bold text-black/50">de série en cours</span>
-            </div>
+    <section aria-label="Ton rythme du jour" className="rounded-2xl border-2 border-black/15 bg-black/[0.035] px-4 py-3.5">
+      <div className="flex items-start gap-3">
+        <span
+          aria-hidden="true"
+          className={`mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border-2 border-black ${
+            goalMet ? 'bg-emerald-300' : 'bg-[#FFE08A]'
+          }`}
+        >
+          {goalMet ? <Check size={19} strokeWidth={3} /> : <Flame size={19} fill="#FF6B35" color="#151821" strokeWidth={2.5} />}
+        </span>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between gap-3">
+            <p className="font-mono text-[0.64rem] font-black uppercase tracking-wide text-black/55">Ton rythme du jour</p>
+            <span className="flex-shrink-0 text-xs font-black text-black/70">{goalMet ? 'Validé' : `${goalPct}%`}</span>
           </div>
-          {/* Real freeze count — same value the header HUD already shows, next to the streak it
-              protects this time, not duplicated data. Colour matches HeaderHUD's own freeze pill
-              exactly (cyan-400 face, dark text) rather than an unrelated blue this app never
-              actually uses for "gel" anywhere else. */}
-          <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full border-2 border-black bg-cyan-400 px-2.5 py-1 text-sm font-black text-[#151821] shadow-[2px_2px_0px_0px_#000]">
-            <SnowflakeIcon size={14} />
-            {freezes}
-          </span>
-        </div>
+          <p className="mt-0.5 text-sm font-bold leading-snug text-[#151821]">{rhythmLine}</p>
 
-        {/* One bordered box per day (letter + marker both inside), not a letter floating below
-            a separate icon circle. Today's cell and any already-banked day both get a solid
-            fill distinct from the plain white/grey "nothing yet" cells — green for a day already
-            behind you, amber for today. White text needed real darkening to stay legible:
-            emerald-500 measured 2.5:1 for white text, emerald-700 clears it at 5.5:1. */}
-        {/* Height was 60px, noticeably taller than wide at real phone widths (~45px cells on a
-            375px screen) — blockier than the reference's near-square cells. 46px brings it back
-            close to square there. */}
-        <div className="mt-3 flex justify-between gap-1">
-          {weekCells.map((cell, i) => (
-            <motion.div
-              key={i}
-              animate={
-                justBanked && cell.kind === 'done-today'
-                  ? { scale: [1, 1.32, 0.94, 1.06, 1] }
-                  : { scale: 1 }
-              }
-              transition={
-                justBanked && cell.kind === 'done-today'
-                  ? { duration: 0.6, times: [0, 0.35, 0.55, 0.8, 1], ease: 'easeOut' }
-                  : { duration: 0.15 }
-              }
-              className={`flex h-[46px] flex-1 flex-col items-center justify-between rounded-lg border-2 py-1 ${
-                cell.kind === 'done-past'
-                  ? 'border-black bg-emerald-700'
-                  : cell.kind === 'done-today'
-                    ? 'border-black bg-amber-400'
-                    : cell.kind === 'pending-today'
-                      ? 'border-dashed border-black/40 bg-white'
-                      : 'border-black/25 bg-white'
-              }`}
+          {!goalMet && (
+            <div
+              className="mt-2.5 h-2 overflow-hidden rounded-full border border-black/25 bg-white"
+              role="progressbar"
+              aria-label={progressLabel}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={goalPct}
             >
-              <span
-                className={`text-[0.6rem] font-black ${
-                  cell.kind === 'done-past' ? 'text-white' : cell.kind === 'done-today' ? 'text-black' : 'text-black/40'
-                }`}
-              >
-                {cell.letter}
-              </span>
-              {cell.kind === 'done-past' && <StreakFlameIcon size={11} />}
-              {cell.kind === 'done-today' && <Star size={11} fill="#151821" color="#151821" />}
-              {(cell.kind === 'pending-today' || cell.kind === 'empty') && (
-                <span className="h-1 w-1 rounded-full bg-black/25" aria-hidden="true" />
-              )}
-            </motion.div>
-          ))}
-        </div>
+              <div className="h-full rounded-full bg-[#FF6B35] transition-[width] duration-500" style={{ width: `${goalPct}%` }} />
+            </div>
+          )}
 
-        <p className="mt-3 flex items-center gap-1.5 text-sm font-bold text-black/70">
-          {atRisk && <Clock size={15} className="flex-shrink-0" />}
-          {!atRisk && remaining <= 0 && <PartyPopper size={15} className="flex-shrink-0" />}
-          {coachingText}
-        </p>
+          {goalMet && dueCount > 0 && (
+            <button
+              type="button"
+              onClick={onContinue}
+              className="mt-3 inline-flex min-h-10 items-center gap-1.5 rounded-xl border-2 border-black bg-white px-3 py-2 text-sm font-black text-black shadow-[2px_2px_0px_0px_#000] transition-transform active:translate-y-[2px] active:shadow-none"
+            >
+              <Sparkles size={15} />
+              Revoir {dueCount} notion{dueCount > 1 ? 's' : ''}
+              <ArrowRight size={15} />
+            </button>
+          )}
+
+          {allDone && (
+            <button
+              type="button"
+              onClick={onShare}
+              className="mt-3 inline-flex min-h-10 items-center gap-1.5 rounded-xl border-2 border-black bg-white px-3 py-2 text-sm font-black text-black shadow-[2px_2px_0px_0px_#000] transition-transform active:translate-y-[2px] active:shadow-none"
+            >
+              <Sparkles size={15} />
+              Garder ce moment
+            </button>
+          )}
+        </div>
       </div>
-
-      {!allDone && (
-        <div className="mt-3 h-3.5 rounded-full border border-black bg-black/70 p-0.5">
-          <div
-            className={`h-full rounded-full transition-[width,background-color] duration-500 ${atRisk ? 'bg-red-400' : 'bg-emerald-400'}`}
-            style={{ width: `${goalPct}%`, boxShadow: almostThere ? '0 0 8px #10b98180' : 'none' }}
-          />
-        </div>
-      )}
-
-      {goalMet && dueCount > 0 && (
-        <button
-          onClick={onContinue}
-          className="group relative mt-3 block w-full"
-        >
-          <span
-            aria-hidden="true"
-            className="absolute inset-0 translate-y-[2px] rounded-xl border-2 border-black bg-emerald-700"
-          />
-          <span className="relative flex items-center justify-center gap-1.5 rounded-xl border-2 border-black bg-emerald-400 px-3 py-2 text-sm font-black text-black transition-transform duration-100 group-active:translate-y-[2px]">
-            <Zap size={14} className="fill-black" />
-            Lancer une manche bonus · {dueCount} carte{dueCount > 1 ? 's' : ''}
-          </span>
-        </button>
-      )}
-
-      {allDone && (
-        <button
-          onClick={onShare}
-          className="group relative mt-2 block w-full"
-        >
-          <span
-            aria-hidden="true"
-            className="absolute inset-0 translate-y-[2px] rounded-xl border-2 border-black bg-black/60"
-          />
-          <span className="relative flex items-center justify-center gap-1.5 rounded-xl border-2 border-black bg-white px-3 py-2 text-sm font-black text-black transition-transform duration-100 group-active:translate-y-[2px]">
-            <TrophyIcon size={16} />
-            Partager ma série
-          </span>
-        </button>
-      )}
-    </div>
+    </section>
   );
 }

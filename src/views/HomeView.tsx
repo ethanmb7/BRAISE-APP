@@ -223,6 +223,25 @@ export function HomeView() {
             />
           </motion.div>
 
+          <motion.div variants={staggerItem}>
+            <TodayStrip
+              streak={state.streak}
+              dailyGoalMet={state.dailyGoalMet}
+              remaining={remainingToGoal(state)}
+              goalPct={computeGoalPct(state)}
+              dueCount={dueCount}
+              onContinue={() => {
+                sfx.tap(state.soundOn);
+                setTab('revisions');
+              }}
+              onShare={() => {
+                sfx.tap(state.soundOn);
+                if (navigator.vibrate) navigator.vibrate(10);
+                setShareOpen(true);
+              }}
+            />
+          </motion.div>
+
           {showIntoxBanner && (
             <motion.div variants={staggerItem}>
               <MissedCardsBanner
@@ -236,29 +255,9 @@ export function HomeView() {
             </motion.div>
           )}
 
-          <motion.div variants={staggerItem}>
-            <TodayStrip
-              streak={state.streak}
-              dailyGoalMet={state.dailyGoalMet}
-              remaining={remainingToGoal(state)}
-              goalPct={computeGoalPct(state)}
-              dueCount={dueCount}
-              freezes={state.freezes}
-              onContinue={() => {
-                sfx.tap(state.soundOn);
-                setTab('revisions');
-              }}
-              onShare={() => {
-                sfx.tap(state.soundOn);
-                if (navigator.vibrate) navigator.vibrate(10);
-                setShareOpen(true);
-              }}
-            />
-          </motion.div>
-
           <motion.div variants={staggerItem} className="space-y-3">
             <div className="flex items-center gap-2">
-              <span className="font-display text-base font-extrabold text-[var(--ink)]">Tes decks</span>
+              <span className="font-display text-base font-extrabold text-[var(--ink)]">Choisis une matière</span>
               <span className="rounded-lg border border-black bg-[var(--neo-orange)] px-2 py-0.5 text-xs font-black text-white shadow-[1px_1px_0px_0px_#000]">
                 {SUBJECTS.length}
               </span>
