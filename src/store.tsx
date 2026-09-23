@@ -205,6 +205,7 @@ const INITIAL: AppState = {
   completedChapters: [],
   chatBridgeMessage: null,
   lessonReturnTo: null,
+  lastCompletion: null,
   cardReviews: {},
   sessionDate: new Date().toDateString(),
   sessionCardsReviewed: 0,
@@ -360,40 +361,49 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const completeChapter = useCallback((chapterId: string) => {
     setState((s) => {
-      const already = s.completedChapters.includes(chapterId);
-      const sessionChaptersDone = already ? s.sessionChaptersDone : s.sessionChaptersDone + 1;
-      const activity = s.sessionCardsReviewed + sessionChaptersDone * 3;
+      // Always derive the reward from today's counters. This matters if the first completion
+      // happens after midnight while a previous session is still in local storage.
+      const session = { ...s, ...ensureSession(s) };
+      const already = session.completedChapters.includes(chapterId);
+      const xpGained = already ? 0 : 50;
+      const sessionChaptersDone = already ? session.sessionChaptersDone : session.sessionChaptersDone + 1;
+      const activity = session.sessionCardsReviewed + sessionChaptersDone * 3;
       return {
-        ...s,
-        ...ensureSession(s),
-        completedChapters: already ? s.completedChapters : [...s.completedChapters, chapterId],
+        ...session,
+        completedChapters: already ? session.completedChapters : [...session.completedChapters, chapterId],
         sessionChaptersDone,
-        xp: already ? s.xp : s.xp + 50,
-        dailyGoalMet: activity >= goalTarget(s),
+        xp: session.xp + xpGained,
+        dailyGoalMet: activity >= goalTarget(session),
+        lastCompletion: { chapterId, wasNewCompletion: !already, xpGained },
       };
     });
   }, []);
 
   const reviewCard = useCallback((cardId: string, confidence: Confidence) => {
     setState((s) => {
-      const prev = s.cardReviews[cardId];
+      // `ensureSession` is intentionally first, just as it is in `completeChapter`. A card
+      // reviewed just after midnight must be card 1 of *today*, never yesterday's total plus
+      // one — otherwise the goal HUD and the Pioche's supporting progress can claim a false
+      // daily completion. Keeping the daily accounting truthful is a product invariant, not a
+      // display concern.
+      const session = { ...s, ...ensureSession(s) };
+      const prev = session.cardReviews[cardId];
       const updated = sm2(prev, confidence);
-      const sessionCardsReviewed = s.sessionCardsReviewed + 1;
+      const sessionCardsReviewed = session.sessionCardsReviewed + 1;
       // A wrong swipe-judgment (RevisionsView's only caller for 'not-sure') used to still grant
       // +3 XP here — invisible everywhere a student could see it: the "GRILLÉ" feedback line
       // never mentioned it, and BraiseRecap's own +XP total only ever summed correct answers.
       // The real account XP (this field) and the celebratory total shown at the end of a
       // session could silently drift apart by 3 XP per mistake with no explanation offered.
       const xpGain = confidence === 'sure' ? 15 : confidence === 'doubt' ? 8 : 0;
-      const activity = sessionCardsReviewed + s.sessionChaptersDone * 3;
+      const activity = sessionCardsReviewed + session.sessionChaptersDone * 3;
       void saveCardReview(cardId, updated);
       return {
-        ...s,
-        ...ensureSession(s),
-        cardReviews: { ...s.cardReviews, [cardId]: updated },
+        ...session,
+        cardReviews: { ...session.cardReviews, [cardId]: updated },
         sessionCardsReviewed,
-        xp: s.xp + xpGain,
-        dailyGoalMet: activity >= goalTarget(s),
+        xp: session.xp + xpGain,
+        dailyGoalMet: activity >= goalTarget(session),
       };
     });
   }, []);
