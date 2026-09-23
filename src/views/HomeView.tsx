@@ -169,7 +169,7 @@ export function HomeView() {
 
   return (
     <>
-      <div className="view is-active home-view" style={{ paddingTop: 16 }}>
+      <div className="view is-active home-view pt-3">
         {!state.user.level && (
           <div className="setup-banner">Configure ton niveau pour des leçons sur mesure.</div>
         )}
@@ -199,8 +199,6 @@ export function HomeView() {
           </motion.div>
 
           <motion.div variants={staggerItem} className="home-mission-zone">
-            <span className="home-mission-orbit home-mission-orbit-one" aria-hidden="true" />
-            <span className="home-mission-orbit home-mission-orbit-two" aria-hidden="true" />
             <HeroPiocheCard
               bubbleLine={bubbleLine}
               subjectName={currentSubject?.name}
