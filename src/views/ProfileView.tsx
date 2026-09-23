@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Settings, ChevronRight, Check, Pencil, X, Share2 } from 'lucide-react';
+import { Settings, ChevronRight, Check, Pencil, X, Share2, Target, Flame, BookOpen, Award } from 'lucide-react';
 import { useApp, computeUnlockedBadges, countDoneChapters } from '@/store';
 import { sfx } from '@/lib/sound';
 import { getRankInfo, badgeRemainingLabel, nextBadgeHint, countMasteredCards, RANKS } from '@/lib/aura';
@@ -276,9 +276,33 @@ export function ProfileView() {
           </div>
         )}
 
-        {/* Unified card — badges/ton de Braise/matières as quiet settings-style rows instead of
-            three separately bordered+shadowed blocks. Only the hero above gets the bold-border
-            treatment; everything here stays deliberately calm by comparison. */}
+        <motion.section className="profile-command-center" variants={staggerItem} aria-label="Ton espace personnel">
+          <div className="profile-command-heading">
+            <div>
+              <span className="profile-eyebrow">Ton espace</span>
+              <h1>Prêt à faire chauffer tes neurones ?</h1>
+              <p>Tout ce qui t&apos;aide à garder le rythme, au même endroit.</p>
+            </div>
+            <div className="profile-command-flame" aria-hidden="true"><BraiseMascot size={48} mood={state.streak > 0 ? 'proud' : 'sleepy'} /></div>
+          </div>
+
+          <div className="profile-weekly-mission">
+            <div className="profile-mission-icon" aria-hidden="true"><Target size={19} /></div>
+            <div className="profile-mission-copy">
+              <strong>Mission du jour</strong>
+              <span>{state.streak > 0 ? 'Garde ton élan avec une carte de révision.' : 'Relance ta série avec une première carte.'}</span>
+            </div>
+            <button type="button" onClick={() => { sfx.tap(state.soundOn); setTab('revisions'); }}>Commencer <ChevronRight size={15} /></button>
+          </div>
+
+          <div className="profile-stat-grid">
+            <div className="profile-stat-card profile-stat-orange"><Flame size={18} /><strong>{state.streak}</strong><span>jours de série</span></div>
+            <div className="profile-stat-card profile-stat-blue"><BookOpen size={18} /><strong>{cardsSeenCount}</strong><span>cartes vues</span></div>
+            <div className="profile-stat-card profile-stat-violet"><Award size={18} /><strong>{badgeUnlockedCount}/{BADGES.length}</strong><span>badges gagnés</span></div>
+          </div>
+        </motion.section>
+
+        {/* Settings and personalisation live below the actionable dashboard. */}
         <motion.div className="uni-card" variants={staggerItem}>
           <div
             className="uni-row progress-row stacked"
