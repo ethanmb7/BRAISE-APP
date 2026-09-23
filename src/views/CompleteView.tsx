@@ -5,15 +5,20 @@ import { sfx } from '@/lib/sound';
 import { BraiseMascot } from '@/components/BraiseMascot';
 import { getAgeGroup, lessonComplete } from '@/lib/braiseVoice';
 import { SUBJECTS } from '@/data';
+import { remainingToGoal } from '@/store';
 
 const CONFETTI = ['🎉', '⭐', '🔥', '✨', '🎊', '⭐', '🎉', '✨'];
 
 export function CompleteView() {
   const { state, setView } = useApp();
   const [showShare, setShowShare] = useState(false);
-  const chapterTitle =
-    SUBJECTS.find((s) => s.id === state.currentSubjectId)?.chapters.find((c) => c.id === state.currentChapterId)
-      ?.title ?? 'cette leçon';
+  const chapter = SUBJECTS.find((s) => s.id === state.currentSubjectId)?.chapters.find((c) => c.id === state.currentChapterId);
+  const chapterTitle = chapter?.title ?? 'cette leçon';
+  // A completed chapter is durable state, but the reward belongs to this exact finish. This
+  // transient result prevents the celebration from promising XP or quiz scores the learner did
+  // not actually earn (for example when reopening an already-completed chapter).
+  const completion = state.lastCompletion?.chapterId === chapter?.id ? state.lastCompletion : null;
+  const remaining = remainingToGoal(state);
   const completeLine = lessonComplete(
     { personality: state.user.personality, age: getAgeGroup(state.user.level) },
     chapterTitle
@@ -78,17 +83,21 @@ export function CompleteView() {
         <div className="complete-badge">
           <BraiseMascot size={50} mood="proud" />
         </div>
-        <h2>Leçon terminée !</h2>
+        <h2>Mission terminée !</h2>
         <p>{completeLine}</p>
-        <div className="complete-xp">+50 XP</div>
+        {completion?.wasNewCompletion ? (
+          <div className="complete-xp">+{completion.xpGained} XP</div>
+        ) : (
+          <div className="complete-xp is-repeat">Chapitre déjà validé</div>
+        )}
         <div className="complete-stats">
           <div className="complete-stat">
-            <b>3/3</b>
-            <span>bonnes réponses</span>
+            <b>{completion?.wasNewCompletion ? '1' : '—'}</b>
+            <span>{completion?.wasNewCompletion ? 'chapitre débloqué' : 'pas d’XP en double'}</span>
           </div>
           <div className="complete-stat">
-            <b>{state.streak} 🔥</b>
-            <span>série</span>
+            <b>{state.dailyGoalMet ? 'Objectif OK' : `${remaining} restant${remaining > 1 ? 's' : ''}`}</b>
+            <span>{state.dailyGoalMet ? 'pour aujourd’hui' : 'avant ton objectif du jour'}</span>
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>

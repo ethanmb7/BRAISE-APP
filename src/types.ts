@@ -106,6 +106,14 @@ export type UserProfile = {
   joinedAt?: number;
 };
 
+/** Outcome of the chapter that just opened the completion screen. It is intentionally transient:
+ * it explains this celebration, while durable progress remains in `completedChapters`. */
+export type ChapterCompletion = {
+  chapterId: string;
+  wasNewCompletion: boolean;
+  xpGained: number;
+};
+
 export type AppState = {
   view: ViewId;
   tab: TabId;
@@ -129,6 +137,8 @@ export type AppState = {
   /** Where "back" from a lesson should land when it wasn't reached through a subject (e.g.
    *  "Revoir la notion" mid-session on Réviser). In-memory only, never persisted. */
   lessonReturnTo: ViewId | null;
+  /** In-memory handoff from LessonView to CompleteView; never restored after a reload. */
+  lastCompletion: ChapterCompletion | null;
   cardReviews: Record<string, CardReview>;
   sessionDate: string;
   sessionCardsReviewed: number;

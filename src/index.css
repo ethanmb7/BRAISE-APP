@@ -2761,6 +2761,10 @@ select {
   margin: 14px 0 4px;
   animation: xpBounce 0.5s ease;
 }
+.complete-xp.is-repeat {
+  font-size: 1.05rem;
+  color: var(--ink-soft);
+}
 @keyframes xpBounce {
   0% { transform: scale(0.5); opacity: 0; }
   60% { transform: scale(1.15); }

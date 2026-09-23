@@ -205,6 +205,7 @@ const INITIAL: AppState = {
   completedChapters: [],
   chatBridgeMessage: null,
   lessonReturnTo: null,
+  lastCompletion: null,
   cardReviews: {},
   sessionDate: new Date().toDateString(),
   sessionCardsReviewed: 0,
@@ -360,16 +361,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const completeChapter = useCallback((chapterId: string) => {
     setState((s) => {
-      const already = s.completedChapters.includes(chapterId);
-      const sessionChaptersDone = already ? s.sessionChaptersDone : s.sessionChaptersDone + 1;
-      const activity = s.sessionCardsReviewed + sessionChaptersDone * 3;
+      // Always derive the reward from today's counters. This matters if the first completion
+      // happens after midnight while a previous session is still in local storage.
+      const session = { ...s, ...ensureSession(s) };
+      const already = session.completedChapters.includes(chapterId);
+      const xpGained = already ? 0 : 50;
+      const sessionChaptersDone = already ? session.sessionChaptersDone : session.sessionChaptersDone + 1;
+      const activity = session.sessionCardsReviewed + sessionChaptersDone * 3;
       return {
-        ...s,
-        ...ensureSession(s),
-        completedChapters: already ? s.completedChapters : [...s.completedChapters, chapterId],
+        ...session,
+        completedChapters: already ? session.completedChapters : [...session.completedChapters, chapterId],
         sessionChaptersDone,
-        xp: already ? s.xp : s.xp + 50,
-        dailyGoalMet: activity >= goalTarget(s),
+        xp: session.xp + xpGained,
+        dailyGoalMet: activity >= goalTarget(session),
+        lastCompletion: { chapterId, wasNewCompletion: !already, xpGained },
       };
     });
   }, []);
