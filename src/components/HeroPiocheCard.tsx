@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, MotionConfig } from 'framer-motion';
+codex/recuperer-le-code-eh064a
 import { Play, Sparkles } from 'lucide-react';
+=======
+import { Play, Sparkles, Zap } from 'lucide-react';
+  main
 import { BraiseChest } from '@/components/BraiseChest';
 import { sfx } from '@/lib/sound';
 import { getLastPiocheOpenDate, setLastPiocheOpenDate } from '@/lib/celebrations';
@@ -113,6 +117,18 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
         <span className="sr-only">
           {bubbleLine} Cette mission contient {cardCount} carte{cardCount > 1 ? 's' : ''}.
         </span>
+codex/recuperer-le-code-eh064a
+=======
+
+        <div className="relative mt-3 flex items-center justify-between gap-2 border-t-2 border-black/20 pt-3">
+          <p className="min-w-0 font-display text-[0.78rem] font-extrabold leading-tight text-[#151821]">
+            Braise t’a préparé un petit piège.
+          </p>
+          <span className="flex flex-shrink-0 items-center gap-1 rounded-full border-2 border-black bg-[#FDC800] px-2 py-1 font-mono text-[0.6rem] font-black uppercase text-[#151821] shadow-[2px_2px_0_#000]">
+            <Zap size={11} fill="currentColor" strokeWidth={2.7} /> Express
+          </span>
+        </div>
+main
 
         {/* Base+face bevel — untouched, the same mechanic SubjectDecks/HeaderHUD use everywhere
             else on Accueil. Pointer events here drive `hyped` on the chest (hover for a mouse,
