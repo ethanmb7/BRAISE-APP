@@ -202,6 +202,7 @@ export function HomeView() {
             <HeroPiocheCard
               bubbleLine={bubbleLine}
               subjectName={currentSubject?.name}
+              subjectColor={currentSubject?.color}
               chapterTitle={currentChapter?.title ?? 'Leçon du jour'}
               duration={currentChapter?.duration ?? 0}
               cardCount={currentChapterCardCount}
