@@ -279,9 +279,9 @@ export function ProfileView() {
         <motion.section className="profile-command-center" variants={staggerItem} aria-label="Ton espace personnel">
           <div className="profile-command-heading">
             <div>
-              <span className="profile-eyebrow">Ton espace</span>
-              <h1>Prêt à faire chauffer tes neurones ?</h1>
-              <p>Tout ce qui t&apos;aide à garder le rythme, au même endroit.</p>
+              <span className="profile-eyebrow">Ton coin à toi</span>
+              <h1>Ton mood du moment, c&apos;est quoi ?</h1>
+              <p>Ton énergie, tes badges et tes petites victoires réunis ici.</p>
             </div>
             <div className="profile-command-flame" aria-hidden="true"><BraiseMascot size={48} mood={state.streak > 0 ? 'proud' : 'sleepy'} /></div>
           </div>
@@ -289,16 +289,16 @@ export function ProfileView() {
           <div className="profile-weekly-mission">
             <div className="profile-mission-icon" aria-hidden="true"><Target size={19} /></div>
             <div className="profile-mission-copy">
-              <strong>Mission du jour</strong>
-              <span>{state.streak > 0 ? 'Garde ton élan avec une carte de révision.' : 'Relance ta série avec une première carte.'}</span>
+              <strong>Petit défi du jour</strong>
+              <span>{state.streak > 0 ? 'Un mini passage et ta série reste dans le game.' : 'Une première carte pour relancer la vibe.'}</span>
             </div>
             <button type="button" onClick={() => { sfx.tap(state.soundOn); setTab('revisions'); }}>Commencer <ChevronRight size={15} /></button>
           </div>
 
           <div className="profile-stat-grid">
-            <div className="profile-stat-card profile-stat-orange"><Flame size={18} /><strong>{state.streak}</strong><span>jours de série</span></div>
-            <div className="profile-stat-card profile-stat-blue"><BookOpen size={18} /><strong>{cardsSeenCount}</strong><span>cartes vues</span></div>
-            <div className="profile-stat-card profile-stat-violet"><Award size={18} /><strong>{badgeUnlockedCount}/{BADGES.length}</strong><span>badges gagnés</span></div>
+            <div className="profile-stat-card profile-stat-orange"><Flame size={18} /><strong>{state.streak}</strong><span>jours en feu</span></div>
+            <div className="profile-stat-card profile-stat-blue"><BookOpen size={18} /><strong>{cardsSeenCount}</strong><span>cartes explorées</span></div>
+            <div className="profile-stat-card profile-stat-violet"><Award size={18} /><strong>{badgeUnlockedCount}/{BADGES.length}</strong><span>badges débloqués</span></div>
           </div>
         </motion.section>
 
@@ -349,7 +349,7 @@ export function ProfileView() {
               badges-count dot row, which said the same "x/6" this already shows. */}
           <div className="uni-row stacked">
             <div className="uni-row-main">
-              <span className="uni-row-label">Parcours</span>
+              <span className="uni-row-label">Tes moments forts</span>
               <span className="uni-row-sub">
                 {badgeUnlockedCount} badge{badgeUnlockedCount > 1 ? 's' : ''} débloqué{badgeUnlockedCount > 1 ? 's' : ''} sur {BADGES.length}
               </span>
