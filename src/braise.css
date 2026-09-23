@@ -4192,6 +4192,7 @@ select {
 .home-header-identity:active,
 .home-header-aura:active { transform: scale(0.96); }
 
+codex/analyser-l-application-u3fig7
 /* ===== Matières — exploration volontaire ===== */
 .subjects-view { padding-top: 18px; }
 .subjects-heading {
@@ -4247,6 +4248,8 @@ select {
 .subjects-summary span { display: flex; align-items: center; gap: 5px; }
 .subjects-summary b { color: var(--ink); }
 
+=======
+main
 .mission-topbar {
   display: grid;
   gap: 10px;

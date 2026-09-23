@@ -158,7 +158,11 @@ export function HomeView() {
               onAvatarClick={() => setView('profile')}
               onAuraClick={() => {
                 sfx.tap(state.soundOn);
+codex/analyser-l-application-u3fig7
                 setView('progres');
+=======
+                setTab('progres');
+main
               }}
             />
           </motion.div>
