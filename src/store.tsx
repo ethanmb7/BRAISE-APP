@@ -124,7 +124,7 @@ function resolveRestoredView(saved: Partial<AppState>): ViewId {
     if (view === 'lesson' && !subject.chapters.find((c) => c.id === saved.currentChapterId)) return 'home';
     return view;
   }
-  if (view === 'revisions' || view === 'progres' || view === 'profile' || view === 'settings') return view;
+  if (view === 'subjects' || view === 'revisions' || view === 'progres' || view === 'profile' || view === 'settings') return view;
   return 'home';
 }
 
@@ -133,8 +133,10 @@ function resolveRestoredView(saved: Partial<AppState>): ViewId {
 // just `view` — otherwise resuming into e.g. Revisions would show the right screen with the wrong
 // tab lit up, and a subsequent "back" from Subject/Settings would return to the wrong place.
 function resolveRestoredTab(view: ViewId, savedTab: TabId | undefined): TabId {
-  if (view === 'home' || view === 'revisions' || view === 'progres' || view === 'profile') return view;
-  return savedTab ?? 'home';
+  if (view === 'home' || view === 'subjects' || view === 'revisions' || view === 'profile') return view;
+  if (savedTab === 'home' || savedTab === 'subjects' || savedTab === 'revisions' || savedTab === 'profile') return savedTab;
+  // `progres` used to be a tab. Old localStorage values now land on Moi, where Aura belongs.
+  return view === 'progres' ? 'profile' : 'home';
 }
 
 function sm2(review: CardReview | undefined, confidence: Confidence): CardReview {
