@@ -202,6 +202,7 @@ export function HomeView() {
             <HeroPiocheCard
               bubbleLine={bubbleLine}
               subjectName={currentSubject?.name}
+              subjectColor={currentSubject?.color}
               chapterTitle={currentChapter?.title ?? 'Leçon du jour'}
               duration={currentChapter?.duration ?? 0}
               cardCount={currentChapterCardCount}
@@ -277,11 +278,7 @@ export function HomeView() {
 
       {freezeToast && (
         <div key={freezeToast} className="freeze-toast">
-codex/analyser-et-ameliorer-l-application-braise-pvobf9
-          {freezeToast === 'on' ? '🧊 Gel activé : ta série est protégée.' : 'Gel de série désactivé'}
-=======
           {freezeToast === 'on' ? '🧊 Joker prêt : ta série est protégée.' : 'Joker de série désactivé'}
-main
         </div>
       )}
 
