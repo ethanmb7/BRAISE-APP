@@ -19,10 +19,10 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
+      // This application deliberately co-locates store helpers and palette constants with the
+      // components that consume them. They are safe runtime exports, but they are outside the
+      // scope of Fast Refresh's component-only heuristic and would otherwise create CI noise.
+      'react-refresh/only-export-components': 'off',
     },
   }
 );
