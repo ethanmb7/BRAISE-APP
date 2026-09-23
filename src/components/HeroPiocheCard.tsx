@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, MotionConfig } from 'framer-motion';
 import { Clock3, Play, Sparkles, Trophy } from 'lucide-react';
-import { BraiseChest } from '@/components/BraiseChest';
+import { BraisePioche } from '@/components/BraisePioche';
 import { sfx } from '@/lib/sound';
 import { getLastPiocheOpenDate, setLastPiocheOpenDate } from '@/lib/celebrations';
 import { firePiocheReveal, getPiocheRevealTiming } from '@/lib/piocheTransition';
@@ -42,8 +42,8 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
   const [hyped, setHyped] = useState(false);
   const [launching, setLaunching] = useState(false);
   const [quick, setQuick] = useState(false);
-  const launchTimer = useRef<ReturnType<typeof setTimeout>>();
-  const revealTimer = useRef<ReturnType<typeof setTimeout>>();
+  const launchTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const revealTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => () => {
     if (launchTimer.current) clearTimeout(launchTimer.current);
@@ -132,7 +132,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
         </motion.div>
 
         <div className="relative flex items-center gap-3">
-          <div className="relative flex h-[68px] w-[68px] flex-shrink-0 items-center justify-center">
+          <div className="relative flex h-[76px] w-[76px] flex-shrink-0 items-end justify-center">
             {/* One slow aura makes the chest feel warm and rare at rest. It wakes up only when
                 the player reaches for the button; the frame and reading order never move. */}
             <motion.span
@@ -141,7 +141,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
               animate={hyped || launching ? { scale: [0.9, 1.22, 0.9], opacity: [0.25, 0.85, 0.25] } : { scale: [0.96, 1.06, 0.96], opacity: [0.22, 0.4, 0.22] }}
               transition={{ duration: hyped || launching ? 0.72 : 3.2, repeat: Infinity, ease: 'easeInOut' }}
             />
-            <BraiseChest size={64} hyped={hyped} diving={launching} quick={quick} />
+            <BraisePioche size={72} hyped={hyped} diving={launching} quick={quick} />
           </div>
           <div className="min-w-0 flex-1">
             {/* Dark ink, not white — #FF6B35 measures 2.84:1 for white text (a hard AA
@@ -171,6 +171,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
         <span className="sr-only">
           {bubbleLine} Cette mission contient {cardCount} carte{cardCount > 1 ? 's' : ''}, dure environ {duration} minutes et rapporte 50 points d'Aura à sa première validation.
         </span>
+
         {launching && <span className="sr-only" role="status">Braise révèle ta mission.</span>}
 
         {/* Base+face bevel — untouched, the same mechanic SubjectDecks/HeaderHUD use everywhere

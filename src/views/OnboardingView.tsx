@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
 import { BraiseMascot, SapiLogo } from '@/components/BraiseMascot';
+import { AvatarGlyph, getAvatarName } from '@/components/AvatarGlyph';
 import { useApp } from '@/store';
 import { sfx } from '@/lib/sound';
 import { LEVELS, SUBJECTS, AVATARS } from '@/data';
@@ -109,16 +110,20 @@ export function OnboardingView() {
                 sfx.tap(state.soundOn);
                 setAvatar(a.emoji);
               }}
+              aria-label={`Choisir l'avatar ${getAvatarName(a.emoji)}`}
               style={{
-                width: 42,
-                height: 42,
-                borderRadius: 12,
-                fontSize: '1.3rem',
+                width: 52,
+                height: 52,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 14,
                 background: avatar === a.emoji ? 'var(--blue-pale)' : 'var(--paper)',
-                border: `2px solid ${avatar === a.emoji ? 'var(--blue)' : 'var(--line)'}`,
+                border: `2.5px solid ${avatar === a.emoji ? 'var(--neo-ink)' : 'var(--line)'}`,
+                boxShadow: avatar === a.emoji ? '3px 3px 0 var(--neo-ink)' : 'none',
               }}
             >
-              {a.emoji}
+              <AvatarGlyph id={a.emoji} size={36} />
             </button>
           ))}
         </div>

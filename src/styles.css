@@ -1,0 +1,36 @@
+@import "tailwindcss" source(none);
+@source "../src";
+/* layer(components) : du CSS non-« layered » bat TOUTES les classes Tailwind, quelle que soit
+   la spécificité. En le plaçant dans la couche components, les styles maison restent la base et
+   les utilitaires Tailwind posés dans le JSX reprennent le dessus. */
+@import "./braise.css" layer(components);
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-sapie-blue: #3b82f6;
+  --color-sapie-blue-2: #1e48c4;
+  --color-sapie-blue-ink: #13214f;
+  --color-sapie-blue-pale: #eaf1ff;
+  --color-sapie-paper: #ffffff;
+  --color-sapie-bg: #f8fafc;
+  --color-sapie-orange: #f97316;
+  --color-sapie-orange-ink: #7c2d12;
+  --color-sapie-sun: #ffc24b;
+  --color-sapie-sun-ink: #5c3a00;
+  --color-sapie-amber: #f59e0b;
+  --color-sapie-coral: #ff6f59;
+  --color-sapie-coral-2: #c23f2e;
+  --color-sapie-mint: #10b981;
+  --color-sapie-mint-text: #0d7a5f;
+  --color-sapie-violet: #8b5cf6;
+  --color-sapie-ink: #16213a;
+  --color-sapie-neo-orange: #ff4500;
+  --color-sapie-neo-ink: #151821;
+  --color-sapie-neo-blue: #1e3a8a;
+  --color-sapie-neo-paper: #faf8f3;
+
+  --font-display: "Baloo 2", sans-serif;
+  --font-sans: "IBM Plex Sans", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+}

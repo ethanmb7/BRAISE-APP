@@ -1,6 +1,7 @@
 import { ArrowUpRight, Layers, Snowflake } from 'lucide-react';
 import { getRankInfo } from '@/lib/aura';
 import { RankIcon } from '@/components/RankIcon';
+import { AvatarGlyph } from '@/components/AvatarGlyph';
 
 interface HeaderHUDProps {
   name: string;
@@ -44,7 +45,9 @@ export function HeaderHUD({
     <header className="mission-topbar" aria-label="Ton rituel du jour">
       <div className="mission-topbar-head">
         <button type="button" onClick={onAvatarClick} className="mission-profile-button" aria-label="Ouvrir ton profil">
-          <span className="mission-profile-avatar" aria-hidden="true">{avatar}</span>
+          <span className="mission-profile-avatar" aria-hidden="true">
+            <AvatarGlyph id={avatar} rankId={rank.id} size={30} />
+          </span>
           <span className="mission-profile-rank" aria-hidden="true" style={{ background: `linear-gradient(135deg, ${rank.colorFrom}, ${rank.colorTo})` }}>
             <RankIcon rankId={rank.id} color="#fff" size={12} />
           </span>

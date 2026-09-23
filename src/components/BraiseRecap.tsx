@@ -64,7 +64,7 @@ export function BraiseRecap({
   const [i, setI] = useState(0);
   const slide = slides[i];
   const isLast = i === slides.length - 1;
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const precision = reviewed > 0 ? Math.round(((reviewed - wrongCount) / reviewed) * 100) : 0;
 
   // The session's own payoff moment — the biggest celebration in the whole screen — played no

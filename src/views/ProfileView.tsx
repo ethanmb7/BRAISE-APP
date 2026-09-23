@@ -10,6 +10,7 @@ import { TopBar } from '@/components/TopBar';
 import { RankIcon } from '@/components/RankIcon';
 import { SubjectIcon } from '@/components/SubjectIcon';
 import { BraiseMascot } from '@/components/BraiseMascot';
+import { AvatarGlyph, getAvatarName } from '@/components/AvatarGlyph';
 import { BADGES, SUBJECTS, AVATARS } from '@/data';
 import type { Personality } from '@/types';
 
@@ -59,6 +60,16 @@ export function ProfileView() {
   const animatedXp = useCountUp(state.xp);
   const rankName = rank.name;
 
+  // Prochain avatar à débloquer — sert de sous-titre au rail : une raison de revenir, sans
+  // recopier un seul chiffre de l'Aura.
+  const nextAvatarHint = useMemo(() => {
+    const next = AVATARS.find((a) => a.minRankId && !isAvatarUnlocked(a.minRankId, rank.id));
+    if (!next) return null;
+    const required = RANKS.find((r) => r.id === next.minRankId);
+    return `${getAvatarName(next.emoji)} se débloque au rang ${required?.name}.`;
+  }, [rank.id]);
+
+
   // Memoized on the real facts it depends on, not re-rolled on every render (e.g. opening the
   // identity editor or toggling a subject chip) — only changes when something Braise would
   // actually react to differently changes.
@@ -97,31 +108,38 @@ export function ProfileView() {
       <motion.div className="view is-active" variants={staggerContainer} initial="hidden" animate="show">
         {!editingIdentity ? (
           <motion.div className="profile-hero-card" variants={staggerItem}>
-            <div className="profile-hero-banner" style={{ background: `linear-gradient(125deg, ${rank.colorFrom}, ${rank.colorTo})` }}>
-              <div className="profile-hero-rank-pill">
-                <RankIcon rankId={rank.id} color={rank.colorFrom} size={14} />
+            {/* Le "pass BRAISE" : une vraie carte d'accès plutôt qu'un bandeau décoratif —
+                bande perforée en haut (les deux trous suggèrent le cordon), identité alignée
+                à gauche comme sur un badge, rien de centré ni de générique. */}
+            <div className="profile-pass-strip" style={{ background: `linear-gradient(125deg, ${rank.colorFrom}, ${rank.colorTo})` }}>
+              <span className="profile-pass-punch" aria-hidden="true" />
+              <span className="profile-hero-overline">Pass BRAISE</span>
+              <span className="profile-hero-rank-pill">
+                <RankIcon rankId={rank.id} color="#fff" size={12} />
                 {rank.name}
-              </div>
+              </span>
             </div>
             <div className="profile-hero-body">
-              <div className="profile-hero-avatar-stage">
-                <div
-                  className="profile-hero-avatar-glow"
-                  style={{ background: `radial-gradient(circle, ${rank.colorTo}80, transparent 70%)` }}
-                />
-                <div
-                  className="profile-hero-avatar-ring"
-                  style={{ background: `conic-gradient(${rank.colorFrom}, ${rank.colorTo}, ${rank.colorFrom})` }}
-                />
-                <button type="button" className="profile-hero-avatar" onClick={openIdentityEdit} aria-label="Modifier ton avatar et ton prénom">
-                  {state.user.avatar}
-                  <span className="profile-hero-edit-badge" aria-hidden="true">
-                    <Pencil size={11} />
-                  </span>
-                </button>
+
+              <div className="profile-hero-identity">
+                <div className="profile-hero-avatar-stage">
+                  <div
+                    className="profile-hero-avatar-glow"
+                    style={{ background: `radial-gradient(circle, ${rank.colorTo}80, transparent 70%)` }}
+                  />
+                  <button type="button" className="profile-hero-avatar" onClick={openIdentityEdit} aria-label="Modifier ton avatar et ton prénom">
+                    <AvatarGlyph id={state.user.avatar} rankId={rank.id} size={58} />
+                    <span className="profile-hero-edit-badge" aria-hidden="true">
+                      <Pencil size={11} />
+                    </span>
+                  </button>
+                </div>
+                <div className="profile-hero-identity-main">
+                  <h2 className="profile-hero-name">{state.user.name}</h2>
+                  {state.user.joinedAt && <p className="profile-joined">Membre depuis le {formatShortDate(state.user.joinedAt)}</p>}
+                </div>
               </div>
-              <h2 className="profile-hero-name">{state.user.name}</h2>
-              {state.user.joinedAt && <p className="profile-joined">Membre depuis le {formatShortDate(state.user.joinedAt)}</p>}
+
 
               {/* Braise's take — real facts (rank/série/badges), never generic filler; changes
                   when they actually change, so there's a real reason to come back and see what
@@ -150,25 +168,29 @@ export function ProfileView() {
                 </div>
               </div>
 
-              <div className="profile-hero-num">{animatedXp}</div>
-              <div className="profile-hero-lbl">XP</div>
-
-              <div className="profile-hero-mini-row">
-                <div className="profile-hero-mini">
-                  <b>{state.streak}</b>
-                  <span>jours</span>
-                </div>
-                <div className="profile-hero-mini">
-                  <b>{cardsSeenCount}</b>
-                  <span>cartes</span>
-                </div>
-                <div className="profile-hero-mini">
-                  <b>{chaptersDone}</b>
-                  <span>{chaptersDone > 1 ? 'chapitres' : 'chapitre'}</span>
-                </div>
-              </div>
+              {/* Un seul renvoi vers Aura — ni XP géant, ni ligne de stats ici : la progression
+                  (XP, série, cartes, badges, rang) vit entièrement sur Ton Aura. Profil garde
+                  l'identité et les réglages qui changent le comportement de l'appli. */}
+              <button
+                type="button"
+                className="profile-aura-link"
+                onClick={() => {
+                  sfx.tap(state.soundOn);
+                  setTab('progres');
+                }}
+              >
+                <span className="profile-aura-link-badge" aria-hidden="true">
+                  <RankIcon rankId={rank.id} color={rank.colorFrom} size={16} />
+                </span>
+                <span className="profile-aura-link-main">
+                  <span className="profile-aura-link-label">Rang {rank.name}</span>
+                  <span className="profile-aura-link-sub">{animatedXp} XP · voir ton parcours</span>
+                </span>
+                <ChevronRight size={18} />
+              </button>
             </div>
           </motion.div>
+
         ) : (
           <div className="profile-identity-edit">
             <div className="profile-avatar-picker">
@@ -186,9 +208,9 @@ export function ProfileView() {
                       setDraftAvatar(a.emoji);
                     }}
                     disabled={!unlocked}
-                    aria-label={unlocked ? `Choisir l'avatar ${a.emoji}` : `Avatar verrouillé — débloqué au rang ${requiredRank?.name}`}
+                    aria-label={unlocked ? `Choisir l'avatar ${getAvatarName(a.emoji)}` : `Avatar verrouillé — débloqué au rang ${requiredRank?.name}`}
                   >
-                    {a.emoji}
+                    <AvatarGlyph id={a.emoji} rankId={rank.id} size={30} />
                     {!unlocked && (
                       <span className="profile-avatar-option-lock" aria-hidden="true">
                         <RankIcon rankId="" color="" locked size={11} />
@@ -204,7 +226,7 @@ export function ProfileView() {
               const requiredRank = RANKS.find((r) => r.id === nextLockedAvatar.minRankId);
               return (
                 <p className="profile-avatar-unlock-hint">
-                  {nextLockedAvatar.emoji} débloqué au rang {requiredRank?.name}
+                  {getAvatarName(nextLockedAvatar.emoji)} débloqué au rang {requiredRank?.name}
                 </p>
               );
             })()}
@@ -241,6 +263,43 @@ export function ProfileView() {
         {/* No rank-progress bar and no "Parcours" badge timeline here anymore — both moved to
             Ton Aura, the one place progression/achievement now lives. Profil's own job is
             identity + how the app behaves for you, not a second copy of "how am I doing". */}
+        {/* Choix de tête — sorti de la carte de réglages : c'est de l'identité, ça appartient
+            juste sous le pass. Les avatars verrouillés montrent qu'il y a quelque chose à
+            gagner en montant de rang, sans recopier un chiffre de l'Aura. */}
+        <motion.section className="profile-face-card" variants={staggerItem}>
+          <div className="profile-face-head">
+            <span className="profile-face-label">Ta tête</span>
+            <span className="profile-face-sub">{nextAvatarHint ?? 'Tout est débloqué. Respect.'}</span>
+          </div>
+          <div className="profile-avatar-rail">
+            {AVATARS.map((a) => {
+              const unlocked = isAvatarUnlocked(a.minRankId, rank.id);
+              const requiredRank = a.minRankId ? RANKS.find((r) => r.id === a.minRankId) : null;
+              return (
+                <button
+                  key={a.emoji}
+                  type="button"
+                  className={`profile-avatar-option ${state.user.avatar === a.emoji ? 'is-selected' : ''} ${unlocked ? '' : 'is-locked'}`}
+                  onClick={() => {
+                    if (!unlocked) return;
+                    sfx.tap(state.soundOn);
+                    setUser({ ...state.user, avatar: a.emoji });
+                  }}
+                  disabled={!unlocked}
+                  aria-label={unlocked ? `Choisir l'avatar ${getAvatarName(a.emoji)}` : `Avatar verrouillé — débloqué au rang ${requiredRank?.name}`}
+                >
+                  <AvatarGlyph id={a.emoji} rankId={rank.id} size={32} />
+                  {!unlocked && (
+                    <span className="profile-avatar-option-lock" aria-hidden="true">
+                      <RankIcon rankId="" color="" locked size={11} />
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </motion.section>
+
         <motion.div className="uni-card" variants={staggerItem}>
           <div className="uni-row">
             <div className="uni-row-main">
@@ -291,7 +350,9 @@ export function ProfileView() {
               })}
             </div>
           </div>
+
         </motion.div>
+
 
         {/* Settings link — the one bridge Profil keeps: Paramètres is the deeper configuration
             layer (son, thème, dyslexie), Profil itself only holds identity + the two preferences

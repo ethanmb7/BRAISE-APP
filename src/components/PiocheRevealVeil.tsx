@@ -23,7 +23,7 @@ import { onPiocheReveal, getPiocheRevealTiming } from '@/lib/piocheTransition';
 export function PiocheRevealVeil() {
   const [active, setActive] = useState(false);
   const [durations, setDurations] = useState({ fadeInMs: 0, holdMs: 0, fadeOutMs: 0, veilTotalMs: 0 });
-  const resetTimer = useRef<ReturnType<typeof setTimeout>>();
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     const unsubscribe = onPiocheReveal((totalMs) => {

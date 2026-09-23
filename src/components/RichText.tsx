@@ -51,5 +51,6 @@ export function RichText({ text, markClass = 'neo-highlight', strongClass }: Pro
 
 function MathSpan({ expr, display = false }: { expr: string; display?: boolean }) {
   const html = katex.renderToString(expr, { throwOnError: false, displayMode: display });
+  // eslint-disable-next-line react/no-danger
   return <span className="math-inline" dangerouslySetInnerHTML={{ __html: html }} />;
 }
