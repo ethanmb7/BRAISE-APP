@@ -28,7 +28,7 @@ function formatShortDate(ts: number): string {
 export function BadgeShelf({ state }: { state: AppState }) {
   const unlockedBadges = useMemo(() => computeUnlockedBadges(state), [state]);
   const unlockedCount = useMemo(() => Object.values(unlockedBadges).filter(Boolean).length, [unlockedBadges]);
-  const badgeUnlockedAt = useMemo(() => getBadgeUnlockedAtMap(), [unlockedBadges]);
+  const badgeUnlockedAt = getBadgeUnlockedAtMap();
   const unlockedSorted = useMemo(
     () => BADGES.filter((b) => unlockedBadges[b.id]).sort((a, b) => (badgeUnlockedAt[a.id] ?? 0) - (badgeUnlockedAt[b.id] ?? 0)),
     [unlockedBadges, badgeUnlockedAt]
