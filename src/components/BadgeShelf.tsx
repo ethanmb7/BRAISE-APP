@@ -10,11 +10,11 @@ function formatShortDate(ts: number): string {
   return new Date(ts).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
 }
 
-// The full trophy shelf — every badge visible at once, unlocked or not, so the collection reads
-// like Duolingo's own achievement grid: what you earned AND what's next, with the real
-// condition or remaining amount on each locked one (badgeRemainingLabel / badgeUnlockedAt are
-// the same real data sources the old Parcours timeline used — nothing fabricated). The gold
-// medal construction matches BadgeIcon's own ring family and the BadgeBridge medallion.
+// "Parcours" — the journal of what you've accomplished, on Ton parcours (ProfilAuraView), not
+// on Profil: every badge visible at once, unlocked or not, with the real unlock date on each
+// earned one and the real condition or remaining amount on each locked one
+// (badgeRemainingLabel / badgeUnlockedAt — nothing fabricated). The gold medal construction
+// matches BadgeIcon's own ring family.
 export function BadgeShelf({ state }: { state: AppState }) {
   const unlocked = useMemo(() => computeUnlockedBadges(state), [state]);
   const unlockedCount = Object.values(unlocked).filter(Boolean).length;
@@ -27,7 +27,7 @@ export function BadgeShelf({ state }: { state: AppState }) {
   return (
     <div className="badge-shelf">
       <div className="badge-shelf-head">
-        <span className="mastery-tab">Badges</span>
+        <span className="mastery-tab">Parcours</span>
         <span className="badge-shelf-count">
           {unlockedCount}/{BADGES.length} débloqués
         </span>

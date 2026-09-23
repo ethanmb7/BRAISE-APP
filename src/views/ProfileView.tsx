@@ -1,20 +1,14 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Settings, ChevronRight, Check, Pencil, X, Share2 } from 'lucide-react';
-import { useApp, computeUnlockedBadges } from '@/store';
+import { Settings, ChevronRight, Check, Pencil, X } from 'lucide-react';
+import { useApp } from '@/store';
 import { sfx } from '@/lib/sound';
-import { getRankInfo, countMasteredCards, computeSubjectMastery, RANKS } from '@/lib/aura';
-import { getAgeGroup, profileReactionLine } from '@/lib/braiseVoice';
+import { getRankInfo, RANKS } from '@/lib/aura';
 import { TopBar } from '@/components/TopBar';
 import { RankIcon } from '@/components/RankIcon';
 import { SubjectIcon } from '@/components/SubjectIcon';
-import { BraiseMascot } from '@/components/BraiseMascot';
-import { SubjectMasteryGrid } from '@/components/SubjectMasteryGrid';
-import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { StatsTiles } from '@/components/profile/StatsTiles';
-import { MissionsBoard } from '@/components/profile/MissionsBoard';
-import { BadgeShelf } from '@/components/profile/BadgeShelf';
-import { BADGES, SUBJECTS, AVATARS, FLASHCARDS } from '@/data';
+import { SUBJECTS, AVATARS } from '@/data';
 import type { Personality } from '@/types';
 
 const PERSONAS: { id: Personality; title: string; sub: string }[] = [
@@ -44,43 +38,18 @@ const staggerItem = {
   show: { opacity: 1, y: 0, transition: { duration: 0.32, ease: [0.16, 1, 0.3, 1] as const } },
 };
 
+// PROFIL = "Toi" — la page qu'on configure, jamais qu'on contemple. Sa seule question :
+// "qui je suis, et comment je veux que Braise fonctionne pour moi ?" Tout ce qui est un
+// accomplissement à contempler (maîtrise, parcours de badges, partage) vit sur Ton parcours.
 export function ProfileView() {
-  const { state, setView, setTab, setPersonality, setUser, openSubject } = useApp();
+  const { state, setView, setPersonality, setUser } = useApp();
   const [editingIdentity, setEditingIdentity] = useState(false);
   const [draftName, setDraftName] = useState(state.user.name);
   const [draftAvatar, setDraftAvatar] = useState(state.user.avatar);
-  const [shareOpen, setShareOpen] = useState(false);
 
   const subjectsCount = state.user.subjects.length;
-  const badgeUnlocked = computeUnlockedBadges(state);
-  const badgeUnlockedCount = Object.values(badgeUnlocked).filter(Boolean).length;
   const rankInfo = getRankInfo(state.xp);
   const rank = rankInfo.current;
-
-  const subjectMastery = useMemo(() => computeSubjectMastery(state.cardReviews), [state.cardReviews]);
-
-  // Same derivation as Aura's own share button — real distinct-subjects-reviewed count, not a
-  // second, possibly-diverging computation of "how many subjects".
-  const reviewedSubjectsCount = useMemo(
-    () =>
-      new Set(
-        Object.keys(state.cardReviews).map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)
-      ).size,
-    [state.cardReviews]
-  );
-  const masteredCards = useMemo(() => countMasteredCards(state.cardReviews), [state.cardReviews]);
-
-  // Memoized on the real facts it depends on, not re-rolled on every render (e.g. opening the
-  // identity editor or toggling a subject chip) — only changes when something Braise would
-  // actually react to differently changes.
-  const braiseTake = useMemo(
-    () =>
-      profileReactionLine(
-        { personality: state.user.personality, age: getAgeGroup(state.user.level) },
-        { rankName: rank.name, streak: state.streak, badgesUnlocked: badgeUnlockedCount, badgesTotal: BADGES.length }
-      ),
-    [state.user.personality, state.user.level, rank.name, state.streak, badgeUnlockedCount]
-  );
 
   const openIdentityEdit = () => {
     sfx.tap(state.soundOn);
@@ -102,32 +71,9 @@ export function ProfileView() {
     setUser({ ...state.user, subjects: next });
   };
 
-  const handleShareOpen = () => {
-    sfx.tap(state.soundOn);
-    if (navigator.vibrate) navigator.vibrate(10);
-    setShareOpen(true);
-  };
-  const handleShareClose = () => setShareOpen(false);
-
-  // The one honest action every mission advances (daily goal, rank, badge are all moved by
-  // revising) — same sound+haptic pairing as every other tap target on this page.
-  const goRevise = () => {
-    sfx.tap(state.soundOn);
-    if (navigator.vibrate) navigator.vibrate(10);
-    setTab('revisions');
-  };
-
-  // Same tap-to-the-deck behaviour as Aura's own mastery grid — a subject you're weak in is
-  // something to act on immediately, not a number to sit with.
-  const handleSubjectSelect = (subjectId: string) => {
-    sfx.tap(state.soundOn);
-    if (navigator.vibrate) navigator.vibrate(10);
-    openSubject(subjectId);
-  };
-
   return (
     <div>
-      <TopBar title="Profil" onBack={() => setView(state.tab)} />
+      <TopBar title="Toi" onBack={() => setView(state.tab)} />
       <motion.div className="view is-active" variants={staggerContainer} initial="hidden" animate="show">
         {!editingIdentity ? (
           <motion.div className="profile-hero-card" variants={staggerItem}>
@@ -156,33 +102,6 @@ export function ProfileView() {
               </div>
               <h2 className="profile-hero-name">{state.user.name}</h2>
               {state.user.joinedAt && <p className="profile-joined">Membre depuis le {formatShortDate(state.user.joinedAt)}</p>}
-
-              {/* Braise's take — real facts (rank/série/badges), never generic filler; changes
-                  when they actually change, so there's a real reason to come back and see what
-                  he says now. `sleepy` at streak 0 (not `happy`) — resting and waiting for you,
-                  never disappointed; the copy in profileReactionLine was rewritten to match
-                  (always ends on an open door, never a flat diss). The "reprendre" link is the
-                  actual door: a real jump into Révisions, not just a line with nowhere to go. */}
-              <div className="profile-hero-bubble">
-                <span className="profile-hero-bubble-icon" aria-hidden="true">
-                  <BraiseMascot size={26} mood={state.streak > 0 ? 'proud' : 'sleepy'} />
-                </span>
-                <div>
-                  <p>{braiseTake}</p>
-                  {state.streak === 0 && (
-                    <button
-                      type="button"
-                      className="profile-hero-bubble-cta"
-                      onClick={() => {
-                        sfx.tap(state.soundOn);
-                        setTab('revisions');
-                      }}
-                    >
-                      Réviser une carte →
-                    </button>
-                  )}
-                </div>
-              </div>
             </div>
           </motion.div>
         ) : (
@@ -251,32 +170,15 @@ export function ProfileView() {
           </div>
         )}
 
-        {/* Stats & progression — the quick-glance scoreboard (XP lives here now, not on the
-            hero: the hero stays pure identity like Aura's own, numbers get their own tiles). */}
+        {/* Résumé chiffré simple — série/XP/cartes, juste pour contextualiser qui tu es. Pas de
+            barre de progression de rang ici : l'échelle de rang n'existe que sur Ton parcours. */}
         <motion.div variants={staggerItem}>
           <StatsTiles state={state} />
         </motion.div>
 
-        {/* Missions du moment — the three things a student can actually move today, each with
-            its real progress and one honest GO (revising advances all three). */}
-        <motion.div variants={staggerItem}>
-          <MissionsBoard state={state} onGo={goRevise} />
-        </motion.div>
-
-        {/* Badges & récompenses — the full trophy shelf: earned with real unlock dates, locked
-            with their real condition or remaining amount. */}
-        <motion.div variants={staggerItem}>
-          <BadgeShelf state={state} />
-        </motion.div>
-
-        {/* Maîtrise par matière — the same card-stack visualization as Ton Aura (one shared
-            component), tapping a stack drops straight into that deck. */}
-        <motion.div variants={staggerItem}>
-          <SubjectMasteryGrid subjects={subjectMastery} onSelect={handleSubjectSelect} />
-        </motion.div>
-
-        {/* Unified card — ton de Braise/matières as quiet settings-style rows. Only the hero
-            above gets the bold-border treatment; everything here stays deliberately calm. */}
+        {/* Réglages — ton de Braise / matières favorites en rangées discrètes façon réglages.
+            Seule la carte héros ci-dessus garde le traitement bord épais ; ici tout reste
+            volontairement calme : c'est une page qu'on règle, pas qu'on contemple. */}
         <motion.div className="uni-card" variants={staggerItem}>
           <div className="uni-row">
             <div className="uni-row-main">
@@ -329,11 +231,6 @@ export function ProfileView() {
           </div>
         </motion.div>
 
-        <motion.button type="button" className="profile-hero-cta" onClick={handleShareOpen} variants={staggerItem}>
-          <Share2 size={16} />
-          Partager mon profil
-        </motion.button>
-
         {/* Settings link */}
         <motion.div variants={staggerItem}>
           <button type="button" className="profile-settings-link" onClick={() => { sfx.tap(state.soundOn); setView('settings'); }}>
@@ -345,17 +242,6 @@ export function ProfileView() {
           </button>
         </motion.div>
       </motion.div>
-
-      {shareOpen && (
-        <ShareAuraModal
-          rank={rank}
-          streak={state.streak}
-          xp={state.xp}
-          subjectsCount={reviewedSubjectsCount}
-          masteredCards={masteredCards}
-          onClose={handleShareClose}
-        />
-      )}
     </div>
   );
 }
