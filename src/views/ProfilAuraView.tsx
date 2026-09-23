@@ -1,6 +1,6 @@
 import { memo, useCallback, useMemo, useState, type CSSProperties } from 'react';
 import { motion } from 'framer-motion';
-import { WifiOff, Layers } from 'lucide-react';
+import { WifiOff } from 'lucide-react';
 import { useApp } from '@/store';
 import { sfx } from '@/lib/sound';
 import { useOnlineStatus } from '@/lib/useOnlineStatus';
@@ -47,11 +47,10 @@ const heroPop = {
   show: { opacity: 1, scale: 1, y: 0, transition: { type: 'spring', stiffness: 260, damping: 18 } as const },
 };
 export function ProfilAuraView() {
-  const { state, loaded, openSubject, setTab, getDueCards } = useApp();
+  const { state, loaded, openSubject } = useApp();
   const isOnline = useOnlineStatus();
   const [shareOpen, setShareOpen] = useState(false);
   const { current, next, pct } = getRankInfo(state.xp);
-  const dueCount = getDueCards().length;
 
   const stats = useMemo(() => {
     const reviewedIds = Object.keys(state.cardReviews);
@@ -91,15 +90,6 @@ export function ProfilAuraView() {
   }, [state.soundOn]);
 
   const handleShareClose = useCallback(() => setShareOpen(false), []);
-
-  // The action most worth taking on a page whose whole point is "make them want to come back" —
-  // used to have zero presence here, only "Partager" did. Same sound+haptic pairing as every
-  // other tap target on this page.
-  const handleReviewClick = useCallback(() => {
-    sfx.tap(state.soundOn);
-    if (navigator.vibrate) navigator.vibrate(10);
-    setTab('revisions');
-  }, [state.soundOn, setTab]);
 
   // Tapping a subject medallion drops straight into that deck — a weak subject becomes
   // something to act on immediately, not just a number to sit with. Same sound+haptic pairing
@@ -166,18 +156,13 @@ export function ProfilAuraView() {
         <motion.div variants={staggerItem}>
           <BadgeShelf state={state} />
         </motion.div>
-        {/* Réviser était absent de la page dont le but entier est de donner envie de revenir —
-            seul "Partager" avait une présence. C'est maintenant l'action principale (pleine,
-            bruyante) ; "Partager" reste réel mais passe en secondaire (contour) — les deux
-            gardent le même orange signature de l'appli, la hiérarchie se joue sur plein/contour,
-            pas sur une deuxième couleur. */}
-        <motion.div variants={staggerItem} className="aura-cta-stack">
-          <button className="aura-review-cta" onClick={handleReviewClick}>
-            <span className="aura-review-icon" aria-hidden="true">
-              <Layers size={18} />
-            </span>
-            {dueCount > 0 ? `Réviser maintenant · ${dueCount} carte${dueCount > 1 ? 's' : ''}` : 'Réviser une carte'}
-          </button>
+        {/* A "Réviser" CTA was tried here too, paired with this one — pulled back out. It aimed
+            at a real gap (nothing on this page pushed toward reviewing), but it duplicated the
+            tab bar's own Réviser tab sitting right underneath: same label, same icon, same
+            destination, no added specificity. Partager stays the one action here precisely
+            because it's the one thing this page can do that nowhere else in the app already
+            does. */}
+        <motion.div variants={staggerItem}>
           <button className="aura-share-cta" onClick={handleShareOpen}>
             <span className="aura-share-icon" aria-hidden="true">
               <TrophyIcon size={19} />
