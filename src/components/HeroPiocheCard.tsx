@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, MotionConfig } from 'framer-motion';
-import { Play, Sparkles, Zap } from 'lucide-react';
+import { Play, Sparkles } from 'lucide-react';
 import { BraiseChest } from '@/components/BraiseChest';
 import { sfx } from '@/lib/sound';
 import { getLastPiocheOpenDate, setLastPiocheOpenDate } from '@/lib/celebrations';
@@ -73,7 +73,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
       {/* The frame is intentionally motionless: this is the daily ritual's reliable anchor.
           Braise, light and the little invitation badge are the only things that get to move. */}
       <section
-        className="relative overflow-hidden rounded-2xl border-[2.5px] border-black bg-[#FF6B35] p-4 shadow-[3px_3px_0px_0px_#000]"
+        className="relative overflow-hidden rounded-2xl border-[3px] border-black bg-[#FF6B35] p-5 shadow-[6px_6px_0px_0px_#000]"
         aria-label={`Mission du jour : ${chapterTitle}`}
       >
         {/* Intermittent heat glow near the sun sliver — a light effect, not the frame moving, so
@@ -112,9 +112,15 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
             <p className="flex items-center gap-1 font-mono text-[0.67rem] font-black uppercase tracking-wide text-[#151821]">
               <Sparkles size={12} strokeWidth={3} /> Ta mission du jour
             </p>
-            <h2 className="truncate font-display text-lg font-black leading-tight text-[#151821]">{chapterTitle}</h2>
+            <h2 className="truncate font-display text-xl font-black leading-tight text-[#151821]">{chapterTitle}</h2>
+            {/* "3 min · Histoire-Géo" — duration first (the promise: this is short), subject
+                second. Card count still reaches assistive tech via the sr-only line below; a
+                visible "Express" badge next to a number that already says "3 min" was saying the
+                same thing twice, and the flavour line above it named a piège the card doesn't
+                actually reveal — a micro-briefing this stripped-down has no room for text that
+                isn't information. */}
             <p className="mt-1 truncate font-sans text-[0.78rem] font-semibold text-[#151821]">
-              {subjectName ? `${subjectName} · ` : ''}{duration} min pour capter le truc
+              {duration} min{subjectName ? ` · ${subjectName}` : ''}
             </p>
           </div>
         </div>
@@ -122,19 +128,10 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
           {bubbleLine} Cette mission contient {cardCount} carte{cardCount > 1 ? 's' : ''}.
         </span>
 
-        <div className="relative mt-3 flex items-center justify-between gap-2 border-t-2 border-black/20 pt-3">
-          <p className="min-w-0 font-display text-[0.78rem] font-extrabold leading-tight text-[#151821]">
-            Braise t’a préparé un petit piège.
-          </p>
-          <span className="flex flex-shrink-0 items-center gap-1 rounded-full border-2 border-black bg-[#FDC800] px-2 py-1 font-mono text-[0.6rem] font-black uppercase text-[#151821] shadow-[2px_2px_0_#000]">
-            <Zap size={11} fill="currentColor" strokeWidth={2.7} /> Express
-          </span>
-        </div>
-
         {/* Base+face bevel — untouched, the same mechanic SubjectDecks/HeaderHUD use everywhere
             else on Accueil. Pointer events here drive `hyped` on the chest (hover for a mouse,
             pointerdown for a touch — the only reliable "finger's on it" signal on mobile). */}
-        <div className="tw-cta-pulse group relative mt-4">
+        <div className="tw-cta-pulse group relative mt-5">
           <span aria-hidden="true" className="absolute inset-0 translate-y-[3px] rounded-full border-[2.5px] border-black bg-black" />
           <button
             onPointerEnter={() => setHyped(true)}
@@ -144,9 +141,9 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
             onPointerCancel={unhype}
             onClick={handleStart}
             disabled={launching}
-            className="tw-shimmer relative flex w-full items-center justify-center gap-1.5 rounded-full border-[2.5px] border-black bg-white px-3.5 py-3 font-display text-sm font-black text-black shadow-[3px_3px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[3px] group-active:shadow-none disabled:opacity-95"
+            className="tw-shimmer relative flex w-full items-center justify-center gap-1.5 rounded-full border-[2.5px] border-black bg-white px-3.5 py-3.5 font-display text-base font-black text-black shadow-[3px_3px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[3px] group-active:shadow-none disabled:opacity-95"
           >
-            <Play size={15} fill="currentColor" />
+            <Play size={17} fill="currentColor" />
             JE PIOCHE !
           </button>
         </div>
