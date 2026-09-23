@@ -199,8 +199,6 @@ export function HomeView() {
           </motion.div>
 
           <motion.div variants={staggerItem} className="home-mission-zone">
-            <span className="home-mission-orbit home-mission-orbit-one" aria-hidden="true" />
-            <span className="home-mission-orbit home-mission-orbit-two" aria-hidden="true" />
             <HeroPiocheCard
               bubbleLine={bubbleLine}
               subjectName={currentSubject?.name}
