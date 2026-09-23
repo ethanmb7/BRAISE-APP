@@ -13,6 +13,7 @@ export interface SubjectDeckItem {
   /** The current chapter's own title (leading article stripped for brevity) — real data, one
    *  short segment. Never truncated with an ellipsis: it wraps instead if it doesn't fit. */
   chapterLabel: string;
+  isDailyPick?: boolean;
 }
 
 interface SubjectDecksProps {
@@ -34,7 +35,7 @@ export function SubjectDecks({ items, onSelect }: SubjectDecksProps) {
   return (
     <div className="grid grid-cols-2 gap-4">
       {items.map((item) => (
-        <button key={item.id} onClick={() => onSelect(item.id)} className="group relative block h-full text-left">
+        <button key={item.id} onClick={() => onSelect(item.id)} className="group relative block h-full text-left" aria-label={`${item.name}, ${item.chapterLabel}${item.isDailyPick ? ', matière de ta mission du jour' : ''}`}>
           <span
             aria-hidden="true"
             className="absolute inset-0 translate-y-[3px] rounded-2xl border-[2.5px] border-black"
@@ -46,12 +47,12 @@ export function SubjectDecks({ items, onSelect }: SubjectDecksProps) {
             whileTap={{ y: 3, scale: 0.98 }}
             transition={{ type: 'spring', stiffness: 500, damping: 22 }}
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border-2 border-black bg-white shadow-[1.5px_1.5px_0px_0px_#000]">
                 <SubjectIcon subjectId={item.id} color={item.color} size={22} />
               </span>
-              <span className="rounded-lg border border-black bg-amber-300 px-2 py-0.5 text-xs font-black text-black shadow-[1px_1px_0px_0px_#000]">
-                Niv. {item.level}
+              <span className={`rounded-lg border border-black px-2 py-0.5 text-xs font-black text-black shadow-[1px_1px_0px_0px_#000] ${item.isDailyPick ? 'bg-white' : 'bg-amber-300'}`}>
+                {item.isDailyPick ? 'Aujourd’hui' : `Niv. ${item.level}`}
               </span>
             </div>
 
