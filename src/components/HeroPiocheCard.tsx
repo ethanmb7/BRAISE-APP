@@ -132,16 +132,17 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
         </motion.div>
 
         <div className="relative flex items-center gap-3">
-          <div className="relative flex h-[76px] w-[76px] flex-shrink-0 items-end justify-center">
+          <div className="relative flex h-[92px] w-[92px] flex-shrink-0 items-end justify-center">
             {/* One slow aura makes the chest feel warm and rare at rest. It wakes up only when
                 the player reaches for the button; the frame and reading order never move. */}
             <motion.span
               aria-hidden="true"
               className="absolute inset-[5px] rounded-full bg-[#FDC800]/40 blur-md"
               animate={hyped || launching ? { scale: [0.9, 1.22, 0.9], opacity: [0.25, 0.85, 0.25] } : { scale: [0.96, 1.06, 0.96], opacity: [0.22, 0.4, 0.22] }}
-              transition={{ duration: hyped || launching ? 0.72 : 3.2, repeat: Infinity, ease: 'easeInOut' }}
+              transition={{ duration: hyped || launching ? 0.58 : 3.2, repeat: Infinity, ease: 'easeInOut' }}
             />
-            <BraisePioche size={72} hyped={hyped} diving={launching} quick={quick} />
+            <BraisePioche size={88} hyped={hyped} diving={launching} quick={quick} />
+
           </div>
           <div className="min-w-0 flex-1">
             {/* Dark ink, not white — #FF6B35 measures 2.84:1 for white text (a hard AA

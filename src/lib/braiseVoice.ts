@@ -76,12 +76,13 @@ export function dailyHookLine(ctx: VoiceCtx, userName: string): string {
 }
 
 // Same 3 ranks that unlock a new avatar option on Profil (see AVATARS in data.ts) — kept here
-// too rather than importing it, since data.ts's minRankId is per-avatar-emoji plumbing and this
-// only needs "what unlocks at this rank", a much smaller fact.
+// too rather than importing it, since data.ts's minRankId is per-avatar plumbing and this
+// only needs "what unlocks at this rank", a much smaller fact. Les Flambés : la fuse (Or),
+// la glace (Platine), le phénix (Légende).
 const AVATAR_UNLOCK_BY_RANK: Record<string, string> = {
-  or: 'un dragon',
-  platine: 'un lion',
-  legende: 'une licorne',
+  or: 'la fuse',
+  platine: 'la glace',
+  legende: 'le phénix',
 };
 
 /** The line under Braise's transformation when a real rank threshold (getRankInfo) is crossed —

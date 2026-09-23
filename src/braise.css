@@ -853,6 +853,89 @@ select {
 .rank-rail {
   margin-bottom: 16px;
 }
+.braise-evolution-line {
+  margin-bottom: 16px;
+  padding: 10px 10px 8px;
+  background: var(--paper);
+  border: 3px solid var(--neo-ink);
+  border-radius: 8px;
+  box-shadow: 4px 4px 0 var(--neo-ink);
+}
+.braise-evolution-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 3px 7px;
+}
+.braise-evolution-heading span {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.braise-evolution-heading strong {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 0.9rem;
+  color: var(--neo-orange);
+}
+.braise-evolution-cast {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: end;
+  gap: 3px;
+  min-height: 76px;
+}
+.braise-evolution-stage {
+  min-width: 0;
+  min-height: 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  border-bottom: 3px solid transparent;
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+.braise-evolution-stage svg {
+  max-width: 100%;
+  height: auto;
+}
+.braise-evolution-stage span {
+  width: 100%;
+  overflow: hidden;
+  color: var(--ink);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.48rem;
+  font-weight: 700;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.braise-evolution-stage.is-current {
+  border-color: var(--neo-orange);
+}
+.braise-evolution-stage.is-locked {
+  filter: grayscale(1);
+  opacity: 0.28;
+}
+.braise-mascot .braise-outfit {
+  transform-origin: 54px 76px;
+}
+.braise-mascot .braise-core {
+  transform-origin: 53px 82px;
+  animation: braise-core-pulse 2.8s ease-in-out infinite;
+}
+@keyframes braise-core-pulse {
+  0%, 100% { transform: scale(0.94); }
+  50% { transform: scale(1.06); }
+}
+.braise-form-legende .braise-outfit,
+.braise-form-platine .braise-outfit {
+  filter: drop-shadow(1px 1px 0 rgba(21, 24, 33, 0.22));
+}
+@media (prefers-reduced-motion: reduce) {
+  .braise-mascot .braise-core { animation: none; }
+}
 .rank-rail-caption {
   text-align: center;
   margin: 0 0 12px;

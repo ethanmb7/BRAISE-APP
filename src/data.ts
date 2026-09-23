@@ -148,22 +148,22 @@ export const BADGES: Badge[] = [
 ];
 
 // Shared between onboarding (first pick) and Profil (change it later) — one source so the two
-// pickers can never drift apart. The original 6 stay free for everyone (no minRankId — an
-// existing account already has them, taking them away would be a regression). The 3 added ones
-// are real rank rewards, the same "unlock by tier" idea as badges/rank medals, scoped to what's
-// actually buildable with emoji (no colour-tinting, no accessories — an emoji glyph can't take
-// either without being redrawn as real vector art, a separate and much bigger undertaking).
+// pickers can never drift apart. Les Flambés : 6 esprits de flamme à vibe d'ado, gratuits dès le
+// départ (un nouveau compte est rang Bronze). Les 3 derniers sont de vraies récompenses de rang,
+// dans la même logique "débloqué par palier" que les badges/médailles. Le champ `emoji` est
+// historique (c'était un emoji) ; il porte désormais un slug stable ('fleme', 'crane'…), clé vers
+// le SVG vectoriel dessiné dans AvatarGlyph.tsx. Aucun emoji système n'est plus affiché.
 export type AvatarOption = { emoji: string; minRankId?: string };
 export const AVATARS: AvatarOption[] = [
-  { emoji: '🦊' },
-  { emoji: '🐼' },
-  { emoji: '🦉' },
-  { emoji: '🐱' },
-  { emoji: '🚀' },
-  { emoji: '⭐' },
-  { emoji: '🐉', minRankId: 'or' },
-  { emoji: '🦁', minRankId: 'platine' },
-  { emoji: '🦄', minRankId: 'legende' },
+  { emoji: 'fleme' },
+  { emoji: 'crane' },
+  { emoji: 'bucheuse' },
+  { emoji: 'casque' },
+  { emoji: 'masque' },
+  { emoji: 'eclair' },
+  { emoji: 'fuse', minRankId: 'or' },
+  { emoji: 'glace', minRankId: 'platine' },
+  { emoji: 'phenix', minRankId: 'legende' },
 ];
 
 export const DEFAULT_USER: UserProfile = {
@@ -172,7 +172,7 @@ export const DEFAULT_USER: UserProfile = {
   levelLabel: '3ème',
   goal: '30 min/jour',
   subjects: ['maths', 'francais', 'histoire-geo', 'svt'],
-  avatar: '🦊',
+  avatar: 'fleme',
   personality: 'chill',
 };
 

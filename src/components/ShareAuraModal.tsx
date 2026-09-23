@@ -3,7 +3,8 @@ import { Share2, X, Zap } from 'lucide-react';
 import { useApp } from '@/store';
 import { sfx } from '@/lib/sound';
 import type { Rank } from '@/lib/aura';
-import { RANK_FLAME_COLORS } from '@/components/BraiseMascot';
+import { BRAISE_BODY_PATHS, BRAISE_RANK_COLORS } from '@/components/BraiseCharacter';
+import type { BraiseRankId } from '@/components/BraiseCharacter';
 
 // Native Story format (1080x1920) — the canvas is always rasterized at this true resolution
 // for a crisp export; on screen it's scaled down responsively via CSS (width:100%, height:auto
@@ -488,17 +489,6 @@ function drawRankIcon(ctx: CanvasRenderingContext2D, rankId: string, x: number, 
   });
 }
 
-// Braise, ported from BraiseMascot.tsx's own 100x100 construction: the flame body (three
-// layered paths, coloured per rank via the same RANK_FLAME_COLORS BraiseMascot itself exports),
-// one rank-specific accent feature, then the "cool" face (sunglasses) — the same mood used for
-// the Hero medallion on Ton Aura, since this card is the same kind of flex moment.
-const FLAME_BODY_OUTER_D =
-  'M50 6 C 60 24, 72 30, 72 52 C 72 70, 62 82, 50 82 C 38 82, 28 70, 28 52 C 28 34, 40 30, 44 18 C 46 12, 48 8, 50 6 Z';
-const FLAME_BODY_MIDDLE_D =
-  'M50 22 C 56 34, 64 38, 64 54 C 64 66, 58 74, 50 74 C 42 74, 36 66, 36 54 C 36 42, 44 38, 46 30 C 47 26, 49 24, 50 22 Z';
-const FLAME_BODY_INNER_D =
-  'M50 38 C 54 46, 58 48, 58 58 C 58 64, 54 68, 50 68 C 46 68, 42 64, 42 58 C 42 50, 48 48, 48 42 C 49 40, 49 39, 50 38 Z';
-
 function drawRankAccent(ctx: CanvasRenderingContext2D, rankId: string) {
   if (rankId === 'argent') {
     fillStrokePath(ctx, 'M50 0 L55.5 8 L50 16 L44.5 8 Z', '#CFE8FF', INK, 1.4);
@@ -539,48 +529,20 @@ function drawRankAccent(ctx: CanvasRenderingContext2D, rankId: string) {
 }
 
 function drawMascot(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number, rankId: string) {
-  const [outer, middle, inner] = RANK_FLAME_COLORS[rankId] ?? RANK_FLAME_COLORS.bronze;
+  const safeRank = (rankId in BRAISE_RANK_COLORS ? rankId : 'bronze') as BraiseRankId;
+  const [outer, middle, inner] = BRAISE_RANK_COLORS[safeRank];
+  const mature = safeRank === 'or' || safeRank === 'platine' || safeRank === 'legende';
   ctx.save();
   ctx.translate(cx - size / 2, cy - size / 2);
-  ctx.scale(size / 100, size / 100);
+  ctx.scale(size / 108, size / 116);
 
-  fillStrokePath(ctx, FLAME_BODY_OUTER_D, outer);
-  fillStrokePath(ctx, FLAME_BODY_MIDDLE_D, middle);
-  fillStrokePath(ctx, FLAME_BODY_INNER_D, inner);
-  drawRankAccent(ctx, rankId);
+  fillStrokePath(ctx, BRAISE_BODY_PATHS[safeRank], outer, INK, 4.5);
+  fillStrokePath(ctx, mature ? 'M26 82 C25 59 39 43 53 42 C71 41 86 58 83 82 C81 98 68 105 53 105 C37 105 28 98 26 82 Z' : 'M30 80 C29 61 40 47 53 46 C69 46 80 60 79 80 C78 94 67 101 53 101 C39 101 31 94 30 80 Z', middle);
+  fillStrokePath(ctx, mature ? 'M30 67 C30 52 40 45 53 45 C68 45 78 53 78 68 C78 82 67 89 53 89 C39 89 30 81 30 67 Z' : 'M31 67 C31 53 41 46 53 46 C67 46 77 54 77 68 C77 82 67 89 53 89 C40 89 31 81 31 67 Z', '#FFF2D8', INK, 3.2);
 
-  // Eyes
-  [
-    [42, 54, 3.2, '#16213A'],
-    [58, 54, 3.2, '#16213A'],
-    [43, 53, 1, '#fff'],
-    [59, 53, 1, '#fff'],
-  ].forEach(([x, y, r, fill]) => {
-    ctx.beginPath();
-    ctx.arc(x as number, y as number, r as number, 0, Math.PI * 2);
-    ctx.fillStyle = fill as string;
-    ctx.fill();
-  });
-
-  // Smile
-  ctx.beginPath();
-  ctx.moveTo(44, 62);
-  ctx.quadraticCurveTo(50, 67, 56, 62);
-  ctx.strokeStyle = '#16213A';
-  ctx.lineWidth = 2.2;
-  ctx.lineCap = 'round';
-  ctx.stroke();
-
-  // Cheeks
-  ctx.globalAlpha = 0.45;
-  ctx.fillStyle = '#FF6F59';
-  ctx.beginPath();
-  ctx.arc(38, 60, 2.4, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(62, 60, 2.4, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.globalAlpha = 1;
+  // The exported card carries the same brand signature as the app: controlled gaze + live core.
+  if (mature) fillStrokePath(ctx, 'M36 53 L49 55 M58 55 L71 52', undefined, INK, 2.8);
+  fillStrokePath(ctx, safeRank === 'bronze' ? 'M53 76 L58 82 L53 90 L48 82 Z' : safeRank === 'argent' ? 'M53 72 L60 81 L53 92 L46 81 Z' : safeRank === 'or' ? 'M53 69 L62 80 L53 94 L44 80 Z' : safeRank === 'platine' ? 'M53 66 L63 79 L58 94 L48 94 L43 79 Z' : 'M53 64 L65 78 L60 96 L46 96 L41 78 Z', inner, INK, 2.6);
 
   // Sunglasses — the same "cool" mood as the Hero medallion, since this card is the same flex.
   ctx.fillStyle = '#16213A';

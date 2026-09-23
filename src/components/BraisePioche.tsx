@@ -29,23 +29,25 @@ interface BraisePiocheProps {
 // seule respiration lente de 2,8s ; chaque mouvement est un accusé de réception, une anticipation
 // ou une récompense — jamais de décoration.
 export function BraisePioche({ size = 64, hyped, diving, quick }: BraisePiocheProps) {
-  const t = quick ? 0.46 : 1;
+  // Net et rapide : la même chorégraphie, jouée plus serré (≈560ms plein, ≈300ms en relance).
+  const t = quick ? 0.34 : 0.62;
   const s = (v: number) => size * v;
-  const lean = { type: 'spring' as const, stiffness: 520, damping: 22, mass: 0.7 };
+  const lean = { type: 'spring' as const, stiffness: 620, damping: 20, mass: 0.6 };
 
   // Paquet au repos, écarté seulement au survol/appui. L'index 1 est la carte piochée.
   const fan = [
-    { rot: -14, x: -0.19, dip: -0.02 },
+    { rot: -14, x: -0.17, dip: -0.02 },
     { rot: 0, x: 0, dip: 0 },
-    { rot: 14, x: 0.19, dip: -0.02 },
+    { rot: 14, x: 0.17, dip: -0.02 },
   ];
 
   const cardBox = {
-    width: s(0.38),
-    height: s(0.52),
-    marginLeft: -s(0.19),
+    width: s(0.34),
+    height: s(0.46),
+    marginLeft: -s(0.17),
     transformOrigin: '50% 94%',
   } as const;
+
 
   return (
     <MotionConfig reducedMotion="user">
@@ -62,25 +64,25 @@ export function BraisePioche({ size = 64, hyped, diving, quick }: BraisePiochePr
           transition={{ duration: diving || hyped ? 0.7 : 2.8, repeat: Infinity, ease: 'easeInOut' }}
         />
 
-        {/* Braise, derrière le paquet : au repos seules sa tête et ses flammèches dépassent. */}
+        {/* Braise, derrière le paquet : contenue dans le cadre — buste visible, jamais coupée. */}
         <motion.div
           className="absolute left-1/2 z-0"
-          style={{ width: s(0.86), marginLeft: -s(0.43), bottom: s(0.46) }}
+          style={{ width: s(0.86), marginLeft: -s(0.43), bottom: s(0.3) }}
           animate={
             diving
               ? {
                   // plongeon (anticipation) → elle se redresse au-dessus du paquet → se pose, fière
-                  y: [0, s(0.12), -s(0.3), -s(0.22)],
+                  y: [0, s(0.08), -s(0.22), -s(0.14)],
                   rotate: [0, 3, -6, 0],
-                  scale: [1, 0.93, 1.12, 1.05],
+                  scale: [1, 0.94, 1.12, 1.05],
                 }
               : hyped
-                ? { y: -s(0.1), rotate: -3, scale: 1.05 }
-                : { y: [0, -s(0.03), 0], rotate: 0, scale: 1 }
+                ? { y: -s(0.07), rotate: -3, scale: 1.05 }
+                : { y: [0, -s(0.02), 0], rotate: 0, scale: 1 }
           }
           transition={
             diving
-              ? { duration: 0.72 * t, times: [0, 0.28, 0.7, 1], ease: [0.16, 1, 0.3, 1] }
+              ? { duration: 0.72 * t, times: [0, 0.22, 0.62, 1], ease: [0.16, 1, 0.3, 1] }
               : hyped
                 ? lean
                 : { duration: 2.8, repeat: Infinity, ease: 'easeInOut' }
@@ -92,6 +94,16 @@ export function BraisePioche({ size = 64, hyped, diving, quick }: BraisePiochePr
             presenting={diving}
           />
         </motion.div>
+
+        {/* Flash de tirage : un seul éclat net au moment où la carte quitte le paquet. */}
+        <motion.span
+          className="absolute left-1/2 z-10 rounded-full border-[2.5px] border-[#FFD84B]"
+          style={{ width: s(0.5), height: s(0.5), marginLeft: -s(0.25), bottom: s(0.42) }}
+          initial={false}
+          animate={diving ? { opacity: [0, 0.9, 0], scale: [0.3, 1.9, 2.4] } : { opacity: 0, scale: 0.3 }}
+          transition={diving ? { duration: 0.5 * t, delay: 0.24 * t, ease: 'easeOut' } : { duration: 0.1 }}
+        />
+
 
         {/* Le paquet. Écrasement à l'appui, resserrement pendant l'anticipation, recul au tirage. */}
         {fan.map((c, i) => (
@@ -178,34 +190,38 @@ export function BraisePioche({ size = 64, hyped, diving, quick }: BraisePiochePr
         </motion.div>
 
         {/* Étincelles : lumière seule, déclenchées quand la carte quitte le paquet. */}
-        {[0, 1, 2, 3, 4].map((i) => (
-          <motion.span
-            key={`spark-${i}`}
-            className="absolute left-1/2 z-10 block rounded-full bg-[#FFD84B]"
-            style={{
-              width: s(0.075),
-              height: s(0.075),
-              marginLeft: -s(0.0375),
-              bottom: s(0.48),
-            }}
-            initial={false}
-            animate={
-              diving
-                ? {
-                    opacity: [0, 1, 0],
-                    x: [0, (i - 2) * s(0.19), (i - 2) * s(0.3)],
-                    y: [0, -s(0.14 + (i % 2) * 0.12), -s(0.2 + (i % 2) * 0.18)],
-                    scale: [0.3, 1, 0.2],
-                  }
-                : { opacity: 0, x: 0, y: 0, scale: 0.3 }
-            }
-            transition={
-              diving
-                ? { duration: 0.46 * t, delay: (0.3 + i * 0.015) * t, ease: 'easeOut' }
-                : { duration: 0.1 }
-            }
-          />
-        ))}
+        {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => {
+          const dir = i - 3.5;
+          return (
+            <motion.span
+              key={`spark-${i}`}
+              className="absolute left-1/2 z-10 block rounded-full bg-[#FFD84B]"
+              style={{
+                width: s(0.07 + (i % 3) * 0.018),
+                height: s(0.07 + (i % 3) * 0.018),
+                marginLeft: -s(0.04),
+                bottom: s(0.5),
+              }}
+              initial={false}
+              animate={
+                diving
+                  ? {
+                      opacity: [0, 1, 0],
+                      x: [0, dir * s(0.16), dir * s(0.3)],
+                      y: [0, -s(0.16 + (i % 2) * 0.14), -s(0.24 + (i % 2) * 0.2)],
+                      scale: [0.3, 1.1, 0.2],
+                    }
+                  : { opacity: 0, x: 0, y: 0, scale: 0.3 }
+              }
+              transition={
+                diving
+                  ? { duration: 0.42 * t, delay: (0.26 + i * 0.012) * t, ease: 'easeOut' }
+                  : { duration: 0.1 }
+              }
+            />
+          );
+        })}
+
       </div>
     </MotionConfig>
   );

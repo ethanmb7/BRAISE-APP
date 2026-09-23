@@ -16,7 +16,7 @@ export function OnboardingView() {
   const [level, setLevel] = useState<Level | null>(null);
   const [goal, setGoal] = useState('');
   const [subjects, setSubjects] = useState<string[]>([]);
-  const [avatar, setAvatar] = useState('🦊');
+  const [avatar, setAvatar] = useState('fleme');
   const [consent, setConsent] = useState(false);
   const [showPrivacyInfo, setShowPrivacyInfo] = useState(false);
 

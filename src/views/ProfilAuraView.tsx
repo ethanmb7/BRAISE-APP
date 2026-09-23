@@ -6,6 +6,7 @@ import { sfx } from '@/lib/sound';
 import { useOnlineStatus } from '@/lib/useOnlineStatus';
 import { useCountUp } from '@/lib/useCountUp';
 import { BraiseMascot } from '@/components/BraiseMascot';
+import { BraiseCharacter } from '@/components/BraiseCharacter';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { BadgeShelf } from '@/components/BadgeShelf';
 import { SubjectIcon } from '@/components/SubjectIcon';
@@ -132,6 +133,10 @@ export function ProfilAuraView() {
         {/* Pillar 1 — Ancrage émotionnel : identité pure, zéro chiffre de progression. */}
         <motion.div variants={heroPop}>
           <AuraHeroScene rank={current} streak={state.streak} freezes={state.freezes} />
+        </motion.div>
+
+        <motion.div variants={staggerItem}>
+          <BraiseEvolutionLine currentRankId={current.id} />
         </motion.div>
 
         {/* Pillar 2 — Contrat de rétention : tout le calcul de progression vit ici, et
@@ -271,6 +276,38 @@ const AuraHeroScene = memo(function AuraHeroScene({
       </div>
       <span className="aura-hero-rankname">{rank.name.toUpperCase()}</span>
     </div>
+  );
+});
+
+const EVOLUTION_NAMES: Record<string, string> = {
+  bronze: 'Étincelle',
+  argent: 'Focus',
+  or: 'Impact',
+  platine: 'Maîtrise',
+  legende: 'Libre',
+};
+
+const BraiseEvolutionLine = memo(function BraiseEvolutionLine({ currentRankId }: { currentRankId: string }) {
+  const currentIdx = RANKS.findIndex((rank) => rank.id === currentRankId);
+  return (
+    <section className="braise-evolution-line" aria-label="Les évolutions de Braise">
+      <div className="braise-evolution-heading">
+        <span>TA BRAISE</span>
+        <strong>{EVOLUTION_NAMES[currentRankId]}</strong>
+      </div>
+      <div className="braise-evolution-cast">
+        {RANKS.map((rank, index) => {
+          const unlocked = index <= currentIdx;
+          const current = index === currentIdx;
+          return (
+            <div className={`braise-evolution-stage ${current ? 'is-current' : ''} ${unlocked ? '' : 'is-locked'}`} key={rank.id}>
+              <BraiseCharacter size={current ? 58 : 46} rankId={rank.id} expression={current ? 'proud' : 'happy'} labelled={false} />
+              <span>{current ? EVOLUTION_NAMES[rank.id] : rank.name}</span>
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 });
 

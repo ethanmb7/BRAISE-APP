@@ -1,31 +1,36 @@
 /**
- * Les Éclats — la famille d'avatars maison de BRAISE.
+ * Les Flambés — la famille d'avatars maison de BRAISE.
  *
- * Avant : neuf emojis système (🦊 🐼 🦉 …). Un emoji ne se dessine pas, ne se décline pas, et ne
- * ressemble à rien de l'app : il change de tête selon le téléphone. Ici, chaque avatar est un
- * personnage dessiné depuis zéro, dans la même grammaire que Braise :
- *   – même contour noir épais (#151821), mêmes coins ronds, couleurs à plat, aucun dégradé ;
- *   – mêmes yeux, même placement, même sourire d'une tête à l'autre → ils forment une bande,
- *     pas neuf dessins sans rapport ;
- *   – lisibles à 26px (rail, en-tête) comme à 88px (hero du Profil).
+ * Un avatar, ici, n'est plus un emoji ni un animal de zoo : c'est un petit esprit de flamme
+ * avec une vibe d'ado. Chaque Flambé vit dans le même monde que Braise (le feu, la braise,
+ * l'étincelle), mais il reste TOI — le visage que tu choisis pour te représenter — jamais la
+ * mascotte elle-même. Braise guide ; ton Flambé, c'est toi.
  *
- * L'ÉVOLUTION est portée par le personnage lui-même, pas par un cadre décoratif : à chaque rang
- * franchi, l'avatar gagne UNE marque et une seule (jamais un empilement illisible à 26px) —
- *   bronze   : rien, la tête nue, c'est le point de départ
- *   argent   : une écharpe chrome
- *   or       : une boucle d'oreille dorée
- *   platine  : trois éclats facettés autour de la tête
- *   légende  : une couronne de braise
- * Chaque marque s'ajoute, la tête en dessous ne change jamais : on reste soi, on monte en grade.
+ * Grammaire partagée avec Braise :
+ *   – contour noir épais (#151821), couleurs à plat, aucun dégradé ;
+ *   – même flame de base, yeux placés au même endroit → ils forment une bande ;
+ *   – lisibles à 26px (rail, en-tête) comme à 58px (hero du Profil).
  *
- * L'identifiant stocké reste la chaîne emoji d'origine (state.user.avatar) : les profils déjà
- * enregistrés en localStorage continuent de pointer sur le bon personnage, aucune migration.
+ * La vibe se lit par UN accessoire net, jamais un empilement :
+ *   La Flème    — yeux endormis, vibe chill/flemme
+ *   Le Crâne    — face de crâne, vibe dark/réaliste
+ *   La Bûcheuse — lunettes, vibe sérieuse
+ *   Le Casque   — casque audio, vibe gamer
+ *   Le Masque   — masque/visière, vibe mystère
+ *   L'Éclair    — éclair + bouche ouverte, vibe énergie
+ *   La Fuse     — hublot de fusée, vibe ambition        (rang Or)
+ *   La Glace    — lunettes de soleil, vibe cool          (rang Platine)
+ *   Le Phénix   — ailes + or, vibe ultime                (rang Légende)
+ *
+ * L'ÉVOLUTION est portée par RankMark (une marque par rang, jamais empilée) — voir plus bas.
+ * L'identifiant stocké reste state.user.avatar ; la valeur est un slug stable ('fleme', 'crane'…),
+ * pas un emoji système. Les anciennes clés emoji tombent sur La Flème (défaut).
  */
 
 const INK = '#151821';
 
 type Props = {
-  /** Identifiant de l'avatar — la chaîne emoji historique, conservée comme clé stable. */
+  /** Identifiant de l'avatar — slug stable ('fleme', 'crane', …). */
   id: string;
   size?: number;
   /** Rang actuel : ajoute la marque d'évolution correspondante. */
@@ -35,7 +40,19 @@ type Props = {
 
 type Glyph = { name: string; body: (c: string) => React.ReactNode; color: string };
 
-const eyes = (
+/** La flame de base — compacte, deux épaules, pointe unique. Même silhouette pour toute la bande. */
+const flame = (c: string) => (
+  <path
+    d="M50 10 C 64 26, 78 40, 78 60 C 78 82, 64 94, 50 94 C 36 94, 22 82, 22 60 C 22 40, 36 26, 50 10 Z"
+    fill={c}
+    stroke={INK}
+    strokeWidth="4.5"
+    strokeLinejoin="round"
+  />
+);
+
+/** Yeux ronds standards, avec reflet. */
+const dotEyes = (
   <>
     <ellipse cx="41" cy="55" rx="4.4" ry="4.8" fill={INK} />
     <ellipse cx="59" cy="55" rx="4.4" ry="4.8" fill={INK} />
@@ -44,186 +61,207 @@ const eyes = (
   </>
 );
 
-const smile = <path d="M44 66 Q 50 71.5, 56 66" stroke={INK} strokeWidth="3.2" strokeLinecap="round" fill="none" />;
-
-const cheeks = (
-  <>
-    <circle cx="33" cy="64" r="3" fill="#FF6F59" opacity="0.5" />
-    <circle cx="67" cy="64" r="3" fill="#FF6F59" opacity="0.5" />
-  </>
-);
-
-const round = (c: string) => (
-  <path
-    d="M20 52 C 20 32, 33 22, 50 22 C 67 22, 80 32, 80 52 C 80 72, 67 84, 50 84 C 33 84, 20 72, 20 52 Z"
-    fill={c}
-    stroke={INK}
-    strokeWidth="4.5"
-    strokeLinejoin="round"
-  />
-);
-
 const GLYPHS: Record<string, Glyph> = {
-  // Renard — oreilles triangulaires hautes, museau clair.
-  '🦊': {
-    name: 'Renard',
-    color: '#FF7A2F',
+  // La Flème — yeux endormis, bouche plate. Vibe chill.
+  fleme: {
+    name: 'La Flème',
+    color: '#FFD84B',
     body: (c) => (
       <>
-        <path d="M24 34 L20 12 L40 24 Z" fill={c} stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
-        <path d="M76 34 L80 12 L60 24 Z" fill={c} stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
-        {round(c)}
-        <path d="M37 66 C 37 60, 43 57, 50 57 C 57 57, 63 60, 63 66 C 63 74, 57 79, 50 79 C 43 79, 37 74, 37 66 Z" fill="#FFF0D2" stroke={INK} strokeWidth="3" />
-        {eyes}
-        <ellipse cx="50" cy="65" rx="3.2" ry="2.4" fill={INK} />
-        <path d="M44 71 Q 50 76, 56 71" stroke={INK} strokeWidth="2.8" strokeLinecap="round" fill="none" />
-        {cheeks}
+        {flame(c)}
+        {/* yeux endormis : arcs vers le bas */}
+        <path d="M36 55 Q 41 59, 46 55" stroke={INK} strokeWidth="3.4" strokeLinecap="round" fill="none" />
+        <path d="M54 55 Q 59 59, 64 55" stroke={INK} strokeWidth="3.4" strokeLinecap="round" fill="none" />
+        <circle cx="41" cy="57" r="1.6" fill={INK} />
+        <circle cx="59" cy="57" r="1.6" fill={INK} />
+        {/* bouche plate, blasée */}
+        <path d="M44 70 H 56" stroke={INK} strokeWidth="3.2" strokeLinecap="round" />
       </>
     ),
   },
-  // Panda — oreilles rondes sombres, taches autour des yeux.
-  '🐼': {
-    name: 'Panda',
-    color: '#FFF6E8',
-    body: (c) => (
-      <>
-        <circle cx="27" cy="27" r="11" fill={INK} />
-        <circle cx="73" cy="27" r="11" fill={INK} />
-        {round(c)}
-        <ellipse cx="41" cy="55" rx="9" ry="10" fill={INK} transform="rotate(-14 41 55)" />
-        <ellipse cx="59" cy="55" rx="9" ry="10" fill={INK} transform="rotate(14 59 55)" />
-        <circle cx="41" cy="55" r="3.6" fill="#fff" />
-        <circle cx="59" cy="55" r="3.6" fill="#fff" />
-        <ellipse cx="50" cy="66" rx="3.6" ry="2.8" fill={INK} />
-        <path d="M44 72 Q 50 76.5, 56 72" stroke={INK} strokeWidth="3" strokeLinecap="round" fill="none" />
-      </>
-    ),
-  },
-  // Hibou — deux aigrettes, grands disques oculaires, bec triangulaire.
-  '🦉': {
-    name: 'Hibou',
+  // Le Crâne — face de crâne sur la flamme. Vibe dark.
+  crane: {
+    name: 'Le Crâne',
     color: '#7C5CFF',
     body: (c) => (
       <>
-        <path d="M28 26 L26 10 L42 20 Z" fill={c} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-        <path d="M72 26 L74 10 L58 20 Z" fill={c} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-        {round(c)}
-        <circle cx="40" cy="54" r="12" fill="#FFF0D2" stroke={INK} strokeWidth="3" />
-        <circle cx="60" cy="54" r="12" fill="#FFF0D2" stroke={INK} strokeWidth="3" />
-        <circle cx="40" cy="54" r="4.6" fill={INK} />
-        <circle cx="60" cy="54" r="4.6" fill={INK} />
-        <circle cx="41.8" cy="52.2" r="1.5" fill="#fff" />
-        <circle cx="61.8" cy="52.2" r="1.5" fill="#fff" />
-        <path d="M50 64 L55 70 L45 70 Z" fill="#FFD84B" stroke={INK} strokeWidth="2.6" strokeLinejoin="round" />
+        {flame(c)}
+        {/* plaque crâne */}
+        <path
+          d="M33 48 C 33 38, 40 34, 50 34 C 60 34, 67 38, 67 48 C 67 60, 61 72, 50 72 C 39 72, 33 60, 33 48 Z"
+          fill="#FFF6E8"
+          stroke={INK}
+          strokeWidth="3.2"
+          strokeLinejoin="round"
+        />
+        {/* orbites */}
+        <ellipse cx="42" cy="50" rx="5" ry="6" fill={INK} />
+        <ellipse cx="58" cy="50" rx="5" ry="6" fill={INK} />
+        {/* nez */}
+        <path d="M50 56 L 47 62 L 53 62 Z" fill={INK} />
+        {/* dents */}
+        <path d="M40 66 H 60" stroke={INK} strokeWidth="2.8" strokeLinecap="round" />
+        <path d="M45 66 V 70 M 50 66 V 70 M 55 66 V 70" stroke={INK} strokeWidth="2.2" strokeLinecap="round" />
       </>
     ),
   },
-  // Chat — oreilles pointues, moustaches.
-  '🐱': {
-    name: 'Chat',
+  // La Bûcheuse — lunettes, bouche déterminée. Vibe sérieuse.
+  bucheuse: {
+    name: 'La Bûcheuse',
+    color: '#FF4500',
+    body: (c) => (
+      <>
+        {flame(c)}
+        {dotEyes}
+        {/* lunettes */}
+        <circle cx="41" cy="55" r="8" fill="none" stroke={INK} strokeWidth="3.4" />
+        <circle cx="59" cy="55" r="8" fill="none" stroke={INK} strokeWidth="3.4" />
+        <path d="M49 53 H 51" stroke={INK} strokeWidth="3.4" strokeLinecap="round" />
+        <path d="M33 54 L 27 52 M 67 54 L 73 52" stroke={INK} strokeWidth="2.8" strokeLinecap="round" />
+        {/* bouche déterminée (légère moue) */}
+        <path d="M43 70 Q 50 67, 57 70" stroke={INK} strokeWidth="3.2" strokeLinecap="round" fill="none" />
+      </>
+    ),
+  },
+  // Le Casque — casque audio. Vibe gamer.
+  casque: {
+    name: 'Le Casque',
     color: '#3FBF87',
     body: (c) => (
       <>
-        <path d="M26 32 L24 13 L42 25 Z" fill={c} stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
-        <path d="M74 32 L76 13 L58 25 Z" fill={c} stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
-        {round(c)}
-        {eyes}
-        <path d="M46 64 L54 64 L50 68 Z" fill={INK} />
-        <path d="M50 68 Q 45 73, 41 69 M50 68 Q 55 73, 59 69" stroke={INK} strokeWidth="2.8" strokeLinecap="round" fill="none" />
-        <path d="M18 58 L30 60 M18 66 L30 65 M82 58 L70 60 M82 66 L70 65" stroke={INK} strokeWidth="2.4" strokeLinecap="round" />
+        {flame(c)}
+        {/* serre-tête */}
+        <path d="M30 40 Q 50 24, 70 40" stroke={INK} strokeWidth="4.2" strokeLinecap="round" fill="none" />
+        {/* oreillettes */}
+        <rect x="21" y="44" width="11" height="19" rx="4" fill={INK} />
+        <rect x="68" y="44" width="11" height="19" rx="4" fill={INK} />
+        {/* éclat vert sur l'oreillette gauche */}
+        <circle cx="26.5" cy="53.5" r="2.4" fill="#3FBF87" />
+        <circle cx="73.5" cy="53.5" r="2.4" fill="#3FBF87" />
+        {dotEyes}
+        {/* sourire confiant */}
+        <path d="M44 67 Q 50 72, 56 67" stroke={INK} strokeWidth="3.2" strokeLinecap="round" fill="none" />
       </>
     ),
   },
-  // Fusée — capsule, hublot, ailerons.
-  '🚀': {
-    name: 'Fusée',
+  // Le Masque — visière/masque noir. Vibe mystère.
+  masque: {
+    name: 'Le Masque',
     color: '#3373D6',
     body: (c) => (
       <>
-        <path d="M26 66 L18 82 L34 78 Z" fill="#FF4500" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-        <path d="M74 66 L82 82 L66 78 Z" fill="#FF4500" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-        <path d="M50 10 C 66 26, 72 44, 72 62 C 72 76, 62 84, 50 84 C 38 84, 28 76, 28 62 C 28 44, 34 26, 50 10 Z" fill={c} stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
-        <circle cx="50" cy="48" r="14" fill="#FFF0D2" stroke={INK} strokeWidth="3.5" />
-        <circle cx="45" cy="45" r="4" fill="#8ECFFF" />
-        <path d="M38 70 H 62" stroke={INK} strokeWidth="3.4" strokeLinecap="round" />
+        {flame(c)}
+        {/* masque couvrant les yeux */}
+        <path
+          d="M28 50 C 28 43, 38 41, 50 41 C 62 41, 72 43, 72 50 C 72 57, 62 59, 50 59 C 38 59, 28 57, 28 50 Z"
+          fill={INK}
+        />
+        {/* fentes/blancs des yeux */}
+        <ellipse cx="41" cy="50" rx="3.4" ry="2.2" fill="#fff" />
+        <ellipse cx="59" cy="50" rx="3.4" ry="2.2" fill="#fff" />
+        {/* bouche discrète */}
+        <path d="M45 70 H 55" stroke={INK} strokeWidth="3" strokeLinecap="round" />
       </>
     ),
   },
-  // Étoile — cinq branches franches, visage centré.
-  '⭐': {
-    name: 'Étoile',
+  // L'Éclair — éclair + bouche ouverte. Vibe énergie.
+  eclair: {
+    name: "L'Éclair",
+    color: '#FFE06B',
+    body: (c) => (
+      <>
+        {flame(c)}
+        {/* éclair qui traverse */}
+        <path
+          d="M55 26 L 42 50 L 50 50 L 44 70 L 62 44 L 54 44 Z"
+          fill="#FF4500"
+          stroke={INK}
+          strokeWidth="2.8"
+          strokeLinejoin="round"
+        />
+        {/* yeux écarquillés */}
+        <ellipse cx="38" cy="56" rx="3.8" ry="4.4" fill={INK} />
+        <ellipse cx="62" cy="56" rx="3.8" ry="4.4" fill={INK} />
+        <circle cx="39" cy="54.5" r="1.3" fill="#fff" />
+        <circle cx="63" cy="54.5" r="1.3" fill="#fff" />
+        {/* bouche ouverte (hype) */}
+        <ellipse cx="50" cy="69" rx="4.6" ry="3.4" fill={INK} />
+      </>
+    ),
+  },
+  // La Fuse — hublot de fusée, pointe haute. Vibe ambition. (rang Or)
+  fuse: {
+    name: 'La Fuse',
     color: '#FFC400',
     body: (c) => (
       <>
+        {/* flame pointue comme une fusée */}
         <path
-          d="M50 8 L62 38 L94 40 L69 60 L78 90 L50 73 L22 90 L31 60 L6 40 L38 38 Z"
+          d="M50 6 C 60 22, 76 38, 76 60 C 76 82, 64 94, 50 94 C 36 94, 24 82, 24 60 C 24 38, 40 22, 50 6 Z"
           fill={c}
           stroke={INK}
           strokeWidth="4.5"
           strokeLinejoin="round"
         />
-        <ellipse cx="42" cy="52" rx="4" ry="4.4" fill={INK} />
-        <ellipse cx="58" cy="52" rx="4" ry="4.4" fill={INK} />
-        <circle cx="43.4" cy="50.4" r="1.3" fill="#fff" />
-        <circle cx="59.4" cy="50.4" r="1.3" fill="#fff" />
-        <path d="M44 62 Q 50 67.5, 56 62" stroke={INK} strokeWidth="3.2" strokeLinecap="round" fill="none" />
+        {/* ailerons de base */}
+        <path d="M28 84 L 20 92 L 34 90 Z" fill="#FF4500" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+        <path d="M72 84 L 80 92 L 66 90 Z" fill="#FF4500" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+        {/* hublot */}
+        <circle cx="50" cy="52" r="11" fill="#FFF0D2" stroke={INK} strokeWidth="3.6" />
+        <circle cx="46" cy="48" r="3.6" fill="#8ECFFF" />
+        {/* étoiles dans les yeux (ambition) */}
+        <path d="M38 76 L 39.5 79 L 42.5 79 L 40 81 L 41 84 L 38 82 L 35 84 L 36 81 L 33.5 79 L 36.5 79 Z" fill="#FF4500" />
+        <path d="M62 76 L 63.5 79 L 66.5 79 L 64 81 L 65 84 L 62 82 L 59 84 L 60 81 L 57.5 79 L 60.5 79 Z" fill="#FF4500" />
       </>
     ),
   },
-  // Dragon — cornes recourbées, museau, narine.
-  '🐉': {
-    name: 'Dragon',
-    color: '#21B59A',
+  // La Glace — lunettes de soleil, flame froide. Vibe cool. (rang Platine)
+  glace: {
+    name: 'La Glace',
+    color: '#8ECFFF',
     body: (c) => (
       <>
-        <path d="M30 26 C 22 18, 20 10, 26 6 C 30 12, 36 16, 38 22 Z" fill="#FFD84B" stroke={INK} strokeWidth="3.6" strokeLinejoin="round" />
-        <path d="M70 26 C 78 18, 80 10, 74 6 C 70 12, 64 16, 62 22 Z" fill="#FFD84B" stroke={INK} strokeWidth="3.6" strokeLinejoin="round" />
-        {round(c)}
-        <path d="M22 44 L14 40 M78 44 L86 40" stroke={INK} strokeWidth="3" strokeLinecap="round" />
-        {eyes}
-        <path d="M36 66 C 36 60, 43 57, 50 57 C 57 57, 64 60, 64 66 C 64 74, 57 79, 50 79 C 43 79, 36 74, 36 66 Z" fill="#FFF0D2" stroke={INK} strokeWidth="3" />
-        <circle cx="45" cy="65" r="1.9" fill={INK} />
-        <circle cx="55" cy="65" r="1.9" fill={INK} />
-        <path d="M43 72 Q 50 77, 57 72" stroke={INK} strokeWidth="2.8" strokeLinecap="round" fill="none" />
+        {flame(c)}
+        {/* lunettes de soleil (double verre) */}
+        <rect x="30" y="49" width="16" height="12" rx="4.5" fill={INK} />
+        <rect x="54" y="49" width="16" height="12" rx="4.5" fill={INK} />
+        <path d="M46 54 H 54" stroke={INK} strokeWidth="3.4" strokeLinecap="round" />
+        {/* reflets */}
+        <path d="M34 52 H 40 M 58 52 H 64" stroke="#8ECFFF" strokeWidth="2.2" strokeLinecap="round" />
+        {/* sourire en coin (smirk) */}
+        <path d="M44 68 Q 50 66, 57 69" stroke={INK} strokeWidth="3.2" strokeLinecap="round" fill="none" />
       </>
     ),
   },
-  // Lion — crinière en dents franches autour de la tête.
-  '🦁': {
-    name: 'Lion',
-    color: '#F2A93B',
+  // Le Phénix — ailes + or, yeux fiers. Vibe ultime. (rang Légende)
+  phenix: {
+    name: 'Le Phénix',
+    color: '#FF4500',
     body: (c) => (
       <>
+        {/* ailes dorées flanquant la flamme */}
         <path
-          d="M50 6 L59 15 L71 11 L74 24 L86 29 L80 41 L88 51 L78 59 L81 72 L68 73 L62 85 L50 79 L38 85 L32 73 L19 72 L22 59 L12 51 L20 41 L14 29 L26 24 L29 11 L41 15 Z"
-          fill="#C96A14"
+          d="M22 58 C 6 50, 4 62, 13 68 C 4 70, 7 78, 19 78 C 14 72, 16 64, 22 58 Z"
+          fill="#FFD84B"
           stroke={INK}
-          strokeWidth="4"
+          strokeWidth="3.4"
           strokeLinejoin="round"
         />
-        <circle cx="50" cy="50" r="24" fill={c} stroke={INK} strokeWidth="4" />
-        <ellipse cx="42" cy="47" rx="3.8" ry="4.2" fill={INK} />
-        <ellipse cx="58" cy="47" rx="3.8" ry="4.2" fill={INK} />
-        <path d="M46 57 L54 57 L50 61 Z" fill={INK} />
-        <path d="M50 61 Q 45 66, 41 62 M50 61 Q 55 66, 59 62" stroke={INK} strokeWidth="2.6" strokeLinecap="round" fill="none" />
-      </>
-    ),
-  },
-  // Licorne — corne torsadée, mèche de crinière.
-  '🦄': {
-    name: 'Licorne',
-    color: '#FF7BAC',
-    body: (c) => (
-      <>
-        <path d="M50 4 L58 26 L42 26 Z" fill="#FFD84B" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-        <path d="M46 12 L54 14 M44 19 L56 21" stroke={INK} strokeWidth="2.2" strokeLinecap="round" />
-        <path d="M24 32 C 16 26, 14 16, 22 12 C 24 22, 32 24, 34 30 Z" fill="#7C5CFF" stroke={INK} strokeWidth="3.4" strokeLinejoin="round" />
-        {round(c)}
-        {eyes}
-        <ellipse cx="50" cy="66" rx="10" ry="7" fill="#FFF0D2" stroke={INK} strokeWidth="3" />
-        <circle cx="46" cy="65" r="1.7" fill={INK} />
-        <circle cx="54" cy="65" r="1.7" fill={INK} />
-        {cheeks}
+        <path
+          d="M78 58 C 94 50, 96 62, 87 68 C 96 70, 93 78, 81 78 C 86 72, 84 64, 78 58 Z"
+          fill="#FFD84B"
+          stroke={INK}
+          strokeWidth="3.4"
+          strokeLinejoin="round"
+        />
+        {flame(c)}
+        {/* liseré or à la pointe */}
+        <path d="M50 10 C 56 20, 62 30, 66 42" stroke="#FFD84B" strokeWidth="2.6" strokeLinecap="round" fill="none" />
+        {/* yeux fiers (^ ^) */}
+        <path d="M36 54 Q 41 49, 46 54" stroke={INK} strokeWidth="3.4" strokeLinecap="round" fill="none" />
+        <path d="M54 54 Q 59 49, 64 54" stroke={INK} strokeWidth="3.4" strokeLinecap="round" fill="none" />
+        {/* grand sourire fier */}
+        <path d="M41 65 Q 50 75, 59 65" stroke={INK} strokeWidth="3.4" strokeLinecap="round" fill="#FFD84B" />
       </>
     ),
   },
@@ -270,11 +308,11 @@ function RankMark({ rankId }: { rankId?: string }) {
 }
 
 export function getAvatarName(id: string) {
-  return GLYPHS[id]?.name ?? 'Avatar';
+  return GLYPHS[id]?.name ?? 'Flambé';
 }
 
 export function AvatarGlyph({ id, size = 40, rankId, className = '' }: Props) {
-  const glyph = GLYPHS[id] ?? GLYPHS['🦊'];
+  const glyph = GLYPHS[id] ?? GLYPHS['fleme'];
   return (
     <svg
       width={size}
