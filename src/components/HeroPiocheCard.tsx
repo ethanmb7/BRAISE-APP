@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, MotionConfig } from 'framer-motion';
+codex/recuperer-le-code-fg2r25
 import { Play, Sparkles } from 'lucide-react';
+=======
+import { Play, Sparkles, Zap } from 'lucide-react';
+main
 import { BraiseChest } from '@/components/BraiseChest';
 import { sfx } from '@/lib/sound';
 import { getLastPiocheOpenDate, setLastPiocheOpenDate } from '@/lib/celebrations';
@@ -85,6 +89,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
         />
 
         <div className="relative flex items-center gap-3">
+codex/recuperer-le-code-fg2r25
           <div className="relative flex h-[68px] w-[68px] flex-shrink-0 items-center justify-center">
             {/* One slow aura makes the chest feel warm and rare at rest. It wakes up only when
                 the player reaches for the button; the frame and reading order never move. */}
@@ -95,6 +100,25 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
               transition={{ duration: hyped || launching ? 0.72 : 3.2, repeat: Infinity, ease: 'easeInOut' }}
             />
             <BraiseChest size={64} hyped={hyped} diving={launching} quick={quick} />
+=======
+          <div className="relative flex h-16 w-16 flex-shrink-0 items-center justify-center">
+            {/* A living invitation around Braise's chest, never an animation of the card itself. */}
+            <motion.span
+              aria-hidden="true"
+              className="absolute inset-0 rounded-[22px] border-2 border-black/25"
+              animate={hyped || launching ? { scale: [1, 1.16, 1], opacity: [0.55, 0, 0.55] } : { scale: 1, opacity: 0.42 }}
+              transition={hyped || launching ? { duration: 0.75, repeat: Infinity, ease: 'easeOut' } : { duration: 0.18 }}
+            />
+            <BraiseChest size={56} hyped={hyped} diving={launching} quick={quick} />
+            <motion.span
+              aria-hidden="true"
+              className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full border-2 border-black bg-[#FDC800] shadow-[2px_2px_0_#000]"
+              animate={{ rotate: [0, 12, -8, 0], scale: [1, 1.08, 1] }}
+              transition={{ duration: 2.4, repeat: Infinity, repeatDelay: 1.2 }}
+            >
+              <Sparkles size={11} strokeWidth={3} />
+            </motion.span>
+main
           </div>
           <div className="min-w-0 flex-1">
             {/* Dark ink, not white — #FF6B35 measures 2.84:1 for white text (a hard AA
@@ -102,17 +126,37 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
                 (same as every other small-caps label app-wide), font-display for the title,
                 font-sans for the stats line. */}
             <p className="flex items-center gap-1 font-mono text-[0.67rem] font-black uppercase tracking-wide text-[#151821]">
+codex/recuperer-le-code-fg2r25
               <Sparkles size={12} strokeWidth={3} /> Ta mission du jour
             </p>
             <h2 className="truncate font-display text-lg font-black leading-tight text-[#151821]">{chapterTitle}</h2>
             <p className="mt-1 truncate font-sans text-[0.78rem] font-semibold text-[#151821]">
               {subjectName ? `${subjectName} · ` : ''}{duration} min pour capter le truc
+=======
+              <Sparkles size={12} strokeWidth={3} /> Mission du jour
+            </p>
+            <h2 className="truncate font-display text-lg font-black leading-tight text-[#151821]">{chapterTitle}</h2>
+            <p className="mt-1 truncate font-sans text-[0.78rem] font-semibold text-[#151821]">
+              {duration} min pour être carré{subjectName ? ` en ${subjectName}` : ''}
+            </p>
+            <p className="mt-0.5 truncate font-mono text-[0.62rem] font-bold uppercase tracking-wide text-[#151821]/75">
+              {cardCount} carte{cardCount > 1 ? 's' : ''} · 1 notion à verrouiller
+main
             </p>
           </div>
         </div>
         <span className="sr-only">
           {bubbleLine} Cette mission contient {cardCount} carte{cardCount > 1 ? 's' : ''}.
         </span>
+
+        <div className="relative mt-3 flex items-center justify-between gap-2 border-t-2 border-black/20 pt-3">
+          <p className="min-w-0 font-display text-[0.78rem] font-extrabold leading-tight text-[#151821]">
+            Braise t’a préparé un petit piège.
+          </p>
+          <span className="flex flex-shrink-0 items-center gap-1 rounded-full border-2 border-black bg-[#FDC800] px-2 py-1 font-mono text-[0.6rem] font-black uppercase text-[#151821] shadow-[2px_2px_0_#000]">
+            <Zap size={11} fill="currentColor" strokeWidth={2.7} /> Express
+          </span>
+        </div>
 
         {/* Base+face bevel — untouched, the same mechanic SubjectDecks/HeaderHUD use everywhere
             else on Accueil. Pointer events here drive `hyped` on the chest (hover for a mouse,
@@ -130,7 +174,11 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
             className="tw-shimmer relative flex w-full items-center justify-center gap-1.5 rounded-full border-[2.5px] border-black bg-white px-3.5 py-3 font-display text-sm font-black text-black shadow-[3px_3px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[3px] group-active:shadow-none disabled:opacity-95"
           >
             <Play size={15} fill="currentColor" />
+codex/recuperer-le-code-fg2r25
             JE PIOCHE !
+=======
+            LANCER MA MISSION
+main
           </button>
         </div>
       </section>
