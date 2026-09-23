@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight } from 'lucide-react';
 import { useApp, computeGoalPct, remainingToGoal, resolveChapters } from '@/store';
 import { sfx } from '@/lib/sound';
 import { fireConfetti } from '@/lib/confetti';
@@ -28,21 +27,10 @@ const staggerItem = {
 };
 
 export function HomeView() {
-  const { state, setTab, setView, openSubject, openLesson, setUser, toggleFreeze, getDueCards } = useApp();
+  const { state, setTab, setView, openSubject, openLesson, setUser, getDueCards } = useApp();
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [bump, setBump] = useState<'freeze' | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const [intoxDismissedCount, setIntoxDismissedCountState] = useState(getIntoxDismissedCount);
-  // Toggling a freeze used to be silent beyond the pill's own colour swap (cyan/amber) — no
-  // confirmation that the tap actually registered or what it just did. This is the same
-  // "combo-toast" pattern already used in RevisionsView (see .freeze-toast in index.css, which
-  // reuses its exact comboToastRise animation), not a new one.
-  const [freezeToast, setFreezeToast] = useState<'on' | 'off' | null>(null);
-  useEffect(() => {
-    if (freezeToast === null) return;
-    const t = setTimeout(() => setFreezeToast(null), 1100);
-    return () => clearTimeout(t);
-  }, [freezeToast]);
   const prevGoalMet = useRef(state.dailyGoalMet);
 
   useEffect(() => {
@@ -53,20 +41,6 @@ export function HomeView() {
   }, [state.dailyGoalMet]);
 
   const dueCount = getDueCards().length;
-
-  const handleFreezeClick = () => {
-    sfx.flip(state.soundOn);
-    // toggleFreeze() itself silently no-ops when trying to arm with 0 freezes left (see
-    // store.tsx) — mirror that guard here too, so the toast never confirms something that didn't
-    // actually happen.
-    const willToggle = state.freezeArmed || state.freezes > 0;
-    if (willToggle) {
-      setBump('freeze');
-      setTimeout(() => setBump(null), 300);
-      setFreezeToast(state.freezeArmed ? 'off' : 'on');
-    }
-    toggleFreeze();
-  };
 
   const handleLevel = (l: Level) => {
     sfx.tap(state.soundOn);
@@ -169,38 +143,27 @@ export function HomeView() {
 
   return (
     <>
-      <div className="view is-active home-view" style={{ paddingTop: 16 }}>
+      <div className="view is-active home-view pt-3">
         {!state.user.level && (
           <div className="setup-banner">Configure ton niveau pour des leçons sur mesure.</div>
         )}
 
-        <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-6 pb-8">
+        <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-4 pb-8">
           <motion.div variants={staggerItem}>
             <HeaderHUD
               name={state.user.name}
               avatar={state.user.avatar}
               streak={state.streak}
               xp={state.xp}
-              freezes={state.freezes}
-              freezeArmed={state.freezeArmed}
-              freezeBumped={bump === 'freeze'}
-              dueCount={dueCount}
               onAvatarClick={() => setView('profile')}
               onAuraClick={() => {
                 sfx.tap(state.soundOn);
-                setTab('progres');
-              }}
-              onFreezeClick={handleFreezeClick}
-              onReviewClick={() => {
-                sfx.tap(state.soundOn);
-                setTab('revisions');
+                setView('progres');
               }}
             />
           </motion.div>
 
           <motion.div variants={staggerItem} className="home-mission-zone">
-            <span className="home-mission-orbit home-mission-orbit-one" aria-hidden="true" />
-            <span className="home-mission-orbit home-mission-orbit-two" aria-hidden="true" />
             <HeroPiocheCard
               bubbleLine={bubbleLine}
               subjectName={currentSubject?.name}
@@ -250,15 +213,13 @@ export function HomeView() {
           <motion.div variants={staggerItem} className="space-y-3">
             <div className="flex items-end justify-between gap-3">
               <div>
-                <span className="font-mono text-[0.62rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">Quand tu veux aller plus loin</span>
-                <h2 className="font-display text-[1.15rem] font-extrabold leading-tight text-[var(--ink)]">Tes univers</h2>
+                <span className="font-mono text-[0.62rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">Accès rapide</span>
+                <h2 className="font-display text-[1.15rem] font-extrabold leading-tight text-[var(--ink)]">Tes matières</h2>
               </div>
-              <span className="rounded-lg border border-black bg-[var(--neo-orange)] px-2 py-0.5 text-xs font-black text-white shadow-[1px_1px_0px_0px_#000]">
-                {SUBJECTS.length}
-              </span>
+              <button type="button" onClick={() => setTab('subjects')} className="text-xs font-black text-[var(--neo-orange)]">Tout voir →</button>
             </div>
             <SubjectDecks
-              items={subjectDecks}
+              items={subjectDecks.slice(0, 2)}
               onSelect={(id) => {
                 const deck = subjectDecks.find((d) => d.id === id);
                 goToChapter(id, deck?.currentChapterId);
@@ -266,22 +227,8 @@ export function HomeView() {
             />
           </motion.div>
 
-          <motion.div variants={staggerItem} className="text-center">
-            <button
-              onClick={() => setView('settings')}
-              className="inline-flex items-center gap-1.5 text-[0.8rem] text-[var(--ink-soft)]"
-            >
-              <ChevronRight size={14} /> Paramètres
-            </button>
-          </motion.div>
         </motion.div>
       </div>
-
-      {freezeToast && (
-        <div key={freezeToast} className="freeze-toast">
-          {freezeToast === 'on' ? '🧊 Joker prêt : ta série est protégée.' : 'Joker de série désactivé'}
-        </div>
-      )}
 
       <LevelSheet open={sheetOpen} current={state.user.level} onSelect={handleLevel} onClose={() => setSheetOpen(false)} />
 
