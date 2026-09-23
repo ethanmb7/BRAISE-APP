@@ -106,6 +106,29 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
           style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0) 20px)' }}
         />
 
+        {/* The mission ticket is the one extra reveal beat after the chest pops. It is not a
+            second CTA or a new piece of information to read: it rises for a few frames behind
+            the static mission copy, making the opening feel like Braise has actually drawn a
+            ticket, then disappears into the hand-off light. */}
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none absolute right-5 top-[58px] z-0 flex h-14 w-[116px] -rotate-6 flex-col justify-center rounded-lg border-2 border-[#151821] bg-[#FFF8EE] px-2 shadow-[3px_3px_0px_0px_#151821]"
+          initial={false}
+          animate={
+            launching
+              ? { opacity: [0, 1, 1, 0], y: [24, -10, -16, -26], rotate: [-6, -10, -8, -5], scale: [0.82, 1.02, 1, 1.06] }
+              : { opacity: 0, y: 24, rotate: -6, scale: 0.82 }
+          }
+          transition={
+            launching
+              ? { duration: quick ? 0.38 : 0.72, delay: quick ? 0.05 : 0.17, times: [0, 0.25, 0.68, 1], ease: [0.16, 1, 0.3, 1] }
+              : { duration: 0.1 }
+          }
+        >
+          <span className="font-mono text-[0.48rem] font-black tracking-[0.12em] text-[#7C2D12]">MISSION TROUVÉE</span>
+          <span className="mt-0.5 font-display text-[0.66rem] font-black leading-none text-[#151821]">C’est parti !</span>
+        </motion.div>
+
         <div className="relative flex items-center gap-3">
           <div className="relative flex h-[68px] w-[68px] flex-shrink-0 items-center justify-center">
             {/* One slow aura makes the chest feel warm and rare at rest. It wakes up only when
@@ -124,7 +147,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
                 (same as every other small-caps label app-wide), font-display for the title,
                 font-sans for the stats line. */}
             <p className="flex items-center gap-1 font-mono text-[0.67rem] font-black uppercase tracking-wide text-[#151821]">
-              <Sparkles size={12} strokeWidth={3} /> Ta mission du jour
+              <Sparkles size={12} strokeWidth={3} /> {launching ? 'Mission trouvée !' : 'Braise a une mission'}
             </p>
             <h2 className="truncate font-display text-xl font-black leading-tight text-[#151821]">{chapterTitle}</h2>
             {/* "3 min · Histoire-Géo · 1 notion à débloquer" — duration first (the promise: this
@@ -141,6 +164,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
         <span className="sr-only">
           {bubbleLine} Cette mission contient {cardCount} carte{cardCount > 1 ? 's' : ''}.
         </span>
+        {launching && <span className="sr-only" role="status">Braise révèle ta mission.</span>}
 
         {/* Base+face bevel — untouched, the same mechanic SubjectDecks/HeaderHUD use everywhere
             else on Accueil. Pointer events here drive `hyped` on the chest (hover for a mouse,
