@@ -97,5 +97,3 @@ export function ProfileView() {
 }
 
 export default ProfileView;
-
-Բ
