@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, MotionConfig } from 'framer-motion';
+codex/analyser-l-application-y53s8j
+import { ArrowRight, Clock3, Layers3 } from 'lucide-react';
+=======
 import { Clock3, Layers3, Play } from 'lucide-react';
+main
 import { BraisePioche } from '@/components/BraisePioche';
 import { sfx } from '@/lib/sound';
 import { getLastPiocheOpenDate, setLastPiocheOpenDate } from '@/lib/celebrations';
@@ -83,7 +87,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
           piocheTransition.ts) already covers the actual cut; this is a small, safe complement to
           it, not a replacement. */}
       <motion.section
-        className="relative overflow-hidden rounded-2xl border-[3px] border-black bg-[#FF6B35] p-5 shadow-[6px_6px_0px_0px_#000]"
+        className="relative overflow-hidden rounded-[22px] border-[3px] border-black bg-[#FF6B35] p-4 shadow-[5px_5px_0px_0px_#000]"
         aria-label={`Mission du jour : ${chapterTitle}`}
         animate={{ scale: launching ? 1.025 : 1 }}
         // Same full/quick split as everything else in this ceremony (BraiseChest, the reveal
@@ -91,24 +95,49 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
         // would finish — matching the shorter window here instead of leaving it visibly cut off.
         transition={{ duration: quick ? 0.22 : 0.5, ease: [0.16, 1, 0.3, 1] }}
       >
+codex/analyser-l-application-y53s8j
+        <div className="relative flex items-center justify-between gap-3">
+          <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.1em] text-[#151821]">
+            {launching ? 'Mission lancée' : 'Pioche du jour'}
+          </p>
+          <span className="rounded-full bg-[#FFF8EE]/80 px-2.5 py-1 font-mono text-[0.61rem] font-black uppercase text-[#7C2D12]">
+            +50 Aura
+          </span>
+        </div>
+
+        <div className="relative mt-2 flex items-center gap-3">
+=======
         <div className="relative flex items-center gap-3">
+main
           <div className="relative flex h-[92px] w-[92px] flex-shrink-0 items-end justify-center">
-            {/* One slow aura makes the chest feel warm and rare at rest. It wakes up only when
-                the player reaches for the button; the frame and reading order never move. */}
-            <motion.span
+            {/* A quiet, static stage separates Braise from the copy without adding another card.
+                BraisePioche owns the meaningful motion; the background never competes with it. */}
+            <span
               aria-hidden="true"
-              className="absolute inset-[5px] rounded-full bg-[#FDC800]/40 blur-md"
-              animate={hyped || launching ? { scale: [0.9, 1.22, 0.9], opacity: [0.25, 0.85, 0.25] } : { scale: [0.96, 1.06, 0.96], opacity: [0.22, 0.4, 0.22] }}
-              transition={{ duration: hyped || launching ? 0.58 : 3.2, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute inset-[5px] rounded-full border-2 border-black/10 bg-[#FDC800]/45"
             />
             <BraisePioche size={88} hyped={hyped} diving={launching} quick={quick} />
-
           </div>
           <div className="min-w-0 flex-1">
             {/* Dark ink, not white — #FF6B35 measures 2.84:1 for white text (a hard AA
                 failure), 6.25:1 for dark ink. Three real fonts: font-mono for the eyebrow
                 (same as every other small-caps label app-wide), font-display for the title,
                 font-sans for the stats line. */}
+codex/analyser-l-application-y53s8j
+            <p className="mb-1 flex items-center gap-1.5 text-[0.72rem] font-black text-[#151821]/75">
+              <span aria-hidden="true" className="h-2.5 w-2.5 flex-none rounded-full border border-[#151821]" style={{ background: subjectColor ?? '#FDC800' }} />
+              <span className="truncate">{subjectName ?? 'Mission du jour'}</span>
+            </p>
+            <h2 className="line-clamp-2 font-display text-xl font-black leading-tight text-[#151821]">{chapterTitle}</h2>
+            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[#151821]/80" aria-label="Les repères de ta mission">
+              <span className="flex items-center gap-1 font-mono text-[0.66rem] font-black">
+                <Clock3 size={14} strokeWidth={3} aria-hidden="true" /> {duration} MIN
+              </span>
+              <span className="flex items-center gap-1 font-mono text-[0.66rem] font-black">
+                <Layers3 size={14} strokeWidth={3} aria-hidden="true" /> {cardCount} CARTE{cardCount > 1 ? 'S' : ''}
+              </span>
+            </div>
+=======
             <div className="mb-1 flex items-center justify-between gap-2">
               <p className="font-mono text-[0.67rem] font-black uppercase tracking-wide text-[#151821]">
                 {launching ? 'Mission lancée' : 'Pioche du jour'}
@@ -132,6 +161,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
             <span className="font-mono text-[0.67rem] font-black text-[#151821]">
               {cardCount} CARTE{cardCount > 1 ? 'S' : ''}
             </span>
+main
           </div>
         </div>
         <span className="sr-only">
@@ -140,10 +170,9 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
 
         {launching && <span className="sr-only" role="status">Braise révèle ta mission.</span>}
 
-        {/* Base+face bevel — untouched, the same mechanic SubjectDecks/HeaderHUD use everywhere
-            else on Accueil. Pointer events here drive `hyped` on the chest (hover for a mouse,
-            pointerdown for a touch — the only reliable "finger's on it" signal on mobile). */}
-        <div className="tw-cta-pulse group relative mt-5">
+        {/* The bevel matches the rest of Home, but does not pulse at rest: Pioche is an everyday
+            tool, not an alert. Pointer events still wake Braise as direct feedback to intent. */}
+        <div className="group relative mt-3.5">
           <span aria-hidden="true" className="absolute inset-0 translate-y-[3px] rounded-full border-[2.5px] border-black bg-black" />
           <button
             onPointerEnter={() => setHyped(true)}
@@ -153,10 +182,15 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
             onPointerCancel={unhype}
             onClick={handleStart}
             disabled={launching}
-            className="tw-shimmer relative flex w-full items-center justify-center gap-1.5 rounded-full border-[2.5px] border-black bg-white px-3.5 py-3.5 font-display text-base font-black text-black shadow-[3px_3px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[3px] group-active:shadow-none disabled:opacity-95"
+            className="tw-shimmer relative flex min-h-12 w-full items-center justify-center gap-2 rounded-full border-[2.5px] border-black bg-[#FFF8EE] px-4 py-3 font-display text-[0.98rem] font-black text-black shadow-[3px_3px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[3px] group-active:shadow-none disabled:opacity-95"
           >
+codex/analyser-l-application-y53s8j
+            {launching ? 'C’EST PARTI…' : 'COMMENCER'}
+            <ArrowRight size={18} strokeWidth={3} aria-hidden="true" />
+=======
             <Play size={17} fill="currentColor" />
             {launching ? 'C’EST PARTI…' : 'COMMENCER'}
+main
           </button>
         </div>
       </motion.section>
