@@ -70,11 +70,25 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
 
   return (
     <MotionConfig reducedMotion="user">
-      {/* The frame is intentionally motionless: this is the daily ritual's reliable anchor.
-          Braise, light and the little invitation badge are the only things that get to move. */}
-      <section
+      {/* The frame stays immobile for as long as there's anything to read: no jitter, no idle
+          drift, nothing that costs a DYS/TDAH reader attention while they're actually looking at
+          the mission. The one exception is deliberate and one-way — a small scale-up exactly
+          while `launching` is true, already the "committed to leaving" state, so the card leans
+          into the handoff instead of just vanishing. A real cross-view shared-element morph
+          (layoutId into whatever LessonView shows) isn't attempted: App.tsx's view switch is a
+          plain conditional with no AnimatePresence, so the outgoing view unmounts before any
+          such animation could run — wiring that in would mean restructuring the mount/unmount
+          timing for every view transition in the app, not just this one. PiocheRevealVeil (see
+          piocheTransition.ts) already covers the actual cut; this is a small, safe complement to
+          it, not a replacement. */}
+      <motion.section
         className="relative overflow-hidden rounded-2xl border-[3px] border-black bg-[#FF6B35] p-5 shadow-[6px_6px_0px_0px_#000]"
         aria-label={`Mission du jour : ${chapterTitle}`}
+        animate={{ scale: launching ? 1.025 : 1 }}
+        // Same full/quick split as everything else in this ceremony (BraiseChest, the reveal
+        // veil): a same-day reopen unmounts this component at 420ms, well before a 500ms scale-up
+        // would finish — matching the shorter window here instead of leaving it visibly cut off.
+        transition={{ duration: quick ? 0.22 : 0.5, ease: [0.16, 1, 0.3, 1] }}
       >
         {/* Intermittent heat glow near the sun sliver — a light effect, not the frame moving, so
             it stays even though the card itself is static. */}
@@ -113,14 +127,14 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
               <Sparkles size={12} strokeWidth={3} /> Ta mission du jour
             </p>
             <h2 className="truncate font-display text-xl font-black leading-tight text-[#151821]">{chapterTitle}</h2>
-            {/* "3 min · Histoire-Géo" — duration first (the promise: this is short), subject
-                second. Card count still reaches assistive tech via the sr-only line below; a
-                visible "Express" badge next to a number that already says "3 min" was saying the
-                same thing twice, and the flavour line above it named a piège the card doesn't
-                actually reveal — a micro-briefing this stripped-down has no room for text that
-                isn't information. */}
-            <p className="mt-1 truncate font-sans text-[0.78rem] font-semibold text-[#151821]">
-              {duration} min{subjectName ? ` · ${subjectName}` : ''}
+            {/* "3 min · Histoire-Géo · 1 notion à débloquer" — duration first (the promise: this
+                is short), subject second, then the real card count relabelled as "notion(s)":
+                each flashcard already is one discrete, testable concept, so this isn't a new
+                number invented for the label, just the same cardCount already reaching screen
+                readers below, finally shown. No visible "Express" badge next to a number that
+                already says "3 min" — that was saying the same thing twice. */}
+            <p className="mt-1 font-sans text-[0.78rem] font-semibold leading-snug text-[#151821]">
+              {duration} min{subjectName ? ` · ${subjectName}` : ''} · {cardCount} notion{cardCount > 1 ? 's' : ''} à débloquer
             </p>
           </div>
         </div>
@@ -147,7 +161,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
             JE PIOCHE !
           </button>
         </div>
-      </section>
+      </motion.section>
     </MotionConfig>
   );
 }
