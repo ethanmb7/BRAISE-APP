@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Bell } from 'lucide-react';
+import { Layers } from 'lucide-react';
 import { getRankInfo } from '@/lib/aura';
 import { RankIcon } from '@/components/RankIcon';
 import { SnowflakeIcon } from '@/components/SnowflakeIcon';
@@ -19,7 +19,7 @@ interface HeaderHUDProps {
   onStreakClick: () => void;
   onAuraClick: () => void;
   onFreezeClick: () => void;
-  onBellClick: () => void;
+  onReviewClick: () => void;
 }
 
 // Structural rebuild, not another value pass on the same oval pill: every button is now two
@@ -198,22 +198,13 @@ export function HeaderHUD({
   onStreakClick,
   onAuraClick,
   onFreezeClick,
-  onBellClick,
+  onReviewClick,
 }: HeaderHUDProps) {
   const rank = getRankInfo(xp).current;
+  // Série first: TodayStrip's own comments already call the streak count "the app's central
+  // retention lever" — the HUD's reading order should agree with that instead of leading with
+  // Gel, a defensive mechanic used far less often.
   const metrics: Metric[] = [
-    {
-      key: 'freeze',
-      icon: <SnowflakeIcon />,
-      value: freezes,
-      base: 'bg-cyan-950',
-      face: freezeArmed ? 'bg-amber-400' : 'bg-cyan-400',
-      text: 'text-black',
-      socket: 'bg-black/15',
-      label: `${freezes} gels de série`,
-      onClick: onFreezeClick,
-      bump: freezeBumped,
-    },
     {
       key: 'streak',
       icon: <FlameIcon />,
@@ -236,6 +227,18 @@ export function HeaderHUD({
       socket: 'bg-black/10',
       label: `${xp} points d'Aura — voir Ton Aura`,
       onClick: onAuraClick,
+    },
+    {
+      key: 'freeze',
+      icon: <SnowflakeIcon />,
+      value: freezes,
+      base: 'bg-cyan-950',
+      face: freezeArmed ? 'bg-amber-400' : 'bg-cyan-400',
+      text: 'text-black',
+      socket: 'bg-black/15',
+      label: `${freezes} gels de série`,
+      onClick: onFreezeClick,
+      bump: freezeBumped,
     },
   ];
 
@@ -275,11 +278,17 @@ export function HeaderHUD({
         ))}
       </div>
 
+      {/* Used to be a Bell icon — a near-universal "notifications/inbox" signal — even though
+          tapping it has always just jumped straight into Réviser (setTab('revisions')), with no
+          inbox behind it. The app has no real notification content to show (no social, no
+          leaderboard, see the no-leaderboard rule), so the honest fix isn't building a fake inbox
+          — it's using the icon that actually matches the action: Layers, the same one the tab bar
+          and Aura's own Réviser CTA already use for exactly this. */}
       <AnchorButton
-        onClick={onBellClick}
-        label={dueCount > 0 ? `${dueCount} carte${dueCount > 1 ? 's' : ''} à réviser` : 'Notifications'}
+        onClick={onReviewClick}
+        label={dueCount > 0 ? `${dueCount} carte${dueCount > 1 ? 's' : ''} à réviser` : 'Réviser'}
       >
-        <Bell size={18} className="text-[var(--neo-ink)]" />
+        <Layers size={18} className="text-[var(--neo-ink)]" />
         {dueCount > 0 && (
           <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full border-2 border-white bg-red-600 px-1 text-[0.62rem] font-black leading-none text-white">
             {dueCount > 9 ? '9+' : dueCount}

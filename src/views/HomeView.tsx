@@ -198,7 +198,7 @@ export function HomeView() {
                 setTab('progres');
               }}
               onFreezeClick={handleFreezeClick}
-              onBellClick={() => {
+              onReviewClick={() => {
                 sfx.tap(state.soundOn);
                 setTab('revisions');
               }}
