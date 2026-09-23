@@ -966,6 +966,16 @@ select {
   letter-spacing: 0.04em;
   box-shadow: 2px 2px 0 #000;
 }
+/* BadgeShelf's own real count line, under its .mastery-tab eyebrow — same treatment as
+   .mastery-count (small IBM Plex Mono, muted), a new class because the two say different things
+   ("3/6 cartes" vs "4 badges débloqués"), not because the styling itself differs. */
+.parcours-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin: 0 0 10px;
+}
 .mastery-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

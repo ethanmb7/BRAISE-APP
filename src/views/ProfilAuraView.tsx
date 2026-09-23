@@ -1,12 +1,13 @@
 import { memo, useCallback, useMemo, useState, type CSSProperties } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight, WifiOff } from 'lucide-react';
-import { useApp, computeUnlockedBadges } from '@/store';
+import { WifiOff } from 'lucide-react';
+import { useApp } from '@/store';
 import { sfx } from '@/lib/sound';
 import { useOnlineStatus } from '@/lib/useOnlineStatus';
 import { useCountUp } from '@/lib/useCountUp';
 import { BraiseMascot } from '@/components/BraiseMascot';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
+import { BadgeShelf } from '@/components/BadgeShelf';
 import { SubjectIcon } from '@/components/SubjectIcon';
 import { RankIcon } from '@/components/RankIcon';
 import { StreakFlameIcon } from '@/components/StreakFlameIcon';
@@ -17,14 +18,12 @@ import {
   computeSubjectMastery,
   countMasteredCards,
   computeBraiseInsight,
-  nextBadgeHint,
   type Rank,
   type SubjectMastery,
   type BraiseInsight,
 } from '@/lib/aura';
 import { getAgeGroup, progressAdvice, strongSubjectLine } from '@/lib/braiseVoice';
-import { BadgeIcon } from '@/components/BadgeIcon';
-import { FLASHCARDS, BADGES } from '@/data';
+import { FLASHCARDS } from '@/data';
 
 // Diameter of the hero ring frame — the single largest element on the page, on purpose.
 const HERO_SIZE = 180;
@@ -46,7 +45,7 @@ const heroPop = {
   show: { opacity: 1, scale: 1, y: 0, transition: { type: 'spring', stiffness: 260, damping: 18 } as const },
 };
 export function ProfilAuraView() {
-  const { state, loaded, openSubject, setView } = useApp();
+  const { state, loaded, openSubject } = useApp();
   const isOnline = useOnlineStatus();
   const [shareOpen, setShareOpen] = useState(false);
   const { current, next, pct } = getRankInfo(state.xp);
@@ -73,9 +72,6 @@ export function ProfilAuraView() {
   }, [insight, state.user.personality, state.user.level]);
 
   const subjectMastery = useMemo(() => computeSubjectMastery(state.cardReviews), [state.cardReviews]);
-  const unlockedBadges = useMemo(() => computeUnlockedBadges(state), [state]);
-  const unlockedBadgeCount = useMemo(() => Object.values(unlockedBadges).filter(Boolean).length, [unlockedBadges]);
-  const badgeHint = useMemo(() => nextBadgeHint(state, unlockedBadges), [state, unlockedBadges]);
 
   const handleShareOpen = useCallback(() => {
     sfx.tap(state.soundOn);
@@ -97,22 +93,13 @@ export function ProfilAuraView() {
     [state.soundOn, openSubject]
   );
 
-  // The one bridge between this page and Profil's own badge grid — Aura never duplicates the
-  // full grid, just enough of a trophy signal (a count, always true, no unlock-date needed) to
-  // justify pointing there.
-  const handleOpenBadges = useCallback(() => {
-    sfx.tap(state.soundOn);
-    if (navigator.vibrate) navigator.vibrate(10);
-    setView('profile');
-  }, [state.soundOn, setView]);
-
   if (!loaded) {
     return <ProfilAuraSkeleton />;
   }
 
   return (
     <div className="view is-active aura-view aura-hud">
-      <h1 className="aura-view-title">Ton Aura</h1>
+      <h1 className="aura-view-title">Ton parcours</h1>
 
       {!isOnline && (
         <div className="aura-offline-banner" role="status">
@@ -152,9 +139,12 @@ export function ProfilAuraView() {
           <SubjectMasteryGrid subjects={subjectMastery} onSelect={handleSubjectSelect} />
         </motion.div>
 
-        {/* Pillar 3 — Le Flex social : le pont vers Profil, puis l'action de fin de scène. */}
+        {/* Parcours — le journal des badges débloqués (vraies dates, jamais inventées — voir
+            BadgeShelf), déplacé ici depuis Profil : c'est un historique d'accomplissement, pas
+            une question d'identité. Remplace l'ancien BadgeBridge (un simple pont vers Profil) —
+            il n'y a plus besoin de pont, le contenu réel vit directement ici maintenant. */}
         <motion.div variants={staggerItem}>
-          <BadgeBridge unlocked={unlockedBadgeCount} total={BADGES.length} hint={badgeHint} onOpen={handleOpenBadges} />
+          <BadgeShelf state={state} />
         </motion.div>
         <motion.div variants={staggerItem}>
           <button className="aura-share-cta" onClick={handleShareOpen}>
@@ -394,37 +384,9 @@ const SubjectMasteryGrid = memo(function SubjectMasteryGrid({
   );
 });
 
-// The one bridge between Aura and Profil's own badge grid. Never "ton dernier badge" — nothing
-// in AppState timestamps when a badge unlocked, so claiming a "most recent" one would be a
-// fabricated claim, not a real one. `hint` is the honest alternative: the single locked badge
-// closest to unlocking (see nextBadgeHint in aura.ts), computed from real streak/XP/chapter
-// state, giving a reason to act now instead of a flat count with no momentum signal.
-const BadgeBridge = memo(function BadgeBridge({
-  unlocked,
-  total,
-  hint,
-  onOpen,
-}: {
-  unlocked: number;
-  total: number;
-  hint: { badgeId: string; label: string } | null;
-  onOpen: () => void;
-}) {
-  return (
-    <button type="button" className="badge-bridge" onClick={onOpen}>
-      <span className="badge-bridge-icon" aria-hidden="true">
-        {hint ? <BadgeIcon badgeId={hint.badgeId} size={18} /> : <RankIcon rankId="or" color="#ffd166" size={18} />}
-      </span>
-      <span className="badge-bridge-text">
-        <span className="badge-bridge-hint">{hint ? hint.label : 'Tous tes badges sont débloqués !'}</span>
-        <span className="badge-bridge-sub">
-          {unlocked}/{total} badges débloqués
-        </span>
-      </span>
-      <ChevronRight size={18} className="badge-bridge-chevron" aria-hidden="true" />
-    </button>
-  );
-});
+// BadgeBridge (a teaser + a link over to Profil's own badge grid) used to live here — removed
+// now that Profil no longer holds any badge content to bridge to; see BadgeShelf.tsx for the
+// real thing that replaced it, rendered directly on this page.
 
 function Skeleton({ width, height, radius = 8, style }: { width: string | number; height: string | number; radius?: number; style?: CSSProperties }) {
   return <div className="skeleton-block" style={{ width, height, borderRadius: radius, ...style }} />;
@@ -432,8 +394,8 @@ function Skeleton({ width, height, radius = 8, style }: { width: string | number
 
 function ProfilAuraSkeleton() {
   return (
-    <div className="view is-active aura-view aura-hud" aria-busy="true" aria-label="Chargement de ton Aura">
-      <h1 className="aura-view-title">Ton Aura</h1>
+    <div className="view is-active aura-view aura-hud" aria-busy="true" aria-label="Chargement de ton parcours">
+      <h1 className="aura-view-title">Ton parcours</h1>
 
       <div className="aura-hero">
         <Skeleton width={HERO_SIZE} height={HERO_SIZE} radius={999} style={{ marginBottom: 10 }} />
