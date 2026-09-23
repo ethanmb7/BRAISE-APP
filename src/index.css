@@ -218,6 +218,17 @@ select {
   display: none;
 }
 
+/* PiocheRevealVeil — see the component for why this exists. Fixed to the viewport (not
+   .app-content) so it sits above the tab bar too, and pointer-events: none throughout since its
+   whole visible window is a couple hundred ms with nothing on screen worth clicking through it. */
+.pioche-reveal-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 42%, #fff8ee 0%, #fdc800 38%, #ff6b35 100%);
+}
+
 .topbar {
   display: flex;
   align-items: center;

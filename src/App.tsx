@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AppProvider, useApp } from '@/store';
 import { TabBar } from '@/components/TabBar';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { PiocheRevealVeil } from '@/components/PiocheRevealVeil';
 import { BraiseMascot } from '@/components/BraiseMascot';
 import { RankUpCelebration } from '@/components/RankUpCelebration';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
@@ -64,6 +65,10 @@ function Screen() {
       </div>
 
       {showTabBar && <TabBar active={state.tab} onChange={setTab} />}
+
+      {/* Sits here, not inside HeroPiocheCard/HomeView — it needs to survive the exact unmount
+          it's meant to cover. See PiocheRevealVeil for why. */}
+      <PiocheRevealVeil />
 
       {celebration?.type === 'badge' && (
         <div key={`badge-${celebration.badge.id}`} className="milestone-toast">

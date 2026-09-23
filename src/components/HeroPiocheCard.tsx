@@ -4,6 +4,7 @@ import { Play, Sparkles, Zap } from 'lucide-react';
 import { BraiseChest } from '@/components/BraiseChest';
 import { sfx } from '@/lib/sound';
 import { getLastPiocheOpenDate, setLastPiocheOpenDate } from '@/lib/celebrations';
+import { firePiocheReveal, getPiocheRevealTiming } from '@/lib/piocheTransition';
 
 interface HeroPiocheCardProps {
   /** Fuller sentence (from `dailyPickLine()`) announced to screen readers only — folds the
@@ -40,9 +41,11 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
   const [launching, setLaunching] = useState(false);
   const [quick, setQuick] = useState(false);
   const launchTimer = useRef<ReturnType<typeof setTimeout>>();
+  const revealTimer = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => () => {
     if (launchTimer.current) clearTimeout(launchTimer.current);
+    if (revealTimer.current) clearTimeout(revealTimer.current);
   }, []);
 
   const unhype = () => setHyped(false);
@@ -56,8 +59,13 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
     // The real navigation (onStart → openSubject) unmounts this component immediately, so it's
     // delayed just long enough for the chosen sequence to actually be seen before the screen
     // changes — the full ceremony needs ~900ms to land, the abbreviated repeat only ~420ms.
+    const totalMs = firstToday ? 900 : 420;
     setLaunching(true);
-    launchTimer.current = setTimeout(onStart, firstToday ? 900 : 420);
+    launchTimer.current = setTimeout(onStart, totalMs);
+    // Fires PiocheRevealVeil's light burst timed to peak right as the view actually swaps — see
+    // piocheTransition.ts for why this and launchTimer share one timing source instead of two
+    // separately-guessed numbers.
+    revealTimer.current = setTimeout(() => firePiocheReveal(totalMs), totalMs - getPiocheRevealTiming(totalMs).fadeInMs);
   };
 
   return (
