@@ -207,3 +207,62 @@ Chaque parcours suit le même cycle :
 Une fonctionnalité n'entre dans le produit que si l'élève comprend son action en moins de trois
 secondes et si elle rapproche réellement du moment « maintenant, j'ai compris ».
 
+codex/analyser-l-application-2zbvd9
+## 11. Réunion architecture fonctionnelle — décisions
+
+L'accueil n'est pas un tableau de bord. Il montre la meilleure action disponible, puis donne accès
+au reste sans répéter les mêmes informations.
+
+### Placement de chaque fonction
+
+| Fonction | Lieu principal | Rappel autorisé sur Aujourd'hui |
+| --- | --- | --- |
+| Activité en cours | Matière ou activité | Carte prioritaire « Reprendre » |
+| Pioche du Jour | Aujourd'hui | Carte compacte si rien n'est en cours |
+| Objectif quotidien | Aujourd'hui | Ligne de progression légère |
+| Notions dues | Réviser | Une relance « À consolider » si nécessaire |
+| Matières et chapitres | Apprendre | Aperçu limité et accès « Tout voir » |
+| Série | Moi | Compteur compact dans l'en-tête |
+| Aura et rang | Moi | Résumé discret lié au profil |
+| Joker de série | Moi > Série | Seulement lorsqu'il est consommé ou nécessaire |
+| Badges et apparences | Moi | Célébration au déblocage |
+| Préférences et accessibilité | Moi > Mon confort | Aucun raccourci permanent sur l'accueil |
+| Partage | Résultat ou Moi | Jamais comme action concurrente sur l'accueil |
+
+### Priorité contextuelle d'Aujourd'hui
+
+Une seule carte domine selon cet ordre :
+
+1. activité déjà commencée ;
+2. consolidation arrivée à échéance ;
+3. Pioche du Jour ;
+4. découverte d'une matière.
+
+Les autres propositions restent dans leur espace dédié. Elles ne sont pas empilées sous forme de
+plusieurs grandes cartes concurrentes.
+
+### Fonctions à inventer avant d'élargir le catalogue
+
+- **Reprendre** : restaurer exactement une activité interrompue ;
+- **À consolider** : réunir les notions réellement arrivées à échéance ;
+- **Objectif flexible** : léger, normal ou intense, sans pression temporelle ;
+- **Favoris** : conserver une explication, une astuce ou une notion ;
+- **Recherche** : retrouver une notion, un chapitre ou une matière ;
+- **Mon confort** : texte, audio, mouvement, contraste, durée et ton de Braise ;
+- **Mon activité** : historique utile des acquis et prochaines consolidations ;
+- **Échéances** : préparer un contrôle uniquement lorsque de vraies dates sont renseignées.
+
+### Accueil validé pour la prochaine itération
+
+1. en-tête compact : avatar, prénom, série et résumé de progression ;
+2. prochaine action contextuelle ;
+3. progression quotidienne légère ;
+4. une relance utile au maximum ;
+5. aperçu des matières ;
+6. navigation persistante.
+
+Le joker, le bouton Réviser, les réglages et les statistiques détaillées ne vivent plus dans le
+HUD. La Pioche conserve Braise à 88 px mais place matière, titre, durée, volume et CTA dans une
+composition horizontale compacte.
+=======
+main

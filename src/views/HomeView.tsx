@@ -28,21 +28,10 @@ const staggerItem = {
 };
 
 export function HomeView() {
-  const { state, setTab, setView, openSubject, openLesson, setUser, toggleFreeze, getDueCards } = useApp();
+  const { state, setTab, setView, openSubject, openLesson, setUser, getDueCards } = useApp();
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [bump, setBump] = useState<'freeze' | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const [intoxDismissedCount, setIntoxDismissedCountState] = useState(getIntoxDismissedCount);
-  // Toggling a freeze used to be silent beyond the pill's own colour swap (cyan/amber) — no
-  // confirmation that the tap actually registered or what it just did. This is the same
-  // "combo-toast" pattern already used in RevisionsView (see .freeze-toast in index.css, which
-  // reuses its exact comboToastRise animation), not a new one.
-  const [freezeToast, setFreezeToast] = useState<'on' | 'off' | null>(null);
-  useEffect(() => {
-    if (freezeToast === null) return;
-    const t = setTimeout(() => setFreezeToast(null), 1100);
-    return () => clearTimeout(t);
-  }, [freezeToast]);
   const prevGoalMet = useRef(state.dailyGoalMet);
 
   useEffect(() => {
@@ -53,20 +42,6 @@ export function HomeView() {
   }, [state.dailyGoalMet]);
 
   const dueCount = getDueCards().length;
-
-  const handleFreezeClick = () => {
-    sfx.flip(state.soundOn);
-    // toggleFreeze() itself silently no-ops when trying to arm with 0 freezes left (see
-    // store.tsx) — mirror that guard here too, so the toast never confirms something that didn't
-    // actually happen.
-    const willToggle = state.freezeArmed || state.freezes > 0;
-    if (willToggle) {
-      setBump('freeze');
-      setTimeout(() => setBump(null), 300);
-      setFreezeToast(state.freezeArmed ? 'off' : 'on');
-    }
-    toggleFreeze();
-  };
 
   const handleLevel = (l: Level) => {
     sfx.tap(state.soundOn);
@@ -174,26 +149,17 @@ export function HomeView() {
           <div className="setup-banner">Configure ton niveau pour des leçons sur mesure.</div>
         )}
 
-        <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-6 pb-8">
+        <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-4 pb-8">
           <motion.div variants={staggerItem}>
             <HeaderHUD
               name={state.user.name}
               avatar={state.user.avatar}
               streak={state.streak}
               xp={state.xp}
-              freezes={state.freezes}
-              freezeArmed={state.freezeArmed}
-              freezeBumped={bump === 'freeze'}
-              dueCount={dueCount}
               onAvatarClick={() => setView('profile')}
               onAuraClick={() => {
                 sfx.tap(state.soundOn);
                 setTab('progres');
-              }}
-              onFreezeClick={handleFreezeClick}
-              onReviewClick={() => {
-                sfx.tap(state.soundOn);
-                setTab('revisions');
               }}
             />
           </motion.div>
@@ -274,12 +240,6 @@ export function HomeView() {
           </motion.div>
         </motion.div>
       </div>
-
-      {freezeToast && (
-        <div key={freezeToast} className="freeze-toast">
-          {freezeToast === 'on' ? '🧊 Joker prêt : ta série est protégée.' : 'Joker de série désactivé'}
-        </div>
-      )}
 
       <LevelSheet open={sheetOpen} current={state.user.level} onSelect={handleLevel} onClose={() => setSheetOpen(false)} />
 

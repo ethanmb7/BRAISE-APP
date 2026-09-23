@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, MotionConfig } from 'framer-motion';
+codex/analyser-l-application-2zbvd9
+import { ArrowRight, Clock3, Layers3 } from 'lucide-react';
+=======
 codex/analyser-l-application-6j80wg
 import { ArrowRight, Clock3, Layers3 } from 'lucide-react';
 =======
@@ -10,6 +13,7 @@ codex/analyser-l-application-y53s8j
 import { ArrowRight, Clock3, Layers3 } from 'lucide-react';
 =======
 import { Clock3, Layers3, Play } from 'lucide-react';
+main
 main
 main
 main
@@ -95,7 +99,11 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
           piocheTransition.ts) already covers the actual cut; this is a small, safe complement to
           it, not a replacement. */}
       <motion.section
+codex/analyser-l-application-2zbvd9
+        className="relative overflow-hidden rounded-[20px] border-[2.5px] border-black bg-[#FF6B35] p-3.5 shadow-[3px_3px_0px_0px_#000]"
+=======
         className="relative overflow-hidden rounded-[22px] border-[3px] border-black bg-[#FF6B35] p-4 shadow-[5px_5px_0px_0px_#000]"
+main
         aria-label={`Mission du jour : ${chapterTitle}`}
         animate={{ scale: launching ? 1.025 : 1 }}
         // Same full/quick split as everything else in this ceremony (BraiseChest, the reveal
@@ -103,6 +111,16 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
         // would finish — matching the shorter window here instead of leaving it visibly cut off.
         transition={{ duration: quick ? 0.22 : 0.5, ease: [0.16, 1, 0.3, 1] }}
       >
+codex/analyser-l-application-2zbvd9
+        <div className="relative flex items-center justify-between gap-2">
+          <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.1em] text-[#151821]">
+            Pioche du jour
+          </p>
+          <span className="font-mono text-[0.58rem] font-black uppercase tracking-wide text-[#151821]/55">Pour toi</span>
+        </div>
+
+        <div className="relative mt-1 flex items-end gap-3">
+=======
 codex/analyser-l-application-6j80wg
 =======
 codex/analyser-l-application-7cezw4
@@ -129,6 +147,7 @@ codex/analyser-l-application-7cezw4
 main
 main
 main
+main
           <div className="relative flex h-[92px] w-[92px] flex-shrink-0 items-end justify-center">
             {/* A quiet, static stage separates Braise from the copy without adding another card.
                 BraisePioche owns the meaningful motion; the background never competes with it. */}
@@ -138,11 +157,45 @@ main
             />
             <BraisePioche size={88} hyped={hyped} diving={launching} quick={quick} />
           </div>
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 pb-0.5">
             {/* Dark ink, not white — #FF6B35 measures 2.84:1 for white text (a hard AA
                 failure), 6.25:1 for dark ink. Three real fonts: font-mono for the eyebrow
                 (same as every other small-caps label app-wide), font-display for the title,
                 font-sans for the stats line. */}
+codex/analyser-l-application-2zbvd9
+            <p className="mb-0.5 flex items-center gap-1.5 text-[0.68rem] font-black text-[#151821]/70">
+              <span aria-hidden="true" className="h-2.5 w-2.5 flex-none rounded-full border border-[#151821]" style={{ background: subjectColor ?? '#FDC800' }} />
+              <span className="truncate">{subjectName ?? 'Mission du jour'}</span>
+            </p>
+            <h2 className="line-clamp-2 font-display text-[1.08rem] font-black leading-[1.05] text-[#151821]">{chapterTitle}</h2>
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[#151821]/75" aria-label="Les repères de ta mission">
+              <span className="flex items-center gap-1 font-mono text-[0.61rem] font-black">
+                <Clock3 size={13} strokeWidth={3} aria-hidden="true" /> {duration} MIN
+              </span>
+              <span className="flex items-center gap-1 font-mono text-[0.61rem] font-black">
+                <Layers3 size={13} strokeWidth={3} aria-hidden="true" /> {cardCount} CARTE{cardCount > 1 ? 'S' : ''}
+              </span>
+            </div>
+
+            {/* Compact and colocated with the mission copy: no separate footer stretching a
+                secondary tool into a hero. The 44px target remains comfortable on touch. */}
+            <div className="group relative mt-2.5">
+              <span aria-hidden="true" className="absolute inset-0 translate-y-[2px] rounded-xl border-2 border-black bg-black" />
+              <button
+                onPointerEnter={() => setHyped(true)}
+                onPointerDown={() => setHyped(true)}
+                onPointerUp={unhype}
+                onPointerLeave={unhype}
+                onPointerCancel={unhype}
+                onClick={handleStart}
+                disabled={launching}
+                className="relative flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border-2 border-black bg-[#FFF8EE] px-3 py-2 font-display text-[0.86rem] font-black text-black shadow-[2px_2px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[2px] group-active:shadow-none disabled:opacity-95"
+              >
+                {launching ? 'OUVERTURE…' : 'COMMENCER'}
+                <ArrowRight size={16} strokeWidth={3} aria-hidden="true" />
+              </button>
+            </div>
+=======
 codex/analyser-l-application-6j80wg
 =======
 codex/analyser-l-application-7cezw4
@@ -194,6 +247,7 @@ codex/analyser-l-application-7cezw4
 main
 main
 main
+main
           </div>
         </div>
         <span className="sr-only">
@@ -202,6 +256,8 @@ main
 
         {launching && <span className="sr-only" role="status">Braise révèle ta mission.</span>}
 
+codex/analyser-l-application-2zbvd9
+=======
         {/* The bevel matches the rest of Home, but does not pulse at rest: Pioche is an everyday
             tool, not an alert. Pointer events still wake Braise as direct feedback to intent. */}
         <div className="group relative mt-3.5">
@@ -235,6 +291,7 @@ main
 main
           </button>
         </div>
+main
       </motion.section>
     </MotionConfig>
   );
