@@ -28,7 +28,7 @@ const staggerItem = {
 };
 
 export function HomeView() {
-  const { state, setTab, setView, openSubject, setUser, toggleFreeze, getDueCards } = useApp();
+  const { state, setTab, setView, openSubject, openLesson, setUser, toggleFreeze, getDueCards } = useApp();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [bump, setBump] = useState<'streak' | 'xp' | 'freeze' | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
@@ -214,7 +214,11 @@ export function HomeView() {
               cardCount={currentChapterCardCount}
               soundOn={state.soundOn}
               onStart={() => {
-                if (currentSubject && currentChapter) openSubject(currentSubject.id, currentChapter.id);
+                // A daily ritual must deliver on its promise in one tap. Sending the player to
+                // the subject map here made "Je pioche" lead to a second choice before any
+                // learning started; the map remains available from the decks below, while the
+                // hero goes straight to the chapter Braise picked.
+                if (currentSubject && currentChapter) openLesson(currentSubject.id, currentChapter.id);
               }}
             />
           </motion.div>
