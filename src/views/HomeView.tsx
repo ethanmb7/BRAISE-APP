@@ -30,7 +30,7 @@ const staggerItem = {
 export function HomeView() {
   const { state, setTab, setView, openSubject, openLesson, setUser, toggleFreeze, getDueCards } = useApp();
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [bump, setBump] = useState<'streak' | 'xp' | 'freeze' | null>(null);
+  const [bump, setBump] = useState<'freeze' | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const [intoxDismissedCount, setIntoxDismissedCountState] = useState(getIntoxDismissedCount);
   // Toggling a freeze used to be silent beyond the pill's own colour swap (cyan/amber) — no
@@ -53,12 +53,6 @@ export function HomeView() {
   }, [state.dailyGoalMet]);
 
   const dueCount = getDueCards().length;
-
-  const fireStreak = () => {
-    sfx.streak(state.soundOn);
-    setBump('streak');
-    setTimeout(() => setBump(null), 300);
-  };
 
   const handleFreezeClick = () => {
     sfx.flip(state.soundOn);
@@ -183,16 +177,15 @@ export function HomeView() {
         <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-6 pb-8">
           <motion.div variants={staggerItem}>
             <HeaderHUD
+              name={state.user.name}
               avatar={state.user.avatar}
               streak={state.streak}
               xp={state.xp}
               freezes={state.freezes}
               freezeArmed={state.freezeArmed}
-              streakBumped={bump === 'streak'}
               freezeBumped={bump === 'freeze'}
               dueCount={dueCount}
               onAvatarClick={() => setView('profile')}
-              onStreakClick={fireStreak}
               onAuraClick={() => {
                 sfx.tap(state.soundOn);
                 setTab('progres');
@@ -284,7 +277,11 @@ export function HomeView() {
 
       {freezeToast && (
         <div key={freezeToast} className="freeze-toast">
+codex/analyser-et-ameliorer-l-application-braise-pvobf9
+          {freezeToast === 'on' ? '🧊 Gel activé : ta série est protégée.' : 'Gel de série désactivé'}
+=======
           {freezeToast === 'on' ? '🧊 Joker prêt : ta série est protégée.' : 'Joker de série désactivé'}
+main
         </div>
       )}
 
