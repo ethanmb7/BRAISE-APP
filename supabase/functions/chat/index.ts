@@ -71,13 +71,16 @@ Deno.serve(async (req: Request) => {
             }
           }
         }
-      } catch (_e) {
+      } catch {
         // Embedding/retrieval is best-effort; continue without context
       }
     }
 
     // Build the full prompt for Gemini
     const promptParts: string[] = [SYSTEM_PROMPT];
+    if (typeof subject === "string" && subject.trim()) {
+      promptParts.push(`Matière en cours : ${subject.trim()}.`);
+    }
     if (contextText) {
       promptParts.push(
         `\nVoici les extraits de cours pertinents. Réponds en te basant UNIQUEMENT sur ces extraits :\n\n${contextText}`
