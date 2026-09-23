@@ -1,5 +1,44 @@
 # Roadmap BRAISE
 
+## Cap produit
+
+- [x] Formaliser la promesse, l'architecture cible et la boucle propriétaire dans `PRODUCT_VISION.md`
+- [ ] Tester la promesse et l'architecture « Aujourd'hui / Apprendre / Réviser / Moi » avec 8 à 12 élèves
+- [ ] Prototyper une conversation « Capte » complète sur une seule notion
+- [ ] Faire valider le prototype par des élèves dyslexiques/TDAH et un expert pédagogique
+
+## Expérience centrale
+
+- [ ] Reconcevoir l'onboarding autour d'une compréhension obtenue avant la création de compte
+- [ ] Créer le moteur de notion : objectif, confusions, explications, exemples et vérification
+- [ ] Implémenter « Je ne sais pas », « Plus simple », « Un exemple » et « Lis-le »
+- [ ] Ajouter la reformulation texte ou voix et la validation de l'idée comprise
+- [ ] Remplacer la complétion binaire par cinq états de maîtrise
+- [ ] Refaire l'écran de résultat : acquis, fragilités, prochaine consolidation, puis récompenses
+
+## Interface
+
+- [ ] Prototyper les quatre espaces cibles avant une nouvelle passe de code visuel
+- [x] Remplacer le HUD-tableau de bord par un en-tête compact centré sur l'identité
+- [x] Compacter la Pioche sans réduire Braise et rapprocher contenu, repères et CTA
+- [ ] Aujourd'hui : rendre la prochaine action contextuelle et alléger le rythme quotidien
+- [ ] Déplacer joker, série détaillée, Aura et rang dans Moi
+- [ ] Créer un espace Matières/Apprendre et limiter l'aperçu de l'accueil
+- [ ] Apprendre : conversation guidée, calme et accessible
+- [ ] Réviser : erreurs, notions dues et choix de matière
+- [ ] Moi : réunir progression, Aura, profil, préférences et accessibilité
+- [ ] Documenter les composants et les trois niveaux de surface dans un système de design
+
+## Qualité produit
+
+- [ ] Remplacer toutes les formulations humiliantes du ton `savage` par « Coach énergie »
+- [ ] Déplacer l'appel IA côté serveur et ajouter limites, modération et journalisation minimale
+- [ ] Ajouter tests unitaires, parcours end-to-end et contrôles d'accessibilité
+- [ ] Instrumenter la compréhension différée plutôt que le seul engagement
+- [ ] Tester performances, hors-ligne, audio et reprise sur de vrais téléphones
+
+## Identité déjà construite
+
 - [x] Nouvelle Braise dessinée depuis zéro (BraiseEmber) + scène de la Pioche du Jour
 - [x] Identité visuelle des avatars de profil (Les Éclats) + évolution par rang
 - [x] Nouveau design de la page Profil (esprit néobrutaliste conservé)
