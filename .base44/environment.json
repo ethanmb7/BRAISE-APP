@@ -1,0 +1,22 @@
+{
+  "previewPort": 3000,
+  "healthPath": "/",
+  "startCommand": "docker compose -f docker-compose.base44.yml up -d",
+  "secrets": [
+    {
+      "name": "VITE_SUPABASE_URL",
+      "description": "Supabase project URL (e.g. https://xxx.supabase.co). Optional — app falls back to localStorage without it.",
+      "requiredAtBoot": false
+    },
+    {
+      "name": "VITE_SUPABASE_ANON_KEY",
+      "description": "Supabase anon public key. Optional — app falls back to localStorage without it.",
+      "requiredAtBoot": false
+    },
+    {
+      "name": "VITE_MISTRAL_API_KEY",
+      "description": "Mistral AI API key for the Braise chat tutor. Optional — chat shows an error message without it.",
+      "requiredAtBoot": false
+    }
+  ]
+}
