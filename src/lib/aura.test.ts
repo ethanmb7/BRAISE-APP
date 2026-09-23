@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getRankInfo, computeSubjectMastery, countMasteredCards, nextBadgeHint, badgeRemainingLabel, RANKS } from '@/lib/aura';
+import { getRankInfo, computeSubjectMastery, countMasteredCards, nextBadgeHint, badgeRemainingLabel, computeNextMilestone, RANKS } from '@/lib/aura';
 import type { CardReview } from '@/types';
 
 function review(repetitions: number): CardReview {
@@ -144,5 +144,32 @@ describe('badgeRemainingLabel', () => {
   it('returns null for badges with no numeric threshold (b3/b4)', () => {
     expect(badgeRemainingLabel('b3', { streak: 0, xp: 0 })).toBeNull();
     expect(badgeRemainingLabel('b4', { streak: 0, xp: 0 })).toBeNull();
+  });
+});
+
+describe('computeNextMilestone', () => {
+  it('picks the first real step on a fresh account', () => {
+    expect(computeNextMilestone(0, 0)).toEqual({ kind: 'streak', target: 7, remaining: 7, pct: 0 });
+  });
+
+  it('picks whichever axis is proportionally closer to its own next step', () => {
+    // streak 6/7 = 85.7% there; mastered 5/10 = 50% there — streak wins despite a smaller gap.
+    expect(computeNextMilestone(6, 5)).toEqual({ kind: 'streak', target: 7, remaining: 1, pct: expect.closeTo(85.7, 1) });
+    // mastered 9/10 = 90% there; streak 1/7 = 14% there — mastery wins here instead.
+    expect(computeNextMilestone(1, 9)).toEqual({ kind: 'mastery', target: 10, remaining: 1, pct: expect.closeTo(90, 1) });
+  });
+
+  it('advances to the next step once the current one is cleared', () => {
+    expect(computeNextMilestone(7, 0).target).toBe(14);
+    expect(computeNextMilestone(0, 10).target).toBe(25);
+  });
+
+  it('keeps producing new targets past the end of the hand-authored list, forever', () => {
+    // 365 is the last authored streak step; past it, every +100 days is a new real target.
+    expect(computeNextMilestone(365, 0)).toEqual({ kind: 'streak', target: 465, remaining: 100, pct: 0 });
+    expect(computeNextMilestone(500, 0)).toEqual({ kind: 'streak', target: 565, remaining: 65, pct: 35 });
+    // 500 is the last authored mastery step; past it, every +250 cards is a new real target.
+    expect(computeNextMilestone(0, 500)).toEqual({ kind: 'mastery', target: 750, remaining: 250, pct: 0 });
+    expect(computeNextMilestone(0, 900)).toEqual({ kind: 'mastery', target: 1000, remaining: 100, pct: 60 });
   });
 });

@@ -46,9 +46,13 @@ export function BadgeShelf({ state }: { state: AppState }) {
           {unlockedCount} badge{unlockedCount > 1 ? 's' : ''} débloqué{unlockedCount > 1 ? 's' : ''} sur {BADGES.length}
         </p>
         <div className="timeline-row">
-          {unlockedSorted.map((b) => (
+          {unlockedSorted.map((b, idx) => (
             <div className="timeline-item" key={b.id}>
-              <div className="timeline-line" aria-hidden="true" />
+              {/* Each item draws the connecting line to its own right, so the true last item
+                  (the ghost hint when there is one, the last real badge otherwise) must skip it:
+                  nothing to connect to after the list ends, so drawing it there was a stray line
+                  poking past the card's own border with nothing at the other end. */}
+              {(idx < unlockedSorted.length - 1 || hint) && <div className="timeline-line" aria-hidden="true" />}
               <div className="timeline-dot">
                 <BadgeIcon badgeId={b.id} size={14} />
               </div>
@@ -57,7 +61,6 @@ export function BadgeShelf({ state }: { state: AppState }) {
           ))}
           {hint && (
             <div className="timeline-item">
-              <div className="timeline-line" aria-hidden="true" />
               <div className="timeline-dot ghost">
                 <BadgeIcon badgeId={hint.badgeId} size={14} />
               </div>

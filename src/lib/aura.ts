@@ -125,6 +125,54 @@ export function computeBraiseInsight(cardReviews: Record<string, CardReview>): B
   return null;
 }
 
+// Once Légende (the top rank) is reached, RankRail's own "X XP jusqu'à Y" caption runs out of
+// anything to say — "Rang maximum atteint" is honest but it's a dead end on the one part of the
+// page whose entire job is showing there's always something more to reach. Streak and mastered-
+// cards both keep growing long after XP caps out, so a milestone track built on those two axes
+// never runs out either: each step is a plain arithmetic sequence, not hand-authored content, so
+// it keeps producing a real next target for a user at any level without new tiers being written
+// by hand. Purely "you, past where you were" — never a comparison between students (see the
+// no-leaderboard rule).
+const STREAK_MILESTONES = [7, 14, 30, 60, 100, 150, 200, 300, 365];
+const STREAK_MILESTONE_TAIL_STEP = 100;
+const MASTERY_MILESTONES = [10, 25, 50, 100, 200, 350, 500];
+const MASTERY_MILESTONE_TAIL_STEP = 250;
+
+function nextInSequence(value: number, steps: number[], tailStep: number): { prev: number; next: number } {
+  for (let i = 0; i < steps.length; i++) {
+    if (steps[i] > value) return { prev: i === 0 ? 0 : steps[i - 1], next: steps[i] };
+  }
+  const last = steps[steps.length - 1];
+  const over = value - last;
+  const next = last + (Math.floor(over / tailStep) + 1) * tailStep;
+  return { prev: next - tailStep, next };
+}
+
+export type NextMilestone = {
+  kind: 'streak' | 'mastery';
+  target: number;
+  remaining: number;
+  pct: number;
+};
+
+// Picks whichever axis (série ou cartes maîtrisées) is proportionally closer to its own next
+// step — the same fairness rule nextBadgeHint already uses to compare streak-days against XP:
+// the one that's honestly nearest is the one worth naming. A tie in that percentage (most often
+// both axes sitting at their very first rung, 0%) falls back to whichever axis has already
+// cleared more ground overall (`prev`, its last passed milestone) — a fresh streak of 0 and 500
+// already-mastered cards both read as "0% of the way to the next step", but they are not
+// remotely the same situation, and the higher-prev axis is the one that's actually been earned.
+export function computeNextMilestone(streak: number, masteredCards: number): NextMilestone {
+  const s = nextInSequence(streak, STREAK_MILESTONES, STREAK_MILESTONE_TAIL_STEP);
+  const m = nextInSequence(masteredCards, MASTERY_MILESTONES, MASTERY_MILESTONE_TAIL_STEP);
+  const sPct = s.next > s.prev ? ((streak - s.prev) / (s.next - s.prev)) * 100 : 0;
+  const mPct = m.next > m.prev ? ((masteredCards - m.prev) / (m.next - m.prev)) * 100 : 0;
+  const streakWins = sPct !== mPct ? sPct > mPct : s.prev >= m.prev;
+  return streakWins
+    ? { kind: 'streak', target: s.next, remaining: s.next - streak, pct: sPct }
+    : { kind: 'mastery', target: m.next, remaining: m.next - masteredCards, pct: mPct };
+}
+
 export type BadgeHint = { badgeId: string; label: string };
 
 // The 4 numeric badges' real thresholds, in the order nextBadgeHint has always checked them —

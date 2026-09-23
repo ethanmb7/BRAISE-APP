@@ -1104,9 +1104,18 @@ select {
   color: var(--ink-soft);
 }
 
-/* --- Share CTA — the single primary action on the screen, so it's the loudest element on
-   the page after the mascot itself: full width, vivid, its own hard shadow, plus a shine
-   sweep to keep it feeling alive rather than static. --- */
+/* --- Aura's two bottom actions. Réviser is the loudest element on the page after the mascot
+   itself — full fill, vivid, its own hard shadow, plus a shine sweep to keep it feeling alive —
+   because it's the action that actually earns a return visit, not just a flex. Partager keeps
+   the exact same signature orange (the app's rule: every major CTA uses --neo-orange, full
+   stop) but as an outline instead of a fill, so hierarchy reads through weight, not colour. --- */
+.aura-cta-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.aura-review-cta,
 .aura-share-cta {
   position: relative;
   overflow: hidden;
@@ -1115,19 +1124,34 @@ select {
   justify-content: center;
   gap: 10px;
   width: 100%;
-  /* Same fix as .mastery-tab: white text on plain --neo-orange is 3.44:1, under WCAG's 4.5:1
-     minimum — on the page's single most important button, no less. 20% darker clears it. */
-  background: color-mix(in srgb, var(--neo-orange) 80%, #000);
-  color: #fff;
   font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 1rem;
   border: 3px solid #000;
   border-radius: 999px;
   padding: 8px 22px 8px 8px;
-  box-shadow: 5px 5px 0 #000;
-  margin-bottom: 16px;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.aura-review-cta {
+  /* Same fix as .mastery-tab: white text on plain --neo-orange is 3.44:1, under WCAG's 4.5:1
+     minimum — on the page's single most important button, no less. 20% darker clears it. */
+  background: color-mix(in srgb, var(--neo-orange) 80%, #000);
+  color: #fff;
+  box-shadow: 5px 5px 0 #000;
+}
+.aura-share-cta {
+  background: var(--paper);
+  /* Plain --neo-orange text on light --paper measures ~3.2:1 — under the 4.5:1 minimum for
+     normal text. Same 20%-darker mix already used for white-on-orange elsewhere on this page,
+     just run the other direction (orange-on-paper) to clear the same bar. */
+  color: color-mix(in srgb, var(--neo-orange) 80%, #000);
+  box-shadow: 3px 3px 0 #000;
+}
+/* --paper flips to a near-black navy in dark mode, so the light-mode darkening above would go
+   the wrong way (orange-on-navy measured ~3:1). Lightening toward white instead keeps the same
+   ~4.8:1 clearance on the dark surface. */
+.app-shell.dark .aura-share-cta {
+  color: color-mix(in srgb, var(--neo-orange) 90%, #fff);
 }
 /* A gold medallion for the trophy icon — the button reads as "the reward you're about to
    flex", not just a generic action pill. */
@@ -1143,11 +1167,27 @@ select {
   border: 2px solid #000;
   border-radius: 50%;
 }
+/* Same medallion construction as .aura-share-icon, mint instead of gold — "go do it" instead
+   of "here's your reward", the one other colour this page's two-CTA row needs to tell the two
+   actions apart at a glance despite sharing the same button shape. */
+.aura-review-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: var(--mint);
+  color: #fff;
+  border: 2px solid #000;
+  border-radius: 50%;
+}
 /* A diagonal light band swept across the button — sits above the fill, below the label
    (z-index isn't needed since it's painted before the text in source order and the text has
    no background of its own to be occluded by). Idle off-screen to the left; sweeps through
-   on hover (desktop) and on every tap (mobile, which has no hover state to rely on). */
-.aura-share-cta::after {
+   on hover (desktop) and on every tap (mobile, which has no hover state to rely on). Reserved
+   for Réviser now — the secondary Partager button stays calmer on purpose. */
+.aura-review-cta::after {
   content: '';
   position: absolute;
   top: 0;
@@ -1158,17 +1198,21 @@ select {
   transform: skewX(-20deg);
   pointer-events: none;
 }
-.aura-share-cta:hover::after,
-.aura-share-cta:active::after {
+.aura-review-cta:hover::after,
+.aura-review-cta:active::after {
   animation: shineSweep 0.7s ease forwards;
 }
 @keyframes shineSweep {
   from { left: -60%; }
   to { left: 130%; }
 }
-.aura-share-cta:active {
+.aura-review-cta:active {
   transform: translate(3px, 3px);
   box-shadow: 2px 2px 0 #000;
+}
+.aura-share-cta:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000;
 }
 
 /* --- ShareAuraModal — full screen, summoned only while actively sharing. --- */

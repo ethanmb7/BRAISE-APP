@@ -1,6 +1,6 @@
 import { memo, useCallback, useMemo, useState, type CSSProperties } from 'react';
 import { motion } from 'framer-motion';
-import { WifiOff } from 'lucide-react';
+import { WifiOff, Layers } from 'lucide-react';
 import { useApp } from '@/store';
 import { sfx } from '@/lib/sound';
 import { useOnlineStatus } from '@/lib/useOnlineStatus';
@@ -18,9 +18,11 @@ import {
   computeSubjectMastery,
   countMasteredCards,
   computeBraiseInsight,
+  computeNextMilestone,
   type Rank,
   type SubjectMastery,
   type BraiseInsight,
+  type NextMilestone,
 } from '@/lib/aura';
 import { getAgeGroup, progressAdvice, strongSubjectLine } from '@/lib/braiseVoice';
 import { FLASHCARDS } from '@/data';
@@ -45,10 +47,11 @@ const heroPop = {
   show: { opacity: 1, scale: 1, y: 0, transition: { type: 'spring', stiffness: 260, damping: 18 } as const },
 };
 export function ProfilAuraView() {
-  const { state, loaded, openSubject } = useApp();
+  const { state, loaded, openSubject, setTab, getDueCards } = useApp();
   const isOnline = useOnlineStatus();
   const [shareOpen, setShareOpen] = useState(false);
   const { current, next, pct } = getRankInfo(state.xp);
+  const dueCount = getDueCards().length;
 
   const stats = useMemo(() => {
     const reviewedIds = Object.keys(state.cardReviews);
@@ -57,6 +60,14 @@ export function ProfilAuraView() {
     );
     return { subjectsCount: subjectsSeen.size, masteredCards: countMasteredCards(state.cardReviews) };
   }, [state.cardReviews]);
+
+  // Once the rank ladder is maxed, RankRail's own caption has nothing left to say — this keeps
+  // it pointing forward on a different, uncapped axis instead of just announcing a dead end. See
+  // computeNextMilestone in aura.ts for why streak/mastered-cards never run out the way XP does.
+  const milestone = useMemo(
+    () => computeNextMilestone(state.streak, stats.masteredCards),
+    [state.streak, stats.masteredCards]
+  );
 
   // "Ce que Braise a remarqué" — real observation mined from Réviser's own SM-2 state
   // (computeBraiseInsight), phrased through the existing tone system so it matches every other
@@ -80,6 +91,15 @@ export function ProfilAuraView() {
   }, [state.soundOn]);
 
   const handleShareClose = useCallback(() => setShareOpen(false), []);
+
+  // The action most worth taking on a page whose whole point is "make them want to come back" —
+  // used to have zero presence here, only "Partager" did. Same sound+haptic pairing as every
+  // other tap target on this page.
+  const handleReviewClick = useCallback(() => {
+    sfx.tap(state.soundOn);
+    if (navigator.vibrate) navigator.vibrate(10);
+    setTab('revisions');
+  }, [state.soundOn, setTab]);
 
   // Tapping a subject medallion drops straight into that deck — a weak subject becomes
   // something to act on immediately, not just a number to sit with. Same sound+haptic pairing
@@ -119,7 +139,7 @@ export function ProfilAuraView() {
             jusqu'à Y" vit maintenant comme légende du rail lui-même — même histoire de
             progression, un seul bloc au lieu de deux qui se répétaient. */}
         <motion.div variants={staggerItem}>
-          <RankRail currentRankId={current.id} rank={current} pct={pct} next={next} xp={state.xp} />
+          <RankRail currentRankId={current.id} rank={current} pct={pct} next={next} xp={state.xp} milestone={milestone} />
         </motion.div>
 
         {/* "Ce que Braise a remarqué" juste avant la grille qu'elle commente (jamais avant le rail
@@ -146,7 +166,18 @@ export function ProfilAuraView() {
         <motion.div variants={staggerItem}>
           <BadgeShelf state={state} />
         </motion.div>
-        <motion.div variants={staggerItem}>
+        {/* Réviser était absent de la page dont le but entier est de donner envie de revenir —
+            seul "Partager" avait une présence. C'est maintenant l'action principale (pleine,
+            bruyante) ; "Partager" reste réel mais passe en secondaire (contour) — les deux
+            gardent le même orange signature de l'appli, la hiérarchie se joue sur plein/contour,
+            pas sur une deuxième couleur. */}
+        <motion.div variants={staggerItem} className="aura-cta-stack">
+          <button className="aura-review-cta" onClick={handleReviewClick}>
+            <span className="aura-review-icon" aria-hidden="true">
+              <Layers size={18} />
+            </span>
+            {dueCount > 0 ? `Réviser maintenant · ${dueCount} carte${dueCount > 1 ? 's' : ''}` : 'Réviser une carte'}
+          </button>
           <button className="aura-share-cta" onClick={handleShareOpen}>
             <span className="aura-share-icon" aria-hidden="true">
               <TrophyIcon size={19} />
@@ -273,15 +304,19 @@ const RankRail = memo(function RankRail({
   pct,
   next,
   xp,
+  milestone,
 }: {
   currentRankId: string;
   rank: Rank;
   pct: number;
   next: Rank | null;
   xp: number;
+  milestone: NextMilestone;
 }) {
   const currentIdx = RANKS.findIndex((r) => r.id === currentRankId);
   const overallPct = ((currentIdx + pct / 100) / (RANKS.length - 1)) * 100;
+  const milestoneUnit = milestone.kind === 'streak' ? 'jour' : 'carte';
+  const milestoneGoal = milestone.kind === 'streak' ? `${milestone.target} jours de série` : `${milestone.target} cartes maîtrisées`;
   return (
     <div className="rank-rail" role="list" aria-label="Les 5 rangs">
       <div className="rank-rail-caption">
@@ -291,7 +326,15 @@ const RankRail = memo(function RankRail({
             <span className="rank-rail-caption-rest"> jusqu'à {next.name}</span>
           </>
         ) : (
-          <span className="rank-rail-caption-amount">Rang maximum atteint</span>
+          // Le ladder de rangs est fini par design (5 paliers), mais série et cartes maîtrisées
+          // continuent de grandir bien après — la légende reste "toujours quelque chose à
+          // atteindre" au lieu de s'arrêter net sur "Rang maximum atteint".
+          <>
+            <span className="rank-rail-caption-amount">
+              {milestone.remaining} {milestoneUnit}{milestone.remaining > 1 ? 's' : ''}
+            </span>
+            <span className="rank-rail-caption-rest"> jusqu'à {milestoneGoal}</span>
+          </>
         )}
       </div>
       <div className="rank-rail-track">
