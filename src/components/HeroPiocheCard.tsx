@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, MotionConfig } from 'framer-motion';
+codex/recuperer-le-code-63pdu7
+import { Play, Sparkles } from 'lucide-react';
+=======
 codex/recuperer-le-code-fg2r25
 import { Play, Sparkles } from 'lucide-react';
 =======
 import { Play, Sparkles, Zap } from 'lucide-react';
+main
 main
 import { BraiseChest } from '@/components/BraiseChest';
 import { sfx } from '@/lib/sound';
@@ -89,7 +93,10 @@ export function HeroPiocheCard({ bubbleLine, subjectName, chapterTitle, duration
         />
 
         <div className="relative flex items-center gap-3">
+codex/recuperer-le-code-63pdu7
+=======
 codex/recuperer-le-code-fg2r25
+main
           <div className="relative flex h-[68px] w-[68px] flex-shrink-0 items-center justify-center">
             {/* One slow aura makes the chest feel warm and rare at rest. It wakes up only when
                 the player reaches for the button; the frame and reading order never move. */}
@@ -100,6 +107,8 @@ codex/recuperer-le-code-fg2r25
               transition={{ duration: hyped || launching ? 0.72 : 3.2, repeat: Infinity, ease: 'easeInOut' }}
             />
             <BraiseChest size={64} hyped={hyped} diving={launching} quick={quick} />
+codex/recuperer-le-code-63pdu7
+=======
 =======
           <div className="relative flex h-16 w-16 flex-shrink-0 items-center justify-center">
             {/* A living invitation around Braise's chest, never an animation of the card itself. */}
@@ -119,6 +128,7 @@ codex/recuperer-le-code-fg2r25
               <Sparkles size={11} strokeWidth={3} />
             </motion.span>
 main
+main
           </div>
           <div className="min-w-0 flex-1">
             {/* Dark ink, not white — #FF6B35 measures 2.84:1 for white text (a hard AA
@@ -126,6 +136,13 @@ main
                 (same as every other small-caps label app-wide), font-display for the title,
                 font-sans for the stats line. */}
             <p className="flex items-center gap-1 font-mono text-[0.67rem] font-black uppercase tracking-wide text-[#151821]">
+codex/recuperer-le-code-63pdu7
+              <Sparkles size={12} strokeWidth={3} /> Ta mission du jour
+            </p>
+            <h2 className="truncate font-display text-lg font-black leading-tight text-[#151821]">{chapterTitle}</h2>
+            <p className="mt-1 truncate font-sans text-[0.78rem] font-semibold text-[#151821]">
+              {subjectName ? `${subjectName} · ` : ''}{duration} min pour capter le truc
+=======
 codex/recuperer-le-code-fg2r25
               <Sparkles size={12} strokeWidth={3} /> Ta mission du jour
             </p>
@@ -142,12 +159,15 @@ codex/recuperer-le-code-fg2r25
             <p className="mt-0.5 truncate font-mono text-[0.62rem] font-bold uppercase tracking-wide text-[#151821]/75">
               {cardCount} carte{cardCount > 1 ? 's' : ''} · 1 notion à verrouiller
 main
+main
             </p>
           </div>
         </div>
         <span className="sr-only">
           {bubbleLine} Cette mission contient {cardCount} carte{cardCount > 1 ? 's' : ''}.
         </span>
+codex/recuperer-le-code-63pdu7
+=======
 
         <div className="relative mt-3 flex items-center justify-between gap-2 border-t-2 border-black/20 pt-3">
           <p className="min-w-0 font-display text-[0.78rem] font-extrabold leading-tight text-[#151821]">
@@ -157,6 +177,7 @@ main
             <Zap size={11} fill="currentColor" strokeWidth={2.7} /> Express
           </span>
         </div>
+main
 
         {/* Base+face bevel — untouched, the same mechanic SubjectDecks/HeaderHUD use everywhere
             else on Accueil. Pointer events here drive `hyped` on the chest (hover for a mouse,
@@ -174,10 +195,14 @@ main
             className="tw-shimmer relative flex w-full items-center justify-center gap-1.5 rounded-full border-[2.5px] border-black bg-white px-3.5 py-3 font-display text-sm font-black text-black shadow-[3px_3px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[3px] group-active:shadow-none disabled:opacity-95"
           >
             <Play size={15} fill="currentColor" />
+codex/recuperer-le-code-63pdu7
+            JE PIOCHE !
+=======
 codex/recuperer-le-code-fg2r25
             JE PIOCHE !
 =======
             LANCER MA MISSION
+main
 main
           </button>
         </div>
