@@ -284,7 +284,7 @@ export function HomeView() {
 
       {freezeToast && (
         <div key={freezeToast} className="freeze-toast">
-          {freezeToast === 'on' ? '🧊 Gel activé pour ce soir !' : 'Gel désactivé'}
+          {freezeToast === 'on' ? '🧊 Joker prêt : ta série est protégée.' : 'Joker de série désactivé'}
         </div>
       )}
 
