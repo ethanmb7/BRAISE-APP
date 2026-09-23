@@ -207,6 +207,7 @@ Chaque parcours suit le même cycle :
 Une fonctionnalité n'entre dans le produit que si l'élève comprend son action en moins de trois
 secondes et si elle rapproche réellement du moment « maintenant, j'ai compris ».
 
+codex/analyser-l-application-2zbvd9
 ## 11. Réunion architecture fonctionnelle — décisions
 
 L'accueil n'est pas un tableau de bord. Il montre la meilleure action disponible, puis donne accès
@@ -263,3 +264,5 @@ plusieurs grandes cartes concurrentes.
 Le joker, le bouton Réviser, les réglages et les statistiques détaillées ne vivent plus dans le
 HUD. La Pioche conserve Braise à 88 px mais place matière, titre, durée, volume et CTA dans une
 composition horizontale compacte.
+=======
+main
