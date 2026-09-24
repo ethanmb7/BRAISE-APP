@@ -200,8 +200,11 @@ export function ProfileView() {
                 type="button"
                 className="profile-aura-link"
                 onClick={() => {
-                  sfx.tap(state.soundOn);
+                  sfx.tap(state.soundOn);codex/analyser-l-application-pour-ameliorer-l-education
                   setView("progres");
+=======
+                  setView('progres');
+main
                 }}
               >
                 <span className="profile-aura-link-badge" aria-hidden="true">

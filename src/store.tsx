@@ -141,6 +141,7 @@ function resolveRestoredView(saved: Partial<AppState>): ViewId {
       return "home";
     return view;
   }
+codex/analyser-l-application-pour-ameliorer-l-education
   if (
     view === "learn" ||
     view === "revisions" ||
@@ -150,6 +151,10 @@ function resolveRestoredView(saved: Partial<AppState>): ViewId {
   )
     return view;
   return "home";
+=======
+  if (view === 'subjects' || view === 'revisions' || view === 'progres' || view === 'profile' || view === 'settings') return view;
+  return 'home';
+main
 }
 
 // `tab` drives the bottom nav highlight independently of `view` (SubjectView/SettingsView both
@@ -157,10 +162,17 @@ function resolveRestoredView(saved: Partial<AppState>): ViewId {
 // just `view` — otherwise resuming into e.g. Revisions would show the right screen with the wrong
 // tab lit up, and a subsequent "back" from Subject/Settings would return to the wrong place.
 function resolveRestoredTab(view: ViewId, savedTab: TabId | undefined): TabId {
+codex/analyser-l-application-pour-ameliorer-l-education
   if (view === "home" || view === "learn" || view === "revisions" || view === "profile")
     return view;
   // `progres` used to be a main tab. It now lives inside Moi; migrate old local saves safely.
   return (savedTab as string | undefined) === "progres" ? "profile" : (savedTab ?? "home");
+=======
+  if (view === 'home' || view === 'subjects' || view === 'revisions' || view === 'profile') return view;
+  if (savedTab === 'home' || savedTab === 'subjects' || savedTab === 'revisions' || savedTab === 'profile') return savedTab;
+  // `progres` used to be a tab. Old localStorage values now land on Moi, where Aura belongs.
+  return view === 'progres' ? 'profile' : 'home';
+main
 }
 
 function sm2(review: CardReview | undefined, confidence: Confidence): CardReview {
