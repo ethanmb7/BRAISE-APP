@@ -22,15 +22,15 @@ export function SettingsView() {
         <div className="settings-label">Affichage</div>
         <div className="settings-group">
           <div className="settings-row">
-            <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Moon size={18} color="var(--ink-soft)" />
+            <span className="settings-row-main">
+              <span className="settings-row-icon" aria-hidden="true"><Moon size={18} /></span>
               Mode sombre
             </span>
             <Switch checked={state.darkMode} onChange={toggleDark} aria-label="Mode sombre" />
           </div>
           <div className="settings-row">
-            <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Type size={18} color="var(--ink-soft)" />
+            <span className="settings-row-main">
+              <span className="settings-row-icon" aria-hidden="true"><Type size={18} /></span>
               Mode dyslexie
             </span>
             <Switch checked={state.dyslexiaMode} onChange={toggleDyslexia} aria-label="Mode dyslexie" />
@@ -41,8 +41,8 @@ export function SettingsView() {
         <div className="settings-label">Audio</div>
         <div className="settings-group">
           <div className="settings-row">
-            <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Volume2 size={18} color="var(--ink-soft)" />
+            <span className="settings-row-main">
+              <span className="settings-row-icon" aria-hidden="true"><Volume2 size={18} /></span>
               Sons et effets
             </span>
             <Switch checked={state.soundOn} onChange={toggleSound} aria-label="Sons" />
@@ -53,8 +53,8 @@ export function SettingsView() {
         <div className="settings-label">Compte</div>
         <div className="settings-group">
           <div className="settings-row">
-            <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <Globe size={18} color="var(--ink-soft)" />
+            <span className="settings-row-main">
+              <span className="settings-row-icon" aria-hidden="true"><Globe size={18} /></span>
               Niveau
             </span>
             <select
@@ -63,14 +63,7 @@ export function SettingsView() {
                 const l = LEVELS.find((x) => x.id === e.target.value);
                 if (l) handleLevel(l);
               }}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--ink-soft)',
-                fontSize: '0.84rem',
-                fontFamily: 'inherit',
-                cursor: 'pointer',
-              }}
+              className="settings-select"
             >
               {LEVELS.map((l) => (
                 <option key={l.id} value={l.id}>
@@ -82,7 +75,7 @@ export function SettingsView() {
         </div>
 
         <p style={{ textAlign: 'center', color: 'var(--ink-soft)', fontSize: '0.72rem', marginTop: 20 }}>
-          SAPIE v1.0 · Fait avec 🔥 par Braise
+          BRAISE v1.0 · Pensée pour apprendre autrement
         </p>
       </div>
     </div>
