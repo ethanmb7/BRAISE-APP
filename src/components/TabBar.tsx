@@ -1,4 +1,4 @@
-import { BookOpen, CalendarDays, Layers, User } from 'lucide-react';
+import { CalendarDays, Layers, TrendingUp, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { TabId } from '@/types';
 
@@ -7,9 +7,14 @@ type Props = {
   onChange: (tab: TabId) => void;
 };
 
+// BRAISE's whole premise is "un pote qui t'aide", pas un classeur d'école rangé par matière —
+// une appli quatre-onglets qui met "Matières" au même rang que Braise et ta progression
+// ressemble à un portail scolaire, pas à un compagnon. Aura (ton parcours, ta preuve de
+// progrès) est le vrai pilier d'identité de l'appli et reste une destination permanente ; les
+// matières restent consultables (depuis Accueil ou Réviser), juste pas promues au même niveau.
 const TABS: { id: TabId; label: string; icon: typeof CalendarDays }[] = [
   { id: 'home', label: 'Aujourd’hui', icon: CalendarDays },
-  { id: 'subjects', label: 'Matières', icon: BookOpen },
+  { id: 'progres', label: 'Aura', icon: TrendingUp },
   { id: 'revisions', label: 'Réviser', icon: Layers },
   { id: 'profile', label: 'Moi', icon: User },
 ];
