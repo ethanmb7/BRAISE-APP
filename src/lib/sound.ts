@@ -33,7 +33,8 @@ function playTones(tones: Tone[], enabled: boolean) {
   });
 }
 
-function haptic(pattern: number | number[]) {
+function haptic(pattern: number | number[], enabled: boolean) {
+  if (!enabled) return;
   if (typeof navigator === 'undefined' || !navigator.vibrate) return;
   try {
     navigator.vibrate(pattern);
@@ -45,11 +46,11 @@ function haptic(pattern: number | number[]) {
 export const sfx = {
   tap: (on: boolean) => {
     playTones([{ f: 880, d: 0.06, t: 'sine' }], on);
-    haptic(8);
+    haptic(8, on);
   },
   flip: (on: boolean) => {
     playTones([{ f: 660, d: 0.08, t: 'triangle' }], on);
-    haptic(12);
+    haptic(12, on);
   },
   correct: (on: boolean) => {
     playTones(
@@ -60,7 +61,7 @@ export const sfx = {
       ],
       on
     );
-    haptic([10, 30, 10]);
+    haptic([10, 30, 10], on);
   },
   wrong: (on: boolean) => {
     playTones(
@@ -70,7 +71,7 @@ export const sfx = {
       ],
       on
     );
-    haptic([20, 40, 20]);
+    haptic([20, 40, 20], on);
   },
   complete: (on: boolean) => {
     playTones(
@@ -82,7 +83,7 @@ export const sfx = {
       ],
       on
     );
-    haptic([15, 50, 15, 50, 30]);
+    haptic([15, 50, 15, 50, 30], on);
   },
   streak: (on: boolean) => {
     playTones(
@@ -92,7 +93,7 @@ export const sfx = {
       ],
       on
     );
-    haptic([10, 30, 20]);
+    haptic([10, 30, 20], on);
   },
   // Follows the chest's own 6-beat choreography (HeroPiocheCard/BraiseChest): a low creak at the
   // anticipation squash, a sharp crack at the lid-pop, and a bright two-note "ding" at the
@@ -111,7 +112,7 @@ export const sfx = {
     // Matches the same three moments: a light tap, a pause, a slightly stronger pop, a longer
     // pause, then the "ding" pulse — one call, timed like the visual beats rather than one flat
     // buzz for the whole ~900ms sequence.
-    haptic([10, 110, 14, 440, 18]);
+    haptic([10, 110, 14, 440, 18], on);
   },
   // Abbreviated pair for a repeat "pioche" open later the same day (see getLastPiocheOpenDate) —
   // the full ceremony is for the day's first draw; replaying it every time would just be noise by
@@ -124,7 +125,7 @@ export const sfx = {
       ],
       on
     );
-    haptic([10, 70, 12]);
+    haptic([10, 70, 12], on);
   },
   whoosh: (on: boolean) => {
     if (!on) return;
@@ -142,6 +143,6 @@ export const sfx = {
     osc.connect(gain).connect(c.destination);
     osc.start(now);
     osc.stop(now + 0.2);
-    haptic(8);
+    haptic(8, on);
   },
 };

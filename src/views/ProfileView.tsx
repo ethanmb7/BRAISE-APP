@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Settings, ChevronRight, Check, Pencil, X } from 'lucide-react';
-import { useApp, computeUnlockedBadges, countDoneChapters } from '@/store';
+import { useApp, computeUnlockedBadges } from '@/store';
 import { sfx } from '@/lib/sound';
 import { getRankInfo, RANKS } from '@/lib/aura';
+import { formatShortDate } from '@/lib/utils';
 import { useCountUp } from '@/lib/useCountUp';
 import { getAgeGroup, profileReactionLine } from '@/lib/braiseVoice';
 import { TopBar } from '@/components/TopBar';
@@ -28,10 +29,6 @@ function isAvatarUnlocked(minRankId: string | undefined, currentRankId: string):
   return currentIdx >= minIdx;
 }
 
-function formatShortDate(ts: number): string {
-  return new Date(ts).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-}
-
 const staggerContainer = {
   hidden: {},
   show: { transition: { staggerChildren: 0.08, delayChildren: 0.04 } },
@@ -42,17 +39,11 @@ const staggerItem = {
 };
 
 export function ProfileView() {
-  const { state, setView, setTab, setPersonality, setUser } = useApp();
+  const { state, setView, goBack, setTab, setPersonality, setUser } = useApp();
   const [editingIdentity, setEditingIdentity] = useState(false);
   const [draftName, setDraftName] = useState(state.user.name);
-  const [draftAvatar, setDraftAvatar] = useState(state.user.avatar);
 
   const subjectsCount = state.user.subjects.length;
-  const chaptersDone = countDoneChapters(state.completedChapters);
-  // Distinct from "cartes maîtrisées" (shown on Aura) — this is raw effort, every card ever
-  // opened in Réviser, mastered or not. Real apps show volume and mastery as two separate
-  // numbers; until now this page only ever showed the second one.
-  const cardsSeenCount = Object.keys(state.cardReviews).length;
   const badgeUnlocked = computeUnlockedBadges(state);
   const badgeUnlockedCount = Object.values(badgeUnlocked).filter(Boolean).length;
   const rankInfo = getRankInfo(state.xp);
@@ -85,13 +76,12 @@ export function ProfileView() {
   const openIdentityEdit = () => {
     sfx.tap(state.soundOn);
     setDraftName(state.user.name);
-    setDraftAvatar(state.user.avatar);
     setEditingIdentity(true);
   };
 
   const saveIdentity = () => {
     sfx.tap(state.soundOn);
-    setUser({ ...state.user, name: draftName.trim() || state.user.name, avatar: draftAvatar });
+    setUser({ ...state.user, name: draftName.trim() || state.user.name });
     setEditingIdentity(false);
   };
 
@@ -104,7 +94,7 @@ export function ProfileView() {
 
   return (
     <div>
-      <TopBar title="Profil" onBack={() => setView(state.tab)} />
+      <TopBar title="Profil" onBack={goBack} />
       <motion.div className="view is-active" variants={staggerContainer} initial="hidden" animate="show">
         {!editingIdentity ? (
           <motion.div className="profile-hero-card" variants={staggerItem}>
@@ -193,43 +183,11 @@ export function ProfileView() {
 
         ) : (
           <div className="profile-identity-edit">
-            <div className="profile-avatar-picker">
-              {AVATARS.map((a) => {
-                const unlocked = isAvatarUnlocked(a.minRankId, rank.id);
-                const requiredRank = a.minRankId ? RANKS.find((r) => r.id === a.minRankId) : null;
-                return (
-                  <button
-                    key={a.emoji}
-                    type="button"
-                    className={`profile-avatar-option ${draftAvatar === a.emoji ? 'is-selected' : ''} ${unlocked ? '' : 'is-locked'}`}
-                    onClick={() => {
-                      if (!unlocked) return;
-                      sfx.tap(state.soundOn);
-                      setDraftAvatar(a.emoji);
-                    }}
-                    disabled={!unlocked}
-                    aria-label={unlocked ? `Choisir l'avatar ${getAvatarName(a.emoji)}` : `Avatar verrouillé — débloqué au rang ${requiredRank?.name}`}
-                  >
-                    <AvatarGlyph id={a.emoji} rankId={rank.id} size={30} />
-                    {!unlocked && (
-                      <span className="profile-avatar-option-lock" aria-hidden="true">
-                        <RankIcon rankId="" color="" locked size={11} />
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-            {(() => {
-              const nextLockedAvatar = AVATARS.find((a) => a.minRankId && !isAvatarUnlocked(a.minRankId, rank.id));
-              if (!nextLockedAvatar) return null;
-              const requiredRank = RANKS.find((r) => r.id === nextLockedAvatar.minRankId);
-              return (
-                <p className="profile-avatar-unlock-hint">
-                  {getAvatarName(nextLockedAvatar.emoji)} débloqué au rang {requiredRank?.name}
-                </p>
-              );
-            })()}
+            {/* Avatar picker removed from here — "Ta tête" below already changes it instantly,
+                no confirmation needed (it's a single reversible tap, not text entry). Having both
+                on screen at once during edit meant two grids for one action, with two different
+                behaviours (draft+confirm here, instant-apply there). This panel now only edits
+                what actually needs a confirm step: the name. */}
             <input
               type="text"
               className="profile-name-input"

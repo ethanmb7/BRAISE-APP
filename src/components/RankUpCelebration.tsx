@@ -2,19 +2,23 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { motion } from 'framer-motion';
 import { BraiseMascot } from './BraiseMascot';
 import { RankIcon } from './RankIcon';
-import { RANKS, type Rank } from '@/lib/aura';
+import { RANKS, getRankInfo, computeNextMilestone, type Rank } from '@/lib/aura';
 
 interface RankUpCelebrationProps {
   fromRank: Rank;
   toRank: Rank;
   xp: number;
+  streak: number;
+  masteredCards: number;
   message: string;
   /** "cool" (sunglasses) for the Coach Savage tone, "proud" for Pote Chill — matches whichever
    *  voice tone actually generated `message`, instead of a fixed expression for every tone. */
   mood?: 'proud' | 'cool';
-  /** Collège gets the full bouncy/sparkly treatment; lycée keeps the same beats (still a real
-   *  celebration) but toned down — the copy already splits tone by age ("Le bac recule encore
-   *  d'un pas" reads nothing like a collège line), the animation never did. */
+  /** BRAISE est désormais lycée uniquement (2024) — ce prop garde son type 'college' | 'lycee'
+   *  seulement parce qu'AgeGroup (types.ts) le conserve pour rester compatible avec
+   *  RevisionsView.tsx, mais plus aucun appelant réel ne passe jamais 'college'. Le défaut suit
+   *  ce même changement : avant, un appelant qui omettait le prop tombait sur le traitement
+   *  collège (bouncy/sparkly) — un défaut qui ne correspond plus à rien de sélectionnable. */
   ageGroup?: 'college' | 'lycee';
   onDismiss: () => void;
   onShare: () => void;
@@ -34,15 +38,24 @@ export function RankUpCelebration({
   fromRank,
   toRank,
   xp,
+  streak,
+  masteredCards,
   message,
   mood = 'proud',
-  ageGroup = 'college',
+  ageGroup = 'lycee',
   onDismiss,
   onShare,
 }: RankUpCelebrationProps) {
   const [morphed, setMorphed] = useState(false);
   const teen = ageGroup === 'lycee';
   const next = RANKS[RANKS.findIndex((r) => r.id === toRank.id) + 1] ?? null;
+  // Same fallback "always point forward" system as Ton Aura (ProfilAuraView) once the rank
+  // ladder itself is maxed out — only computed for the branch below, but cheap enough not to
+  // bother gating behind `!next`.
+  const milestone = computeNextMilestone(streak, masteredCards);
+  const milestoneUnit = milestone.kind === 'streak' ? 'jour' : 'carte';
+  const milestoneGoal =
+    milestone.kind === 'streak' ? `${milestone.target} jours de série` : `${milestone.target} cartes maîtrisées`;
   // "Passer" used to be tappable from the very first frame — a fast tap could close the screen
   // before the transformation even started, skipping the whole moment this component exists to
   // deliver. It now only becomes real (visible and clickable, not just present) once the core
@@ -189,7 +202,13 @@ export function RankUpCelebration({
                 <span className="text-white">{next.min - xp} XP</span> jusqu'à {next.name}
               </>
             ) : (
-              'Rang maximum atteint 👑'
+              <>
+                <span className="text-white">
+                  {milestone.remaining} {milestoneUnit}
+                  {milestone.remaining > 1 ? 's' : ''}
+                </span>{' '}
+                jusqu'à {milestoneGoal}
+              </>
             )}
           </motion.p>
         </motion.div>
@@ -203,7 +222,7 @@ export function RankUpCelebration({
         onClick={(e) => e.stopPropagation()}
       >
         <div className={compact ? '-mb-2' : undefined}>
-          <RankJourney currentRankId={toRank.id} accent={toRank.colorFrom} />
+          <RankJourney currentRankId={toRank.id} accent={toRank.colorFrom} pct={getRankInfo(xp).pct} />
         </div>
 
         <div className={`flex gap-3 ${compact ? 'mt-2' : 'mt-4'}`}>
@@ -231,13 +250,17 @@ export function RankUpCelebration({
 // Same ladder as "Ton Aura" (same CSS classes, same pulsing current node) — reused rather than
 // redrawn, so the celebration and the profile page agree on what the journey looks like instead
 // of inventing a second visual language for the same 5 ranks.
-function RankJourney({ currentRankId, accent }: { currentRankId: string; accent: string }) {
+function RankJourney({ currentRankId, accent, pct }: { currentRankId: string; accent: string; pct: number }) {
   const currentIdx = RANKS.findIndex((r) => r.id === currentRankId);
+  // Same fractional formula as Ton Aura's own RankJourney (ProfilAuraView.tsx) — this used to
+  // only count whole ranks reached, so the same real XP landed the fill bar at a different spot
+  // on this screen than on Ton Aura.
+  const overallPct = ((currentIdx + pct / 100) / (RANKS.length - 1)) * 100;
   return (
     <div className="rank-rail" role="list" aria-label="Les 5 rangs">
       <div className="rank-rail-track">
         <div className="rank-rail-line">
-          <div className="rank-rail-line-fill" style={{ width: `${(currentIdx / (RANKS.length - 1)) * 100}%` }} />
+          <div className="rank-rail-line-fill" style={{ width: `${overallPct}%` }} />
         </div>
         {RANKS.map((r, idx) => {
           const tier: 'done' | 'current' | 'locked' = idx === currentIdx ? 'current' : idx < currentIdx ? 'done' : 'locked';

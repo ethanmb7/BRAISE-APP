@@ -25,6 +25,12 @@
   --radius-lg: 24px;
   --shadow-soft: 0 12px 32px rgba(22, 33, 58, 0.08);
   --shadow-press: 3px 3px 0 var(--neo-ink);
+  /* Three-tier hard-offset shadow used by the app's primary content cards (mastery, insight,
+     lesson stage, checkpoint, quiz, share modal, profile) — depth scales with the card's own
+     prominence, not picked per-component. Pure #000, distinct from --shadow-press's --neo-ink. */
+  --shadow-card-sm: 4px 4px 0 #000;
+  --shadow-card-md: 5px 5px 0 #000;
+  --shadow-card-lg: 6px 6px 0 #000;
   --page-gutter: 18px;
 
   /* Accent palette — reserved for icons, tags, status colours and secondary UI (subject
@@ -476,27 +482,14 @@ select {
   text-decoration: underline;
 }
 
-/* ===== Bottom sheet (level picker) ===== */
+/* ===== Bottom sheet (reused by BraiseFeynmanDrawer — name is a holdover from the level picker
+   this pattern first shipped for) ===== */
 .level-sheet-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(15, 20, 40, 0.5);
   z-index: 90;
   backdrop-filter: blur(4px);
-}
-.level-sheet {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 0;
-  width: 100%;
-  max-width: 428px;
-  background: var(--paper);
-  border-radius: 24px 24px 0 0;
-  padding: 10px 20px 26px;
-  z-index: 91;
-  max-height: 75%;
-  overflow-y: auto;
 }
 .level-sheet-handle {
   width: 36px;
@@ -528,16 +521,6 @@ select {
 }
 
 /* ===== Home — Neobrutalist Hype (palette officielle 60/30/10) ===== */
-.setup-banner {
-  background: var(--paper);
-  border: 2px solid var(--neo-ink);
-  color: var(--ink);
-  font-size: 0.78rem;
-  font-weight: 700;
-  padding: 10px 14px;
-  border-radius: 12px;
-  margin-bottom: 14px;
-}
 
 /* Home is now built with Tailwind utility classes (src/components/HeaderHUD.tsx,
    HeroPiocheCard.tsx, SubjectDecks.tsx) instead of hand-written classes here — these three
@@ -834,9 +817,9 @@ select {
   padding: 14px 14px 16px;
   margin-bottom: 16px;
   border: 2.5px solid #000;
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   background: var(--paper);
-  box-shadow: 4px 4px 0 #000;
+  box-shadow: var(--shadow-card-sm);
 }
 .braise-insight-tab {
   display: inline-block;
@@ -997,9 +980,9 @@ select {
 .mastery-section {
   padding: 16px 14px 14px;
   border: 2.5px solid #000;
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   background: var(--paper);
-  box-shadow: 4px 4px 0 #000;
+  box-shadow: var(--shadow-card-sm);
 }
 /* A small tag instead of either extreme this went through (a bare grey caption nobody read, or
    a full-width black plaque loud enough to compete with the cards below it) — real presence,
@@ -1288,9 +1271,9 @@ select {
   max-height: 92vh;
   overflow-y: auto;
   background: var(--paper);
-  border: 2px solid #000;
-  border-radius: 24px;
-  box-shadow: 6px 6px 0 #000;
+  border: 2.5px solid #000;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card-lg);
   padding: 18px 18px 20px;
 }
 .share-modal-head {
@@ -2214,12 +2197,12 @@ select {
   position: relative;
   background: var(--paper);
   border: 2.5px solid #000;
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   min-height: 380px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 5px 5px 0 #000;
+  box-shadow: var(--shadow-card-md);
 }
 
 /* Checkpoint micro-quiz overlay */
@@ -2238,12 +2221,12 @@ select {
 .checkpoint-card {
   background: var(--paper);
   border: 2.5px solid #000;
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   padding: 24px 20px;
   width: 100%;
   max-width: 340px;
   text-align: center;
-  box-shadow: 6px 6px 0 #000;
+  box-shadow: var(--shadow-card-lg);
   animation: pop-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .checkpoint-badge {
@@ -2578,9 +2561,9 @@ select {
   position: relative;
   background: var(--paper);
   border: 2.5px solid #000;
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
   padding: 24px 22px;
-  box-shadow: 6px 6px 0 #000;
+  box-shadow: var(--shadow-card-lg);
   animation: cardIn 0.35s ease;
 }
 @keyframes cardIn {
@@ -2929,6 +2912,42 @@ select {
   font-size: 1rem;
   color: var(--ink);
 }
+.complete-run {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 16px 0 0;
+  flex-wrap: wrap;
+}
+.complete-run-stat {
+  background: var(--paper);
+  border-radius: 12px;
+  padding: 10px 14px;
+  min-width: 68px;
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+}
+.complete-run-stat b {
+  display: block;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.15rem;
+  color: var(--ink);
+}
+/* Same orange as the quiz's own "+15 XP · rattrapé !" popup — same event, same colour, so the
+   recap reads as the payoff of that exact moment instead of a second, disconnected system. */
+.complete-run-stat.is-rebond b {
+  color: var(--neo-orange);
+}
+/* Same coral as SubjectView's "À renforcer" badge (c.reinforce) — this is that same real signal,
+   just surfaced a screen earlier, not a new one invented for this recap. */
+.complete-run-stat.is-fragile b {
+  color: var(--color-sapie-coral);
+}
+.complete-run-note {
+  color: var(--ink-soft);
+  font-size: 0.74rem;
+  margin-top: 8px;
+}
 .btn-return {
   background: var(--blue);
   color: var(--paper);
@@ -3223,9 +3242,9 @@ select {
    palette. */
 .profile-hero-card {
   position: relative;
-  border: 3px solid #000;
-  border-radius: 24px;
-  box-shadow: 5px 5px 0 #000;
+  border: 2.5px solid #000;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card-md);
   overflow: hidden;
   background: var(--paper);
   margin-bottom: 16px;
@@ -3370,9 +3389,9 @@ select {
 /* Carte "Ta tête" — l'identité sort des réglages et prend le même langage que le pass :
    bordure franche, ombre dure, étiquette mono. */
 .profile-face-card {
-  border: 3px solid #000;
+  border: 2.5px solid #000;
   border-radius: 20px;
-  box-shadow: 4px 4px 0 #000;
+  box-shadow: var(--shadow-card-sm);
   background: var(--paper);
   padding: 13px 0 14px 14px;
   margin-bottom: 16px;
@@ -3542,13 +3561,6 @@ select {
   box-shadow: 3px 3px 0 var(--neo-orange);
 }
 
-.profile-avatar-picker {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 14px;
-}
 .profile-avatar-option {
   position: relative;
   width: 42px;
@@ -3591,11 +3603,6 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.profile-avatar-unlock-hint {
-  font-size: 0.66rem;
-  color: var(--ink-soft);
-  margin: -4px 0 12px;
 }
 .profile-name-input {
   width: 100%;
@@ -3745,16 +3752,6 @@ select {
   border-radius: 11px;
   background: color-mix(in srgb, var(--neo-orange) 10%, var(--paper));
   color: var(--neo-orange);
-}
-.settings-select {
-  max-width: 46%;
-  border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
-  border-radius: 10px;
-  background: var(--bg);
-  color: var(--ink-soft);
-  padding: 7px 9px;
-  font-size: 0.82rem;
-  font-weight: 650;
 }
 .switch {
   position: relative;

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { AppProvider, useApp } from '@/store';
 import { TabBar } from '@/components/TabBar';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -8,9 +9,9 @@ import { RankUpCelebration } from '@/components/RankUpCelebration';
 import { BadgeIcon } from '@/components/BadgeIcon';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { useMilestoneCelebrations } from '@/lib/useMilestoneCelebrations';
+import { sfx } from '@/lib/sound';
 import { rankUpLine, getAgeGroup } from '@/lib/braiseVoice';
-import { getRankInfo, countMasteredCards } from '@/lib/aura';
-import { FLASHCARDS } from '@/data';
+import { getRankInfo, countMasteredCards, countSubjectsReviewed } from '@/lib/aura';
 import { OnboardingView } from '@/views/OnboardingView';
 import { HomeView } from '@/views/HomeView';
 import { SubjectsView } from '@/views/SubjectsView';
@@ -48,23 +49,31 @@ function Screen() {
   return (
     <div className={`app-shell ${state.darkMode ? 'dark' : ''} ${state.dyslexiaMode ? 'dyslexia-mode' : ''}`}>
       <div className="app-content">
-        {/* `key={state.view}`: this is what makes the boundary self-healing on navigation — a
-            crash on one view sets its internal hasError, and switching to any other view (via
-            the tab bar, which lives outside this boundary and stays clickable, or the
-            fallback's own "Retour à l'accueil") changes the key, which remounts a fresh
-            boundary for wherever the player lands instead of carrying the old error forward. */}
-        <ErrorBoundary key={state.view} onGoHome={() => setTab('home')}>
-          {state.view === 'onboarding' && <OnboardingView />}
-          {state.view === 'home' && <HomeView />}
-          {state.view === 'subjects' && <SubjectsView />}
-          {state.view === 'revisions' && <RevisionsView />}
-          {state.view === 'progres' && <ProfilAuraView />}
-          {state.view === 'subject' && <SubjectView />}
-          {state.view === 'lesson' && <LessonView />}
-          {state.view === 'complete' && <CompleteView />}
-          {state.view === 'profile' && <ProfileView />}
-          {state.view === 'settings' && <SettingsView />}
-        </ErrorBoundary>
+        {/* `key={state.view}` on both the motion wrapper and the boundary: no <AnimatePresence>
+            here on purpose. The Pioche reveal veil and the error boundary's self-healing both
+            depend on the outgoing view unmounting the instant `state.view` changes — an exit
+            animation would hold it mounted a beat longer and desync both. So this only animates
+            the *entrance* of the new view; the old one still disappears synchronously, exactly
+            as before. */}
+        <motion.div
+          key={state.view}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <ErrorBoundary key={state.view} onGoHome={() => setTab('home')}>
+            {state.view === 'onboarding' && <OnboardingView />}
+            {state.view === 'home' && <HomeView />}
+            {state.view === 'subjects' && <SubjectsView />}
+            {state.view === 'revisions' && <RevisionsView />}
+            {state.view === 'progres' && <ProfilAuraView />}
+            {state.view === 'subject' && <SubjectView />}
+            {state.view === 'lesson' && <LessonView />}
+            {state.view === 'complete' && <CompleteView />}
+            {state.view === 'profile' && <ProfileView />}
+            {state.view === 'settings' && <SettingsView />}
+          </ErrorBoundary>
+        </motion.div>
       </div>
 
       {showTabBar && <TabBar active={state.tab} onChange={setTab} />}
@@ -86,6 +95,8 @@ function Screen() {
           fromRank={celebration.fromRank}
           toRank={celebration.toRank}
           xp={state.xp}
+          streak={state.streak}
+          masteredCards={countMasteredCards(state.cardReviews)}
           // "Cool" (sunglasses) for the Coach Savage tone, "proud" for Pote Chill — the mood and
           // the voice tone were two already-built systems that just never spoke to each other on
           // this screen; a savage-toned message paired with a plain happy face undercut its own
@@ -97,8 +108,14 @@ function Screen() {
             celebration.toRank.name,
             celebration.toRank.id
           )}
-          onDismiss={dismiss}
-          onShare={() => setShareOpen(true)}
+          onDismiss={() => {
+            sfx.tap(state.soundOn);
+            dismiss();
+          }}
+          onShare={() => {
+            sfx.tap(state.soundOn);
+            setShareOpen(true);
+          }}
         />
       )}
 
@@ -107,11 +124,7 @@ function Screen() {
           rank={celebration?.type === 'rank' ? celebration.toRank : getRankInfo(state.xp).current}
           streak={state.streak}
           xp={state.xp}
-          subjectsCount={
-            new Set(
-              Object.keys(state.cardReviews).map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)
-            ).size
-          }
+          subjectsCount={countSubjectsReviewed(state.cardReviews)}
           masteredCards={countMasteredCards(state.cardReviews)}
           onClose={() => setShareOpen(false)}
         />

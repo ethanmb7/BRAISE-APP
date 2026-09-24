@@ -1,4 +1,6 @@
-import { ArrowRight, Check, Flame, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
+import { BraiseMascot } from '@/components/BraiseMascot';
+import { todayRhythmLine, type VoiceCtx } from '@/lib/braiseVoice';
 
 interface TodayStripProps {
   /** Number of consecutive days completed before today. The detailed count remains available in
@@ -10,6 +12,15 @@ interface TodayStripProps {
   goalPct: number;
   /** Real spaced-repetition cards currently due. */
   dueCount: number;
+  /** Real freezes left in the bank (store.tsx) — 0 with an active streak is the one real "act
+   *  today or the streak breaks tonight" state worth a heads-up (never a threat, see
+   *  todayRhythmLine's own comment). */
+  freezes: number;
+  /** Real prior activity (xp or completedChapters) on this device — the only way to tell a
+   *  genuine first-ever visit (streak 0, nothing to restart) from a real gap since the last
+   *  session (streak 0, but there IS a history to pick back up). */
+  hasPriorActivity: boolean;
+  voiceCtx: VoiceCtx;
   onContinue: () => void;
   onShare: () => void;
 }
@@ -20,16 +31,42 @@ interface TodayStripProps {
  * second large CTA. That made the student decide between two competing "main" areas immediately
  * after landing on Accueil. This strip now has one job: situate today's mission and, only once
  * the daily goal is complete, offer the next real action.
+ *
+ * Braise's own face used to be absent from all of Aujourd'hui — HeroPiocheCard shows the chest,
+ * not the mascot, and the flame/check badge here was a generic Lucide glyph with no personality.
+ * This is now the one spot on the screen seen every single day where Braise's mood reacts to
+ * what's actually true right now, the same "resting, not disappointed" / "heads-up, not a threat"
+ * principles already established in ProfilAuraView/ProfileView, just finally reaching Home too.
  */
-export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount, onContinue, onShare }: TodayStripProps) {
+export function TodayStrip({
+  streak,
+  dailyGoalMet,
+  remaining,
+  goalPct,
+  dueCount,
+  freezes,
+  hasPriorActivity,
+  voiceCtx,
+  onContinue,
+  onShare,
+}: TodayStripProps) {
   const goalMet = dailyGoalMet || remaining === 0;
   const allDone = goalMet && dueCount === 0;
   const progressLabel = goalMet ? 'Objectif du jour validé' : `${goalPct}% de ton objectif du jour`;
-  const rhythmLine = goalMet
+
+  // Highest-priority real signal first — see todayRhythmLine's own comment for why each one
+  // exists and why the order matters (a freeze about to be spent matters more today than a
+  // generic progress count, but never more than the goal already being real and done).
+  const { kind, mood } = goalMet
     ? streak > 0
-      ? `Belle régularité : ta série continue.`
-      : `Ton objectif du jour est validé.`
-    : `Encore ${remaining} étape${remaining > 1 ? 's' : ''} pour boucler ta journée.`;
+      ? { kind: 'goal-met-streak' as const, mood: 'proud' as const }
+      : { kind: 'goal-met-fresh' as const, mood: 'proud' as const }
+    : streak > 0 && freezes === 0
+      ? { kind: 'freeze-danger' as const, mood: 'hesitant' as const }
+      : streak === 0 && hasPriorActivity
+        ? { kind: 'returning' as const, mood: 'sleepy' as const }
+        : { kind: 'progressing' as const, mood: 'eager' as const };
+  const rhythmLine = todayRhythmLine(voiceCtx, kind, remaining);
 
   return (
     <section aria-label="Ton rythme du jour" className="rounded-2xl border-2 border-black/15 bg-black/[0.035] px-4 py-3.5">
@@ -40,7 +77,7 @@ export function TodayStrip({ streak, dailyGoalMet, remaining, goalPct, dueCount,
             goalMet ? 'bg-emerald-300' : 'bg-[#FFE08A]'
           }`}
         >
-          {goalMet ? <Check size={19} strokeWidth={3} /> : <Flame size={19} fill="#FF6B35" color="#151821" strokeWidth={2.5} />}
+          <BraiseMascot size={26} mood={mood} />
         </span>
 
         <div className="min-w-0 flex-1">

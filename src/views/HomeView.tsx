@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { useApp, computeGoalPct, remainingToGoal, resolveChapters } from '@/store';
+import { useApp, buildSubjectDecks, computeGoalPct, remainingToGoal, resolveChapters } from '@/store';
 import { sfx } from '@/lib/sound';
 import { fireConfetti } from '@/lib/confetti';
-import { LevelSheet } from '@/components/LevelSheet';
 import { HeaderHUD } from '@/components/HeaderHUD';
 import { HeroPiocheCard } from '@/components/HeroPiocheCard';
 import { MissedCardsBanner } from '@/components/MissedCardsBanner';
@@ -11,10 +10,10 @@ import { SubjectDecks } from '@/components/SubjectDecks';
 import { TodayStrip } from '@/components/TodayStrip';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { SUBJECTS, FLASHCARDS } from '@/data';
-import { dailyPickLine, getAgeGroup } from '@/lib/braiseVoice';
-import { getRankInfo, countMasteredCards } from '@/lib/aura';
+import { dailyPickLine, headerGreeting, getAgeGroup } from '@/lib/braiseVoice';
+import { getRankInfo, countMasteredCards, countSubjectsReviewed } from '@/lib/aura';
 import { getIntoxDismissedCount, setIntoxDismissedCount } from '@/lib/celebrations';
-import type { Level, Subject, Chapter } from '@/types';
+import type { Subject, Chapter } from '@/types';
 
 // Same choreography language as Ton Aura: a calm stagger fade for each block.
 const staggerContainer = {
@@ -27,8 +26,7 @@ const staggerItem = {
 };
 
 export function HomeView() {
-  const { state, setTab, setView, openSubject, openLesson, setUser, getDueCards } = useApp();
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const { state, setTab, setView, openSubject, openLesson, getDueCards } = useApp();
   const [shareOpen, setShareOpen] = useState(false);
   const [intoxDismissedCount, setIntoxDismissedCountState] = useState(getIntoxDismissedCount);
   const prevGoalMet = useRef(state.dailyGoalMet);
@@ -36,17 +34,14 @@ export function HomeView() {
   useEffect(() => {
     if (state.dailyGoalMet && !prevGoalMet.current) {
       fireConfetti();
+      // Same cue as a badge or rank unlock (useMilestoneCelebrations) — this was visual-only
+      // before, the one celebratory moment in the app with no sound or haptic behind it.
+      sfx.complete(state.soundOn);
     }
     prevGoalMet.current = state.dailyGoalMet;
   }, [state.dailyGoalMet]);
 
   const dueCount = getDueCards().length;
-
-  const handleLevel = (l: Level) => {
-    sfx.tap(state.soundOn);
-    setUser({ ...state.user, level: l.id, levelLabel: l.label });
-    setSheetOpen(false);
-  };
 
   // "Chapitres prioritaires" — every subject's in-progress chapter, ranked by real mastery
   // (lowest first). No exam-date field exists anywhere in the data model, so this deliberately
@@ -104,27 +99,15 @@ export function HomeView() {
   // "Chapitres prioritaires" used to do as a separate carousel — same data (every subject's
   // current chapter), it was never two different things, just the same list shown twice.
   const SHORT_SUBJECT_NAME: Record<string, string> = { maths: 'Maths' };
-  const stripLeadingArticle = (title: string) => title.replace(/^(les |la |le |l')/i, '');
-  const subjectDecks = SUBJECTS.map((s) => {
-    const chapters = resolveChapters(s.chapters, state.completedChapters);
-    const doneCount = chapters.filter((c) => c.status === 'done').length;
-    const pct = Math.round((doneCount / chapters.length) * 100);
-    const currentIndex = chapters.findIndex((c) => c.status === 'current');
-    const current = currentIndex >= 0 ? chapters[currentIndex] : null;
+  const subjectDecks = buildSubjectDecks(state.completedChapters).map((d) => {
     return {
-      id: s.id,
-      name: SHORT_SUBJECT_NAME[s.id] ?? s.name,
-      color: s.color,
-      pct,
-      level: currentIndex >= 0 ? currentIndex + 1 : chapters.length,
-      chapterLabel: current ? stripLeadingArticle(current.title) : s.name,
-      currentChapterId: current?.id,
-      currentMastery: current?.mastery ?? 100,
+      ...d,
+      name: SHORT_SUBJECT_NAME[d.id] ?? d.name,
       // Same subject the hero card above already names as today's draw — surfacing it first
       // here too, instead of leaving the grid to sort purely on mastery, matters most on a
       // fresh account: a real new user's 6 decks all tie at 0% mastery (see resolveChapters),
       // so without this every card looks interchangeable and nothing says where to start.
-      isDailyPick: s.id === currentSubject?.id,
+      isDailyPick: d.id === currentSubject?.id,
     };
   }).sort((a, b) => Number(b.isDailyPick) - Number(a.isDailyPick) || a.currentMastery - b.currentMastery);
 
@@ -133,21 +116,13 @@ export function HomeView() {
     openSubject(subjectId, chapterId);
   };
 
-  // Same derivation as ProfilAuraView's own share button — real distinct-subjects-reviewed
-  // count from card review history, not a second, possibly-diverging computation.
-  const subjectsCount = new Set(
-    Object.keys(state.cardReviews).map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)
-  ).size;
+  const subjectsCount = countSubjectsReviewed(state.cardReviews);
   const masteredCards = countMasteredCards(state.cardReviews);
   const rank = getRankInfo(state.xp).current;
 
   return (
     <>
       <div className="view is-active home-view pt-3">
-        {!state.user.level && (
-          <div className="setup-banner">Configure ton niveau pour des leçons sur mesure.</div>
-        )}
-
         <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-4 pb-8">
           <motion.div variants={staggerItem}>
             <HeaderHUD
@@ -155,6 +130,7 @@ export function HomeView() {
               avatar={state.user.avatar}
               streak={state.streak}
               xp={state.xp}
+              greeting={headerGreeting(voiceCtx)}
               onAvatarClick={() => setView('profile')}
               onAuraClick={() => {
                 sfx.tap(state.soundOn);
@@ -185,13 +161,15 @@ export function HomeView() {
               remaining={remainingToGoal(state)}
               goalPct={computeGoalPct(state)}
               dueCount={dueCount}
+              freezes={state.freezes}
+              hasPriorActivity={state.xp > 0 || state.completedChapters.length > 0}
+              voiceCtx={voiceCtx}
               onContinue={() => {
                 sfx.tap(state.soundOn);
                 setTab('revisions');
               }}
               onShare={() => {
                 sfx.tap(state.soundOn);
-                if (navigator.vibrate) navigator.vibrate(10);
                 setShareOpen(true);
               }}
             />
@@ -229,8 +207,6 @@ export function HomeView() {
 
         </motion.div>
       </div>
-
-      <LevelSheet open={sheetOpen} current={state.user.level} onSelect={handleLevel} onClose={() => setSheetOpen(false)} />
 
       {shareOpen && (
         <ShareAuraModal

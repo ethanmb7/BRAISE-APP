@@ -18,6 +18,7 @@ import {
   RANKS,
   computeSubjectMastery,
   countMasteredCards,
+  countSubjectsReviewed,
   computeBraiseInsight,
   computeNextMilestone,
   type Rank,
@@ -26,7 +27,6 @@ import {
   type NextMilestone,
 } from '@/lib/aura';
 import { getAgeGroup, progressAdvice, strongSubjectLine } from '@/lib/braiseVoice';
-import { FLASHCARDS } from '@/data';
 
 // Diameter of the hero ring frame — the single largest element on the page, on purpose.
 const HERO_SIZE = 180;
@@ -54,13 +54,13 @@ export function ProfilAuraView() {
   const { current, next, pct } = getRankInfo(state.xp);
   const dueCount = getDueCards().length;
 
-  const stats = useMemo(() => {
-    const reviewedIds = Object.keys(state.cardReviews);
-    const subjectsSeen = new Set(
-      reviewedIds.map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)
-    );
-    return { subjectsCount: subjectsSeen.size, masteredCards: countMasteredCards(state.cardReviews) };
-  }, [state.cardReviews]);
+  const stats = useMemo(
+    () => ({
+      subjectsCount: countSubjectsReviewed(state.cardReviews),
+      masteredCards: countMasteredCards(state.cardReviews),
+    }),
+    [state.cardReviews]
+  );
 
   // Once the rank ladder is maxed, RankRail's own caption has nothing left to say — this keeps
   // it pointing forward on a different, uncapped axis instead of just announcing a dead end. See
@@ -87,28 +87,23 @@ export function ProfilAuraView() {
 
   const handleShareOpen = useCallback(() => {
     sfx.tap(state.soundOn);
-    if (navigator.vibrate) navigator.vibrate(10);
     setShareOpen(true);
   }, [state.soundOn]);
 
   const handleShareClose = useCallback(() => setShareOpen(false), []);
 
   // The action most worth taking on a page whose whole point is "make them want to come back" —
-  // used to have zero presence here, only "Partager" did. Same sound+haptic pairing as every
-  // other tap target on this page.
+  // used to have zero presence here, only "Partager" did.
   const handleReviewClick = useCallback(() => {
     sfx.tap(state.soundOn);
-    if (navigator.vibrate) navigator.vibrate(10);
     setTab('revisions');
   }, [state.soundOn, setTab]);
 
   // Tapping a subject medallion drops straight into that deck — a weak subject becomes
-  // something to act on immediately, not just a number to sit with. Same sound+haptic pairing
-  // as handleShareOpen — every tap target on this page should feel the same under the thumb.
+  // something to act on immediately, not just a number to sit with.
   const handleSubjectSelect = useCallback(
     (subjectId: string) => {
       sfx.tap(state.soundOn);
-      if (navigator.vibrate) navigator.vibrate(10);
       openSubject(subjectId);
     },
     [state.soundOn, openSubject]

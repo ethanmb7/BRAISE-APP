@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
 import { BookOpen, CheckCircle2 } from 'lucide-react';
-import { SubjectDecks, type SubjectDeckItem } from '@/components/SubjectDecks';
+import { SubjectDecks } from '@/components/SubjectDecks';
 import { SUBJECTS } from '@/data';
 import { sfx } from '@/lib/sound';
-import { resolveChapters, useApp } from '@/store';
+import { buildSubjectDecks, type SubjectDeck, useApp } from '@/store';
 
 const stagger = {
   hidden: {},
@@ -19,21 +19,7 @@ const item = {
 export function SubjectsView() {
   const { state, openSubject } = useApp();
 
-  const decks: SubjectDeckItem[] = SUBJECTS.map((subject) => {
-    const chapters = resolveChapters(subject.chapters, state.completedChapters);
-    const doneCount = chapters.filter((chapter) => chapter.status === 'done').length;
-    const currentIndex = chapters.findIndex((chapter) => chapter.status === 'current');
-    const current = currentIndex >= 0 ? chapters[currentIndex] : null;
-
-    return {
-      id: subject.id,
-      name: subject.name,
-      color: subject.color,
-      pct: Math.round((doneCount / chapters.length) * 100),
-      level: currentIndex >= 0 ? currentIndex + 1 : chapters.length,
-      chapterLabel: current?.title.replace(/^(les |la |le |l')/i, '') ?? 'Parcours terminé',
-    };
-  });
+  const decks: SubjectDeck[] = buildSubjectDecks(state.completedChapters);
 
   const completed = decks.filter((deck) => deck.pct === 100).length;
 
@@ -43,7 +29,7 @@ export function SubjectsView() {
         <motion.header variants={item} className="subjects-heading">
           <span className="subjects-heading-icon" aria-hidden="true"><BookOpen size={22} strokeWidth={2.7} /></span>
           <div>
-            <p>Ton espace libre</p>
+            <p>Sans pression</p>
             <h1>Tes matières</h1>
             <span>Choisis ce que tu veux comprendre aujourd’hui.</span>
           </div>
@@ -60,9 +46,7 @@ export function SubjectsView() {
             onSelect={(id) => {
               sfx.tap(state.soundOn);
               const deck = decks.find((entry) => entry.id === id);
-              const subject = SUBJECTS.find((entry) => entry.id === id);
-              const chapter = subject && deck ? resolveChapters(subject.chapters, state.completedChapters).find((entry) => entry.status === 'current') : null;
-              openSubject(id, chapter?.id);
+              openSubject(id, deck?.currentChapterId);
             }}
           />
         </motion.div>

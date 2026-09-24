@@ -3,15 +3,18 @@ import { Share2, Home } from 'lucide-react';
 import { useApp } from '@/store';
 import { sfx } from '@/lib/sound';
 import { BraiseMascot } from '@/components/BraiseMascot';
+import { ShareAuraModal } from '@/components/ShareAuraModal';
+import { TopBar } from '@/components/TopBar';
 import { getAgeGroup, lessonComplete } from '@/lib/braiseVoice';
+import { getRankInfo, countMasteredCards, countSubjectsReviewed } from '@/lib/aura';
 import { SUBJECTS } from '@/data';
 import { remainingToGoal } from '@/store';
 
 const CONFETTI = ['🎉', '⭐', '🔥', '✨', '🎊', '⭐', '🎉', '✨'];
 
 export function CompleteView() {
-  const { state, setView } = useApp();
-  const [showShare, setShowShare] = useState(false);
+  const { state, setView, goBack } = useApp();
+  const [shareOpen, setShareOpen] = useState(false);
   const chapter = SUBJECTS.find((s) => s.id === state.currentSubjectId)?.chapters.find((c) => c.id === state.currentChapterId);
   const chapterTitle = chapter?.title ?? 'cette leçon';
   // A completed chapter is durable state, but the reward belongs to this exact finish. This
@@ -24,49 +27,18 @@ export function CompleteView() {
     chapterTitle
   );
 
-  if (showShare) {
-    return (
-      <div className="app-content">
-        <div className="view is-active" style={{ textAlign: 'center' }}>
-          <h2 style={{ fontSize: '1.2rem', marginBottom: 6 }}>Partage ta progression</h2>
-          <p style={{ color: 'var(--ink-soft)', fontSize: '0.85rem', marginBottom: 24 }}>
-            Montre à tes potes que t'es un boss !
-          </p>
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <div className="share-card">
-              <div className="share-card-glow" />
-              <BraiseMascot size={70} mood="proud" />
-              <div className="share-streak">{state.streak} jours 🔥</div>
-              <div className="share-sub">Série de révision sur BRAISE</div>
-              <div className="share-brand">BRAISE · l'app qui réveille les neurones</div>
-            </div>
-          </div>
-          <div style={{ display: 'flex', gap: 10, marginTop: 28 }}>
-            <button
-              className="btn-block"
-              style={{ background: 'var(--paper)', color: 'var(--ink)', marginTop: 0 }}
-              onClick={() => setShowShare(false)}
-            >
-              Retour
-            </button>
-            <button
-              className="btn-block blue"
-              style={{ marginTop: 0 }}
-              onClick={() => {
-                sfx.tap(state.soundOn);
-                setView('home');
-              }}
-            >
-              Accueil
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Only set when this screen was reached from the quiz (not from Échanger, which has no score
+  // to report) — real per-question outcome of this exact run, never inferred or fabricated.
+  const quiz = completion?.quiz;
+  const stillFragile = quiz ? quiz.total - quiz.score - quiz.rebondCount : 0;
+  // Chapter bonus (+50, only on a first completion) plus whatever the quiz itself already paid
+  // out question by question — the real total this run earned, not just the chapter's own cut.
+  const totalXpEarned = (completion?.xpGained ?? 0) + (quiz?.xpEarned ?? 0);
 
   return (
-    <div className="view is-active complete-wrap">
+    <div>
+      <TopBar title={chapterTitle} onBack={goBack} />
+      <div className="view is-active complete-wrap">
         <div className="confetti">
           {CONFETTI.map((c, i) => (
             <span
@@ -85,8 +57,36 @@ export function CompleteView() {
         </div>
         <h2>Mission terminée !</h2>
         <p>{completeLine}</p>
+
+        {/* Real per-question outcome of this run — never shown for a chapter finished from
+            Échanger, which has no quiz to report. Comes before the reward on purpose: what
+            actually happened this run, then what it paid. */}
+        {quiz && (
+          <div className="complete-run">
+            <div className="complete-run-stat">
+              <b>{quiz.score}</b>
+              <span>direct{quiz.score > 1 ? 'es' : ''}</span>
+            </div>
+            {quiz.rebondCount > 0 && (
+              <div className="complete-run-stat is-rebond">
+                <b>{quiz.rebondCount}</b>
+                <span>rattrapée{quiz.rebondCount > 1 ? 's' : ''}</span>
+              </div>
+            )}
+            {stillFragile > 0 && (
+              <div className="complete-run-stat is-fragile">
+                <b>{stillFragile}</b>
+                <span>à renforcer</span>
+              </div>
+            )}
+          </div>
+        )}
+        {stillFragile > 0 && (
+          <p className="complete-run-note">Marqué à renforcer — tu le retrouveras dans Tes matières.</p>
+        )}
+
         {completion?.wasNewCompletion ? (
-          <div className="complete-xp">+{completion.xpGained} XP</div>
+          <div className="complete-xp">+{totalXpEarned} XP</div>
         ) : (
           <div className="complete-xp is-repeat">Chapitre déjà validé</div>
         )}
@@ -106,7 +106,7 @@ export function CompleteView() {
             style={{ background: 'var(--paper)', color: 'var(--ink)', marginTop: 0 }}
             onClick={() => {
               sfx.tap(state.soundOn);
-              setShowShare(true);
+              setShareOpen(true);
             }}
           >
             <Share2 size={16} style={{ display: 'inline', marginRight: 6 }} />
@@ -123,6 +123,18 @@ export function CompleteView() {
             Accueil
           </button>
         </div>
+      </div>
+
+      {shareOpen && (
+        <ShareAuraModal
+          rank={getRankInfo(state.xp).current}
+          streak={state.streak}
+          xp={state.xp}
+          subjectsCount={countSubjectsReviewed(state.cardReviews)}
+          masteredCards={countMasteredCards(state.cardReviews)}
+          onClose={() => setShareOpen(false)}
+        />
+      )}
     </div>
   );
 }

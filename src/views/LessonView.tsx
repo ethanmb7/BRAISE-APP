@@ -13,6 +13,7 @@ import {
   Lightbulb,
   Volume2,
   HelpCircle,
+  WifiOff,
 } from 'lucide-react';
 import { useApp } from '@/store';
 import { sfx } from '@/lib/sound';
@@ -20,6 +21,7 @@ import { TopBar } from '@/components/TopBar';
 import { BraiseMascot } from '@/components/BraiseMascot';
 import { BraiseFeynmanDrawer } from '@/components/BraiseFeynmanDrawer';
 import { sendChatMessage } from '@/lib/chat';
+import { useOnlineStatus } from '@/lib/useOnlineStatus';
 import { speak, stopSpeaking } from '@/lib/speech';
 import { getAgeGroup, quizCorrect, quizWrong, quizDontKnow, lessonOpenerCheckIn } from '@/lib/braiseVoice';
 import { SUBJECTS, STORIES, AUDIO_TRANSCRIPTS, LESSON_INTRO } from '@/data';
@@ -43,9 +45,9 @@ export function LessonView() {
   const storyData = STORIES[chapter.id];
   const transcript = AUDIO_TRANSCRIPTS[chapter.id];
 
-  const handleComplete = () => {
+  const handleComplete = (quiz?: { score: number; total: number; rebondCount: number; xpEarned: number }) => {
     sfx.complete(state.soundOn);
-    completeChapter(chapter.id);
+    completeChapter(chapter.id, quiz);
     setView('complete');
   };
 
@@ -354,6 +356,10 @@ function ChatMode({
   const scrollRef = useRef<HTMLDivElement>(null);
   const bridgeHandled = useRef(false);
   const openerStarted = useRef(false);
+  // Unlike Ton Aura (whose whole screen is local data), Échanger genuinely needs a connection —
+  // sending while offline would just hang until the fetch's own timeout gives up. Catching it
+  // here means the student never fires that doomed request in the first place.
+  const isOnline = useOnlineStatus();
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -410,7 +416,7 @@ function ChatMode({
 
   const send = async () => {
     const text = input.trim();
-    if (!text || typing) return;
+    if (!text || typing || !isOnline) return;
     sfx.tap(soundOn);
     setError(null);
     const nextMessages: Msg[] = [...messages, { from: 'me', text }];
@@ -478,6 +484,23 @@ function ChatMode({
           </p>
         )}
       </div>
+      {!isOnline && (
+        <p
+          role="status"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            fontSize: '0.76rem',
+            color: 'var(--ink-soft)',
+            marginBottom: 8,
+          }}
+        >
+          <WifiOff size={14} />
+          Hors-ligne · le chat a besoin d'internet, réessaie une fois reconnecté
+        </p>
+      )}
       {messages.length > 0 && !typing && (
         <button
           className="explain-btn"
@@ -498,15 +521,21 @@ function ChatMode({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && send()}
-          disabled={typing}
+          disabled={typing || !isOnline}
         />
-        <button className="peer-send" onClick={send} disabled={typing || !input.trim()}>
+        <button className="peer-send" onClick={send} disabled={typing || !input.trim() || !isOnline}>
           <Send size={16} />
         </button>
       </div>
     </div>
   );
 }
+
+const CORRECT_XP = 10;
+// Worth more than a clean first-try answer, not less: struggling, then actually working through
+// it via a Feynman reformulation, is the harder and more durable win — the app's XP shouldn't
+// quietly say the opposite by paying the easy path better.
+const REBOND_XP = 15;
 
 /* ===== Quiz with quiz→chat bridge ===== */
 function Quiz({
@@ -523,7 +552,7 @@ function Quiz({
   chapterId: string;
   subjectName: string;
   topic: string;
-  onComplete: () => void;
+  onComplete: (quiz: { score: number; total: number; rebondCount: number; xpEarned: number }) => void;
   onBridge: (message: string) => void;
 }) {
   const [idx, setIdx] = useState(0);
@@ -535,10 +564,18 @@ function Quiz({
   const [streak, setStreak] = useState(0);
   const [showStreak, setShowStreak] = useState(false);
   const [done, setDone] = useState(false);
-  const [xpPop, setXpPop] = useState<{ x: number; y: number } | null>(null);
+  const [xpPop, setXpPop] = useState<{ x: number; y: number; label: string } | null>(null);
   const [feedbackLine, setFeedbackLine] = useState('');
   const [reading, setReading] = useState(false);
   const [feynmanOpen, setFeynmanOpen] = useState(false);
+  // Set once the student actually sends a Feynman reformulation after struggling on this
+  // question — the one help path that stays inside the quiz (the 3 chips bridge to a full chat
+  // and unmount this component, see askSimpler/askExample/askWhy below), and the one the app
+  // already treats as real understanding-checking rather than passive re-reading.
+  const [rebondEarned, setRebondEarned] = useState(false);
+  // Running total across the whole quiz — the real number CompleteView's recap reports, not a
+  // guess: incremented in lockstep with each real REBOND_XP grant in `next()` below.
+  const [rebondCount, setRebondCount] = useState(0);
   const { state, addXp, flagStruggle } = useApp();
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
   // A completed chapter's quiz can still be replayed (SubjectView never locks a 'done' node) —
@@ -578,12 +615,13 @@ function Quiz({
       // addXp was never called either way, but would become a real one now that a first pass
       // does add real XP: showing it on a replay would promise a reward that never lands.
       if (!alreadyCompleted) {
-        addXp(10);
+        addXp(CORRECT_XP);
         const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
         const parentRect = (event.currentTarget as HTMLElement).parentElement?.getBoundingClientRect();
         setXpPop({
           x: rect.left - (parentRect?.left ?? 0) + rect.width / 2,
           y: rect.top - (parentRect?.top ?? 0),
+          label: `+${CORRECT_XP} XP`,
         });
         setTimeout(() => setXpPop(null), 900);
       }
@@ -641,10 +679,25 @@ function Quiz({
     setFeynmanOpen(true);
   };
 
-  const next = () => {
+  const next = (event?: React.MouseEvent) => {
     stopSpeaking();
     setReading(false);
     setFeynmanOpen(false);
+    if (needsHelp && rebondEarned && !alreadyCompleted) {
+      addXp(REBOND_XP);
+      setRebondCount((n) => n + 1);
+      sfx.correct(soundOn);
+      if (event) {
+        const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+        const parentRect = (event.currentTarget as HTMLElement).parentElement?.getBoundingClientRect();
+        setXpPop({
+          x: rect.left - (parentRect?.left ?? 0) + rect.width / 2,
+          y: rect.top - (parentRect?.top ?? 0),
+          label: `+${REBOND_XP} XP · rattrapé !`,
+        });
+        setTimeout(() => setXpPop(null), 900);
+      }
+    }
     if (idx + 1 >= questions.length) {
       setDone(true);
     } else {
@@ -652,6 +705,7 @@ function Quiz({
       setSelected(null);
       setShowExplain(false);
       setFeedbackLine('');
+      setRebondEarned(false);
     }
   };
 
@@ -666,7 +720,18 @@ function Quiz({
         <p style={{ color: 'var(--ink-soft)', fontSize: '0.85rem' }}>
           {score >= questions.length * 0.6 ? 'Beau travail !' : 'Continue, tu vas progresser !'}
         </p>
-        <button className="btn-block blue" style={{ marginTop: 20 }} onClick={onComplete}>
+        <button
+          className="btn-block blue"
+          style={{ marginTop: 20 }}
+          onClick={() =>
+            onComplete({
+              score,
+              total: questions.length,
+              rebondCount,
+              xpEarned: alreadyCompleted ? 0 : score * CORRECT_XP + rebondCount * REBOND_XP,
+            })
+          }
+        >
           Terminer la leçon
         </button>
       </div>
@@ -678,7 +743,7 @@ function Quiz({
       <div className="quiz-card" style={{ position: 'relative' }}>
         {xpPop && (
           <div className="xp-pop" style={{ left: xpPop.x, top: xpPop.y }}>
-            +10 XP
+            {xpPop.label}
           </div>
         )}
         <div className="quiz-head">
@@ -806,6 +871,7 @@ function Quiz({
           answer={q.explain}
           soundOn={soundOn}
           onClose={() => setFeynmanOpen(false)}
+          onEngaged={() => setRebondEarned(true)}
         />
       )}
     </>

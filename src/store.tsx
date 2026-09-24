@@ -29,7 +29,10 @@ type Ctx = {
   toggleSound: () => void;
   openSubject: (subjectId: string, chapterId?: string) => void;
   openLesson: (subjectId: string, chapterId: string, mode?: 'vocal' | 'echanger') => void;
-  completeChapter: (chapterId: string) => void;
+  completeChapter: (
+    chapterId: string,
+    quiz?: { score: number; total: number; rebondCount: number; xpEarned: number }
+  ) => void;
   flagStruggle: (chapterId: string) => void;
   reviewCard: (cardId: string, confidence: Confidence) => void;
   getDueCards: () => string[];
@@ -89,6 +92,39 @@ export function resolveChapters(chapters: Chapter[], completedChapters: string[]
     const reinforce = struggledChapters.includes(c.id);
     if (i === firstOpenIndex) return { ...c, status: 'current', mastery: 0, reinforce };
     return { ...c, status: 'locked', mastery: 0, reinforce };
+  });
+}
+
+export type SubjectDeck = {
+  id: string;
+  name: string;
+  color: string;
+  pct: number;
+  level: number;
+  chapterLabel: string;
+  currentChapterId?: string;
+  currentMastery: number;
+};
+
+// Per-subject "deck" summary (progress %, current chapter) — was independently rebuilt in both
+// HomeView and SubjectsView from the same resolveChapters call, down to the same leading-article
+// regex. Callers that need more (HomeView's daily-pick sort/name shortening) build on top of this.
+export function buildSubjectDecks(completedChapters: string[]): SubjectDeck[] {
+  return SUBJECTS.map((s) => {
+    const chapters = resolveChapters(s.chapters, completedChapters);
+    const doneCount = chapters.filter((c) => c.status === 'done').length;
+    const currentIndex = chapters.findIndex((c) => c.status === 'current');
+    const current = currentIndex >= 0 ? chapters[currentIndex] : null;
+    return {
+      id: s.id,
+      name: s.name,
+      color: s.color,
+      pct: Math.round((doneCount / chapters.length) * 100),
+      level: currentIndex >= 0 ? currentIndex + 1 : chapters.length,
+      chapterLabel: current ? current.title.replace(/^(les |la |le |l')/i, '') : 'Parcours terminé',
+      currentChapterId: current?.id,
+      currentMastery: current?.mastery ?? 100,
+    };
   });
 }
 
@@ -229,11 +265,11 @@ export function ensureSession(s: AppState): Partial<AppState> {
 // real welcome gift (a resource handed to you, not a fabricated record of past use), same logic
 // game onboarding flows use for starting currency.
 const INITIAL: AppState = {
-  // Temporarily skips straight to 'home' — onboarding itself isn't being worked on right now, no
-  // need to click through it on every fresh session while iterating on the rest of the app.
-  // OnboardingView and its route in App.tsx are untouched; flip this back to 'onboarding' (or add
-  // a real "has the user finished onboarding before" check) when it's back in scope.
-  view: 'home',
+  // A genuine first launch — no saved progress anywhere (see the mount effect below, which only
+  // ever overwrites this when loadProgress() actually finds something). Real device that already
+  // has progress, even from before onboarding tracked `joinedAt`, always restores past this via
+  // resolveRestoredView — this default only ever reaches the screen on a real fresh install.
+  view: 'onboarding',
   tab: 'home',
   user: DEFAULT_USER,
   streak: 0,
@@ -269,19 +305,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const saved = await loadProgress();
-      if (cancelled) return;
-      if (saved) {
-        const restoredView = resolveRestoredView(saved);
-        setState((s) => ({
-          ...s,
-          ...saved,
-          ...ensureSession({ ...s, ...saved }),
-          view: restoredView,
-          tab: resolveRestoredTab(restoredView, saved.tab),
-        }));
+      // loadProgress() already falls back to local data on any Supabase error or timeout — this
+      // catch is a last-resort net for an exception it doesn't anticipate, so `loaded` still
+      // flips and the player lands on INITIAL rather than being stuck on the loading screen
+      // forever with no way out.
+      try {
+        const saved = await loadProgress();
+        if (cancelled) return;
+        if (saved) {
+          const restoredView = resolveRestoredView(saved);
+          setState((s) => ({
+            ...s,
+            ...saved,
+            ...ensureSession({ ...s, ...saved }),
+            view: restoredView,
+            tab: resolveRestoredTab(restoredView, saved.tab),
+          }));
+        }
+      } catch (e) {
+        if (cancelled) return;
+        console.error('loadProgress failed unexpectedly, starting fresh:', e);
+      } finally {
+        if (!cancelled) setLoaded(true);
       }
-      setLoaded(true);
     })();
     return () => {
       cancelled = true;
@@ -404,25 +450,28 @@ export function AppProvider({ children }: { children: ReactNode }) {
     []
   );
 
-  const completeChapter = useCallback((chapterId: string) => {
-    setState((s) => {
-      // Always derive the reward from today's counters. This matters if the first completion
-      // happens after midnight while a previous session is still in local storage.
-      const session = { ...s, ...ensureSession(s) };
-      const already = session.completedChapters.includes(chapterId);
-      const xpGained = already ? 0 : 50;
-      const sessionChaptersDone = already ? session.sessionChaptersDone : session.sessionChaptersDone + 1;
-      const activity = session.sessionCardsReviewed + sessionChaptersDone * 3;
-      return {
-        ...session,
-        completedChapters: already ? session.completedChapters : [...session.completedChapters, chapterId],
-        sessionChaptersDone,
-        xp: session.xp + xpGained,
-        dailyGoalMet: activity >= goalTarget(session),
-        lastCompletion: { chapterId, wasNewCompletion: !already, xpGained },
-      };
-    });
-  }, []);
+  const completeChapter = useCallback(
+    (chapterId: string, quiz?: { score: number; total: number; rebondCount: number; xpEarned: number }) => {
+      setState((s) => {
+        // Always derive the reward from today's counters. This matters if the first completion
+        // happens after midnight while a previous session is still in local storage.
+        const session = { ...s, ...ensureSession(s) };
+        const already = session.completedChapters.includes(chapterId);
+        const xpGained = already ? 0 : 50;
+        const sessionChaptersDone = already ? session.sessionChaptersDone : session.sessionChaptersDone + 1;
+        const activity = session.sessionCardsReviewed + sessionChaptersDone * 3;
+        return {
+          ...session,
+          completedChapters: already ? session.completedChapters : [...session.completedChapters, chapterId],
+          sessionChaptersDone,
+          xp: session.xp + xpGained,
+          dailyGoalMet: activity >= goalTarget(session),
+          lastCompletion: { chapterId, wasNewCompletion: !already, xpGained, quiz },
+        };
+      });
+    },
+    []
+  );
 
   // The real signal behind resolveChapters()'s dynamic `reinforce` — called from LessonView's
   // Quiz on a wrong answer or an honest "Je ne sais pas", never on a correct one. Idempotent
@@ -481,6 +530,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
         return { ...s, view: s.lessonReturnTo, lessonReturnTo: null };
       }
       if (s.view === 'lesson' || s.view === 'complete') return { ...s, view: 'subject' };
+      // Profil is reachable two ways: from its own tab (setTab sets both `tab` and `view` to
+      // 'profile' at once — s.tab is then 'profile' too, so "back to s.tab" would be a no-op) or
+      // as a shortcut from another tab (HeaderHUD's avatar button only calls setView, so `tab`
+      // still names wherever the user actually came from). Only the second case has a real
+      // "back" target; the first falls back to home, same safe default ErrorBoundary itself uses.
+      if (s.view === 'profile') return { ...s, view: s.tab === 'profile' ? 'home' : s.tab };
       if (s.view === 'subject' || s.view === 'settings' || s.view === 'share')
         return { ...s, view: s.tab };
       return s;

@@ -6,11 +6,11 @@ import type { Level, Subject, Flashcard, Badge, UserProfile } from './types';
 // computed at render time by `resolveChapters()` in store.tsx from the device's actual
 // `completedChapters`, which is what both HomeView and SubjectView now read.
 
+// BRAISE se concentre sur le lycée — les niveaux collège ont été retirés (2024). `group` reste
+// sur chaque entrée pour que le type Level n'ait pas besoin de changer, mais vaut 'Lycée' partout
+// maintenant ; les sélecteurs de niveau (LevelSheet, OnboardingView) n'affichent donc plus qu'une
+// liste plate, sans en-tête de groupe.
 export const LEVELS: Level[] = [
-  { id: '6e', label: '6ème', group: 'Collège' },
-  { id: '5e', label: '5ème', group: 'Collège' },
-  { id: '4e', label: '4ème', group: 'Collège' },
-  { id: '3e', label: '3ème', group: 'Collège' },
   { id: '2nde', label: '2nde', group: 'Lycée' },
   { id: '1ere', label: '1ère', group: 'Lycée' },
   { id: 'term', label: 'Terminale', group: 'Lycée' },
@@ -168,8 +168,8 @@ export const AVATARS: AvatarOption[] = [
 
 export const DEFAULT_USER: UserProfile = {
   name: 'Alex',
-  level: '3e',
-  levelLabel: '3ème',
+  level: '2nde',
+  levelLabel: '2nde',
   goal: '30 min/jour',
   subjects: ['maths', 'francais', 'histoire-geo', 'svt'],
   avatar: 'fleme',

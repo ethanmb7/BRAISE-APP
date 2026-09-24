@@ -7,6 +7,9 @@ interface HeaderHUDProps {
   avatar: string;
   streak: number;
   xp: number;
+  /** Braise's own word above the student's name (headerGreeting in braiseVoice.ts) — never a
+   *  hardcoded "Bonjour", which reads like a bank app on the one bar shown on every visit. */
+  greeting: string;
   onAvatarClick: () => void;
   onAuraClick: () => void;
 }
@@ -17,6 +20,7 @@ export function HeaderHUD({
   avatar,
   streak,
   xp,
+  greeting,
   onAvatarClick,
   onAuraClick,
 }: HeaderHUDProps) {
@@ -28,7 +32,7 @@ export function HeaderHUD({
         <span className="home-header-avatar" aria-hidden="true">
           <AvatarGlyph id={avatar} rankId={rank.id} size={30} />
         </span>
-        <span className="home-header-copy"><small>Bonjour</small><b>{name}</b></span>
+        <span className="home-header-copy"><small>{greeting}</small><b>{name}</b></span>
       </button>
 
       <span className="home-header-streak" aria-label={`${streak} jour${streak > 1 ? 's' : ''} de suite`}>

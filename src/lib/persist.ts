@@ -4,6 +4,17 @@ import { supabase, supabaseConfigured, getDeviceId, getDeviceSecret } from './su
 const PROGRESS_KEY = 'sapie_progress';
 const CARDS_KEY = 'sapie_card_reviews';
 
+// A Supabase request that hangs (degraded wifi, not an outright error) never rejects on its
+// own — the surrounding try/catch below is powerless against that, and without this the whole
+// app sits on "Chargement de ton parcours..." (App.tsx) forever, even though the real local data
+// loadProgress would otherwise fall back to is already sitting in memory a function call away.
+function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    p,
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Supabase request timed out')), ms)),
+  ]);
+}
+
 type StoredProgress = {
   xp: number;
   streak: number;
@@ -121,10 +132,13 @@ export async function loadProgress(): Promise<Partial<AppState> | null> {
   if (supabaseConfigured && supabase) {
     try {
       const deviceId = getDeviceId();
-      const [{ data: row, error: rowErr }, { data: cardRows, error: cardsErr }] = await Promise.all([
-        supabase.from('device_progress').select('*').eq('device_id', deviceId).maybeSingle(),
-        supabase.from('card_reviews').select('*').eq('device_id', deviceId),
-      ]);
+      const [{ data: row, error: rowErr }, { data: cardRows, error: cardsErr }] = await withTimeout(
+        Promise.all([
+          supabase.from('device_progress').select('*').eq('device_id', deviceId).maybeSingle(),
+          supabase.from('card_reviews').select('*').eq('device_id', deviceId),
+        ]),
+        8_000
+      );
 
       if (!rowErr && row) {
         const cardReviews: Record<string, CardReview> = {};
