@@ -19,9 +19,14 @@ type Props = {
   answer: string;
   soundOn: boolean;
   onClose: () => void;
+  /** Fired once, the moment the student sends their first real reformulation — not on open, not
+   *  on Braise's reply. Attempting to explain it back is the engagement worth recognizing;
+   *  grading whether the explanation was *correct* would make the AI's reaction the judge of a
+   *  reward, which is exactly the fragile design this avoids. */
+  onEngaged?: () => void;
 };
 
-export function BraiseFeynmanDrawer({ topic, subject, question, answer, soundOn, onClose }: Props) {
+export function BraiseFeynmanDrawer({ topic, subject, question, answer, soundOn, onClose, onEngaged }: Props) {
   const { state } = useApp();
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
   const [messages, setMessages] = useState<Msg[]>(() => [{ from: 'braise', text: feynmanInvite(voiceCtx, topic) }]);
@@ -41,6 +46,7 @@ export function BraiseFeynmanDrawer({ topic, subject, question, answer, soundOn,
     setMessages(nextMessages);
     setInput('');
     setTyping(true);
+    onEngaged?.();
 
     const apiMessages: ChatMessage[] = nextMessages.map((m) => ({
       role: (m.from === 'me' ? 'user' : 'model') as 'user' | 'model',
