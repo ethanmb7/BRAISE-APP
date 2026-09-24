@@ -92,9 +92,49 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
         // would finish — matching the shorter window here instead of leaving it visibly cut off.
         transition={{ duration: quick ? 0.22 : 0.5, ease: [0.16, 1, 0.3, 1] }}
       >
+        {/* Keep the Pioche alive without moving the reading surface itself. */}
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full"
+          style={{ background: 'radial-gradient(circle, #FFE9A8 0%, rgba(255,233,168,0) 70%)' }}
+          animate={{ opacity: [0.35, 0.85, 0.35], scale: [0.9, 1.15, 0.9] }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <div aria-hidden="true" className="pointer-events-none absolute -right-6 -top-6 h-16 w-16 rounded-full bg-[#FDC800]" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-2xl"
+          style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0) 20px)' }}
+        />
+
+        {/* The launch ticket remains a short reward beat, compressed to fit the tighter card. */}
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none absolute right-4 top-10 z-0 flex h-12 w-[106px] -rotate-6 flex-col justify-center rounded-lg border-2 border-[#151821] bg-[#FFF8EE] px-2 shadow-[3px_3px_0px_0px_#151821]"
+          initial={false}
+          animate={
+            launching
+              ? { opacity: [0, 1, 1, 0], y: [20, -8, -14, -22], rotate: [-6, -10, -8, -5], scale: [0.82, 1.02, 1, 1.06] }
+              : { opacity: 0, y: 20, rotate: -6, scale: 0.82 }
+          }
+          transition={
+            launching
+              ? { duration: quick ? 0.38 : 0.72, delay: quick ? 0.05 : 0.17, times: [0, 0.25, 0.68, 1], ease: [0.16, 1, 0.3, 1] }
+              : { duration: 0.1 }
+          }
+        >
+          <span className="font-mono text-[0.44rem] font-black tracking-[0.1em] text-[#7C2D12]">MISSION TROUVÉE</span>
+          <span className="mt-0.5 font-display text-[0.62rem] font-black leading-none text-[#151821]">C’est parti !</span>
+        </motion.div>
+
         <div className="relative flex items-center gap-3">
           <div className="relative flex h-[92px] w-[92px] flex-shrink-0 items-end justify-center">
-            <span aria-hidden="true" className="absolute inset-[6px] rounded-full bg-[#FDC800]/35" />
+            <motion.span
+              aria-hidden="true"
+              className="absolute inset-[6px] rounded-full bg-[#FDC800]/40 blur-md"
+              animate={hyped || launching ? { scale: [0.9, 1.2, 0.9], opacity: [0.25, 0.8, 0.25] } : { scale: [0.97, 1.05, 0.97], opacity: [0.22, 0.38, 0.22] }}
+              transition={{ duration: hyped || launching ? 0.58 : 3.2, repeat: Infinity, ease: 'easeInOut' }}
+            />
             <BraisePioche size={88} hyped={hyped} diving={launching} quick={quick} />
           </div>
           <div className="min-w-0 flex-1">
@@ -122,7 +162,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
 
         {launching && <span className="sr-only" role="status">Braise révèle ta mission.</span>}
 
-        <div className="group relative mt-3">
+        <div className="tw-cta-pulse group relative mt-3">
           <span aria-hidden="true" className="absolute inset-0 translate-y-[2px] rounded-xl border-2 border-black bg-black" />
           <button
             onPointerEnter={() => setHyped(true)}
@@ -132,7 +172,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
             onPointerCancel={unhype}
             onClick={handleStart}
             disabled={launching}
-            className="relative flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border-2 border-black bg-[#FFF8EE] px-3 py-2 font-display text-[0.92rem] font-black text-black shadow-[2px_2px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[2px] group-active:shadow-none disabled:opacity-95"
+            className="tw-shimmer relative flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border-2 border-black bg-[#FFF8EE] px-3 py-2 font-display text-[0.92rem] font-black text-black shadow-[2px_2px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[2px] group-active:shadow-none disabled:opacity-95"
           >
             {launching ? 'OUVERTURE…' : 'COMMENCER'}
             <ArrowRight size={16} strokeWidth={3} aria-hidden="true" />
