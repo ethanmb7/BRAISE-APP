@@ -1,17 +1,36 @@
+codex/analyser-l-application-pour-ameliorer-l-education-na83h9
 import { Home, BookOpenText, Layers, User } from "lucide-react";
 import { motion } from "framer-motion";
 import type { TabId } from "@/types";
+=======
+import { CalendarDays, Layers, TrendingUp, User } from 'lucide-react';
+import { motion } from 'framer-motion';
+import type { TabId } from '@/types';
+main
 
 type Props = {
   active: TabId;
   onChange: (tab: TabId) => void;
 };
 
+codex/analyser-l-application-pour-ameliorer-l-education-na83h9
 const TABS: { id: TabId; label: string; icon: typeof Home }[] = [
   { id: "home", label: "Aujourd'hui", icon: Home },
   { id: "learn", label: "Apprendre", icon: BookOpenText },
   { id: "revisions", label: "Réviser", icon: Layers },
   { id: "profile", label: "Moi", icon: User },
+=======
+// BRAISE's whole premise is "un pote qui t'aide", pas un classeur d'école rangé par matière —
+// une appli quatre-onglets qui met "Matières" au même rang que Braise et ta progression
+// ressemble à un portail scolaire, pas à un compagnon. Aura (ton parcours, ta preuve de
+// progrès) est le vrai pilier d'identité de l'appli et reste une destination permanente ; les
+// matières restent consultables (depuis Accueil ou Réviser), juste pas promues au même niveau.
+const TABS: { id: TabId; label: string; icon: typeof CalendarDays }[] = [
+  { id: 'home', label: 'Aujourd’hui', icon: CalendarDays },
+  { id: 'revisions', label: 'Réviser', icon: Layers },
+  { id: 'progres', label: 'Aura', icon: TrendingUp },
+  { id: 'profile', label: 'Moi', icon: User },
+main
 ];
 
 // Calm floating navigation: it stays recognisably BRAISE through the orange active pill, but the

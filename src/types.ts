@@ -1,4 +1,5 @@
 export type ViewId =
+codex/analyser-l-application-pour-ameliorer-l-education-na83h9
   | "onboarding"
   | "home"
   | "learn"
@@ -12,6 +13,22 @@ export type ViewId =
   | "settings";
 
 export type TabId = "home" | "learn" | "revisions" | "profile";
+=======
+  | 'onboarding'
+  | 'home'
+  | 'subjects'
+  | 'revisions'
+  | 'progres'
+  | 'subject'
+  | 'lesson'
+  | 'complete'
+  | 'share'
+  | 'profile'
+  | 'settings';
+
+/** `progres` remains accepted for migration/back-navigation from pre-Matières installs. */
+export type TabId = 'home' | 'subjects' | 'revisions' | 'profile' | 'progres';
+main
 
 export type Level = {
   id: string;

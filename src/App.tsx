@@ -1,3 +1,4 @@
+codex/analyser-l-application-pour-ameliorer-l-education-na83h9
 import { useState } from "react";
 import { AppProvider, useApp } from "@/store";
 import { TabBar } from "@/components/TabBar";
@@ -20,6 +21,30 @@ import { LessonView } from "@/views/LessonView";
 import { CompleteView } from "@/views/CompleteView";
 import { ProfileView } from "@/views/ProfileView";
 import { SettingsView } from "@/views/SettingsView";
+=======
+import { useState } from 'react';
+import { AppProvider, useApp } from '@/store';
+import { TabBar } from '@/components/TabBar';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { PiocheRevealVeil } from '@/components/PiocheRevealVeil';
+import { BraiseMascot } from '@/components/BraiseMascot';
+import { RankUpCelebration } from '@/components/RankUpCelebration';
+import { ShareAuraModal } from '@/components/ShareAuraModal';
+import { useMilestoneCelebrations } from '@/lib/useMilestoneCelebrations';
+import { rankUpLine, getAgeGroup } from '@/lib/braiseVoice';
+import { getRankInfo, countMasteredCards } from '@/lib/aura';
+import { FLASHCARDS } from '@/data';
+import { OnboardingView } from '@/views/OnboardingView';
+import { HomeView } from '@/views/HomeView';
+import { SubjectsView } from '@/views/SubjectsView';
+import { RevisionsView } from '@/views/RevisionsView';
+import { ProfilAuraView } from '@/views/ProfilAuraView';
+import { SubjectView } from '@/views/SubjectView';
+import { LessonView } from '@/views/LessonView';
+import { CompleteView } from '@/views/CompleteView';
+import { ProfileView } from '@/views/ProfileView';
+import { SettingsView } from '@/views/SettingsView';
+main
 
 function Screen() {
   const { state, setTab, loaded } = useApp();
@@ -31,7 +56,11 @@ function Screen() {
 
   // The floating dock stays through a review session too — it sits under the action row,
   // in its own glass layer, so it never competes with the verdict buttons for the thumb.
+codex/analyser-l-application-pour-ameliorer-l-education-na83h9
   const showTabBar = ["home", "learn", "revisions", "progres", "profile"].includes(state.view);
+=======
+  const showTabBar = ['home', 'subjects', 'revisions', 'progres', 'profile'].includes(state.view);
+main
 
   if (!loaded) {
     return (
@@ -65,6 +94,7 @@ function Screen() {
             the tab bar, which lives outside this boundary and stays clickable, or the
             fallback's own "Retour à l'accueil") changes the key, which remounts a fresh
             boundary for wherever the player lands instead of carrying the old error forward. */}
+codex/analyser-l-application-pour-ameliorer-l-education-na83h9
         <ErrorBoundary key={state.view} onGoHome={() => setTab("home")}>
           {state.view === "onboarding" && <OnboardingView />}
           {state.view === "home" && <HomeView />}
@@ -76,6 +106,19 @@ function Screen() {
           {state.view === "complete" && <CompleteView />}
           {state.view === "profile" && <ProfileView />}
           {state.view === "settings" && <SettingsView />}
+=======
+        <ErrorBoundary key={state.view} onGoHome={() => setTab('home')}>
+          {state.view === 'onboarding' && <OnboardingView />}
+          {state.view === 'home' && <HomeView />}
+          {state.view === 'subjects' && <SubjectsView />}
+          {state.view === 'revisions' && <RevisionsView />}
+          {state.view === 'progres' && <ProfilAuraView />}
+          {state.view === 'subject' && <SubjectView />}
+          {state.view === 'lesson' && <LessonView />}
+          {state.view === 'complete' && <CompleteView />}
+          {state.view === 'profile' && <ProfileView />}
+          {state.view === 'settings' && <SettingsView />}
+main
         </ErrorBoundary>
       </div>
 

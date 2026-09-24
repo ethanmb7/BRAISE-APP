@@ -30,7 +30,6 @@ type Ctx = {
   setPersonality: (p: Personality) => void;
   addXp: (n: number) => void;
   updateBestCombo: (n: number) => void;
-  setStreak: (n: number) => void;
   setFreezes: (n: number) => void;
   toggleFreeze: () => void;
   setDailyGoalMet: (v: boolean) => void;
@@ -141,6 +140,7 @@ function resolveRestoredView(saved: Partial<AppState>): ViewId {
       return "home";
     return view;
   }
+codex/analyser-l-application-pour-ameliorer-l-education-na83h9
   if (
     view === "learn" ||
     view === "revisions" ||
@@ -150,6 +150,10 @@ function resolveRestoredView(saved: Partial<AppState>): ViewId {
   )
     return view;
   return "home";
+=======
+  if (view === 'subjects' || view === 'revisions' || view === 'progres' || view === 'profile' || view === 'settings') return view;
+  return 'home';
+main
 }
 
 // `tab` drives the bottom nav highlight independently of `view` (SubjectView/SettingsView both
@@ -157,10 +161,17 @@ function resolveRestoredView(saved: Partial<AppState>): ViewId {
 // just `view` — otherwise resuming into e.g. Revisions would show the right screen with the wrong
 // tab lit up, and a subsequent "back" from Subject/Settings would return to the wrong place.
 function resolveRestoredTab(view: ViewId, savedTab: TabId | undefined): TabId {
+codex/analyser-l-application-pour-ameliorer-l-education-na83h9
   if (view === "home" || view === "learn" || view === "revisions" || view === "profile")
     return view;
   // `progres` used to be a main tab. It now lives inside Moi; migrate old local saves safely.
   return (savedTab as string | undefined) === "progres" ? "profile" : (savedTab ?? "home");
+=======
+  if (view === 'home' || view === 'subjects' || view === 'revisions' || view === 'profile') return view;
+  if (savedTab === 'home' || savedTab === 'subjects' || savedTab === 'revisions' || savedTab === 'profile') return savedTab;
+  // `progres` used to be a tab. Old localStorage values now land on Moi, where Aura belongs.
+  return view === 'progres' ? 'profile' : 'home';
+main
 }
 
 function sm2(review: CardReview | undefined, confidence: Confidence): CardReview {
@@ -192,8 +203,15 @@ function sm2(review: CardReview | undefined, confidence: Confidence): CardReview
   };
 }
 
-function ensureSession(s: AppState): Partial<AppState> {
+// The one real piece of streak logic in the whole app — everywhere else just reads `state.streak`
+// as if something, somewhere, already keeps it honest. Nothing did: `setStreak` existed but had
+// no caller outside this file, so the count shown on Home/Aura/Profil/the share card never
+// actually moved no matter how many real days a student came back. Fixed here, at the one place
+// that already detects a day boundary for every other session field, rather than adding a second,
+// separately-timed check elsewhere that could drift out of sync with this one.
+export function ensureSession(s: AppState): Partial<AppState> {
   const today = new Date().toDateString();
+codex/analyser-l-application-pour-ameliorer-l-education-na83h9
   if (s.sessionDate !== today) {
     return {
       sessionDate: today,
@@ -201,8 +219,43 @@ function ensureSession(s: AppState): Partial<AppState> {
       sessionChaptersDone: 0,
       dailyGoalMet: false,
     };
+=======
+  if (s.sessionDate === today) return {};
+
+  const reset = { sessionDate: today, sessionCardsReviewed: 0, sessionChaptersDone: 0, dailyGoalMet: false };
+
+  // `sessionDate` is a fresh install's own toDateString() (see INITIAL) or a real prior day —
+  // never truly unparseable, but a defensive fallback for a corrupted/pre-migration localStorage
+  // value costs nothing and avoids NaN ever reaching `streak`.
+  const lastActive = new Date(s.sessionDate);
+  if (Number.isNaN(lastActive.getTime())) return reset;
+
+  const daysSinceLastActive = Math.round((new Date(today).getTime() - lastActive.getTime()) / DAY_MS);
+
+  // Exactly one calendar day since the last real session: the normal nightly boundary every
+  // returning student crosses. Anything wider (2+ days with zero activity) is a real gap a single
+  // freeze was never meant to cover — the streak breaks regardless of freezeArmed, same as
+  // Duolingo's own freeze only ever protecting one missed day, not an open-ended absence.
+  if (daysSinceLastActive !== 1) {
+    return { ...reset, streak: 0, freezeArmed: false };
   }
-  return {};
+
+  if (s.dailyGoalMet) {
+    // Met the goal yesterday. A freeze armed defensively for a day that turned out fine was
+    // never actually spent — hand it back instead of quietly keeping it consumed.
+    return s.freezeArmed
+      ? { ...reset, streak: s.streak + 1, freezeArmed: false, freezes: s.freezes + 1 }
+      : { ...reset, streak: s.streak + 1 };
+main
+  }
+
+  if (s.freezeArmed) {
+    // The miss it was armed for. Streak survives; the freeze itself was already spent the moment
+    // it was armed (see toggleFreeze), so only the armed flag needs clearing here.
+    return { ...reset, freezeArmed: false };
+  }
+
+  return { ...reset, streak: 0 };
 }
 
 // streak/xp were 5/340 here — demo-convenience values so testing didn't start from zero every
@@ -305,10 +358,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setState((s) =>
       n > s.bestCombo ? { ...s, ...ensureSession(s), bestCombo: n } : { ...s, ...ensureSession(s) },
     );
-  }, []);
-
-  const setStreak = useCallback((n: number) => {
-    setState((s) => ({ ...s, ...ensureSession(s), streak: n }));
   }, []);
 
   const setFreezes = useCallback((n: number) => {
@@ -477,7 +526,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setPersonality,
         addXp,
         updateBestCombo,
-        setStreak,
         setFreezes,
         toggleFreeze,
         setDailyGoalMet,
