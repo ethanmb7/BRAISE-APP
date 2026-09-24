@@ -125,6 +125,12 @@ export type AppState = {
   bestCombo: number;
   freezes: number;
   freezeArmed: boolean;
+  /** True the moment a freeze has actually absorbed a missed day (see ensureSession in
+   *  store.tsx) — never true just from arming one, and never reset back to false. The "Gel
+   *  utilisé" badge reads this instead of live freeze state, which used to flip back to
+   *  false the moment a freeze got disarmed or refunded, making an already-earned badge
+   *  disappear and re-celebrate later. */
+  everUsedFreeze: boolean;
   dailyGoalMet: boolean;
   darkMode: boolean;
   dyslexiaMode: boolean;

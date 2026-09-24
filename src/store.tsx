@@ -34,6 +34,7 @@ type Ctx = {
   getDueCards: () => string[];
   goBack: () => void;
   bridgeToChat: (subjectId: string, chapterId: string, bridgeMessage: string, returnTo?: ViewId) => void;
+  clearChatBridge: () => void;
 };
 
 const AppCtx = createContext<Ctx | null>(null);
@@ -97,14 +98,18 @@ export function countDoneChapters(completedChapters: string[]): number {
  *  duplicated inline in ProfileView with its own `chaptersDone`, which read the static chapter
  *  status directly and could therefore never see a real "done" chapter post-resolveChapters. */
 export function computeUnlockedBadges(
-  s: Pick<AppState, 'streak' | 'xp' | 'freezeArmed' | 'freezes' | 'completedChapters'>
+  s: Pick<AppState, 'streak' | 'xp' | 'everUsedFreeze' | 'completedChapters'>
 ): Record<string, boolean> {
   const chaptersDone = countDoneChapters(s.completedChapters);
   return {
     b1: s.streak >= 3,
     b2: s.xp >= 100,
     b3: chaptersDone >= 1,
-    b4: s.freezeArmed || s.freezes < 2,
+    // Was `freezeArmed || freezes < 2` — both live, both flip back to false the moment a freeze
+    // gets disarmed or refunded (see ensureSession), so un-arming made an already-earned badge
+    // vanish and re-arming later re-triggered the same "unlocked!" celebration for it. This field
+    // only ever goes true once, at the one real moment a freeze actually absorbed a missed day.
+    b4: s.everUsedFreeze,
     b5: s.streak >= 7,
     b6: s.xp >= 1000,
   };
@@ -204,9 +209,11 @@ export function ensureSession(s: AppState): Partial<AppState> {
   }
 
   if (s.freezeArmed) {
-    // The miss it was armed for. Streak survives; the freeze itself was already spent the moment
-    // it was armed (see toggleFreeze), so only the armed flag needs clearing here.
-    return { ...reset, freezeArmed: false };
+    // The miss it was armed for — the freeze just genuinely did its job. Streak survives; the
+    // freeze itself was already spent the moment it was armed (see toggleFreeze), so only the
+    // armed flag needs clearing here. `everUsedFreeze` flips once, permanently: this is the one
+    // real "Gel utilisé" moment, never just arming/disarming one experimentally.
+    return { ...reset, freezeArmed: false, everUsedFreeze: true };
   }
 
   return { ...reset, streak: 0 };
@@ -231,6 +238,7 @@ const INITIAL: AppState = {
   bestCombo: 0,
   freezes: 2,
   freezeArmed: false,
+  everUsedFreeze: false,
   dailyGoalMet: false,
   darkMode: false,
   dyslexiaMode: false,
@@ -393,6 +401,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  // ChatMode used to track "already sent" with its own local useRef, which reset to false on
+  // every remount — toggling to "Vocal Animé" and back to "Échanger" unmounts/remounts ChatMode,
+  // and state.chatBridgeMessage itself was only ever cleared by openLesson (a fresh lesson entry),
+  // so the same bridged question got auto-sent and duplicated in the transcript on every toggle.
+  // Clearing it in the store, right when ChatMode actually consumes it, means the message is gone
+  // for good the moment it's been sent once — no local ref needed to survive a remount.
+  const clearChatBridge = useCallback(() => {
+    setState((s) => ({ ...s, ...ensureSession(s), chatBridgeMessage: null }));
+  }, []);
+
   const completeChapter = useCallback((chapterId: string) => {
     setState((s) => {
       // Always derive the reward from today's counters. This matters if the first completion
@@ -483,6 +501,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         openSubject,
         openLesson,
         bridgeToChat,
+        clearChatBridge,
         completeChapter,
         reviewCard,
         getDueCards,

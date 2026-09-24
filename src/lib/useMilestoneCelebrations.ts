@@ -24,10 +24,7 @@ export type Celebration =
 // primary way to leave it: a deliberate full-screen moment should end on the student's own terms.
 const AUTO_DISMISS_MS: Record<Celebration['type'], number> = { badge: 2200, rank: 12000 };
 
-type CelebrationState = Pick<
-  AppState,
-  'streak' | 'xp' | 'freezeArmed' | 'freezes' | 'completedChapters'
->;
+type CelebrationState = Pick<AppState, 'streak' | 'xp' | 'everUsedFreeze' | 'completedChapters'>;
 
 /** Rank-ups and badge unlocks were both real, already-computed milestones (getRankInfo,
  *  computeUnlockedBadges) that fired with zero acknowledgement anywhere in the app — a student
@@ -72,7 +69,7 @@ export function useMilestoneCelebrations(
     }
     setSeenBadgeIds(unlockedIds);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loaded, state.streak, state.xp, state.freezeArmed, state.freezes, state.completedChapters]);
+  }, [loaded, state.streak, state.xp, state.everUsedFreeze, state.completedChapters]);
 
   // Split in two, not one combined "pop + schedule dismissal" effect: under StrictMode's dev-only
   // double-invoke (mount, cleanup, remount), a single effect guarded by `if (active) return` would

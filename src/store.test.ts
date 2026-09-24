@@ -15,6 +15,7 @@ function baseState(overrides: Partial<AppState>): AppState {
     bestCombo: 0,
     freezes: 2,
     freezeArmed: false,
+    everUsedFreeze: false,
     dailyGoalMet: false,
     darkMode: false,
     dyslexiaMode: false,
@@ -58,12 +59,18 @@ describe('ensureSession', () => {
     expect(ensureSession(s).streak).toBe(0);
   });
 
-  it('preserves the streak when a freeze was armed to cover a missed day, and consumes it', () => {
-    const s = baseState({ sessionDate: daysAgo(1), dailyGoalMet: false, freezeArmed: true, freezes: 1, streak: 6 });
+  it('preserves the streak when a freeze was armed to cover a missed day, consumes it, and marks it as ever used', () => {
+    const s = baseState({ sessionDate: daysAgo(1), dailyGoalMet: false, freezeArmed: true, freezes: 1, streak: 6, everUsedFreeze: false });
     const result = ensureSession(s);
     expect(result.streak).toBeUndefined(); // untouched -> stays 6 in the real reducer merge
     expect(result.freezeArmed).toBe(false);
     expect(result.freezes).toBeUndefined(); // already decremented when the freeze was armed
+    expect(result.everUsedFreeze).toBe(true); // the one real "Gel utilisé" moment for badge b4
+  });
+
+  it('does not mark a freeze as used just because it was armed and then refunded unneeded', () => {
+    const s = baseState({ sessionDate: daysAgo(1), dailyGoalMet: true, freezeArmed: true, freezes: 1, streak: 6, everUsedFreeze: false });
+    expect(ensureSession(s).everUsedFreeze).toBeUndefined();
   });
 
   it('refunds a freeze that was armed defensively but never needed', () => {

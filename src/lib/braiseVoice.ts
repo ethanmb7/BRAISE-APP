@@ -14,7 +14,15 @@ function pick(list: string[]): string {
 
 /** key = `${personality}-${age}` */
 function byCombo(ctx: VoiceCtx, table: Record<string, string[]>): string {
-  return pick(table[`${ctx.personality}-${ctx.age}`]);
+  // persist.ts only guards ctx.personality against null/undefined (?? 'chill'), never against an
+  // unexpected string — a stale localStorage edit, a bad cloud round-trip, or a future schema
+  // change without a clean migration could all still hand this an unrecognised key. Every one of
+  // the 20+ call sites across the app would otherwise crash the screen it's on at exactly the
+  // moment it's trying to say something to the student. Falling back to the first real combo
+  // keeps the tone system honest — every entry in `table` is a real, reviewed line either way —
+  // instead of the whole tone system taking down a screen over a corrupted preference field.
+  const line = table[`${ctx.personality}-${ctx.age}`] ?? Object.values(table)[0];
+  return pick(line);
 }
 
 export function quizCorrect(ctx: VoiceCtx): string {
