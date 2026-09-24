@@ -107,6 +107,7 @@ export function LessonView() {
             <Quiz
               questions={storyData.quiz}
               soundOn={state.soundOn}
+              chapterId={chapter.id}
               subjectName={subject.name}
               topic={chapter.title}
               onComplete={handleComplete}
@@ -511,6 +512,7 @@ function ChatMode({
 function Quiz({
   questions,
   soundOn,
+  chapterId,
   subjectName,
   topic,
   onComplete,
@@ -518,6 +520,7 @@ function Quiz({
 }: {
   questions: QuizQuestion[];
   soundOn: boolean;
+  chapterId: string;
   subjectName: string;
   topic: string;
   onComplete: () => void;
@@ -536,8 +539,13 @@ function Quiz({
   const [feedbackLine, setFeedbackLine] = useState('');
   const [reading, setReading] = useState(false);
   const [feynmanOpen, setFeynmanOpen] = useState(false);
-  const { state } = useApp();
+  const { state, addXp, flagStruggle } = useApp();
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
+  // A completed chapter's quiz can still be replayed (SubjectView never locks a 'done' node) —
+  // without this guard, replaying it would mint free XP on every correct tap, forever. The first
+  // pass through is the only one that pays; completeChapter's own `already` guard uses the exact
+  // same idea for the +50 chapter-completion reward.
+  const alreadyCompleted = state.completedChapters.includes(chapterId);
 
   const q = questions[idx];
   const isUnknown = selected === -1;
@@ -565,29 +573,39 @@ function Quiz({
         }
         return ns;
       });
-      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-      const parentRect = (event.currentTarget as HTMLElement).parentElement?.getBoundingClientRect();
-      setXpPop({
-        x: rect.left - (parentRect?.left ?? 0) + rect.width / 2,
-        y: rect.top - (parentRect?.top ?? 0),
-      });
-      setTimeout(() => setXpPop(null), 900);
+      // A replayed, already-completed chapter earns nothing (see alreadyCompleted above) — the
+      // +10 popup used to fire unconditionally here, which used to be a harmless lie back when
+      // addXp was never called either way, but would become a real one now that a first pass
+      // does add real XP: showing it on a replay would promise a reward that never lands.
+      if (!alreadyCompleted) {
+        addXp(10);
+        const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+        const parentRect = (event.currentTarget as HTMLElement).parentElement?.getBoundingClientRect();
+        setXpPop({
+          x: rect.left - (parentRect?.left ?? 0) + rect.width / 2,
+          y: rect.top - (parentRect?.top ?? 0),
+        });
+        setTimeout(() => setXpPop(null), 900);
+      }
     } else {
       sfx.wrong(soundOn);
       setFeedbackLine(quizWrong(voiceCtx));
       setStreak(0);
+      flagStruggle(chapterId);
     }
     setTimeout(() => setShowExplain(true), 400);
   };
 
   // Un positionnement honnête n'est pas une erreur : pas de sfx.wrong, pas de ton "raté" — voir
-  // quizDontKnow dans braiseVoice.ts, volontairement distinct de quizWrong.
+  // quizDontKnow dans braiseVoice.ts, volontairement distinct de quizWrong. Ça reste un vrai
+  // signal de consolidation au même titre qu'une mauvaise réponse : flagStruggle s'applique aussi.
   const handleDontKnow = () => {
     if (selected !== null) return;
     setSelected(-1);
     sfx.tap(soundOn);
     setFeedbackLine(quizDontKnow(voiceCtx));
     setStreak(0);
+    flagStruggle(chapterId);
     setTimeout(() => setShowExplain(true), 300);
   };
 

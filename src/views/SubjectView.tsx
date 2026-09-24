@@ -25,7 +25,7 @@ export function SubjectView() {
 
   if (!subject) return null;
 
-  const chapters = resolveChapters(subject.chapters, state.completedChapters);
+  const chapters = resolveChapters(subject.chapters, state.completedChapters, state.struggledChapters);
   const doneCount = chapters.filter((c) => c.status === 'done').length;
   const pct = Math.round((doneCount / chapters.length) * 100);
 

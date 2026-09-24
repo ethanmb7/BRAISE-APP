@@ -135,6 +135,12 @@ export type AppState = {
   lastChapterId: string | null;
   currentLessonMode: 'vocal' | 'echanger';
   completedChapters: string[];
+  /** Chapters whose lesson quiz revealed a real miss (wrong answer or an honest "Je ne sais
+   *  pas") and hasn't been resolved since — the real signal behind Chapter.reinforce, computed
+   *  by resolveChapters(). Never cleared automatically on completion: a chapter finished after a
+   *  real struggle isn't retroactively un-struggled, resolveChapters() just stops surfacing the
+   *  pill once status is 'done' (see its own comment). */
+  struggledChapters: string[];
   chatBridgeMessage: string | null;
   /** Where "back" from a lesson should land when it wasn't reached through a subject (e.g.
    *  "Revoir la notion" mid-session on Réviser). In-memory only, never persisted. */
