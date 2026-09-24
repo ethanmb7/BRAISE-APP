@@ -14,8 +14,8 @@ type Props = {
 // matières restent consultables (depuis Accueil ou Réviser), juste pas promues au même niveau.
 const TABS: { id: TabId; label: string; icon: typeof CalendarDays }[] = [
   { id: 'home', label: 'Aujourd’hui', icon: CalendarDays },
-  { id: 'progres', label: 'Aura', icon: TrendingUp },
   { id: 'revisions', label: 'Réviser', icon: Layers },
+  { id: 'progres', label: 'Aura', icon: TrendingUp },
   { id: 'profile', label: 'Moi', icon: User },
 ];
 
