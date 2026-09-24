@@ -1,21 +1,21 @@
-import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { ChevronRight } from 'lucide-react';
-import { useApp, computeGoalPct, remainingToGoal, resolveChapters } from '@/store';
-import { sfx } from '@/lib/sound';
-import { fireConfetti } from '@/lib/confetti';
-import { LevelSheet } from '@/components/LevelSheet';
-import { HeaderHUD } from '@/components/HeaderHUD';
-import { HeroPiocheCard } from '@/components/HeroPiocheCard';
-import { MissedCardsBanner } from '@/components/MissedCardsBanner';
-import { SubjectDecks } from '@/components/SubjectDecks';
-import { TodayStrip } from '@/components/TodayStrip';
-import { ShareAuraModal } from '@/components/ShareAuraModal';
-import { SUBJECTS, FLASHCARDS } from '@/data';
-import { dailyPickLine, getAgeGroup } from '@/lib/braiseVoice';
-import { getRankInfo, countMasteredCards } from '@/lib/aura';
-import { getIntoxDismissedCount, setIntoxDismissedCount } from '@/lib/celebrations';
-import type { Level, Subject, Chapter } from '@/types';
+import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import { ChevronRight } from "lucide-react";
+import { useApp, computeGoalPct, remainingToGoal, resolveChapters } from "@/store";
+import { sfx } from "@/lib/sound";
+import { fireConfetti } from "@/lib/confetti";
+import { LevelSheet } from "@/components/LevelSheet";
+import { HeaderHUD } from "@/components/HeaderHUD";
+import { HeroPiocheCard } from "@/components/HeroPiocheCard";
+import { MissedCardsBanner } from "@/components/MissedCardsBanner";
+import { SubjectDecks } from "@/components/SubjectDecks";
+import { TodayStrip } from "@/components/TodayStrip";
+import { ShareAuraModal } from "@/components/ShareAuraModal";
+import { SUBJECTS, FLASHCARDS } from "@/data";
+import { dailyPickLine, getAgeGroup } from "@/lib/braiseVoice";
+import { getRankInfo, countMasteredCards } from "@/lib/aura";
+import { getIntoxDismissedCount, setIntoxDismissedCount } from "@/lib/celebrations";
+import type { Level, Subject, Chapter } from "@/types";
 
 // Same choreography language as Ton Aura: a calm stagger fade for each block.
 const staggerContainer = {
@@ -54,7 +54,9 @@ export function HomeView() {
   // isn't a fabricated "DS dans 2 jours" countdown — mastery % and the reinforce flag are the
   // real signals already tracked per chapter.
   const priorityChapters: { subject: Subject; chapter: Chapter }[] = SUBJECTS.map((s) => {
-    const chapter = resolveChapters(s.chapters, state.completedChapters).find((c) => c.status === 'current');
+    const chapter = resolveChapters(s.chapters, state.completedChapters).find(
+      (c) => c.status === "current",
+    );
     return chapter ? { subject: s, chapter } : null;
   })
     .filter((x): x is { subject: Subject; chapter: Chapter } => x !== null)
@@ -69,7 +71,8 @@ export function HomeView() {
   const todaySeed = new Date().toISOString().slice(0, 10);
   let hash = 0;
   for (let i = 0; i < todaySeed.length; i++) hash = (hash * 31 + todaySeed.charCodeAt(i)) >>> 0;
-  const dailyPick = priorityChapters.length > 0 ? priorityChapters[hash % priorityChapters.length] : null;
+  const dailyPick =
+    priorityChapters.length > 0 ? priorityChapters[hash % priorityChapters.length] : null;
   const currentSubject = dailyPick?.subject;
   const currentChapter = dailyPick?.chapter;
   // Real per-chapter deck size (FLASHCARDS filtered by chapterId) — the card used to show a
@@ -79,7 +82,9 @@ export function HomeView() {
     : 0;
   // Real count of cards whose last swipe-judge verdict was wrong — reviewCard() writes
   // 'not-sure' on an incorrect judgment (RevisionsView), never anything invented here.
-  const missedCardsCount = Object.values(state.cardReviews).filter((r) => r.lastConfidence === 'not-sure').length;
+  const missedCardsCount = Object.values(state.cardReviews).filter(
+    (r) => r.lastConfidence === "not-sure",
+  ).length;
   // Dismissing the banner hides it at the count it was dismissed at — it reappears the moment a
   // NEW card gets missed and the real count climbs past that, not gone for good.
   const showIntoxBanner = missedCardsCount > intoxDismissedCount;
@@ -92,7 +97,13 @@ export function HomeView() {
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
   const bubbleLine =
     currentSubject && currentChapter
-      ? dailyPickLine(voiceCtx, state.user.name, currentSubject.name, currentChapter.title, currentChapter.duration)
+      ? dailyPickLine(
+          voiceCtx,
+          state.user.name,
+          currentSubject.name,
+          currentChapter.title,
+          currentChapter.duration,
+        )
       : `${state.user.name}, série de ${state.streak} jours. On lâche rien !`;
 
   // Each card's "Niv." is the current chapter's real position in the subject's own sequence
@@ -104,13 +115,13 @@ export function HomeView() {
   // Sorted by the current chapter's own mastery, lowest first: this grid now does the job that
   // "Chapitres prioritaires" used to do as a separate carousel — same data (every subject's
   // current chapter), it was never two different things, just the same list shown twice.
-  const SHORT_SUBJECT_NAME: Record<string, string> = { maths: 'Maths' };
-  const stripLeadingArticle = (title: string) => title.replace(/^(les |la |le |l')/i, '');
+  const SHORT_SUBJECT_NAME: Record<string, string> = { maths: "Maths" };
+  const stripLeadingArticle = (title: string) => title.replace(/^(les |la |le |l')/i, "");
   const subjectDecks = SUBJECTS.map((s) => {
     const chapters = resolveChapters(s.chapters, state.completedChapters);
-    const doneCount = chapters.filter((c) => c.status === 'done').length;
+    const doneCount = chapters.filter((c) => c.status === "done").length;
     const pct = Math.round((doneCount / chapters.length) * 100);
-    const currentIndex = chapters.findIndex((c) => c.status === 'current');
+    const currentIndex = chapters.findIndex((c) => c.status === "current");
     const current = currentIndex >= 0 ? chapters[currentIndex] : null;
     return {
       id: s.id,
@@ -127,7 +138,9 @@ export function HomeView() {
       // so without this every card looks interchangeable and nothing says where to start.
       isDailyPick: s.id === currentSubject?.id,
     };
-  }).sort((a, b) => Number(b.isDailyPick) - Number(a.isDailyPick) || a.currentMastery - b.currentMastery);
+  }).sort(
+    (a, b) => Number(b.isDailyPick) - Number(a.isDailyPick) || a.currentMastery - b.currentMastery,
+  );
 
   const goToChapter = (subjectId: string, chapterId?: string) => {
     sfx.tap(state.soundOn);
@@ -137,7 +150,9 @@ export function HomeView() {
   // Same derivation as ProfilAuraView's own share button — real distinct-subjects-reviewed
   // count from card review history, not a second, possibly-diverging computation.
   const subjectsCount = new Set(
-    Object.keys(state.cardReviews).map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)
+    Object.keys(state.cardReviews)
+      .map((id) => FLASHCARDS.find((c) => c.id === id)?.subject)
+      .filter(Boolean),
   ).size;
   const masteredCards = countMasteredCards(state.cardReviews);
   const rank = getRankInfo(state.xp).current;
@@ -149,17 +164,23 @@ export function HomeView() {
           <div className="setup-banner">Configure ton niveau pour des leçons sur mesure.</div>
         )}
 
-        <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-4 pb-8">
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="show"
+          className="space-y-4 pb-8"
+        >
           <motion.div variants={staggerItem}>
             <HeaderHUD
               name={state.user.name}
               avatar={state.user.avatar}
               streak={state.streak}
               xp={state.xp}
-              onAvatarClick={() => setView('profile')}
+              onAvatarClick={() => setView("profile")}
               onAuraClick={() => {
                 sfx.tap(state.soundOn);
-                setTab('progres');
+                setTab("profile");
+                setView("progres");
               }}
             />
           </motion.div>
@@ -169,12 +190,13 @@ export function HomeView() {
               bubbleLine={bubbleLine}
               subjectName={currentSubject?.name}
               subjectColor={currentSubject?.color}
-              chapterTitle={currentChapter?.title ?? 'Leçon du jour'}
+              chapterTitle={currentChapter?.title ?? "Leçon du jour"}
               duration={currentChapter?.duration ?? 0}
               cardCount={currentChapterCardCount}
               soundOn={state.soundOn}
               onStart={() => {
-                if (currentSubject && currentChapter) openLesson(currentSubject.id, currentChapter.id);
+                if (currentSubject && currentChapter)
+                  openLesson(currentSubject.id, currentChapter.id);
               }}
             />
           </motion.div>
@@ -188,7 +210,7 @@ export function HomeView() {
               dueCount={dueCount}
               onContinue={() => {
                 sfx.tap(state.soundOn);
-                setTab('revisions');
+                setTab("revisions");
               }}
               onShare={() => {
                 sfx.tap(state.soundOn);
@@ -204,7 +226,7 @@ export function HomeView() {
                 count={missedCardsCount}
                 onOpen={() => {
                   sfx.tap(state.soundOn);
-                  setTab('revisions');
+                  setTab("revisions");
                 }}
                 onDismiss={handleDismissIntox}
               />
@@ -214,8 +236,12 @@ export function HomeView() {
           <motion.div variants={staggerItem} className="space-y-3">
             <div className="flex items-end justify-between gap-3">
               <div>
-                <span className="font-mono text-[0.62rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">Quand tu veux aller plus loin</span>
-                <h2 className="font-display text-[1.15rem] font-extrabold leading-tight text-[var(--ink)]">Tes univers</h2>
+                <span className="font-mono text-[0.62rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">
+                  Quand tu veux aller plus loin
+                </span>
+                <h2 className="font-display text-[1.15rem] font-extrabold leading-tight text-[var(--ink)]">
+                  Tes univers
+                </h2>
               </div>
               <span className="rounded-lg border border-black bg-[var(--neo-orange)] px-2 py-0.5 text-xs font-black text-white shadow-[1px_1px_0px_0px_#000]">
                 {SUBJECTS.length}
@@ -232,7 +258,7 @@ export function HomeView() {
 
           <motion.div variants={staggerItem} className="text-center">
             <button
-              onClick={() => setView('settings')}
+              onClick={() => setView("settings")}
               className="inline-flex items-center gap-1.5 text-[0.8rem] text-[var(--ink-soft)]"
             >
               <ChevronRight size={14} /> Paramètres
@@ -241,7 +267,12 @@ export function HomeView() {
         </motion.div>
       </div>
 
-      <LevelSheet open={sheetOpen} current={state.user.level} onSelect={handleLevel} onClose={() => setSheetOpen(false)} />
+      <LevelSheet
+        open={sheetOpen}
+        current={state.user.level}
+        onSelect={handleLevel}
+        onClose={() => setSheetOpen(false)}
+      />
 
       {shareOpen && (
         <ShareAuraModal
