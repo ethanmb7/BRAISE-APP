@@ -11,7 +11,7 @@ import { SubjectDecks } from '@/components/SubjectDecks';
 import { TodayStrip } from '@/components/TodayStrip';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { SUBJECTS, FLASHCARDS } from '@/data';
-import { dailyPickLine, getAgeGroup } from '@/lib/braiseVoice';
+import { dailyPickLine, headerGreeting, getAgeGroup } from '@/lib/braiseVoice';
 import { getRankInfo, countMasteredCards } from '@/lib/aura';
 import { getIntoxDismissedCount, setIntoxDismissedCount } from '@/lib/celebrations';
 import type { Level, Subject, Chapter } from '@/types';
@@ -145,7 +145,7 @@ export function HomeView() {
     <>
       <div className="view is-active home-view pt-3">
         {!state.user.level && (
-          <div className="setup-banner">Configure ton niveau pour des leçons sur mesure.</div>
+          <div className="setup-banner">Configure ton niveau pour des leçons pile pour toi.</div>
         )}
 
         <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-4 pb-8">
@@ -155,6 +155,7 @@ export function HomeView() {
               avatar={state.user.avatar}
               streak={state.streak}
               xp={state.xp}
+              greeting={headerGreeting(voiceCtx)}
               onAvatarClick={() => setView('profile')}
               onAuraClick={() => {
                 sfx.tap(state.soundOn);

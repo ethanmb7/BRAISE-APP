@@ -43,7 +43,7 @@ export function SubjectsView() {
         <motion.header variants={item} className="subjects-heading">
           <span className="subjects-heading-icon" aria-hidden="true"><BookOpen size={22} strokeWidth={2.7} /></span>
           <div>
-            <p>Ton espace libre</p>
+            <p>Sans pression</p>
             <h1>Tes matières</h1>
             <span>Choisis ce que tu veux comprendre aujourd’hui.</span>
           </div>
