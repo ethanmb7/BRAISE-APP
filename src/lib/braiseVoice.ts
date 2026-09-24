@@ -70,6 +70,68 @@ export function lessonComplete(ctx: VoiceCtx, name: string): string {
   });
 }
 
+/** "Ton rythme du jour" (TodayStrip) — Braise's real daily-mood read on Aujourd'hui, the screen
+ *  seen more than any other, and until now the one place on Home with zero personality branching:
+ *  flat narration, same two lines for every student regardless of the ton/âge they chose in
+ *  Moi. Five real states, highest-priority first, resolved by the caller (TodayStrip) — never a
+ *  templated "come back!" line, only what's actually true right now:
+ *  - `freeze-danger`: the last gel de série is already spent (see toggleFreeze in store.tsx) and
+ *    today isn't done yet — a heads-up, never a threat (PRODUCT_VISION.md explicitly bans
+ *    streak-pressure guilt: this states the real fact and the real fix, nothing about "losing
+ *    everything").
+ *  - `returning`: streak at 0 but the device has real history (xp or completedChapters) — a real
+ *    gap since the last session, not a brand-new account. A warm restart, not a scolding — same
+ *    "resting, not disappointed" principle as BraiseMascot's `sleepy` mood everywhere else.
+ *  - `goal-met-streak` / `goal-met-fresh`: today's goal is real and done — split so a student
+ *    building day one of a fresh streak doesn't get "ta série continue" about a streak that isn't
+ *    one yet.
+ *  - `progressing`: the honest default — the real remaining count, nothing invented. */
+export function todayRhythmLine(
+  ctx: VoiceCtx,
+  kind: 'freeze-danger' | 'returning' | 'goal-met-streak' | 'goal-met-fresh' | 'progressing',
+  remaining = 0
+): string {
+  const s = remaining > 1 ? 's' : '';
+  if (kind === 'freeze-danger') {
+    return byCombo(ctx, {
+      'chill-college': [`Ton gel de série est déjà utilisé — une petite carte aujourd'hui et ta série tient bon.`],
+      'chill-lycee': [`Plus de gel en réserve — une carte aujourd'hui garde ta série intacte.`],
+      'savage-college': [`Zéro gel en stock. Une carte, et ta série est sauvée.`],
+      'savage-lycee': [`T'as plus de gel. Une carte aujourd'hui, et le sujet est clos.`],
+    });
+  }
+  if (kind === 'returning') {
+    return byCombo(ctx, {
+      'chill-college': [`Ça faisait un moment ! Une carte suffit pour relancer une série.`],
+      'chill-lycee': [`Ça faisait un bail. Une carte, et c'est reparti.`],
+      'savage-college': [`Tiens, tu reviens. Une carte et on oublie la pause.`],
+      'savage-lycee': [`Ah, te revoilà. Une carte et on efface l'absence.`],
+    });
+  }
+  if (kind === 'goal-met-streak') {
+    return byCombo(ctx, {
+      'chill-college': [`Belle régularité, ta série continue !`],
+      'chill-lycee': [`Belle régularité : ta série continue.`],
+      'savage-college': [`Objectif fait, série qui tient. Pas mal.`],
+      'savage-lycee': [`Objectif réglé, série intacte. Le bac recule.`],
+    });
+  }
+  if (kind === 'goal-met-fresh') {
+    return byCombo(ctx, {
+      'chill-college': [`Ton objectif du jour est validé, nickel !`],
+      'chill-lycee': [`Ton objectif du jour est validé.`],
+      'savage-college': [`Objectif fait. On note le début d'une série, peut-être.`],
+      'savage-lycee': [`Objectif réglé. Reste à voir si tu reviens demain.`],
+    });
+  }
+  return byCombo(ctx, {
+    'chill-college': [`Encore ${remaining} étape${s} pour boucler ta journée.`],
+    'chill-lycee': [`Encore ${remaining} étape${s} avant de boucler.`],
+    'savage-college': [`${remaining} étape${s} de plus, et c'est plié.`],
+    'savage-lycee': [`Il te reste ${remaining} étape${s}. Le bac attend.`],
+  });
+}
+
 /** The one word above the student's own name in HeaderHUD — rendered on every single visit to
  *  Aujourd'hui, so it has to survive being seen many times a day without ever reading as a script.
  *  "Bonjour" (the previous, hardcoded value) was neutral to the point of institutional — the kind

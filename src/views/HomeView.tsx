@@ -186,6 +186,9 @@ export function HomeView() {
               remaining={remainingToGoal(state)}
               goalPct={computeGoalPct(state)}
               dueCount={dueCount}
+              freezes={state.freezes}
+              hasPriorActivity={state.xp > 0 || state.completedChapters.length > 0}
+              voiceCtx={voiceCtx}
               onContinue={() => {
                 sfx.tap(state.soundOn);
                 setTab('revisions');
