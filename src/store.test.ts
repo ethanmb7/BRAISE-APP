@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { ensureSession } from '@/store';
+import { ensureSession, resolveChapters } from '@/store';
 import { DEFAULT_USER } from '@/data';
-import type { AppState } from '@/types';
+import type { AppState, Chapter } from '@/types';
 
 // A full, minimal-but-valid AppState so each test only has to override the handful of fields
 // its own case actually cares about — the rest never matters to ensureSession's own branching.
@@ -25,6 +25,7 @@ function baseState(overrides: Partial<AppState>): AppState {
     lastChapterId: null,
     currentLessonMode: 'vocal',
     completedChapters: [],
+    struggledChapters: [],
     chatBridgeMessage: null,
     lessonReturnTo: null,
     lastCompletion: null,
@@ -86,5 +87,35 @@ describe('ensureSession', () => {
     const result = ensureSession(s);
     expect(Number.isNaN(result.streak)).toBe(false);
     expect(result.sessionCardsReviewed).toBe(0);
+  });
+});
+
+const CHAPTERS: Chapter[] = [
+  { id: 'c1', title: 'Un', status: 'current', mastery: 0, duration: 3 },
+  { id: 'c2', title: 'Deux', status: 'locked', mastery: 0, duration: 3 },
+  { id: 'c3', title: 'Trois', status: 'locked', mastery: 0, duration: 3 },
+];
+
+describe('resolveChapters', () => {
+  it('defaults reinforce to false with no struggle history', () => {
+    const result = resolveChapters(CHAPTERS, []);
+    expect(result.every((c) => c.reinforce === false)).toBe(true);
+  });
+
+  it('surfaces reinforce only for chapters with a real recorded struggle', () => {
+    const result = resolveChapters(CHAPTERS, [], ['c2']);
+    expect(result.find((c) => c.id === 'c1')?.reinforce).toBe(false);
+    expect(result.find((c) => c.id === 'c2')?.reinforce).toBe(true);
+    expect(result.find((c) => c.id === 'c3')?.reinforce).toBe(false);
+  });
+
+  it('never shows reinforce on a chapter already completed, even with a struggle on record', () => {
+    // A real case: the student missed a question on c1, then went back and finished it anyway —
+    // "done" and "still needs reinforcement" would read as contradictory with no partial-mastery
+    // state to hold both at once (see resolveChapters' own comment in store.tsx).
+    const result = resolveChapters(CHAPTERS, ['c1'], ['c1']);
+    const c1 = result.find((c) => c.id === 'c1');
+    expect(c1?.status).toBe('done');
+    expect(c1?.reinforce).toBe(false);
   });
 });

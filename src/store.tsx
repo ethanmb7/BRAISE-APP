@@ -30,6 +30,7 @@ type Ctx = {
   openSubject: (subjectId: string, chapterId?: string) => void;
   openLesson: (subjectId: string, chapterId: string, mode?: 'vocal' | 'echanger') => void;
   completeChapter: (chapterId: string) => void;
+  flagStruggle: (chapterId: string) => void;
   reviewCard: (cardId: string, confidence: Confidence) => void;
   getDueCards: () => string[];
   goBack: () => void;
@@ -72,13 +73,22 @@ export function remainingToGoal(s: AppState): number {
  *  level deeper. A completed chapter shows 100% (real completion, not a graded score — nothing
  *  in the data model tracks partial per-chapter mastery); anything not yet completed shows 0%,
  *  never a fabricated in-between number.
+ *
+ *  `reinforce` had the exact same bug: data.ts's `reinforce: true` on m3/p2 was a fresh-install
+ *  baseline the UI displayed as if it were live fact, never recomputed from anything the student
+ *  actually did. It's now driven by `struggledChapters` (a real miss — a wrong lesson-quiz answer
+ *  or an honest "Je ne sais pas", see LessonView's `flagStruggle`) — never shown on a chapter
+ *  that's already 'done', since "finished" and "still needs reinforcement" read as contradictory
+ *  in the app's current binary completion model (no partial-mastery state exists yet to hold
+ *  both facts at once).
  */
-export function resolveChapters(chapters: Chapter[], completedChapters: string[]): Chapter[] {
+export function resolveChapters(chapters: Chapter[], completedChapters: string[], struggledChapters: string[] = []): Chapter[] {
   const firstOpenIndex = chapters.findIndex((c) => !completedChapters.includes(c.id));
   return chapters.map((c, i) => {
-    if (completedChapters.includes(c.id)) return { ...c, status: 'done', mastery: 100 };
-    if (i === firstOpenIndex) return { ...c, status: 'current', mastery: 0 };
-    return { ...c, status: 'locked', mastery: 0 };
+    if (completedChapters.includes(c.id)) return { ...c, status: 'done', mastery: 100, reinforce: false };
+    const reinforce = struggledChapters.includes(c.id);
+    if (i === firstOpenIndex) return { ...c, status: 'current', mastery: 0, reinforce };
+    return { ...c, status: 'locked', mastery: 0, reinforce };
   });
 }
 
@@ -241,6 +251,7 @@ const INITIAL: AppState = {
   lastChapterId: null,
   currentLessonMode: 'vocal' as const,
   completedChapters: [],
+  struggledChapters: [],
   chatBridgeMessage: null,
   lessonReturnTo: null,
   lastCompletion: null,
@@ -413,6 +424,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  // The real signal behind resolveChapters()'s dynamic `reinforce` — called from LessonView's
+  // Quiz on a wrong answer or an honest "Je ne sais pas", never on a correct one. Idempotent
+  // (a second miss on the same chapter is still just one entry) for the same reason
+  // completeChapter's `already` guard exists: this list is a fact ("this chapter had a real
+  // miss"), not a counter, so it shouldn't grow with repeats.
+  const flagStruggle = useCallback((chapterId: string) => {
+    setState((s) => {
+      const session = { ...s, ...ensureSession(s) };
+      if (session.struggledChapters.includes(chapterId)) return session;
+      return { ...session, struggledChapters: [...session.struggledChapters, chapterId] };
+    });
+  }, []);
+
   const reviewCard = useCallback((cardId: string, confidence: Confidence) => {
     setState((s) => {
       // `ensureSession` is intentionally first, just as it is in `completeChapter`. A card
@@ -484,6 +508,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         openLesson,
         bridgeToChat,
         completeChapter,
+        flagStruggle,
         reviewCard,
         getDueCards,
         goBack,

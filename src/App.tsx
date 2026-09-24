@@ -5,6 +5,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PiocheRevealVeil } from '@/components/PiocheRevealVeil';
 import { BraiseMascot } from '@/components/BraiseMascot';
 import { RankUpCelebration } from '@/components/RankUpCelebration';
+import { BadgeIcon } from '@/components/BadgeIcon';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { useMilestoneCelebrations } from '@/lib/useMilestoneCelebrations';
 import { rankUpLine, getAgeGroup } from '@/lib/braiseVoice';
@@ -74,7 +75,8 @@ function Screen() {
 
       {celebration?.type === 'badge' && (
         <div key={`badge-${celebration.badge.id}`} className="milestone-toast">
-          {celebration.badge.emoji} Badge débloqué : {celebration.badge.name} !
+          <BadgeIcon badgeId={celebration.badge.id} size={20} />
+          Badge débloqué : {celebration.badge.name} !
         </div>
       )}
 

@@ -1,7 +1,7 @@
 import { ChevronLeft } from 'lucide-react';
 
 type Props = {
-  title: string;
+  title: React.ReactNode;
   onBack?: () => void;
   right?: React.ReactNode;
 };
