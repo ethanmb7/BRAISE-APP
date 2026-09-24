@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { useApp, computeGoalPct, remainingToGoal, resolveChapters } from '@/store';
 import { sfx } from '@/lib/sound';
 import { fireConfetti } from '@/lib/confetti';
-import { LevelSheet } from '@/components/LevelSheet';
 import { HeaderHUD } from '@/components/HeaderHUD';
 import { HeroPiocheCard } from '@/components/HeroPiocheCard';
 import { MissedCardsBanner } from '@/components/MissedCardsBanner';
@@ -14,7 +13,7 @@ import { SUBJECTS, FLASHCARDS } from '@/data';
 import { dailyPickLine, headerGreeting, getAgeGroup } from '@/lib/braiseVoice';
 import { getRankInfo, countMasteredCards, countSubjectsReviewed } from '@/lib/aura';
 import { getIntoxDismissedCount, setIntoxDismissedCount } from '@/lib/celebrations';
-import type { Level, Subject, Chapter } from '@/types';
+import type { Subject, Chapter } from '@/types';
 
 // Same choreography language as Ton Aura: a calm stagger fade for each block.
 const staggerContainer = {
@@ -27,8 +26,7 @@ const staggerItem = {
 };
 
 export function HomeView() {
-  const { state, setTab, setView, openSubject, openLesson, setUser, getDueCards } = useApp();
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const { state, setTab, setView, openSubject, openLesson, getDueCards } = useApp();
   const [shareOpen, setShareOpen] = useState(false);
   const [intoxDismissedCount, setIntoxDismissedCountState] = useState(getIntoxDismissedCount);
   const prevGoalMet = useRef(state.dailyGoalMet);
@@ -41,12 +39,6 @@ export function HomeView() {
   }, [state.dailyGoalMet]);
 
   const dueCount = getDueCards().length;
-
-  const handleLevel = (l: Level) => {
-    sfx.tap(state.soundOn);
-    setUser({ ...state.user, level: l.id, levelLabel: l.label });
-    setSheetOpen(false);
-  };
 
   // "Chapitres prioritaires" — every subject's in-progress chapter, ranked by real mastery
   // (lowest first). No exam-date field exists anywhere in the data model, so this deliberately
@@ -140,10 +132,6 @@ export function HomeView() {
   return (
     <>
       <div className="view is-active home-view pt-3">
-        {!state.user.level && (
-          <div className="setup-banner">Configure ton niveau pour des leçons pile pour toi.</div>
-        )}
-
         <motion.div variants={staggerContainer} initial="hidden" animate="show" className="space-y-4 pb-8">
           <motion.div variants={staggerItem}>
             <HeaderHUD
@@ -229,8 +217,6 @@ export function HomeView() {
 
         </motion.div>
       </div>
-
-      <LevelSheet open={sheetOpen} current={state.user.level} onSelect={handleLevel} onClose={() => setSheetOpen(false)} />
 
       {shareOpen && (
         <ShareAuraModal

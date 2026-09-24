@@ -482,27 +482,14 @@ select {
   text-decoration: underline;
 }
 
-/* ===== Bottom sheet (level picker) ===== */
+/* ===== Bottom sheet (reused by BraiseFeynmanDrawer — name is a holdover from the level picker
+   this pattern first shipped for) ===== */
 .level-sheet-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(15, 20, 40, 0.5);
   z-index: 90;
   backdrop-filter: blur(4px);
-}
-.level-sheet {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 0;
-  width: 100%;
-  max-width: 428px;
-  background: var(--paper);
-  border-radius: 24px 24px 0 0;
-  padding: 10px 20px 26px;
-  z-index: 91;
-  max-height: 75%;
-  overflow-y: auto;
 }
 .level-sheet-handle {
   width: 36px;
@@ -534,16 +521,6 @@ select {
 }
 
 /* ===== Home — Neobrutalist Hype (palette officielle 60/30/10) ===== */
-.setup-banner {
-  background: var(--paper);
-  border: 2px solid var(--neo-ink);
-  color: var(--ink);
-  font-size: 0.78rem;
-  font-weight: 700;
-  padding: 10px 14px;
-  border-radius: 12px;
-  margin-bottom: 14px;
-}
 
 /* Home is now built with Tailwind utility classes (src/components/HeaderHUD.tsx,
    HeroPiocheCard.tsx, SubjectDecks.tsx) instead of hand-written classes here — these three
@@ -3548,13 +3525,6 @@ select {
   box-shadow: 3px 3px 0 var(--neo-orange);
 }
 
-.profile-avatar-picker {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 14px;
-}
 .profile-avatar-option {
   position: relative;
   width: 42px;
@@ -3597,11 +3567,6 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.profile-avatar-unlock-hint {
-  font-size: 0.66rem;
-  color: var(--ink-soft);
-  margin: -4px 0 12px;
 }
 .profile-name-input {
   width: 100%;
@@ -3751,16 +3716,6 @@ select {
   border-radius: 11px;
   background: color-mix(in srgb, var(--neo-orange) 10%, var(--paper));
   color: var(--neo-orange);
-}
-.settings-select {
-  max-width: 46%;
-  border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
-  border-radius: 10px;
-  background: var(--bg);
-  color: var(--ink-soft);
-  padding: 7px 9px;
-  font-size: 0.82rem;
-  font-weight: 650;
 }
 .switch {
   position: relative;

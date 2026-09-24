@@ -1,18 +1,10 @@
-import { Moon, Type, Volume2, Globe } from 'lucide-react';
+import { Moon, Type, Volume2 } from 'lucide-react';
 import { useApp } from '@/store';
-import { sfx } from '@/lib/sound';
 import { TopBar } from '@/components/TopBar';
 import { Switch } from '@/components/Switch';
-import { LEVELS } from '@/data';
-import type { Level } from '@/types';
 
 export function SettingsView() {
-  const { state, goBack, toggleDark, toggleDyslexia, toggleSound, setUser } = useApp();
-
-  const handleLevel = (l: Level) => {
-    sfx.tap(state.soundOn);
-    setUser({ ...state.user, level: l.id, levelLabel: l.label });
-  };
+  const { state, goBack, toggleDark, toggleDyslexia, toggleSound } = useApp();
 
   return (
     <div>
@@ -46,31 +38,6 @@ export function SettingsView() {
               Sons et effets
             </span>
             <Switch checked={state.soundOn} onChange={toggleSound} aria-label="Sons" />
-          </div>
-        </div>
-
-        {/* Compte */}
-        <div className="settings-label">Compte</div>
-        <div className="settings-group">
-          <div className="settings-row">
-            <span className="settings-row-main">
-              <span className="settings-row-icon" aria-hidden="true"><Globe size={18} /></span>
-              Niveau
-            </span>
-            <select
-              value={state.user.level}
-              onChange={(e) => {
-                const l = LEVELS.find((x) => x.id === e.target.value);
-                if (l) handleLevel(l);
-              }}
-              className="settings-select"
-            >
-              {LEVELS.map((l) => (
-                <option key={l.id} value={l.id}>
-                  {l.label}
-                </option>
-              ))}
-            </select>
           </div>
         </div>
 

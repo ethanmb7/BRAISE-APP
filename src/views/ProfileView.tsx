@@ -42,7 +42,6 @@ export function ProfileView() {
   const { state, setView, goBack, setTab, setPersonality, setUser } = useApp();
   const [editingIdentity, setEditingIdentity] = useState(false);
   const [draftName, setDraftName] = useState(state.user.name);
-  const [draftAvatar, setDraftAvatar] = useState(state.user.avatar);
 
   const subjectsCount = state.user.subjects.length;
   const chaptersDone = countDoneChapters(state.completedChapters);
@@ -82,13 +81,12 @@ export function ProfileView() {
   const openIdentityEdit = () => {
     sfx.tap(state.soundOn);
     setDraftName(state.user.name);
-    setDraftAvatar(state.user.avatar);
     setEditingIdentity(true);
   };
 
   const saveIdentity = () => {
     sfx.tap(state.soundOn);
-    setUser({ ...state.user, name: draftName.trim() || state.user.name, avatar: draftAvatar });
+    setUser({ ...state.user, name: draftName.trim() || state.user.name });
     setEditingIdentity(false);
   };
 
@@ -190,43 +188,11 @@ export function ProfileView() {
 
         ) : (
           <div className="profile-identity-edit">
-            <div className="profile-avatar-picker">
-              {AVATARS.map((a) => {
-                const unlocked = isAvatarUnlocked(a.minRankId, rank.id);
-                const requiredRank = a.minRankId ? RANKS.find((r) => r.id === a.minRankId) : null;
-                return (
-                  <button
-                    key={a.emoji}
-                    type="button"
-                    className={`profile-avatar-option ${draftAvatar === a.emoji ? 'is-selected' : ''} ${unlocked ? '' : 'is-locked'}`}
-                    onClick={() => {
-                      if (!unlocked) return;
-                      sfx.tap(state.soundOn);
-                      setDraftAvatar(a.emoji);
-                    }}
-                    disabled={!unlocked}
-                    aria-label={unlocked ? `Choisir l'avatar ${getAvatarName(a.emoji)}` : `Avatar verrouillé — débloqué au rang ${requiredRank?.name}`}
-                  >
-                    <AvatarGlyph id={a.emoji} rankId={rank.id} size={30} />
-                    {!unlocked && (
-                      <span className="profile-avatar-option-lock" aria-hidden="true">
-                        <RankIcon rankId="" color="" locked size={11} />
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-            {(() => {
-              const nextLockedAvatar = AVATARS.find((a) => a.minRankId && !isAvatarUnlocked(a.minRankId, rank.id));
-              if (!nextLockedAvatar) return null;
-              const requiredRank = RANKS.find((r) => r.id === nextLockedAvatar.minRankId);
-              return (
-                <p className="profile-avatar-unlock-hint">
-                  {getAvatarName(nextLockedAvatar.emoji)} débloqué au rang {requiredRank?.name}
-                </p>
-              );
-            })()}
+            {/* Avatar picker removed from here — "Ta tête" below already changes it instantly,
+                no confirmation needed (it's a single reversible tap, not text entry). Having both
+                on screen at once during edit meant two grids for one action, with two different
+                behaviours (draft+confirm here, instant-apply there). This panel now only edits
+                what actually needs a confirm step: the name. */}
             <input
               type="text"
               className="profile-name-input"
