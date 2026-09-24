@@ -35,6 +35,7 @@ export function ShareAuraModal({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { state } = useApp();
   const [busy, setBusy] = useState(false);
+  const [shareError, setShareError] = useState<string | null>(null);
 
   useEffect(() => {
     draw();
@@ -44,7 +45,7 @@ export function ShareAuraModal({
     // resolves catches that without any visible flicker — it's the same pixels, just crisper.
     document.fonts?.ready?.then(() => draw());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rank.id, streak, xp, subjectsCount, masteredCards]);
+  }, [rank.id, streak, xp, subjectsCount, masteredCards, state.completedChapters.length]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -60,6 +61,7 @@ export function ShareAuraModal({
     if (!canvas || !ctx) return;
     canvas.width = CANVAS_W;
     canvas.height = CANVAS_H;
+    const chaptersDone = state.completedChapters.length;
 
     const bg = ctx.createLinearGradient(0, 0, CANVAS_W, CANVAS_H);
     bg.addColorStop(0, rank.colorFrom);
@@ -124,10 +126,16 @@ export function ShareAuraModal({
     const chipW = (panelW - 120 - chipGap * 2) / 3;
     const chipX0 = panelX + 60;
     statChip(ctx, chipX0, chipY, chipW, 240, '#c4b5fd', drawBoltIcon, `${xp}`, 'XP TOTAL');
+    // masteredCards is 0 for anyone who hasn't touched Réviser yet — real right after finishing
+    // a first lesson from CompleteView, the other place this modal opens from. Falls through one
+    // more step to chapters completed, which that exact moment always has at least one of,
+    // rather than landing back on a second zero-looking chip right next to the first fallback.
     if (streak > 0) {
       statChip(ctx, chipX0 + chipW + chipGap, chipY, chipW, 240, '#ffd166', drawFlameIcon, `${streak}`, 'JOURS');
-    } else {
+    } else if (masteredCards > 0) {
       statChip(ctx, chipX0 + chipW + chipGap, chipY, chipW, 240, '#ffd166', drawCheckIcon, `${masteredCards}`, 'CARTES SUES');
+    } else {
+      statChip(ctx, chipX0 + chipW + chipGap, chipY, chipW, 240, '#ffd166', drawCheckIcon, `${chaptersDone}`, 'CHAPITRES');
     }
     statChip(ctx, chipX0 + (chipW + chipGap) * 2, chipY, chipW, 240, '#a7f3d0', drawBookIcon, `${subjectsCount}`, 'MATIÈRES');
 
@@ -152,10 +160,14 @@ export function ShareAuraModal({
     const canvas = canvasRef.current;
     if (!canvas) return;
     setBusy(true);
+    setShareError(null);
     sfx.tap(state.soundOn);
     try {
       const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
-      if (!blob) return;
+      if (!blob) {
+        setShareError("Oups, la carte n'a pas pu être générée. Réessaie ?");
+        return;
+      }
       const file = new File([blob], 'braise-aura.png', { type: 'image/png' });
       const nav = navigator as Navigator & {
         share?: (data: ShareData) => Promise<void>;
@@ -176,6 +188,9 @@ export function ShareAuraModal({
       a.download = 'braise-aura.png';
       a.click();
       URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('ShareAuraModal export failed:', err);
+      setShareError("Oups, le partage a échoué. Réessaie ?");
     } finally {
       setBusy(false);
     }
@@ -200,6 +215,11 @@ export function ShareAuraModal({
           <Share2 size={18} />
           {busy ? 'Génération…' : 'Partager ma carte'}
         </button>
+        {shareError && (
+          <p style={{ fontSize: '0.76rem', color: 'var(--coral-2)', textAlign: 'center', marginTop: 8 }}>
+            {shareError}
+          </p>
+        )}
       </div>
     </div>
   );

@@ -305,19 +305,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const saved = await loadProgress();
-      if (cancelled) return;
-      if (saved) {
-        const restoredView = resolveRestoredView(saved);
-        setState((s) => ({
-          ...s,
-          ...saved,
-          ...ensureSession({ ...s, ...saved }),
-          view: restoredView,
-          tab: resolveRestoredTab(restoredView, saved.tab),
-        }));
+      // loadProgress() already falls back to local data on any Supabase error or timeout — this
+      // catch is a last-resort net for an exception it doesn't anticipate, so `loaded` still
+      // flips and the player lands on INITIAL rather than being stuck on the loading screen
+      // forever with no way out.
+      try {
+        const saved = await loadProgress();
+        if (cancelled) return;
+        if (saved) {
+          const restoredView = resolveRestoredView(saved);
+          setState((s) => ({
+            ...s,
+            ...saved,
+            ...ensureSession({ ...s, ...saved }),
+            view: restoredView,
+            tab: resolveRestoredTab(restoredView, saved.tab),
+          }));
+        }
+      } catch (e) {
+        if (cancelled) return;
+        console.error('loadProgress failed unexpectedly, starting fresh:', e);
+      } finally {
+        if (!cancelled) setLoaded(true);
       }
-      setLoaded(true);
     })();
     return () => {
       cancelled = true;

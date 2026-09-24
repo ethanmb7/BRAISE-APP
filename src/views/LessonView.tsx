@@ -13,6 +13,7 @@ import {
   Lightbulb,
   Volume2,
   HelpCircle,
+  WifiOff,
 } from 'lucide-react';
 import { useApp } from '@/store';
 import { sfx } from '@/lib/sound';
@@ -20,6 +21,7 @@ import { TopBar } from '@/components/TopBar';
 import { BraiseMascot } from '@/components/BraiseMascot';
 import { BraiseFeynmanDrawer } from '@/components/BraiseFeynmanDrawer';
 import { sendChatMessage } from '@/lib/chat';
+import { useOnlineStatus } from '@/lib/useOnlineStatus';
 import { speak, stopSpeaking } from '@/lib/speech';
 import { getAgeGroup, quizCorrect, quizWrong, quizDontKnow, lessonOpenerCheckIn } from '@/lib/braiseVoice';
 import { SUBJECTS, STORIES, AUDIO_TRANSCRIPTS, LESSON_INTRO } from '@/data';
@@ -354,6 +356,10 @@ function ChatMode({
   const scrollRef = useRef<HTMLDivElement>(null);
   const bridgeHandled = useRef(false);
   const openerStarted = useRef(false);
+  // Unlike Ton Aura (whose whole screen is local data), Échanger genuinely needs a connection —
+  // sending while offline would just hang until the fetch's own timeout gives up. Catching it
+  // here means the student never fires that doomed request in the first place.
+  const isOnline = useOnlineStatus();
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -410,7 +416,7 @@ function ChatMode({
 
   const send = async () => {
     const text = input.trim();
-    if (!text || typing) return;
+    if (!text || typing || !isOnline) return;
     sfx.tap(soundOn);
     setError(null);
     const nextMessages: Msg[] = [...messages, { from: 'me', text }];
@@ -478,6 +484,23 @@ function ChatMode({
           </p>
         )}
       </div>
+      {!isOnline && (
+        <p
+          role="status"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            fontSize: '0.76rem',
+            color: 'var(--ink-soft)',
+            marginBottom: 8,
+          }}
+        >
+          <WifiOff size={14} />
+          Hors-ligne · le chat a besoin d'internet, réessaie une fois reconnecté
+        </p>
+      )}
       {messages.length > 0 && !typing && (
         <button
           className="explain-btn"
@@ -498,9 +521,9 @@ function ChatMode({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && send()}
-          disabled={typing}
+          disabled={typing || !isOnline}
         />
-        <button className="peer-send" onClick={send} disabled={typing || !input.trim()}>
+        <button className="peer-send" onClick={send} disabled={typing || !input.trim() || !isOnline}>
           <Send size={16} />
         </button>
       </div>

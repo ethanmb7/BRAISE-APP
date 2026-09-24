@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { X, Send } from 'lucide-react';
+import { X, Send, WifiOff } from 'lucide-react';
 import { useApp } from '@/store';
 import { sfx } from '@/lib/sound';
 import { sendChatMessage } from '@/lib/chat';
 import { getAgeGroup, feynmanInvite } from '@/lib/braiseVoice';
 import { BraiseMascot } from '@/components/BraiseMascot';
+import { useOnlineStatus } from '@/lib/useOnlineStatus';
 import type { ChatMessage } from '@/types';
 
 type Msg = { from: 'braise' | 'me'; text: string };
@@ -33,6 +34,7 @@ export function BraiseFeynmanDrawer({ topic, subject, question, answer, soundOn,
   const [input, setInput] = useState('');
   const [typing, setTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const isOnline = useOnlineStatus();
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -40,7 +42,7 @@ export function BraiseFeynmanDrawer({ topic, subject, question, answer, soundOn,
 
   const send = async () => {
     const text = input.trim();
-    if (!text || typing) return;
+    if (!text || typing || !isOnline) return;
     sfx.tap(soundOn);
     const nextMessages: Msg[] = [...messages, { from: 'me', text }];
     setMessages(nextMessages);
@@ -111,6 +113,23 @@ export function BraiseFeynmanDrawer({ topic, subject, question, answer, soundOn,
           </div>
         </div>
 
+        {!isOnline && (
+          <p
+            role="status"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6,
+              fontSize: '0.74rem',
+              color: 'var(--ink-soft)',
+              padding: '0 16px 6px',
+            }}
+          >
+            <WifiOff size={13} />
+            Hors-ligne · réessaie une fois reconnecté
+          </p>
+        )}
         <div className="peer-input-row" style={{ background: 'var(--paper)' }}>
           <input
             type="text"
@@ -118,9 +137,9 @@ export function BraiseFeynmanDrawer({ topic, subject, question, answer, soundOn,
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && send()}
-            disabled={typing}
+            disabled={typing || !isOnline}
           />
-          <button className="peer-send" onClick={send} disabled={typing || !input.trim()}>
+          <button className="peer-send" onClick={send} disabled={typing || !input.trim() || !isOnline}>
             <Send size={16} />
           </button>
         </div>

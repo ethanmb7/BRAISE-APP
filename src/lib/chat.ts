@@ -68,7 +68,11 @@ const callMistral = createServerFn({ method: 'POST' })
   .handler(async ({ data }): Promise<{ text: string } | { error: string }> => {
     const apiKey = process.env.MISTRAL_API_KEY;
     if (!apiKey) {
-      return { error: 'Oups, il manque la clé API côté serveur. Vérifie le fichier .env (MISTRAL_API_KEY).' };
+      // A missing key is a deploy/config problem the student can do nothing about — the detail
+      // that actually helps (which env var, where to set it) goes to the server log for whoever
+      // configured the deploy, never to the chat bubble a lycéen is reading.
+      console.error('MISTRAL_API_KEY is not set — see .env.example.');
+      return { error: 'Oups, Braise a un souci de connexion. Réessaie dans un instant.' };
     }
 
     const apiMessages = [
@@ -83,6 +87,11 @@ const callMistral = createServerFn({ method: 'POST' })
     ];
 
     try {
+      // Without this, a request that hangs (rather than fails outright — the common case on a
+      // flaky school wifi) never resolves at all: `typing` stays true and the input/send button
+      // stay disabled (see ChatMode/BraiseFeynmanDrawer) with no way out except leaving the
+      // screen. 20s is generous for a ~200-token completion but still a real ceiling.
+      const timeout = AbortSignal.timeout(20_000);
       const res = await fetch(MISTRAL_URL, {
         method: 'POST',
         headers: {
@@ -95,17 +104,20 @@ const callMistral = createServerFn({ method: 'POST' })
           max_tokens: 200,
           temperature: 0.8,
         }),
+        signal: timeout,
       });
 
       if (!res.ok) {
-        return { error: `Oups, l'API a bugué (${res.status})` };
+        console.error(`Mistral API returned ${res.status}`);
+        return { error: 'Oups, Braise a un souci de connexion. Réessaie dans un instant.' };
       }
 
       const responseData = await res.json();
       const text = responseData?.choices?.[0]?.message?.content;
 
       if (typeof text !== 'string') {
-        return { error: "Oups, réponse bizarre de l'API" };
+        console.error('Mistral API returned an unexpected response shape:', responseData);
+        return { error: 'Oups, Braise a mal compris. Tu peux réessayer ?' };
       }
 
       return { text: text.trim() };
