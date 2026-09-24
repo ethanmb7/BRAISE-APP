@@ -34,6 +34,9 @@ export function HomeView() {
   useEffect(() => {
     if (state.dailyGoalMet && !prevGoalMet.current) {
       fireConfetti();
+      // Same cue as a badge or rank unlock (useMilestoneCelebrations) — this was visual-only
+      // before, the one celebratory moment in the app with no sound or haptic behind it.
+      sfx.complete(state.soundOn);
     }
     prevGoalMet.current = state.dailyGoalMet;
   }, [state.dailyGoalMet]);
@@ -167,7 +170,6 @@ export function HomeView() {
               }}
               onShare={() => {
                 sfx.tap(state.soundOn);
-                if (navigator.vibrate) navigator.vibrate(10);
                 setShareOpen(true);
               }}
             />

@@ -9,6 +9,7 @@ import { RankUpCelebration } from '@/components/RankUpCelebration';
 import { BadgeIcon } from '@/components/BadgeIcon';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { useMilestoneCelebrations } from '@/lib/useMilestoneCelebrations';
+import { sfx } from '@/lib/sound';
 import { rankUpLine, getAgeGroup } from '@/lib/braiseVoice';
 import { getRankInfo, countMasteredCards, countSubjectsReviewed } from '@/lib/aura';
 import { OnboardingView } from '@/views/OnboardingView';
@@ -107,8 +108,14 @@ function Screen() {
             celebration.toRank.name,
             celebration.toRank.id
           )}
-          onDismiss={dismiss}
-          onShare={() => setShareOpen(true)}
+          onDismiss={() => {
+            sfx.tap(state.soundOn);
+            dismiss();
+          }}
+          onShare={() => {
+            sfx.tap(state.soundOn);
+            setShareOpen(true);
+          }}
         />
       )}
 
