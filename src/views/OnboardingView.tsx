@@ -36,8 +36,8 @@ export function OnboardingView() {
     sfx.complete(state.soundOn);
     setUser({
       name: name || 'Alex',
-      level: level?.id ?? '3e',
-      levelLabel: level?.label ?? '3ème',
+      level: level?.id ?? '2nde',
+      levelLabel: level?.label ?? '2nde',
       goal,
       subjects,
       avatar,
@@ -141,25 +141,21 @@ export function OnboardingView() {
         </div>
         <h2>Quel est ton niveau ?</h2>
         <p className="sub">On adapte les leçons à ton programme.</p>
-        <div style={{ marginBottom: 'auto' }}>
-          {['Collège', 'Lycée'].map((g) => (
-            <div key={g} style={{ marginBottom: 14 }}>
-              <div className="level-group-label">{g}</div>
-              <div className="level-list">
-                {LEVELS.filter((l) => l.group === g).map((l) => (
-                  <button
-                    key={l.id}
-                    className={`level-item ${level?.id === l.id ? 'is-selected' : ''}`}
-                    onClick={() => {
-                      sfx.tap(state.soundOn);
-                      setLevel(l);
-                    }}
-                  >
-                    {l.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+        {/* Un seul niveau réel (Lycée) depuis que le collège a été retiré — plus besoin d'un
+            en-tête de groupe pour une liste qui n'en a qu'un ; même liste plate que celle déjà
+            utilisée dans SettingsView. */}
+        <div className="level-list" style={{ marginBottom: 'auto' }}>
+          {LEVELS.map((l) => (
+            <button
+              key={l.id}
+              className={`level-item ${level?.id === l.id ? 'is-selected' : ''}`}
+              onClick={() => {
+                sfx.tap(state.soundOn);
+                setLevel(l);
+              }}
+            >
+              {l.label}
+            </button>
           ))}
         </div>
         <div style={{ display: 'flex', gap: 10 }}>

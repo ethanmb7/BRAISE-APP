@@ -22,8 +22,6 @@ export function LevelSheet({ open, current, onSelect, onClose }: Props) {
 
   if (!render) return null;
 
-  const groups = ['Collège', 'Lycée'];
-
   return (
     <>
       <div
@@ -40,22 +38,19 @@ export function LevelSheet({ open, current, onSelect, onClose }: Props) {
       >
         <div className="level-sheet-handle" />
         <h2 style={{ fontSize: '1.1rem', marginBottom: 14 }}>Choisis ton niveau</h2>
-        {groups.map((g) => (
-          <div key={g} style={{ marginBottom: 12 }}>
-            <div className="level-group-label">{g}</div>
-            <div className="level-list">
-              {LEVELS.filter((l) => l.group === g).map((l) => (
-                <button
-                  key={l.id}
-                  className={`level-item ${current === l.id ? 'is-selected' : ''}`}
-                  onClick={() => onSelect(l)}
-                >
-                  {l.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
+        {/* Un seul groupe réel (Lycée) depuis que le collège a été retiré — liste plate, même
+            simplification que dans OnboardingView. */}
+        <div className="level-list">
+          {LEVELS.map((l) => (
+            <button
+              key={l.id}
+              className={`level-item ${current === l.id ? 'is-selected' : ''}`}
+              onClick={() => onSelect(l)}
+            >
+              {l.label}
+            </button>
+          ))}
+        </div>
       </div>
     </>
   );

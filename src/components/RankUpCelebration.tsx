@@ -12,9 +12,11 @@ interface RankUpCelebrationProps {
   /** "cool" (sunglasses) for the Coach Savage tone, "proud" for Pote Chill — matches whichever
    *  voice tone actually generated `message`, instead of a fixed expression for every tone. */
   mood?: 'proud' | 'cool';
-  /** Collège gets the full bouncy/sparkly treatment; lycée keeps the same beats (still a real
-   *  celebration) but toned down — the copy already splits tone by age ("Le bac recule encore
-   *  d'un pas" reads nothing like a collège line), the animation never did. */
+  /** BRAISE est désormais lycée uniquement (2024) — ce prop garde son type 'college' | 'lycee'
+   *  seulement parce qu'AgeGroup (types.ts) le conserve pour rester compatible avec
+   *  RevisionsView.tsx, mais plus aucun appelant réel ne passe jamais 'college'. Le défaut suit
+   *  ce même changement : avant, un appelant qui omettait le prop tombait sur le traitement
+   *  collège (bouncy/sparkly) — un défaut qui ne correspond plus à rien de sélectionnable. */
   ageGroup?: 'college' | 'lycee';
   onDismiss: () => void;
   onShare: () => void;
@@ -36,7 +38,7 @@ export function RankUpCelebration({
   xp,
   message,
   mood = 'proud',
-  ageGroup = 'college',
+  ageGroup = 'lycee',
   onDismiss,
   onShare,
 }: RankUpCelebrationProps) {
