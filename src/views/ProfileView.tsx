@@ -176,7 +176,7 @@ export function ProfileView() {
                 className="profile-aura-link"
                 onClick={() => {
                   sfx.tap(state.soundOn);
-                  setTab('progres');
+                  setView('progres');
                 }}
               >
                 <span className="profile-aura-link-badge" aria-hidden="true">
