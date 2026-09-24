@@ -2989,53 +2989,6 @@ select {
 }
 
 /* ===== Profile ===== */
-/* Unified card — badges/ton de Braise/matières used to be three separately bordered+shadowed
-   blocks competing with the hero card for attention. Same "quiet" treatment as Strava's own
-   settings-style rows: one thin-bordered container, hairline dividers between rows, no
-   individual borders or shadows — that language stays reserved for the hero above. */
-.uni-card {
-  background: var(--paper);
-  border: 1.5px solid rgba(21, 24, 33, 0.2);
-  border-radius: 18px;
-  overflow: hidden;
-  margin-bottom: 16px;
-}
-.app-shell.dark .uni-card {
-  border-color: rgba(240, 238, 230, 0.16);
-}
-.uni-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 13px 15px;
-  gap: 10px;
-}
-.uni-row + .uni-row {
-  border-top: 1px solid rgba(21, 24, 33, 0.12);
-}
-.app-shell.dark .uni-row + .uni-row {
-  border-top-color: rgba(240, 238, 230, 0.1);
-}
-.uni-row.stacked {
-  flex-direction: column;
-  align-items: stretch;
-  gap: 9px;
-}
-.uni-row-main {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.uni-row-label {
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 700;
-  font-size: 0.78rem;
-}
-.uni-row-sub {
-  font-size: 0.62rem;
-  color: var(--ink-soft);
-}
-
 /* Progression row — the one row that gets a hair more presence than its siblings: a faint
    rank-tinted wash (set inline from rank.colorFrom/colorTo, real per-rank data), never a
    border — the "only the hero has a border" rule still holds inside this card too. */
@@ -3204,44 +3157,43 @@ select {
   color: var(--neo-ink);
 }
 
-.uni-chips {
+/* Le Profil reprend la famille de cartes de Ton Aura (.mastery-section, .braise-insight) :
+   bordure noire 2.5px, rayon 22px, fond --paper, ombre dure 4px, onglet orange en mono. Les
+   rangées reprennent la grammaire de Paramètres (tuile d'icône orange .settings-row-icon,
+   libellé 0.9rem). Aucune taille de texte sous 0.72rem : l'ancienne carte « uni » descendait
+   à 0.62rem et paraissait d'une autre appli à côté des deux écrans voisins. */
+.view.is-active.profile-view {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 28px;
 }
 
-.profile-joined {
-  color: var(--ink-soft);
-  font-size: 0.7rem;
-  margin-top: 2px;
-  opacity: 0.8;
-}
-
-/* ===== Hero card — one focal point (bold border, hard shadow, the real per-rank gradient),
-   everything else in this view stays quiet by comparison. Same discipline as Aura's own hero:
-   avatar first, one big number, then small supporting facts. Colours are set inline per-rank
-   (rank.colorFrom/colorTo) since they're real data, not fixed like the rest of this file's
-   palette. */
+/* ----- Pass BRAISE ----- */
 .profile-hero-card {
   position: relative;
-  border: 3px solid #000;
-  border-radius: 24px;
-  box-shadow: 5px 5px 0 #000;
+  border: 2.5px solid #000;
+  border-radius: 22px;
+  box-shadow: 4px 4px 0 #000;
   overflow: hidden;
   background: var(--paper);
-  margin-bottom: 16px;
 }
-/* Bande du pass : une vraie bande d'accès (trous de cordon + rayures) au lieu d'un aplat de
-   108px qui ne servait qu'à porter un avatar centré. */
 .profile-pass-strip {
   position: relative;
   overflow: hidden;
-  border-bottom: 3px solid #000;
+  border-bottom: 2.5px solid #000;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 9px 12px;
+  padding: 10px 14px;
+}
+.profile-pass-strip::before {
+  content: '';
+  position: absolute;
+  inset: -40% -10%;
+  background: repeating-linear-gradient(58deg, rgba(255, 255, 255, 0.18) 0 8px, transparent 8px 24px);
+  transform: rotate(-3deg);
 }
 .profile-pass-punch {
   position: relative;
@@ -3253,65 +3205,46 @@ select {
   border: 2px solid #000;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
-/* Surtitre "carte de membre" : ancre le bandeau, qui n'était qu'un aplat rayé. */
-.profile-hero-overline {
-  position: relative;
-  margin-right: auto;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.58rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #fff;
-  background: var(--neo-ink);
-  border: 1.5px solid #000;
-  border-radius: 999px;
-  padding: 5px 9px;
-}
-.profile-pass-strip::before {
-  content: '';
-  position: absolute;
-  inset: -40% -10%;
-  background: repeating-linear-gradient(58deg, rgba(255, 255, 255, 0.18) 0 8px, transparent 8px 24px);
-  transform: rotate(-3deg);
-}
+.profile-hero-overline,
 .profile-hero-rank-pill {
   position: relative;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: var(--neo-ink);
-  color: #fff;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.6rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 5px 9px;
-  border-radius: 999px;
+  color: #fff;
+  background: var(--neo-ink);
   border: 1.5px solid #000;
+  border-radius: 999px;
+  padding: 5px 9px;
+}
+.profile-hero-overline {
+  margin-right: auto;
 }
 .profile-hero-body {
   position: relative;
-  padding: 16px 16px 18px;
+  padding: 16px 16px 16px;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  gap: 14px;
 }
-/* Identité en ligne, comme sur un badge : la tête à gauche, le nom qui part du même bord que
-   tout le reste de la carte — plus de composition centrée générique. */
 .profile-hero-identity {
   display: flex;
   align-items: center;
   gap: 14px;
 }
 .profile-hero-identity-main {
+  flex: 1;
   min-width: 0;
 }
 .profile-hero-avatar-stage {
   position: relative;
-  width: 78px;
-  height: 78px;
+  width: 76px;
+  height: 76px;
   flex-shrink: 0;
 }
 .profile-hero-avatar-glow {
@@ -3321,106 +3254,157 @@ select {
   filter: blur(14px);
   pointer-events: none;
 }
-.profile-hero-avatar-ring {
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-}
-/* Squircle et non cercle : la photo d'identité d'un badge est carrée, et ça évite la énième
-   pastille ronde. */
+/* Squircle et non cercle : la photo d'identité d'un badge est carrée. */
 .profile-hero-avatar {
   position: relative;
-  width: 78px;
-  height: 78px;
-  border-radius: 24px;
+  width: 76px;
+  height: 76px;
+  border-radius: 22px;
   background: var(--paper);
-  border: 3px solid #000;
-  box-shadow: 4px 4px 0 #000;
+  border: 2.5px solid #000;
+  box-shadow: 3px 3px 0 #000;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
-.profile-hero-avatar:active {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 #000;
-}
-.profile-hero-edit-badge {
-  position: absolute;
-  bottom: -2px;
-  right: -2px;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--neo-orange);
-  border: 2px solid #000;
+.profile-hero-name-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: #fff;
+  gap: 8px;
+  min-width: 0;
 }
 .profile-hero-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
-  font-size: 1.62rem;
+  font-size: 1.6rem;
   line-height: 1.05;
   letter-spacing: -0.01em;
-  margin-top: 0;
-}
-
-/* Carte "Ta tête" — l'identité sort des réglages et prend le même langage que le pass :
-   bordure franche, ombre dure, étiquette mono. */
-.profile-face-card {
-  border: 3px solid #000;
-  border-radius: 20px;
-  box-shadow: 4px 4px 0 #000;
-  background: var(--paper);
-  padding: 13px 0 14px 14px;
-  margin-bottom: 16px;
-  overflow: hidden;
-}
-.profile-face-head {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding-right: 14px;
-  margin-bottom: 11px;
-}
-.profile-face-label {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
   color: var(--ink);
 }
-.profile-face-sub {
-  font-size: 0.74rem;
-  color: var(--ink-soft);
+.profile-hero-edit {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  background: var(--neo-orange);
+  color: #fff;
+  border: 2px solid #000;
+  box-shadow: 2px 2px 0 #000;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
+.profile-hero-edit:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 #000;
+}
+.profile-hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin-top: 6px;
+}
+/* Même pastille que .subjects-summary (Matières) : discrète, bordure fine, pas d'ombre. */
+.profile-hero-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 0.74rem;
+  font-weight: 650;
+}
+.profile-joined {
+  color: var(--ink-soft);
+  font-size: 0.74rem;
+}
+
+/* Édition du prénom dans la carte — le pass ne disparaît plus pendant l'édition. */
+.profile-name-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.profile-name-input {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg);
+  border: 2px solid var(--neo-ink);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ink);
+}
+.app-shell.dark .profile-name-input {
+  border-color: rgba(240, 238, 230, 0.4);
+}
+.profile-identity-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.profile-identity-cancel,
+.profile-identity-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 10px;
+  border-radius: 12px;
+  border: 2px solid #000;
+  box-shadow: 2px 2px 0 #000;
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  font-size: 0.86rem;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.profile-identity-cancel:active,
+.profile-identity-save:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 #000;
+}
+.profile-identity-cancel {
+  background: var(--paper);
+  color: var(--ink);
+}
+/* Même remplissage que les onglets orange : blanc sur --neo-orange pur ne passe pas 4.5:1. */
+.profile-identity-save {
+  background: color-mix(in srgb, var(--neo-orange) 80%, #000);
+  color: #fff;
+}
+
 .profile-hero-bubble {
   position: relative;
   display: flex;
-  gap: 9px;
+  gap: 10px;
   align-items: flex-start;
-  align-self: stretch;
-  background: color-mix(in srgb, var(--neo-orange) 16%, var(--paper));
-  border: 2.5px solid #000;
+  background: color-mix(in srgb, var(--neo-orange) 12%, var(--paper));
+  border: 2px solid #000;
   border-radius: 16px;
-  box-shadow: 3px 3px 0 #000;
   padding: 11px 13px;
-  margin-top: 14px;
 }
 .profile-hero-bubble::before {
   content: '';
   position: absolute;
   top: -8px;
-  left: 24px;
+  left: 28px;
   width: 13px;
   height: 13px;
-  background: color-mix(in srgb, var(--neo-orange) 16%, var(--paper));
-  border-left: 2.5px solid #000;
-  border-top: 2.5px solid #000;
+  background: color-mix(in srgb, var(--neo-orange) 12%, var(--paper));
+  border-left: 2px solid #000;
+  border-top: 2px solid #000;
   transform: rotate(45deg);
 }
 .profile-hero-bubble-icon {
@@ -3430,15 +3414,12 @@ select {
   margin: 0;
   font-family: 'Baloo 2', sans-serif;
   font-weight: 700;
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   line-height: 1.35;
   color: var(--ink);
 }
-/* The "reprendre" link — only shown at streak 0, paired with Braise's sleepy mood. Mixed
-   toward var(--ink) rather than a fixed dark shade: the bubble's own background is already
-   theme-reactive (color-mix(...,var(--paper))), so a fixed-orange text would under-contrast in
-   dark mode the same way this session already caught once on a fixed-vs-reactive background
-   mismatch elsewhere. Verified 4.6:1 light / 5.3:1 dark against the real bubble background. */
+/* Mélangé vers var(--ink) : le fond de la bulle suit le thème, un orange fixe manquerait de
+   contraste en mode sombre. */
 .profile-hero-bubble-cta {
   margin-top: 5px;
   background: none;
@@ -3449,138 +3430,78 @@ select {
   gap: 4px;
   font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   color: color-mix(in srgb, var(--neo-orange) 70%, var(--ink) 30%);
 }
-.profile-hero-num {
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 800;
-  font-size: 2.3rem;
-  line-height: 1;
-  margin-top: 16px;
-  font-variant-numeric: tabular-nums;
-}
-.profile-hero-lbl {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-  margin-top: 4px;
-}
-.profile-hero-mini-row {
-  display: flex;
-  gap: 24px;
-  margin-top: 16px;
-}
-.profile-hero-mini {
-  text-align: center;
-}
-.profile-hero-mini b {
-  display: block;
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 700;
-  font-size: 1.02rem;
-  font-variant-numeric: tabular-nums;
-}
-.profile-hero-mini span {
-  font-size: 0.6rem;
-  color: var(--ink-soft);
-}
 
-.profile-hero-cta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  text-align: center;
+/* ----- Sections (Ta tête, Tes préférences) ----- */
+.profile-section {
+  padding: 14px 14px 16px;
+  border: 2.5px solid #000;
+  border-radius: 22px;
+  background: var(--paper);
+  box-shadow: 4px 4px 0 #000;
+}
+/* Identique à .mastery-tab / .braise-insight-tab de Ton Aura. */
+.profile-section-tab {
+  display: inline-block;
   background: color-mix(in srgb, var(--neo-orange) 80%, #000);
   color: #fff;
-  border: 2.5px solid var(--neo-ink);
-  box-shadow: 3px 3px 0 var(--neo-ink);
-  border-radius: 16px;
-  padding: 14px;
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 800;
-  font-size: 0.86rem;
-  margin-bottom: 22px;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  border: 2px solid #000;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  box-shadow: 2px 2px 0 #000;
 }
-.profile-hero-cta:active {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 var(--neo-ink);
+.profile-section-sub {
+  margin: 10px 0 0;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
 }
 
-.profile-identity-edit {
-  background: var(--paper);
-  border: 2.5px solid var(--neo-ink);
-  border-radius: 18px;
-  box-shadow: 4px 4px 0 var(--neo-ink);
-  padding: 16px;
-  margin-bottom: 22px;
-}
-/* Rail horizontal du Profil : mêmes pastilles que le sélecteur d'avatar, en une ligne qui
-   défile, pour rester dans la carte de réglages sans la faire grossir. */
 .profile-avatar-rail {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   overflow-x: auto;
-  padding: 4px 2px 6px;
+  margin: 10px -14px 0;
+  padding: 4px 14px 6px;
   scrollbar-width: none;
 }
 .profile-avatar-rail::-webkit-scrollbar { display: none; }
-.profile-avatar-rail .profile-avatar-option {
-  flex: 0 0 auto;
-  border: 2.5px solid #000;
-  box-shadow: 2px 2px 0 #000;
-  background: var(--paper);
-}
-.profile-avatar-rail .profile-avatar-option.is-selected {
-  background: color-mix(in srgb, var(--neo-orange) 22%, var(--paper));
-  border-color: #000;
-  box-shadow: 3px 3px 0 var(--neo-orange);
-}
-
-.profile-avatar-picker {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 14px;
-}
 .profile-avatar-option {
   position: relative;
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  font-size: 1.3rem;
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
   background: var(--bg);
-  border: 2px solid var(--line);
+  border: 2px solid #000;
+  box-shadow: 2px 2px 0 #000;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
-/* Had sound+haptic (sfx.tap) but no visual press at all — a flat swatch with no bevel/shadow of
-   its own to collapse (unlike .profile-hero-avatar etc.), so a scale press fits its actual
-   design instead of inventing a shadow system it never had. */
 .profile-avatar-option:active {
-  transform: scale(0.88);
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 #000;
 }
 .profile-avatar-option.is-selected {
-  background: #eff3ff;
-  border-color: var(--neo-blue);
+  background: color-mix(in srgb, var(--neo-orange) 20%, var(--paper));
+  box-shadow: 3px 3px 0 var(--neo-orange);
 }
 .profile-avatar-option.is-locked {
   opacity: 0.4;
   filter: grayscale(0.6);
+  box-shadow: none;
+  border-style: dashed;
 }
 .profile-avatar-option-lock {
-  /* RankIcon's locked padlock (#c7cbd4 body, dark stroke) was drawn for a light circle behind
-     it, same as the rank rail's own locked nodes — a dark badge here would swallow its dark
-     shackle stroke, so this stays light/white rather than matching the edit-badge's dark fill. */
+  /* RankIcon's locked padlock was drawn for a light circle behind it — stays white. */
   position: absolute;
   bottom: -4px;
   right: -4px;
@@ -3593,106 +3514,154 @@ select {
   align-items: center;
   justify-content: center;
 }
-.profile-avatar-unlock-hint {
-  font-size: 0.66rem;
-  color: var(--ink-soft);
-  margin: -4px 0 12px;
-}
-.profile-name-input {
-  width: 100%;
-  background: var(--bg);
-  border: 2px solid var(--neo-ink);
-  border-radius: 12px;
-  padding: 11px 14px;
-  font-size: 0.92rem;
-  color: var(--ink);
-  margin-bottom: 12px;
-}
-.profile-identity-actions {
-  display: flex;
-  gap: 10px;
-}
-.profile-identity-cancel,
-.profile-identity-save {
-  flex: 1;
+
+/* Rangées au format de Paramètres, séparées par un filet comme .settings-row. */
+.profile-pref-row {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 11px;
+  padding: 14px 0;
+}
+.profile-pref-row:first-of-type {
+  margin-top: 4px;
+}
+.profile-pref-row + .profile-pref-row {
+  border-top: 1px solid color-mix(in srgb, var(--ink) 9%, transparent);
+}
+.profile-pref-row:last-child {
+  padding-bottom: 0;
+}
+.profile-pref-row.is-stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+.profile-pref-head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.profile-pref-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.profile-pref-label {
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
-  padding: 11px;
-  border-radius: 12px;
-  border: 2px solid var(--neo-ink);
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 700;
-  font-size: 0.86rem;
-  transition: transform 0.12s ease;
-}
-/* Same reasoning as .profile-avatar-option — sound+haptic already fired on both (sfx.tap), only
-   the visual press was missing. No shadow on either button to collapse, so scale again. */
-.profile-identity-cancel:active,
-.profile-identity-save:active {
-  transform: scale(0.96);
-}
-.profile-identity-cancel {
-  background: var(--bg);
+  font-size: 0.9rem;
+  font-weight: 650;
   color: var(--ink);
 }
-.profile-identity-save {
-  background: var(--neo-orange);
+.profile-pref-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--neo-ink);
   color: #fff;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+.profile-pref-sub {
+  font-size: 0.76rem;
+  line-height: 1.3;
+  color: var(--ink-soft);
+}
+.profile-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 /* Subject chips — real toggles (see ProfileView.tsx), same "act on me" affordance as the
-   onboarding chips they're based on. Laid out via .uni-chips now (the unified card), not a
-   page-level wrapper. */
+   onboarding chips they're based on. */
 .profile-subject-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  min-height: 40px;
   background: var(--paper);
-  border: 2px solid var(--neo-ink);
+  border: 2px solid color-mix(in srgb, var(--ink) 22%, transparent);
   border-radius: 999px;
-  padding: 8px 13px;
+  padding: 7px 13px;
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--ink-soft);
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
+/* Fond clair fixe → texte sombre fixe (--neo-ink), jamais --ink qui s'éclaircit en sombre. */
 .profile-subject-chip.is-active {
-  background: #eff3ff;
-  border-color: var(--neo-blue);
-  /* Fixed light background — same reasoning as .persona-card.is-active above: must stay fixed
-     dark text, not the theme-reactive --ink (which goes light in dark mode and would vanish
-     against this same fixed light blue). */
+  background: color-mix(in srgb, var(--neo-orange) 14%, #fff);
+  border-color: #000;
   color: var(--neo-ink);
-  box-shadow: 2px 2px 0 var(--neo-blue);
+  box-shadow: 2px 2px 0 #000;
 }
 .profile-subject-chip:active {
   transform: translate(1px, 1px);
 }
 
-.profile-settings-link {
+/* ----- Rangées-liens (Rang → Aura, Paramètres) ----- */
+.profile-link-row {
   width: 100%;
-  background: var(--paper);
-  border-radius: 14px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 14px 16px;
-  border: 2.5px solid var(--neo-ink);
-  box-shadow: 3px 3px 0 var(--neo-ink);
+  gap: 12px;
+  min-height: 60px;
+  padding: 11px 14px;
+  border-radius: 16px;
+  background: var(--paper);
+  border: 2.5px solid #000;
+  box-shadow: 3px 3px 0 #000;
   color: var(--ink);
-  font-size: 0.9rem;
+  text-align: left;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
-.profile-settings-link:active {
+.profile-link-row:active {
   transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 var(--neo-ink);
+  box-shadow: 1px 1px 0 #000;
 }
-.profile-settings-link-label {
+/* Dans le pass, la rangée est déjà sur une carte à ombre dure : un filet suffit. */
+.profile-hero-card .profile-link-row {
+  background: var(--bg);
+  border-width: 2px;
+  box-shadow: none;
+}
+.profile-hero-card .profile-link-row:active {
+  transform: scale(0.98);
+}
+.profile-aura-link-badge {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border: 2px solid var(--neo-ink);
+}
+.profile-link-main {
+  flex: 1;
+  min-width: 0;
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 2px;
+}
+.profile-link-label {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.1;
+}
+.profile-link-sub {
+  font-size: 0.76rem;
+  color: var(--ink-soft);
 }
 
 /* ===== Settings ===== */
@@ -4053,58 +4022,6 @@ select {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: none; }
 }
-
-/* ===== Profil → Aura : le seul renvoi vers la progression =====
-   Profil ne répète plus l'XP, la série, les cartes ni le rang en gros : ces chiffres vivent
-   uniquement sur Ton Aura. Cette rangée est la porte unique entre les deux écrans, dans le
-   même langage néobrutaliste que .profile-settings-link. */
-.profile-aura-link {
-  width: 100%;
-  margin-top: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: var(--paper);
-  border: 2.5px solid var(--neo-ink);
-  box-shadow: 3px 3px 0 var(--neo-ink);
-  color: var(--ink);
-  text-align: left;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-.profile-aura-link:active {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 var(--neo-ink);
-}
-.profile-aura-link-badge {
-  flex-shrink: 0;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: #fff;
-  border: 2.5px solid var(--neo-ink);
-}
-.profile-aura-link-main {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.profile-aura-link-label {
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 700;
-  font-size: 0.95rem;
-  line-height: 1.1;
-}
-.profile-aura-link-sub {
-  font-size: 0.75rem;
-  color: var(--ink-soft);
-}
-
 
 /* ===== Nouveautés reprises du dépôt GitHub (Pioche + barre de mission) ===== */
 /* PiocheRevealVeil — see the component for why this exists. Fixed to the viewport (not
