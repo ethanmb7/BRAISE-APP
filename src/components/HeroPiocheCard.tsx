@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, MotionConfig } from 'framer-motion';
+codex/analyser-l-application-yubt4e
+import { ArrowRight, Clock3, Layers3 } from 'lucide-react';
+=======
 codex/analyser-l-application-u3fig7
 import { ArrowRight, Clock3, Layers3 } from 'lucide-react';
 =======
@@ -16,6 +19,7 @@ codex/analyser-l-application-y53s8j
 import { ArrowRight, Clock3, Layers3 } from 'lucide-react';
 =======
 import { Clock3, Layers3, Play } from 'lucide-react';
+main
 main
 main
 main
@@ -103,6 +107,9 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
           piocheTransition.ts) already covers the actual cut; this is a small, safe complement to
           it, not a replacement. */}
       <motion.section
+codex/analyser-l-application-yubt4e
+        className="relative overflow-hidden rounded-2xl border-[3px] border-black bg-[#FF6B35] p-4 shadow-[4px_4px_0px_0px_#000]"
+=======
 codex/analyser-l-application-u3fig7
         className="relative overflow-hidden rounded-[20px] border-[2.5px] border-black bg-[#FF6B35] p-3.5 shadow-[3px_3px_0px_0px_#000]"
 =======
@@ -112,6 +119,7 @@ codex/analyser-l-application-2zbvd9
         className="relative overflow-hidden rounded-[22px] border-[3px] border-black bg-[#FF6B35] p-4 shadow-[5px_5px_0px_0px_#000]"
 main
 main
+main
         aria-label={`Mission du jour : ${chapterTitle}`}
         animate={{ scale: launching ? 1.025 : 1 }}
         // Same full/quick split as everything else in this ceremony (BraiseChest, the reveal
@@ -119,6 +127,42 @@ main
         // would finish — matching the shorter window here instead of leaving it visibly cut off.
         transition={{ duration: quick ? 0.22 : 0.5, ease: [0.16, 1, 0.3, 1] }}
       >
+        codex/analyser-l-application-yubt4e
+        {/* Keep the Pioche alive without moving the reading surface itself. */}
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full"
+          style={{ background: 'radial-gradient(circle, #FFE9A8 0%, rgba(255,233,168,0) 70%)' }}
+          animate={{ opacity: [0.35, 0.85, 0.35], scale: [0.9, 1.15, 0.9] }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <div aria-hidden="true" className="pointer-events-none absolute -right-6 -top-6 h-16 w-16 rounded-full bg-[#FDC800]" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-2xl"
+          style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0) 20px)' }}
+        />
+
+        {/* The launch ticket remains a short reward beat, compressed to fit the tighter card. */}
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none absolute right-4 top-10 z-0 flex h-12 w-[106px] -rotate-6 flex-col justify-center rounded-lg border-2 border-[#151821] bg-[#FFF8EE] px-2 shadow-[3px_3px_0px_0px_#151821]"
+          initial={false}
+          animate={
+            launching
+              ? { opacity: [0, 1, 1, 0], y: [20, -8, -14, -22], rotate: [-6, -10, -8, -5], scale: [0.82, 1.02, 1, 1.06] }
+              : { opacity: 0, y: 20, rotate: -6, scale: 0.82 }
+          }
+          transition={
+            launching
+              ? { duration: quick ? 0.38 : 0.72, delay: quick ? 0.05 : 0.17, times: [0, 0.25, 0.68, 1], ease: [0.16, 1, 0.3, 1] }
+              : { duration: 0.1 }
+          }
+        >
+          <span className="font-mono text-[0.44rem] font-black tracking-[0.1em] text-[#7C2D12]">MISSION TROUVÉE</span>
+          <span className="mt-0.5 font-display text-[0.62rem] font-black leading-none text-[#151821]">C’est parti !</span>
+        </motion.div>
+=======
 codex/analyser-l-application-u3fig7
 =======
 codex/analyser-l-application-2zbvd9
@@ -151,6 +195,7 @@ main
             +50 Aura
           </span>
         </div>
+main
 
         <div className="relative mt-2 flex items-center gap-3">
 codex/analyser-l-application-6j80wg
@@ -165,11 +210,19 @@ main
 main
 main
           <div className="relative flex h-[92px] w-[92px] flex-shrink-0 items-end justify-center">
+codex/analyser-l-application-yubt4e
+            <motion.span
+              aria-hidden="true"
+              className="absolute inset-[6px] rounded-full bg-[#FDC800]/40 blur-md"
+              animate={hyped || launching ? { scale: [0.9, 1.2, 0.9], opacity: [0.25, 0.8, 0.25] } : { scale: [0.97, 1.05, 0.97], opacity: [0.22, 0.38, 0.22] }}
+              transition={{ duration: hyped || launching ? 0.58 : 3.2, repeat: Infinity, ease: 'easeInOut' }}
+=======
             {/* A quiet, static stage separates Braise from the copy without adding another card.
                 BraisePioche owns the meaningful motion; the background never competes with it. */}
             <span
               aria-hidden="true"
               className="absolute inset-[5px] rounded-full border-2 border-black/10 bg-[#FDC800]/45"
+main
             />
             <BraisePioche size={88} hyped={hyped} diving={launching} quick={quick} />
           </div>
@@ -178,6 +231,20 @@ main
                 failure), 6.25:1 for dark ink. Three real fonts: font-mono for the eyebrow
                 (same as every other small-caps label app-wide), font-display for the title,
                 font-sans for the stats line. */}
+codex/analyser-l-application-yubt4e
+            <p className="font-mono text-[0.64rem] font-black uppercase tracking-[0.1em] text-[#151821]/75">
+              Pioche du jour
+            </p>
+            <h2 className="mt-0.5 line-clamp-2 font-display text-[1.08rem] font-black leading-[1.08] text-[#151821]">{chapterTitle}</h2>
+            <p className="mt-1 flex items-center gap-1.5 text-[0.7rem] font-bold text-[#151821]/75">
+              <span aria-hidden="true" className="h-2.5 w-2.5 flex-none rounded-full border border-[#151821]" style={{ background: subjectColor ?? '#FDC800' }} />
+              <span className="truncate">{subjectName ?? 'Mission'}</span>
+            </p>
+            <div className="mt-1.5 flex items-center gap-3 text-[#151821]/75" aria-label="Les repères de ta mission">
+              <span className="flex items-center gap-1 font-mono text-[0.6rem] font-black"><Clock3 size={13} strokeWidth={3} aria-hidden="true" />{duration} MIN</span>
+              <span className="flex items-center gap-1 font-mono text-[0.6rem] font-black"><Layers3 size={13} strokeWidth={3} aria-hidden="true" />{cardCount} CARTE{cardCount > 1 ? 'S' : ''}</span>
+            </div>
+=======
 codex/analyser-l-application-u3fig7
             <p className="mb-0.5 flex items-center gap-1.5 text-[0.68rem] font-black text-[#151821]/70">
               <span aria-hidden="true" className="h-2.5 w-2.5 flex-none rounded-full border border-[#151821]" style={{ background: subjectColor ?? '#FDC800' }} />
@@ -299,6 +366,7 @@ main
 main
 main
 main
+main
           </div>
         </div>
         <span className="sr-only">
@@ -307,6 +375,10 @@ main
 
         {launching && <span className="sr-only" role="status">Braise révèle ta mission.</span>}
 
+codex/analyser-l-application-yubt4e
+        <div className="tw-cta-pulse group relative mt-3">
+          <span aria-hidden="true" className="absolute inset-0 translate-y-[2px] rounded-xl border-2 border-black bg-black" />
+=======
 codex/analyser-l-application-u3fig7
 =======
 codex/analyser-l-application-2zbvd9
@@ -315,6 +387,7 @@ codex/analyser-l-application-2zbvd9
             tool, not an alert. Pointer events still wake Braise as direct feedback to intent. */}
         <div className="group relative mt-3.5">
           <span aria-hidden="true" className="absolute inset-0 translate-y-[3px] rounded-full border-[2.5px] border-black bg-black" />
+main
           <button
             onPointerEnter={() => setHyped(true)}
             onPointerDown={() => setHyped(true)}
@@ -323,6 +396,12 @@ codex/analyser-l-application-2zbvd9
             onPointerCancel={unhype}
             onClick={handleStart}
             disabled={launching}
+codex/analyser-l-application-yubt4e
+            className="tw-shimmer relative flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border-2 border-black bg-[#FFF8EE] px-3 py-2 font-display text-[0.92rem] font-black text-black shadow-[2px_2px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[2px] group-active:shadow-none disabled:opacity-95"
+          >
+            {launching ? 'OUVERTURE…' : 'COMMENCER'}
+            <ArrowRight size={16} strokeWidth={3} aria-hidden="true" />
+=======
             className="tw-shimmer relative flex min-h-12 w-full items-center justify-center gap-2 rounded-full border-[2.5px] border-black bg-[#FFF8EE] px-4 py-3 font-display text-[0.98rem] font-black text-black shadow-[3px_3px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[3px] group-active:shadow-none disabled:opacity-95"
           >
 codex/analyser-l-application-6j80wg
@@ -339,6 +418,7 @@ codex/analyser-l-application-y53s8j
 =======
             <Play size={17} fill="currentColor" />
             {launching ? 'C’EST PARTI…' : 'COMMENCER'}
+main
 main
 main
 main

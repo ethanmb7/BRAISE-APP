@@ -11,11 +11,16 @@ export type ViewId =
   | 'profile'
   | 'settings';
 
+codex/analyser-l-application-yubt4e
+/** `progres` remains accepted for migration/back-navigation from pre-Matières installs. */
+export type TabId = 'home' | 'subjects' | 'revisions' | 'profile' | 'progres';
+=======
 codex/analyser-l-application-yockaq
 /** `progres` remains accepted for migration/back-navigation from pre-Matières installs. */
 export type TabId = 'home' | 'subjects' | 'revisions' | 'profile' | 'progres';
 =======
 export type TabId = 'home' | 'subjects' | 'revisions' | 'profile';
+main
 main
 
 export type Level = {
