@@ -3,6 +3,7 @@ import { useApp, resolveChapters } from '@/store';
 import { sfx } from '@/lib/sound';
 import { TopBar } from '@/components/TopBar';
 import { BraiseMascot } from '@/components/BraiseMascot';
+import { SubjectIcon } from '@/components/SubjectIcon';
 import { SUBJECTS, STORIES } from '@/data';
 
 const ROW_JUSTIFY: Record<string, string> = {
@@ -31,7 +32,12 @@ export function SubjectView() {
   return (
     <div>
       <TopBar
-        title={`${subject.emoji} ${subject.name}`}
+        title={
+          <span className="inline-flex items-center gap-1.5">
+            <SubjectIcon subjectId={subject.id} color={subject.color} size={18} />
+            {subject.name}
+          </span>
+        }
         onBack={goBack}
         right={<span className="font-mono text-xs font-bold text-[var(--ink-soft)]">{pct}%</span>}
       />

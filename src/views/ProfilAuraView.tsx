@@ -135,16 +135,15 @@ export function ProfilAuraView() {
           <AuraHeroScene rank={current} streak={state.streak} freezes={state.freezes} />
         </motion.div>
 
-        <motion.div variants={staggerItem}>
-          <BraiseEvolutionLine currentRankId={current.id} />
-        </motion.div>
-
         {/* Pillar 2 — Contrat de rétention : tout le calcul de progression vit ici, et
-            uniquement les métriques qui nourrissent la fierté ou l'envie de revenir. Le "X XP
-            jusqu'à Y" vit maintenant comme légende du rail lui-même — même histoire de
-            progression, un seul bloc au lieu de deux qui se répétaient. */}
+            uniquement les métriques qui nourrissent la fierté ou l'envie de revenir. "TA BRAISE"
+            (l'ancienne BraiseEvolutionLine) et le rail de rang racontaient la même histoire — les
+            5 mêmes rangs, une fois via 5 mascottes, une fois via 5 médailles — dans deux cartes
+            à la géométrie différente l'une de l'autre. Un seul rail, dont les nœuds sont
+            maintenant les vraies formes de Braise plutôt qu'une médaille abstraite à côté : la
+            même information, plus vivante, dans une seule carte au lieu de deux. */}
         <motion.div variants={staggerItem}>
-          <RankRail currentRankId={current.id} rank={current} pct={pct} next={next} xp={state.xp} milestone={milestone} />
+          <RankJourney currentRankId={current.id} rank={current} pct={pct} next={next} xp={state.xp} milestone={milestone} />
         </motion.div>
 
         {/* "Ce que Braise a remarqué" juste avant la grille qu'elle commente (jamais avant le rail
@@ -287,30 +286,6 @@ const EVOLUTION_NAMES: Record<string, string> = {
   legende: 'Libre',
 };
 
-const BraiseEvolutionLine = memo(function BraiseEvolutionLine({ currentRankId }: { currentRankId: string }) {
-  const currentIdx = RANKS.findIndex((rank) => rank.id === currentRankId);
-  return (
-    <section className="braise-evolution-line" aria-label="Les évolutions de Braise">
-      <div className="braise-evolution-heading">
-        <span>TA BRAISE</span>
-        <strong>{EVOLUTION_NAMES[currentRankId]}</strong>
-      </div>
-      <div className="braise-evolution-cast">
-        {RANKS.map((rank, index) => {
-          const unlocked = index <= currentIdx;
-          const current = index === currentIdx;
-          return (
-            <div className={`braise-evolution-stage ${current ? 'is-current' : ''} ${unlocked ? '' : 'is-locked'}`} key={rank.id}>
-              <BraiseCharacter size={current ? 58 : 46} rankId={rank.id} expression={current ? 'proud' : 'happy'} labelled={false} />
-              <span>{current ? EVOLUTION_NAMES[rank.id] : rank.name}</span>
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
-});
-
 // "Ce que Braise a remarqué" — one real, specific observation (never a template with invented
 // numbers, see computeBraiseInsight in aura.ts), in the same voice system every other Braise line
 // in the app already uses. `hesitant` for a real weak point (the same mood the mascot already
@@ -331,11 +306,14 @@ const BraiseInsightCard = memo(function BraiseInsightCard({ insight, line }: { i
   );
 });
 
-// Every rank visible at once on a single always-on progress rail, season-pass style. Nothing
-// is hidden behind a tap, a swipe, or an expand — the entire ladder is legible in one glance.
-// Carries its own caption now (used to be a standalone NextRankCallout block above it) — "1 556
-// XP jusqu'à Légende" and the rail are the same story, so they're one component, not two.
-const RankRail = memo(function RankRail({
+// Fusion de l'ancienne BraiseEvolutionLine et de RankRail : les deux racontaient déjà la même
+// histoire (les 5 mêmes rangs, une fois via 5 formes de Braise, une fois via 5 médailles) dans
+// deux cartes empilées à la géométrie différente l'une de l'autre. Un seul rail, dont les nœuds
+// sont maintenant les vraies formes de Braise (BraiseCharacter) plutôt qu'une médaille abstraite
+// à côté — même donnée réelle (rang courant, XP jusqu'au prochain palier, repli sur série/cartes
+// maîtrisées une fois Légende atteint), une seule carte au lieu de deux. Nothing is hidden behind
+// a tap, a swipe, or an expand — the entire ladder is legible in one glance.
+const RankJourney = memo(function RankJourney({
   currentRankId,
   rank,
   pct,
@@ -355,7 +333,8 @@ const RankRail = memo(function RankRail({
   const milestoneUnit = milestone.kind === 'streak' ? 'jour' : 'carte';
   const milestoneGoal = milestone.kind === 'streak' ? `${milestone.target} jours de série` : `${milestone.target} cartes maîtrisées`;
   return (
-    <div className="rank-rail" role="list" aria-label="Les 5 rangs">
+    <div className="mastery-section rank-journey">
+      <span className="mastery-tab">Ta Braise · {EVOLUTION_NAMES[currentRankId]}</span>
       <div className="rank-rail-caption">
         {next ? (
           <>
@@ -374,7 +353,7 @@ const RankRail = memo(function RankRail({
           </>
         )}
       </div>
-      <div className="rank-rail-track">
+      <div className="rank-rail-track" role="list" aria-label="Les 5 rangs">
         <div className="rank-rail-line">
           <div className="rank-rail-line-fill" style={{ width: `${overallPct}%` }} />
         </div>
@@ -388,7 +367,20 @@ const RankRail = memo(function RankRail({
               role="listitem"
               aria-label={`${r.name}, ${r.min} XP${tier === 'done' ? ', débloqué' : tier === 'locked' ? ', verrouillé' : ', rang actuel'}`}
             >
-              <RankIcon rankId={r.id} color={r.colorFrom} locked={tier === 'locked'} size={tier === 'current' ? 24 : 20} />
+              {/* Un rang verrouillé reste un cadenas, jamais un aperçu grisé de la forme de
+                  Braise qu'il débloquera — même règle que RankIcon (locked) : "the shape is a
+                  reward you haven't opened yet, not something to preview worn-down or greyed
+                  out". Seuls les rangs déjà atteints montrent la vraie forme de Braise. */}
+              {tier === 'locked' ? (
+                <RankIcon rankId={r.id} color={r.colorFrom} locked size={20} />
+              ) : (
+                <BraiseCharacter
+                  size={tier === 'current' ? 34 : 26}
+                  rankId={r.id}
+                  expression={tier === 'current' ? 'proud' : 'happy'}
+                  labelled={false}
+                />
+              )}
             </div>
           );
         })}

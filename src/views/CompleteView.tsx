@@ -37,8 +37,8 @@ export function CompleteView() {
               <div className="share-card-glow" />
               <BraiseMascot size={70} mood="proud" />
               <div className="share-streak">{state.streak} jours 🔥</div>
-              <div className="share-sub">Série de révision sur SAPIE</div>
-              <div className="share-brand">SAPIE · l'app qui réveille les neurones</div>
+              <div className="share-sub">Série de révision sur BRAISE</div>
+              <div className="share-brand">BRAISE · l'app qui réveille les neurones</div>
             </div>
           </div>
           <div style={{ display: 'flex', gap: 10, marginTop: 28 }}>

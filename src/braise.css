@@ -417,6 +417,9 @@ select {
   margin-bottom: auto;
 }
 .schip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 10px 15px;
   border-radius: 999px;
   background: var(--paper);
@@ -874,70 +877,11 @@ select {
 .rank-rail {
   margin-bottom: 16px;
 }
-.braise-evolution-line {
+/* RankJourney (ProfilAuraView) sits inside the shared .mastery-section card shell — this only
+   resets the bit of that shell's own padding/tab spacing that would otherwise double up with
+   .rank-rail-caption's own margin right below it. */
+.rank-journey {
   margin-bottom: 16px;
-  padding: 10px 10px 8px;
-  background: var(--paper);
-  border: 3px solid var(--neo-ink);
-  border-radius: 8px;
-  box-shadow: 4px 4px 0 var(--neo-ink);
-}
-.braise-evolution-heading {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding: 0 3px 7px;
-}
-.braise-evolution-heading span {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.6rem;
-  font-weight: 700;
-  color: var(--ink-soft);
-}
-.braise-evolution-heading strong {
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 0.9rem;
-  color: var(--neo-orange);
-}
-.braise-evolution-cast {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  align-items: end;
-  gap: 3px;
-  min-height: 76px;
-}
-.braise-evolution-stage {
-  min-width: 0;
-  min-height: 70px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 2px;
-  border-bottom: 3px solid transparent;
-  transition: transform 180ms ease, opacity 180ms ease;
-}
-.braise-evolution-stage svg {
-  max-width: 100%;
-  height: auto;
-}
-.braise-evolution-stage span {
-  width: 100%;
-  overflow: hidden;
-  color: var(--ink);
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.48rem;
-  font-weight: 700;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.braise-evolution-stage.is-current {
-  border-color: var(--neo-orange);
-}
-.braise-evolution-stage.is-locked {
-  filter: grayscale(1);
-  opacity: 0.28;
 }
 .braise-mascot .braise-outfit {
   transform-origin: 54px 76px;
@@ -1891,6 +1835,9 @@ select {
    celebration alongside confetti, not a small utility confirmation. Mounted in App.tsx rather than
    a single view, since a rank or badge can be earned from any screen. */
 .milestone-toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   position: fixed;
   top: 84px;
   left: 50%;
@@ -2739,6 +2686,27 @@ select {
   color: var(--neo-ink);
   box-shadow: 1px 1px 0 #000;
 }
+/* "Je ne sais pas" — étape 2 (positionnement) de la boucle Capte : un positionnement honnête
+   n'est pas une réponse fausse, donc son bouton ne doit jamais rivaliser visuellement avec les
+   vraies options — pas d'ombre dure, pas de remplissage, juste un contour discret. */
+.quiz-dontknow-btn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: transparent;
+  border: 2px dashed var(--line);
+  border-radius: 14px;
+  padding: 10px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 4px;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.quiz-dontknow-btn:active {
+  border-color: var(--ink-soft);
+  color: var(--ink);
+}
 .quiz-vf2 {
   display: flex;
   gap: 10px;
@@ -2842,6 +2810,37 @@ select {
 .quiz-bridge-btn:active {
   transform: translate(2px, 2px);
   box-shadow: 1px 1px 0 #000;
+}
+/* Étape 5 de la boucle Capte : "choix d'aide" — 4 puces courtes plutôt qu'un unique bouton, pour
+   laisser l'élève choisir le type d'aide dont il a vraiment besoin. Volontairement plus discrètes
+   que .quiz-bridge-btn (la reformulation qui suit reste l'action la plus visible du bloc). */
+.quiz-help-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.quiz-help-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid #000;
+  border-radius: 999px;
+  padding: 8px 13px;
+  font-weight: 700;
+  font-size: 0.76rem;
+  box-shadow: 2px 2px 0 #000;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease;
+}
+.quiz-help-chip:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 #000;
+}
+.quiz-help-chip.is-active {
+  background: var(--sun);
+  color: var(--sun-ink);
 }
 .quiz-summary2 {
   text-align: center;

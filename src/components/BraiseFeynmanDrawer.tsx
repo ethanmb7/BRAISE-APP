@@ -5,20 +5,26 @@ import { sfx } from '@/lib/sound';
 import { sendChatMessage } from '@/lib/chat';
 import { getAgeGroup, feynmanInvite } from '@/lib/braiseVoice';
 import { BraiseMascot } from '@/components/BraiseMascot';
-import type { Flashcard, ChatMessage } from '@/types';
+import type { ChatMessage } from '@/types';
 
 type Msg = { from: 'braise' | 'me'; text: string };
 
+/** Notion to reformulate. Deliberately generic (not `Flashcard`) — a real question/answer/topic
+ *  is everything the Feynman check needs, whether it comes from a Réviser card or, e.g., a
+ *  lesson quiz question (LessonView), which has no Flashcard id/chapterId/level to offer. */
 type Props = {
-  card: Flashcard;
+  topic: string;
+  subject: string;
+  question: string;
+  answer: string;
   soundOn: boolean;
   onClose: () => void;
 };
 
-export function BraiseFeynmanDrawer({ card, soundOn, onClose }: Props) {
+export function BraiseFeynmanDrawer({ topic, subject, question, answer, soundOn, onClose }: Props) {
   const { state } = useApp();
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
-  const [messages, setMessages] = useState<Msg[]>(() => [{ from: 'braise', text: feynmanInvite(voiceCtx, card.topic) }]);
+  const [messages, setMessages] = useState<Msg[]>(() => [{ from: 'braise', text: feynmanInvite(voiceCtx, topic) }]);
   const [input, setInput] = useState('');
   const [typing, setTyping] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -41,9 +47,9 @@ export function BraiseFeynmanDrawer({ card, soundOn, onClose }: Props) {
       text: m.text,
     }));
 
-    const groundTruth = `Vérité de référence pour évaluer l'élève (ne la recopie jamais telle quelle) : la question était "${card.q}", la bonne réponse est "${card.a}". L'élève vient de t'expliquer ce concept avec ses mots pour vérifier qu'il a compris (technique Feynman). Réagis à SON explication : dis ce qu'il a bien capté, et s'il manque un point important ou une erreur, pointe-la du doigt sans donner la réponse toute faite — pousse-le à préciser ou corriger lui-même.`;
+    const groundTruth = `Vérité de référence pour évaluer l'élève (ne la recopie jamais telle quelle) : la question était "${question}", la bonne réponse est "${answer}". L'élève vient de t'expliquer ce concept avec ses mots pour vérifier qu'il a compris (technique Feynman). Réagis à SON explication : dis ce qu'il a bien capté, et s'il manque un point important ou une erreur, pointe-la du doigt sans donner la réponse toute faite — pousse-le à préciser ou corriger lui-même.`;
 
-    const res = await sendChatMessage(apiMessages, null, card.subject, voiceCtx, groundTruth);
+    const res = await sendChatMessage(apiMessages, null, subject, voiceCtx, groundTruth);
     setTyping(false);
     if ('text' in res) {
       sfx.correct(soundOn);
@@ -62,7 +68,7 @@ export function BraiseFeynmanDrawer({ card, soundOn, onClose }: Props) {
             <BraiseMascot size={30} mood="happy" />
             <div>
               <b>Explique à Braise</b>
-              <span>{card.topic}</span>
+              <span>{topic}</span>
             </div>
           </div>
           <button className="intro-close" onClick={onClose} aria-label="Fermer">

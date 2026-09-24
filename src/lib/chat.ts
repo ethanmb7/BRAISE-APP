@@ -5,7 +5,7 @@ const MISTRAL_API_KEY = import.meta.env.VITE_MISTRAL_API_KEY as string | undefin
 const MISTRAL_MODEL = 'mistral-small-latest';
 const MISTRAL_URL = 'https://api.mistral.ai/v1/chat/completions';
 
-const SYSTEM_PROMPT = `Tu es Braise, la mascotte de SAPIE, une app de révision pour les ados de 11 à 18 ans.
+const SYSTEM_PROMPT = `Tu es Braise, la mascotte de BRAISE, une app de révision pour les ados de 11 à 18 ans.
 Tu es le "pote le plus malin de la classe" qui aide à craquer les contrôles en 3 minutes.
 
 RÈGLES DE PERSONNALITÉ :
