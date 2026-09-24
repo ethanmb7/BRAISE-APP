@@ -109,11 +109,16 @@ export type UserProfile = {
 };
 
 /** Outcome of the chapter that just opened the completion screen. It is intentionally transient:
- * it explains this celebration, while durable progress remains in `completedChapters`. */
+ * it explains this celebration, while durable progress remains in `completedChapters`. `xpGained`
+ * is only the +50 chapter-completion bonus, separate from whatever XP the quiz itself already
+ * paid out question by question. `quiz` is undefined when the chapter was finished from Échanger
+ * (chat mode) instead of the quiz — that path has no score to report, and CompleteView must not
+ * invent one. */
 export type ChapterCompletion = {
   chapterId: string;
   wasNewCompletion: boolean;
   xpGained: number;
+  quiz?: { score: number; total: number; rebondCount: number; xpEarned: number };
 };
 
 export type AppState = {

@@ -27,6 +27,14 @@ export function CompleteView() {
     chapterTitle
   );
 
+  // Only set when this screen was reached from the quiz (not from Échanger, which has no score
+  // to report) — real per-question outcome of this exact run, never inferred or fabricated.
+  const quiz = completion?.quiz;
+  const stillFragile = quiz ? quiz.total - quiz.score - quiz.rebondCount : 0;
+  // Chapter bonus (+50, only on a first completion) plus whatever the quiz itself already paid
+  // out question by question — the real total this run earned, not just the chapter's own cut.
+  const totalXpEarned = (completion?.xpGained ?? 0) + (quiz?.xpEarned ?? 0);
+
   return (
     <div>
       <TopBar title={chapterTitle} onBack={goBack} />
@@ -49,8 +57,36 @@ export function CompleteView() {
         </div>
         <h2>Mission terminée !</h2>
         <p>{completeLine}</p>
+
+        {/* Real per-question outcome of this run — never shown for a chapter finished from
+            Échanger, which has no quiz to report. Comes before the reward on purpose: what
+            actually happened this run, then what it paid. */}
+        {quiz && (
+          <div className="complete-run">
+            <div className="complete-run-stat">
+              <b>{quiz.score}</b>
+              <span>direct{quiz.score > 1 ? 'es' : ''}</span>
+            </div>
+            {quiz.rebondCount > 0 && (
+              <div className="complete-run-stat is-rebond">
+                <b>{quiz.rebondCount}</b>
+                <span>rattrapée{quiz.rebondCount > 1 ? 's' : ''}</span>
+              </div>
+            )}
+            {stillFragile > 0 && (
+              <div className="complete-run-stat is-fragile">
+                <b>{stillFragile}</b>
+                <span>à renforcer</span>
+              </div>
+            )}
+          </div>
+        )}
+        {stillFragile > 0 && (
+          <p className="complete-run-note">Marqué à renforcer — tu le retrouveras dans Tes matières.</p>
+        )}
+
         {completion?.wasNewCompletion ? (
-          <div className="complete-xp">+{completion.xpGained} XP</div>
+          <div className="complete-xp">+{totalXpEarned} XP</div>
         ) : (
           <div className="complete-xp is-repeat">Chapitre déjà validé</div>
         )}

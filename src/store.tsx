@@ -29,7 +29,10 @@ type Ctx = {
   toggleSound: () => void;
   openSubject: (subjectId: string, chapterId?: string) => void;
   openLesson: (subjectId: string, chapterId: string, mode?: 'vocal' | 'echanger') => void;
-  completeChapter: (chapterId: string) => void;
+  completeChapter: (
+    chapterId: string,
+    quiz?: { score: number; total: number; rebondCount: number; xpEarned: number }
+  ) => void;
   flagStruggle: (chapterId: string) => void;
   reviewCard: (cardId: string, confidence: Confidence) => void;
   getDueCards: () => string[];
@@ -437,25 +440,28 @@ export function AppProvider({ children }: { children: ReactNode }) {
     []
   );
 
-  const completeChapter = useCallback((chapterId: string) => {
-    setState((s) => {
-      // Always derive the reward from today's counters. This matters if the first completion
-      // happens after midnight while a previous session is still in local storage.
-      const session = { ...s, ...ensureSession(s) };
-      const already = session.completedChapters.includes(chapterId);
-      const xpGained = already ? 0 : 50;
-      const sessionChaptersDone = already ? session.sessionChaptersDone : session.sessionChaptersDone + 1;
-      const activity = session.sessionCardsReviewed + sessionChaptersDone * 3;
-      return {
-        ...session,
-        completedChapters: already ? session.completedChapters : [...session.completedChapters, chapterId],
-        sessionChaptersDone,
-        xp: session.xp + xpGained,
-        dailyGoalMet: activity >= goalTarget(session),
-        lastCompletion: { chapterId, wasNewCompletion: !already, xpGained },
-      };
-    });
-  }, []);
+  const completeChapter = useCallback(
+    (chapterId: string, quiz?: { score: number; total: number; rebondCount: number; xpEarned: number }) => {
+      setState((s) => {
+        // Always derive the reward from today's counters. This matters if the first completion
+        // happens after midnight while a previous session is still in local storage.
+        const session = { ...s, ...ensureSession(s) };
+        const already = session.completedChapters.includes(chapterId);
+        const xpGained = already ? 0 : 50;
+        const sessionChaptersDone = already ? session.sessionChaptersDone : session.sessionChaptersDone + 1;
+        const activity = session.sessionCardsReviewed + sessionChaptersDone * 3;
+        return {
+          ...session,
+          completedChapters: already ? session.completedChapters : [...session.completedChapters, chapterId],
+          sessionChaptersDone,
+          xp: session.xp + xpGained,
+          dailyGoalMet: activity >= goalTarget(session),
+          lastCompletion: { chapterId, wasNewCompletion: !already, xpGained, quiz },
+        };
+      });
+    },
+    []
+  );
 
   // The real signal behind resolveChapters()'s dynamic `reinforce` — called from LessonView's
   // Quiz on a wrong answer or an honest "Je ne sais pas", never on a correct one. Idempotent

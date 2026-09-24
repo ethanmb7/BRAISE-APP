@@ -2912,6 +2912,42 @@ select {
   font-size: 1rem;
   color: var(--ink);
 }
+.complete-run {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 16px 0 0;
+  flex-wrap: wrap;
+}
+.complete-run-stat {
+  background: var(--paper);
+  border-radius: 12px;
+  padding: 10px 14px;
+  min-width: 68px;
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+}
+.complete-run-stat b {
+  display: block;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.15rem;
+  color: var(--ink);
+}
+/* Same orange as the quiz's own "+15 XP · rattrapé !" popup — same event, same colour, so the
+   recap reads as the payoff of that exact moment instead of a second, disconnected system. */
+.complete-run-stat.is-rebond b {
+  color: var(--neo-orange);
+}
+/* Same coral as SubjectView's "À renforcer" badge (c.reinforce) — this is that same real signal,
+   just surfaced a screen earlier, not a new one invented for this recap. */
+.complete-run-stat.is-fragile b {
+  color: var(--color-sapie-coral);
+}
+.complete-run-note {
+  color: var(--ink-soft);
+  font-size: 0.74rem;
+  margin-top: 8px;
+}
 .btn-return {
   background: var(--blue);
   color: var(--paper);

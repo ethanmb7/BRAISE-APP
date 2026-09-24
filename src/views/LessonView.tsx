@@ -43,9 +43,9 @@ export function LessonView() {
   const storyData = STORIES[chapter.id];
   const transcript = AUDIO_TRANSCRIPTS[chapter.id];
 
-  const handleComplete = () => {
+  const handleComplete = (quiz?: { score: number; total: number; rebondCount: number; xpEarned: number }) => {
     sfx.complete(state.soundOn);
-    completeChapter(chapter.id);
+    completeChapter(chapter.id, quiz);
     setView('complete');
   };
 
@@ -529,7 +529,7 @@ function Quiz({
   chapterId: string;
   subjectName: string;
   topic: string;
-  onComplete: () => void;
+  onComplete: (quiz: { score: number; total: number; rebondCount: number; xpEarned: number }) => void;
   onBridge: (message: string) => void;
 }) {
   const [idx, setIdx] = useState(0);
@@ -550,6 +550,9 @@ function Quiz({
   // and unmount this component, see askSimpler/askExample/askWhy below), and the one the app
   // already treats as real understanding-checking rather than passive re-reading.
   const [rebondEarned, setRebondEarned] = useState(false);
+  // Running total across the whole quiz — the real number CompleteView's recap reports, not a
+  // guess: incremented in lockstep with each real REBOND_XP grant in `next()` below.
+  const [rebondCount, setRebondCount] = useState(0);
   const { state, addXp, flagStruggle } = useApp();
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
   // A completed chapter's quiz can still be replayed (SubjectView never locks a 'done' node) —
@@ -659,6 +662,7 @@ function Quiz({
     setFeynmanOpen(false);
     if (needsHelp && rebondEarned && !alreadyCompleted) {
       addXp(REBOND_XP);
+      setRebondCount((n) => n + 1);
       sfx.correct(soundOn);
       if (event) {
         const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
@@ -693,7 +697,18 @@ function Quiz({
         <p style={{ color: 'var(--ink-soft)', fontSize: '0.85rem' }}>
           {score >= questions.length * 0.6 ? 'Beau travail !' : 'Continue, tu vas progresser !'}
         </p>
-        <button className="btn-block blue" style={{ marginTop: 20 }} onClick={onComplete}>
+        <button
+          className="btn-block blue"
+          style={{ marginTop: 20 }}
+          onClick={() =>
+            onComplete({
+              score,
+              total: questions.length,
+              rebondCount,
+              xpEarned: alreadyCompleted ? 0 : score * CORRECT_XP + rebondCount * REBOND_XP,
+            })
+          }
+        >
           Terminer la leçon
         </button>
       </div>
