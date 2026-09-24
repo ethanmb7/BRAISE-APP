@@ -4165,6 +4165,12 @@ select {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* Same bevel language as the avatar right next to it (border-2, hard 2px shadow) and as the
+   Pioche card's own info pills below this header — before this, the streak/Aura pills used a
+   thin 1px translucent-glass style found nowhere else in the app, while the avatar already used
+   the real neo-brutalist border+shadow. Two visual systems sitting side by side in the same 52px
+   bar read as a mistake, not a choice. `var(--paper)`, not a hardcoded fill, so it still adapts
+   under dark mode the same way the avatar already does. */
 .home-header-streak,
 .home-header-aura {
   display: flex;
@@ -4172,12 +4178,13 @@ select {
   align-items: center;
   justify-content: center;
   gap: 5px;
-  border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  border: 2px solid var(--neo-ink);
   border-radius: 13px;
-  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  background: var(--paper);
   color: var(--ink);
   font-size: 0.78rem;
   font-weight: 800;
+  box-shadow: 2px 2px 0 var(--neo-ink);
 }
 .home-header-streak { padding: 0 9px; }
 .home-header-aura { padding: 0 8px 0 5px; }
@@ -4186,11 +4193,24 @@ select {
   width: 28px;
   height: 28px;
   place-items: center;
-  border: 1.5px solid var(--neo-ink);
+  border: 2px solid var(--neo-ink);
   border-radius: 9px;
 }
-.home-header-identity:active,
-.home-header-aura:active { transform: scale(0.96); }
+/* Press feedback matches every other bordered+shadowed tap target in the app (HeroPiocheCard's
+   CTA, TabBar): the element sinks by exactly its own shadow offset and the shadow disappears,
+   instead of a generic scale-down borrowed from a different, softer design language. */
+.home-header-identity,
+.home-header-aura {
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.home-header-identity:active .home-header-avatar {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+.home-header-aura:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
 
 /* ===== Matières — exploration volontaire ===== */
 .subjects-view { padding-top: 18px; }
