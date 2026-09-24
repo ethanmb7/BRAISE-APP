@@ -94,6 +94,8 @@ function Screen() {
           fromRank={celebration.fromRank}
           toRank={celebration.toRank}
           xp={state.xp}
+          streak={state.streak}
+          masteredCards={countMasteredCards(state.cardReviews)}
           // "Cool" (sunglasses) for the Coach Savage tone, "proud" for Pote Chill — the mood and
           // the voice tone were two already-built systems that just never spoke to each other on
           // this screen; a savage-toned message paired with a plain happy face undercut its own

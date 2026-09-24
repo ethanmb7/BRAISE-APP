@@ -2,12 +2,14 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { motion } from 'framer-motion';
 import { BraiseMascot } from './BraiseMascot';
 import { RankIcon } from './RankIcon';
-import { RANKS, getRankInfo, type Rank } from '@/lib/aura';
+import { RANKS, getRankInfo, computeNextMilestone, type Rank } from '@/lib/aura';
 
 interface RankUpCelebrationProps {
   fromRank: Rank;
   toRank: Rank;
   xp: number;
+  streak: number;
+  masteredCards: number;
   message: string;
   /** "cool" (sunglasses) for the Coach Savage tone, "proud" for Pote Chill — matches whichever
    *  voice tone actually generated `message`, instead of a fixed expression for every tone. */
@@ -36,6 +38,8 @@ export function RankUpCelebration({
   fromRank,
   toRank,
   xp,
+  streak,
+  masteredCards,
   message,
   mood = 'proud',
   ageGroup = 'lycee',
@@ -45,6 +49,13 @@ export function RankUpCelebration({
   const [morphed, setMorphed] = useState(false);
   const teen = ageGroup === 'lycee';
   const next = RANKS[RANKS.findIndex((r) => r.id === toRank.id) + 1] ?? null;
+  // Same fallback "always point forward" system as Ton Aura (ProfilAuraView) once the rank
+  // ladder itself is maxed out — only computed for the branch below, but cheap enough not to
+  // bother gating behind `!next`.
+  const milestone = computeNextMilestone(streak, masteredCards);
+  const milestoneUnit = milestone.kind === 'streak' ? 'jour' : 'carte';
+  const milestoneGoal =
+    milestone.kind === 'streak' ? `${milestone.target} jours de série` : `${milestone.target} cartes maîtrisées`;
   // "Passer" used to be tappable from the very first frame — a fast tap could close the screen
   // before the transformation even started, skipping the whole moment this component exists to
   // deliver. It now only becomes real (visible and clickable, not just present) once the core
@@ -191,7 +202,13 @@ export function RankUpCelebration({
                 <span className="text-white">{next.min - xp} XP</span> jusqu'à {next.name}
               </>
             ) : (
-              'Rang maximum atteint 👑'
+              <>
+                <span className="text-white">
+                  {milestone.remaining} {milestoneUnit}
+                  {milestone.remaining > 1 ? 's' : ''}
+                </span>{' '}
+                jusqu'à {milestoneGoal}
+              </>
             )}
           </motion.p>
         </motion.div>
