@@ -92,6 +92,39 @@ export function resolveChapters(chapters: Chapter[], completedChapters: string[]
   });
 }
 
+export type SubjectDeck = {
+  id: string;
+  name: string;
+  color: string;
+  pct: number;
+  level: number;
+  chapterLabel: string;
+  currentChapterId?: string;
+  currentMastery: number;
+};
+
+// Per-subject "deck" summary (progress %, current chapter) — was independently rebuilt in both
+// HomeView and SubjectsView from the same resolveChapters call, down to the same leading-article
+// regex. Callers that need more (HomeView's daily-pick sort/name shortening) build on top of this.
+export function buildSubjectDecks(completedChapters: string[]): SubjectDeck[] {
+  return SUBJECTS.map((s) => {
+    const chapters = resolveChapters(s.chapters, completedChapters);
+    const doneCount = chapters.filter((c) => c.status === 'done').length;
+    const currentIndex = chapters.findIndex((c) => c.status === 'current');
+    const current = currentIndex >= 0 ? chapters[currentIndex] : null;
+    return {
+      id: s.id,
+      name: s.name,
+      color: s.color,
+      pct: Math.round((doneCount / chapters.length) * 100),
+      level: currentIndex >= 0 ? currentIndex + 1 : chapters.length,
+      chapterLabel: current ? current.title.replace(/^(les |la |le |l')/i, '') : 'Parcours terminé',
+      currentChapterId: current?.id,
+      currentMastery: current?.mastery ?? 100,
+    };
+  });
+}
+
 /** Real count of finished chapters across every subject — via `resolveChapters`, not the static
  *  per-chapter `status` in data.ts (that field is only ever a fresh-install baseline now; reading
  *  it directly here would silently undercount every real user's progress). */

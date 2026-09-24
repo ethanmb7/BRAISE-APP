@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Settings, ChevronRight, Check, Pencil, X } from 'lucide-react';
-import { useApp, computeUnlockedBadges, countDoneChapters } from '@/store';
+import { useApp, computeUnlockedBadges } from '@/store';
 import { sfx } from '@/lib/sound';
 import { getRankInfo, RANKS } from '@/lib/aura';
 import { formatShortDate } from '@/lib/utils';
@@ -44,11 +44,6 @@ export function ProfileView() {
   const [draftName, setDraftName] = useState(state.user.name);
 
   const subjectsCount = state.user.subjects.length;
-  const chaptersDone = countDoneChapters(state.completedChapters);
-  // Distinct from "cartes maîtrisées" (shown on Aura) — this is raw effort, every card ever
-  // opened in Réviser, mastered or not. Real apps show volume and mastery as two separate
-  // numbers; until now this page only ever showed the second one.
-  const cardsSeenCount = Object.keys(state.cardReviews).length;
   const badgeUnlocked = computeUnlockedBadges(state);
   const badgeUnlockedCount = Object.values(badgeUnlocked).filter(Boolean).length;
   const rankInfo = getRankInfo(state.xp);

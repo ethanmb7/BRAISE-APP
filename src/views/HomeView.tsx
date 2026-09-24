@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { useApp, computeGoalPct, remainingToGoal, resolveChapters } from '@/store';
+import { useApp, buildSubjectDecks, computeGoalPct, remainingToGoal, resolveChapters } from '@/store';
 import { sfx } from '@/lib/sound';
 import { fireConfetti } from '@/lib/confetti';
 import { HeaderHUD } from '@/components/HeaderHUD';
@@ -96,27 +96,15 @@ export function HomeView() {
   // "Chapitres prioritaires" used to do as a separate carousel — same data (every subject's
   // current chapter), it was never two different things, just the same list shown twice.
   const SHORT_SUBJECT_NAME: Record<string, string> = { maths: 'Maths' };
-  const stripLeadingArticle = (title: string) => title.replace(/^(les |la |le |l')/i, '');
-  const subjectDecks = SUBJECTS.map((s) => {
-    const chapters = resolveChapters(s.chapters, state.completedChapters);
-    const doneCount = chapters.filter((c) => c.status === 'done').length;
-    const pct = Math.round((doneCount / chapters.length) * 100);
-    const currentIndex = chapters.findIndex((c) => c.status === 'current');
-    const current = currentIndex >= 0 ? chapters[currentIndex] : null;
+  const subjectDecks = buildSubjectDecks(state.completedChapters).map((d) => {
     return {
-      id: s.id,
-      name: SHORT_SUBJECT_NAME[s.id] ?? s.name,
-      color: s.color,
-      pct,
-      level: currentIndex >= 0 ? currentIndex + 1 : chapters.length,
-      chapterLabel: current ? stripLeadingArticle(current.title) : 'Parcours terminé',
-      currentChapterId: current?.id,
-      currentMastery: current?.mastery ?? 100,
+      ...d,
+      name: SHORT_SUBJECT_NAME[d.id] ?? d.name,
       // Same subject the hero card above already names as today's draw — surfacing it first
       // here too, instead of leaving the grid to sort purely on mastery, matters most on a
       // fresh account: a real new user's 6 decks all tie at 0% mastery (see resolveChapters),
       // so without this every card looks interchangeable and nothing says where to start.
-      isDailyPick: s.id === currentSubject?.id,
+      isDailyPick: d.id === currentSubject?.id,
     };
   }).sort((a, b) => Number(b.isDailyPick) - Number(a.isDailyPick) || a.currentMastery - b.currentMastery);
 
