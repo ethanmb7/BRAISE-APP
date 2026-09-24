@@ -11,12 +11,8 @@ export type ViewId =
   | 'profile'
   | 'settings';
 
-codex/analyser-l-application-yockaq
 /** `progres` remains accepted for migration/back-navigation from pre-Matières installs. */
 export type TabId = 'home' | 'subjects' | 'revisions' | 'profile' | 'progres';
-=======
-export type TabId = 'home' | 'subjects' | 'revisions' | 'profile';
-main
 
 export type Level = {
   id: string;
