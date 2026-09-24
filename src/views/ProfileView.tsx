@@ -4,6 +4,7 @@ import { Settings, ChevronRight, Check, Pencil, X } from 'lucide-react';
 import { useApp, computeUnlockedBadges, countDoneChapters } from '@/store';
 import { sfx } from '@/lib/sound';
 import { getRankInfo, RANKS } from '@/lib/aura';
+import { formatShortDate } from '@/lib/utils';
 import { useCountUp } from '@/lib/useCountUp';
 import { getAgeGroup, profileReactionLine } from '@/lib/braiseVoice';
 import { TopBar } from '@/components/TopBar';
@@ -28,10 +29,6 @@ function isAvatarUnlocked(minRankId: string | undefined, currentRankId: string):
   return currentIdx >= minIdx;
 }
 
-function formatShortDate(ts: number): string {
-  return new Date(ts).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-}
-
 const staggerContainer = {
   hidden: {},
   show: { transition: { staggerChildren: 0.08, delayChildren: 0.04 } },
@@ -42,7 +39,7 @@ const staggerItem = {
 };
 
 export function ProfileView() {
-  const { state, setView, setTab, setPersonality, setUser } = useApp();
+  const { state, setView, goBack, setTab, setPersonality, setUser } = useApp();
   const [editingIdentity, setEditingIdentity] = useState(false);
   const [draftName, setDraftName] = useState(state.user.name);
   const [draftAvatar, setDraftAvatar] = useState(state.user.avatar);
@@ -104,7 +101,7 @@ export function ProfileView() {
 
   return (
     <div>
-      <TopBar title="Profil" onBack={() => setView(state.tab)} />
+      <TopBar title="Profil" onBack={goBack} />
       <motion.div className="view is-active" variants={staggerContainer} initial="hidden" animate="show">
         {!editingIdentity ? (
           <motion.div className="profile-hero-card" variants={staggerItem}>

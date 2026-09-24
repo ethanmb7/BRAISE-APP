@@ -74,6 +74,14 @@ export function countMasteredCards(cardReviews: Record<string, CardReview>): num
   return Object.values(cardReviews).filter((r) => r.repetitions >= MASTERED_AT_REPETITIONS).length;
 }
 
+// Distinct subjects touched in Réviser at least once — same "at least one real review" bar as
+// `started` in computeSubjectMastery, just counted across subjects instead of per-subject.
+export function countSubjectsReviewed(cardReviews: Record<string, CardReview>): number {
+  return new Set(
+    Object.keys(cardReviews).map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)
+  ).size;
+}
+
 export type BraiseInsight =
   | { kind: 'struggling'; topic: string; subjectName: string; repetitions: number }
   | { kind: 'strong-subject'; subjectName: string; subjectEmoji: string; masteredCount: number; totalCount: number };

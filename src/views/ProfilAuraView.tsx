@@ -18,6 +18,7 @@ import {
   RANKS,
   computeSubjectMastery,
   countMasteredCards,
+  countSubjectsReviewed,
   computeBraiseInsight,
   computeNextMilestone,
   type Rank,
@@ -26,7 +27,6 @@ import {
   type NextMilestone,
 } from '@/lib/aura';
 import { getAgeGroup, progressAdvice, strongSubjectLine } from '@/lib/braiseVoice';
-import { FLASHCARDS } from '@/data';
 
 // Diameter of the hero ring frame — the single largest element on the page, on purpose.
 const HERO_SIZE = 180;
@@ -54,13 +54,13 @@ export function ProfilAuraView() {
   const { current, next, pct } = getRankInfo(state.xp);
   const dueCount = getDueCards().length;
 
-  const stats = useMemo(() => {
-    const reviewedIds = Object.keys(state.cardReviews);
-    const subjectsSeen = new Set(
-      reviewedIds.map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)
-    );
-    return { subjectsCount: subjectsSeen.size, masteredCards: countMasteredCards(state.cardReviews) };
-  }, [state.cardReviews]);
+  const stats = useMemo(
+    () => ({
+      subjectsCount: countSubjectsReviewed(state.cardReviews),
+      masteredCards: countMasteredCards(state.cardReviews),
+    }),
+    [state.cardReviews]
+  );
 
   // Once the rank ladder is maxed, RankRail's own caption has nothing left to say — this keeps
   // it pointing forward on a different, uncapped axis instead of just announcing a dead end. See

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { motion } from 'framer-motion';
 import { BraiseMascot } from './BraiseMascot';
 import { RankIcon } from './RankIcon';
-import { RANKS, type Rank } from '@/lib/aura';
+import { RANKS, getRankInfo, type Rank } from '@/lib/aura';
 
 interface RankUpCelebrationProps {
   fromRank: Rank;
@@ -205,7 +205,7 @@ export function RankUpCelebration({
         onClick={(e) => e.stopPropagation()}
       >
         <div className={compact ? '-mb-2' : undefined}>
-          <RankJourney currentRankId={toRank.id} accent={toRank.colorFrom} />
+          <RankJourney currentRankId={toRank.id} accent={toRank.colorFrom} pct={getRankInfo(xp).pct} />
         </div>
 
         <div className={`flex gap-3 ${compact ? 'mt-2' : 'mt-4'}`}>
@@ -233,13 +233,17 @@ export function RankUpCelebration({
 // Same ladder as "Ton Aura" (same CSS classes, same pulsing current node) — reused rather than
 // redrawn, so the celebration and the profile page agree on what the journey looks like instead
 // of inventing a second visual language for the same 5 ranks.
-function RankJourney({ currentRankId, accent }: { currentRankId: string; accent: string }) {
+function RankJourney({ currentRankId, accent, pct }: { currentRankId: string; accent: string; pct: number }) {
   const currentIdx = RANKS.findIndex((r) => r.id === currentRankId);
+  // Same fractional formula as Ton Aura's own RankJourney (ProfilAuraView.tsx) — this used to
+  // only count whole ranks reached, so the same real XP landed the fill bar at a different spot
+  // on this screen than on Ton Aura.
+  const overallPct = ((currentIdx + pct / 100) / (RANKS.length - 1)) * 100;
   return (
     <div className="rank-rail" role="list" aria-label="Les 5 rangs">
       <div className="rank-rail-track">
         <div className="rank-rail-line">
-          <div className="rank-rail-line-fill" style={{ width: `${(currentIdx / (RANKS.length - 1)) * 100}%` }} />
+          <div className="rank-rail-line-fill" style={{ width: `${overallPct}%` }} />
         </div>
         {RANKS.map((r, idx) => {
           const tier: 'done' | 'current' | 'locked' = idx === currentIdx ? 'current' : idx < currentIdx ? 'done' : 'locked';

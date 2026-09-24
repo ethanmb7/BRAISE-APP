@@ -481,6 +481,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
         return { ...s, view: s.lessonReturnTo, lessonReturnTo: null };
       }
       if (s.view === 'lesson' || s.view === 'complete') return { ...s, view: 'subject' };
+      // Profil is reachable two ways: from its own tab (setTab sets both `tab` and `view` to
+      // 'profile' at once — s.tab is then 'profile' too, so "back to s.tab" would be a no-op) or
+      // as a shortcut from another tab (HeaderHUD's avatar button only calls setView, so `tab`
+      // still names wherever the user actually came from). Only the second case has a real
+      // "back" target; the first falls back to home, same safe default ErrorBoundary itself uses.
+      if (s.view === 'profile') return { ...s, view: s.tab === 'profile' ? 'home' : s.tab };
       if (s.view === 'subject' || s.view === 'settings' || s.view === 'share')
         return { ...s, view: s.tab };
       return s;

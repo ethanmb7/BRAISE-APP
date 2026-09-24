@@ -2,13 +2,10 @@ import { useMemo } from 'react';
 import { computeUnlockedBadges } from '@/store';
 import { nextBadgeHint, badgeRemainingLabel } from '@/lib/aura';
 import { getBadgeUnlockedAtMap } from '@/lib/celebrations';
+import { formatShortDate } from '@/lib/utils';
 import { BadgeIcon } from '@/components/BadgeIcon';
 import { BADGES } from '@/data';
 import type { AppState } from '@/types';
-
-function formatShortDate(ts: number): string {
-  return new Date(ts).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-}
 
 // "Parcours" — moved here from Profil (see ProfilAuraView.tsx): this is real achievement
 // history, it belongs on the page whose whole job is "what have I accomplished", not on the

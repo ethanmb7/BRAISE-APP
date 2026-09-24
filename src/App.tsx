@@ -10,8 +10,7 @@ import { BadgeIcon } from '@/components/BadgeIcon';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { useMilestoneCelebrations } from '@/lib/useMilestoneCelebrations';
 import { rankUpLine, getAgeGroup } from '@/lib/braiseVoice';
-import { getRankInfo, countMasteredCards } from '@/lib/aura';
-import { FLASHCARDS } from '@/data';
+import { getRankInfo, countMasteredCards, countSubjectsReviewed } from '@/lib/aura';
 import { OnboardingView } from '@/views/OnboardingView';
 import { HomeView } from '@/views/HomeView';
 import { SubjectsView } from '@/views/SubjectsView';
@@ -116,11 +115,7 @@ function Screen() {
           rank={celebration?.type === 'rank' ? celebration.toRank : getRankInfo(state.xp).current}
           streak={state.streak}
           xp={state.xp}
-          subjectsCount={
-            new Set(
-              Object.keys(state.cardReviews).map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)
-            ).size
-          }
+          subjectsCount={countSubjectsReviewed(state.cardReviews)}
           masteredCards={countMasteredCards(state.cardReviews)}
           onClose={() => setShareOpen(false)}
         />

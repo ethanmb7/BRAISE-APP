@@ -1,7 +1,6 @@
 type Props = {
   checked: boolean;
   onChange: (v: boolean) => void;
-  label?: string;
   'aria-label'?: string;
 };
 

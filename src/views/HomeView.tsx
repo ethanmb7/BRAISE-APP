@@ -12,7 +12,7 @@ import { TodayStrip } from '@/components/TodayStrip';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
 import { SUBJECTS, FLASHCARDS } from '@/data';
 import { dailyPickLine, headerGreeting, getAgeGroup } from '@/lib/braiseVoice';
-import { getRankInfo, countMasteredCards } from '@/lib/aura';
+import { getRankInfo, countMasteredCards, countSubjectsReviewed } from '@/lib/aura';
 import { getIntoxDismissedCount, setIntoxDismissedCount } from '@/lib/celebrations';
 import type { Level, Subject, Chapter } from '@/types';
 
@@ -117,7 +117,7 @@ export function HomeView() {
       color: s.color,
       pct,
       level: currentIndex >= 0 ? currentIndex + 1 : chapters.length,
-      chapterLabel: current ? stripLeadingArticle(current.title) : s.name,
+      chapterLabel: current ? stripLeadingArticle(current.title) : 'Parcours terminé',
       currentChapterId: current?.id,
       currentMastery: current?.mastery ?? 100,
       // Same subject the hero card above already names as today's draw — surfacing it first
@@ -133,11 +133,7 @@ export function HomeView() {
     openSubject(subjectId, chapterId);
   };
 
-  // Same derivation as ProfilAuraView's own share button — real distinct-subjects-reviewed
-  // count from card review history, not a second, possibly-diverging computation.
-  const subjectsCount = new Set(
-    Object.keys(state.cardReviews).map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)
-  ).size;
+  const subjectsCount = countSubjectsReviewed(state.cardReviews);
   const masteredCards = countMasteredCards(state.cardReviews);
   const rank = getRankInfo(state.xp).current;
 
