@@ -229,11 +229,11 @@ export function ensureSession(s: AppState): Partial<AppState> {
 // real welcome gift (a resource handed to you, not a fabricated record of past use), same logic
 // game onboarding flows use for starting currency.
 const INITIAL: AppState = {
-  // Temporarily skips straight to 'home' — onboarding itself isn't being worked on right now, no
-  // need to click through it on every fresh session while iterating on the rest of the app.
-  // OnboardingView and its route in App.tsx are untouched; flip this back to 'onboarding' (or add
-  // a real "has the user finished onboarding before" check) when it's back in scope.
-  view: 'home',
+  // A genuine first launch — no saved progress anywhere (see the mount effect below, which only
+  // ever overwrites this when loadProgress() actually finds something). Real device that already
+  // has progress, even from before onboarding tracked `joinedAt`, always restores past this via
+  // resolveRestoredView — this default only ever reaches the screen on a real fresh install.
+  view: 'onboarding',
   tab: 'home',
   user: DEFAULT_USER,
   streak: 0,
