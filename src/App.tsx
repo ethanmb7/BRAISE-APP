@@ -12,6 +12,7 @@ import { getRankInfo, countMasteredCards } from '@/lib/aura';
 import { FLASHCARDS } from '@/data';
 import { OnboardingView } from '@/views/OnboardingView';
 import { HomeView } from '@/views/HomeView';
+import { SubjectsView } from '@/views/SubjectsView';
 import { RevisionsView } from '@/views/RevisionsView';
 import { ProfilAuraView } from '@/views/ProfilAuraView';
 import { SubjectView } from '@/views/SubjectView';
@@ -30,7 +31,7 @@ function Screen() {
 
   // The floating dock stays through a review session too — it sits under the action row,
   // in its own glass layer, so it never competes with the verdict buttons for the thumb.
-  const showTabBar = ['home', 'revisions', 'progres', 'profile'].includes(state.view);
+  const showTabBar = ['home', 'subjects', 'revisions', 'progres', 'profile'].includes(state.view);
 
   if (!loaded) {
     return (
@@ -54,6 +55,7 @@ function Screen() {
         <ErrorBoundary key={state.view} onGoHome={() => setTab('home')}>
           {state.view === 'onboarding' && <OnboardingView />}
           {state.view === 'home' && <HomeView />}
+          {state.view === 'subjects' && <SubjectsView />}
           {state.view === 'revisions' && <RevisionsView />}
           {state.view === 'progres' && <ProfilAuraView />}
           {state.view === 'subject' && <SubjectView />}

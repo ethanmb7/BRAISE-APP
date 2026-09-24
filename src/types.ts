@@ -1,6 +1,7 @@
 export type ViewId =
   | 'onboarding'
   | 'home'
+  | 'subjects'
   | 'revisions'
   | 'progres'
   | 'subject'
@@ -10,7 +11,8 @@ export type ViewId =
   | 'profile'
   | 'settings';
 
-export type TabId = 'home' | 'revisions' | 'progres' | 'profile';
+/** `progres` remains accepted for migration/back-navigation from pre-Matières installs. */
+export type TabId = 'home' | 'subjects' | 'revisions' | 'profile' | 'progres';
 
 export type Level = {
   id: string;
