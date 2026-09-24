@@ -1,22 +1,26 @@
-import { useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Settings, ChevronRight, Check, Pencil, X } from 'lucide-react';
-import { useApp, computeUnlockedBadges, countDoneChapters } from '@/store';
-import { sfx } from '@/lib/sound';
-import { getRankInfo, RANKS } from '@/lib/aura';
-import { useCountUp } from '@/lib/useCountUp';
-import { getAgeGroup, profileReactionLine } from '@/lib/braiseVoice';
-import { TopBar } from '@/components/TopBar';
-import { RankIcon } from '@/components/RankIcon';
-import { SubjectIcon } from '@/components/SubjectIcon';
-import { BraiseMascot } from '@/components/BraiseMascot';
-import { AvatarGlyph, getAvatarName } from '@/components/AvatarGlyph';
-import { BADGES, SUBJECTS, AVATARS } from '@/data';
-import type { Personality } from '@/types';
+import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { Settings, ChevronRight, Check, Pencil, X } from "lucide-react";
+import { useApp, computeUnlockedBadges, countDoneChapters } from "@/store";
+import { sfx } from "@/lib/sound";
+import { getRankInfo, RANKS } from "@/lib/aura";
+import { useCountUp } from "@/lib/useCountUp";
+import { getAgeGroup, profileReactionLine } from "@/lib/braiseVoice";
+import { TopBar } from "@/components/TopBar";
+import { RankIcon } from "@/components/RankIcon";
+import { SubjectIcon } from "@/components/SubjectIcon";
+import { BraiseMascot } from "@/components/BraiseMascot";
+import { AvatarGlyph, getAvatarName } from "@/components/AvatarGlyph";
+import { BADGES, SUBJECTS, AVATARS } from "@/data";
+import type { Personality } from "@/types";
 
 const PERSONAS: { id: Personality; title: string; sub: string }[] = [
-  { id: 'chill', title: 'Pote Chill', sub: 'Encourageant, doux, zéro pression.' },
-  { id: 'savage', title: 'Coach Savage', sub: 'Second degré, piques amicales assumées.' },
+  { id: "chill", title: "Pote Chill", sub: "Encourageant, doux, zéro pression." },
+  {
+    id: "savage",
+    title: "Coach énergie",
+    sub: "Plus rythmé, toujours précis et bienveillant.",
+  },
 ];
 
 // Same rank-index comparison RankRail already uses (ProfilAuraView.tsx) — a rank-gated avatar
@@ -29,7 +33,7 @@ function isAvatarUnlocked(minRankId: string | undefined, currentRankId: string):
 }
 
 function formatShortDate(ts: number): string {
-  return new Date(ts).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+  return new Date(ts).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
 }
 
 const staggerContainer = {
@@ -69,7 +73,6 @@ export function ProfileView() {
     return `${getAvatarName(next.emoji)} se débloque au rang ${required?.name}.`;
   }, [rank.id]);
 
-
   // Memoized on the real facts it depends on, not re-rolled on every render (e.g. opening the
   // identity editor or toggling a subject chip) — only changes when something Braise would
   // actually react to differently changes.
@@ -77,9 +80,14 @@ export function ProfileView() {
     () =>
       profileReactionLine(
         { personality: state.user.personality, age: getAgeGroup(state.user.level) },
-        { rankName, streak: state.streak, badgesUnlocked: badgeUnlockedCount, badgesTotal: BADGES.length }
+        {
+          rankName,
+          streak: state.streak,
+          badgesUnlocked: badgeUnlockedCount,
+          badgesTotal: BADGES.length,
+        },
       ),
-    [state.user.personality, state.user.level, rankName, state.streak, badgeUnlockedCount]
+    [state.user.personality, state.user.level, rankName, state.streak, badgeUnlockedCount],
   );
 
   const openIdentityEdit = () => {
@@ -104,14 +112,22 @@ export function ProfileView() {
 
   return (
     <div>
-      <TopBar title="Profil" onBack={() => setView(state.tab)} />
-      <motion.div className="view is-active" variants={staggerContainer} initial="hidden" animate="show">
+      <TopBar title="Moi" onBack={() => setView(state.tab)} />
+      <motion.div
+        className="view is-active"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="show"
+      >
         {!editingIdentity ? (
           <motion.div className="profile-hero-card" variants={staggerItem}>
             {/* Le "pass BRAISE" : une vraie carte d'accès plutôt qu'un bandeau décoratif —
                 bande perforée en haut (les deux trous suggèrent le cordon), identité alignée
                 à gauche comme sur un badge, rien de centré ni de générique. */}
-            <div className="profile-pass-strip" style={{ background: `linear-gradient(125deg, ${rank.colorFrom}, ${rank.colorTo})` }}>
+            <div
+              className="profile-pass-strip"
+              style={{ background: `linear-gradient(125deg, ${rank.colorFrom}, ${rank.colorTo})` }}
+            >
               <span className="profile-pass-punch" aria-hidden="true" />
               <span className="profile-hero-overline">Pass BRAISE</span>
               <span className="profile-hero-rank-pill">
@@ -120,14 +136,20 @@ export function ProfileView() {
               </span>
             </div>
             <div className="profile-hero-body">
-
               <div className="profile-hero-identity">
                 <div className="profile-hero-avatar-stage">
                   <div
                     className="profile-hero-avatar-glow"
-                    style={{ background: `radial-gradient(circle, ${rank.colorTo}80, transparent 70%)` }}
+                    style={{
+                      background: `radial-gradient(circle, ${rank.colorTo}80, transparent 70%)`,
+                    }}
                   />
-                  <button type="button" className="profile-hero-avatar" onClick={openIdentityEdit} aria-label="Modifier ton avatar et ton prénom">
+                  <button
+                    type="button"
+                    className="profile-hero-avatar"
+                    onClick={openIdentityEdit}
+                    aria-label="Modifier ton avatar et ton prénom"
+                  >
                     <AvatarGlyph id={state.user.avatar} rankId={rank.id} size={58} />
                     <span className="profile-hero-edit-badge" aria-hidden="true">
                       <Pencil size={11} />
@@ -136,10 +158,13 @@ export function ProfileView() {
                 </div>
                 <div className="profile-hero-identity-main">
                   <h2 className="profile-hero-name">{state.user.name}</h2>
-                  {state.user.joinedAt && <p className="profile-joined">Membre depuis le {formatShortDate(state.user.joinedAt)}</p>}
+                  {state.user.joinedAt && (
+                    <p className="profile-joined">
+                      Membre depuis le {formatShortDate(state.user.joinedAt)}
+                    </p>
+                  )}
                 </div>
               </div>
-
 
               {/* Braise's take — real facts (rank/série/badges), never generic filler; changes
                   when they actually change, so there's a real reason to come back and see what
@@ -149,7 +174,7 @@ export function ProfileView() {
                   actual door: a real jump into Révisions, not just a line with nowhere to go. */}
               <div className="profile-hero-bubble">
                 <span className="profile-hero-bubble-icon" aria-hidden="true">
-                  <BraiseMascot size={26} mood={state.streak > 0 ? 'proud' : 'sleepy'} />
+                  <BraiseMascot size={26} mood={state.streak > 0 ? "proud" : "sleepy"} />
                 </span>
                 <div>
                   <p>{braiseTake}</p>
@@ -159,7 +184,7 @@ export function ProfileView() {
                       className="profile-hero-bubble-cta"
                       onClick={() => {
                         sfx.tap(state.soundOn);
-                        setTab('revisions');
+                        setTab("revisions");
                       }}
                     >
                       Réviser une carte →
@@ -176,7 +201,7 @@ export function ProfileView() {
                 className="profile-aura-link"
                 onClick={() => {
                   sfx.tap(state.soundOn);
-                  setTab('progres');
+                  setView("progres");
                 }}
               >
                 <span className="profile-aura-link-badge" aria-hidden="true">
@@ -190,7 +215,6 @@ export function ProfileView() {
               </button>
             </div>
           </motion.div>
-
         ) : (
           <div className="profile-identity-edit">
             <div className="profile-avatar-picker">
@@ -201,14 +225,18 @@ export function ProfileView() {
                   <button
                     key={a.emoji}
                     type="button"
-                    className={`profile-avatar-option ${draftAvatar === a.emoji ? 'is-selected' : ''} ${unlocked ? '' : 'is-locked'}`}
+                    className={`profile-avatar-option ${draftAvatar === a.emoji ? "is-selected" : ""} ${unlocked ? "" : "is-locked"}`}
                     onClick={() => {
                       if (!unlocked) return;
                       sfx.tap(state.soundOn);
                       setDraftAvatar(a.emoji);
                     }}
                     disabled={!unlocked}
-                    aria-label={unlocked ? `Choisir l'avatar ${getAvatarName(a.emoji)}` : `Avatar verrouillé — débloqué au rang ${requiredRank?.name}`}
+                    aria-label={
+                      unlocked
+                        ? `Choisir l'avatar ${getAvatarName(a.emoji)}`
+                        : `Avatar verrouillé — débloqué au rang ${requiredRank?.name}`
+                    }
                   >
                     <AvatarGlyph id={a.emoji} rankId={rank.id} size={30} />
                     {!unlocked && (
@@ -221,7 +249,9 @@ export function ProfileView() {
               })}
             </div>
             {(() => {
-              const nextLockedAvatar = AVATARS.find((a) => a.minRankId && !isAvatarUnlocked(a.minRankId, rank.id));
+              const nextLockedAvatar = AVATARS.find(
+                (a) => a.minRankId && !isAvatarUnlocked(a.minRankId, rank.id),
+              );
               if (!nextLockedAvatar) return null;
               const requiredRank = RANKS.find((r) => r.id === nextLockedAvatar.minRankId);
               return (
@@ -269,7 +299,9 @@ export function ProfileView() {
         <motion.section className="profile-face-card" variants={staggerItem}>
           <div className="profile-face-head">
             <span className="profile-face-label">Ta tête</span>
-            <span className="profile-face-sub">{nextAvatarHint ?? 'Tout est débloqué. Respect.'}</span>
+            <span className="profile-face-sub">
+              {nextAvatarHint ?? "Tout est débloqué. Respect."}
+            </span>
           </div>
           <div className="profile-avatar-rail">
             {AVATARS.map((a) => {
@@ -279,14 +311,18 @@ export function ProfileView() {
                 <button
                   key={a.emoji}
                   type="button"
-                  className={`profile-avatar-option ${state.user.avatar === a.emoji ? 'is-selected' : ''} ${unlocked ? '' : 'is-locked'}`}
+                  className={`profile-avatar-option ${state.user.avatar === a.emoji ? "is-selected" : ""} ${unlocked ? "" : "is-locked"}`}
                   onClick={() => {
                     if (!unlocked) return;
                     sfx.tap(state.soundOn);
                     setUser({ ...state.user, avatar: a.emoji });
                   }}
                   disabled={!unlocked}
-                  aria-label={unlocked ? `Choisir l'avatar ${getAvatarName(a.emoji)}` : `Avatar verrouillé — débloqué au rang ${requiredRank?.name}`}
+                  aria-label={
+                    unlocked
+                      ? `Choisir l'avatar ${getAvatarName(a.emoji)}`
+                      : `Avatar verrouillé — débloqué au rang ${requiredRank?.name}`
+                  }
                 >
                   <AvatarGlyph id={a.emoji} rankId={rank.id} size={32} />
                   {!unlocked && (
@@ -304,22 +340,27 @@ export function ProfileView() {
           <div className="uni-row">
             <div className="uni-row-main">
               <span className="uni-row-label">Ton Braise</span>
-              <span className="uni-row-sub">{PERSONAS.find((p) => p.id === state.user.personality)?.sub}</span>
+              <span className="uni-row-sub">
+                {PERSONAS.find((p) => p.id === state.user.personality)?.sub}
+              </span>
             </div>
             <div className="seg-track">
-              <div className={`seg-thumb ${state.user.personality === 'savage' ? 'is-right' : ''}`} aria-hidden="true" />
+              <div
+                className={`seg-thumb ${state.user.personality === "savage" ? "is-right" : ""}`}
+                aria-hidden="true"
+              />
               {PERSONAS.map((p) => (
                 <button
                   key={p.id}
                   type="button"
-                  className={`seg-opt ${state.user.personality === p.id ? 'is-active' : ''}`}
+                  className={`seg-opt ${state.user.personality === p.id ? "is-active" : ""}`}
                   onClick={() => {
                     sfx.tap(state.soundOn);
                     setPersonality(p.id);
                   }}
                   aria-pressed={state.user.personality === p.id}
                 >
-                  {p.id === 'chill' ? 'Chill' : 'Savage'}
+                  {p.id === "chill" ? "Chill" : "Savage"}
                 </button>
               ))}
             </div>
@@ -331,7 +372,9 @@ export function ProfileView() {
           <div className="uni-row stacked">
             <div className="uni-row-main">
               <span className="uni-row-label">Mes matières ({subjectsCount})</span>
-              <span className="uni-row-sub">Favorisées pendant tes révisions — touche pour changer.</span>
+              <span className="uni-row-sub">
+                Favorisées pendant tes révisions — touche pour changer.
+              </span>
             </div>
             <div className="uni-chips">
               {SUBJECTS.map((s) => {
@@ -340,7 +383,7 @@ export function ProfileView() {
                   <button
                     key={s.id}
                     type="button"
-                    className={`profile-subject-chip ${active ? 'is-active' : ''}`}
+                    className={`profile-subject-chip ${active ? "is-active" : ""}`}
                     onClick={() => toggleUserSubject(s.id)}
                     aria-pressed={active}
                   >
@@ -350,16 +393,21 @@ export function ProfileView() {
               })}
             </div>
           </div>
-
         </motion.div>
-
 
         {/* Settings link — the one bridge Profil keeps: Paramètres is the deeper configuration
             layer (son, thème, dyslexie), Profil itself only holds identity + the two preferences
             that affect Braise directly (ton, matières). Sharing moved to Aura too — showing off
             what you've accomplished belongs with the page that IS accomplishment, not here. */}
         <motion.div variants={staggerItem}>
-          <button type="button" className="profile-settings-link" onClick={() => { sfx.tap(state.soundOn); setView('settings'); }}>
+          <button
+            type="button"
+            className="profile-settings-link"
+            onClick={() => {
+              sfx.tap(state.soundOn);
+              setView("settings");
+            }}
+          >
             <span className="profile-settings-link-label">
               <Settings size={18} color="var(--ink-soft)" />
               Paramètres
