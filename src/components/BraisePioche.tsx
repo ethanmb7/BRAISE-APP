@@ -109,7 +109,7 @@ export function BraisePioche({ size = 64, hyped, diving, quick }: BraisePiochePr
         {fan.map((c, i) => (
           <motion.div
             key={i}
-            className="absolute bottom-0 left-1/2 z-10 overflow-hidden rounded-[6px] border-[2.5px] border-[#151821] bg-[#FFF8EE] shadow-[2px_2px_0px_0px_#151821]"
+            className="absolute bottom-0 left-1/2 z-10 overflow-hidden rounded-[6px] border-[2.5px] border-[var(--neo-ink)] bg-[var(--paper)] shadow-[var(--shadow-chip)]"
             style={cardBox}
             animate={
               diving
@@ -135,8 +135,8 @@ export function BraisePioche({ size = 64, hyped, diving, quick }: BraisePiochePr
             }
           >
             <span className="absolute inset-x-[3px] top-[3px] block rounded-[2px] bg-[#FFD84B]" style={{ height: s(0.07) }} />
-            <span className="absolute inset-x-[4px] bottom-[5px] block rounded-[2px] bg-[#151821]/12" style={{ height: s(0.05) }} />
-            <span className="absolute inset-x-[4px] bottom-[11px] block rounded-[2px] bg-[#151821]/12" style={{ height: s(0.04) }} />
+            <span className="absolute inset-x-[4px] bottom-[5px] block rounded-[2px] bg-[var(--neo-ink)]/12" style={{ height: s(0.05) }} />
+            <span className="absolute inset-x-[4px] bottom-[11px] block rounded-[2px] bg-[var(--neo-ink)]/12" style={{ height: s(0.04) }} />
           </motion.div>
         ))}
 
@@ -164,14 +164,14 @@ export function BraisePioche({ size = 64, hyped, diving, quick }: BraisePiochePr
         >
           {/* dos */}
           <span
-            className="absolute inset-0 rounded-[6px] border-[2.5px] border-[#151821] bg-[#FFF8EE] shadow-[2px_2px_0px_0px_#151821]"
+            className="absolute inset-0 rounded-[6px] border-[2.5px] border-[var(--neo-ink)] bg-[var(--paper)] shadow-[var(--shadow-chip)]"
             style={{ backfaceVisibility: 'hidden' }}
           >
             <span className="absolute inset-x-[3px] top-[3px] block rounded-[2px] bg-[#FFD84B]" style={{ height: s(0.07) }} />
           </span>
           {/* face — la mission, révélée : la silhouette de Braise elle-même */}
           <span
-            className="absolute inset-0 flex items-center justify-center rounded-[6px] border-[2.5px] border-[#151821] bg-[#FF4500] shadow-[2px_2px_0px_0px_#151821]"
+            className="absolute inset-0 flex items-center justify-center rounded-[6px] border-[2.5px] border-[var(--neo-ink)] bg-[var(--neo-orange)] shadow-[var(--shadow-chip)]"
             style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
           >
             <svg viewBox="0 0 100 100" width={s(0.26)} height={s(0.26)} fill="none">
@@ -183,7 +183,7 @@ export function BraisePioche({ size = 64, hyped, diving, quick }: BraisePiochePr
               />
               <path
                 d="M32 66 C 32 55, 41.5 48, 52.5 48 C 65 48, 75 55.5, 75 67 C 75 78, 64.5 84, 52.5 84 C 40 84, 32 77, 32 66 Z"
-                fill="#FFF8EE"
+                fill="var(--paper)"
               />
             </svg>
           </span>

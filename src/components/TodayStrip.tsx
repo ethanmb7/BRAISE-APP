@@ -74,7 +74,7 @@ export function TodayStrip({
         <span
           aria-hidden="true"
           className={`mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border-2 border-black ${
-            goalMet ? 'bg-emerald-300' : 'bg-[#FFE08A]'
+            goalMet ? 'bg-[var(--mint)]' : 'bg-[#FFE08A]'
           }`}
         >
           <BraiseMascot size={26} mood={mood} />
@@ -82,10 +82,10 @@ export function TodayStrip({
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-3">
-            <p className="font-mono text-[0.64rem] font-black uppercase tracking-wide text-black/55">Ton rythme du jour</p>
+            <p className="font-mono text-[0.67rem] font-black uppercase tracking-wide text-black/55">Ton rythme du jour</p>
             <span className="flex-shrink-0 text-xs font-black text-black/70">{goalMet ? 'Validé' : `${goalPct}%`}</span>
           </div>
-          <p className="mt-0.5 text-sm font-bold leading-snug text-[#151821]">{rhythmLine}</p>
+          <p className="mt-0.5 text-sm font-bold leading-snug text-[var(--neo-ink)]">{rhythmLine}</p>
 
           {!goalMet && (
             <div
@@ -96,7 +96,7 @@ export function TodayStrip({
               aria-valuemax={100}
               aria-valuenow={goalPct}
             >
-              <div className="h-full rounded-full bg-[#FF6B35] transition-[width] duration-500" style={{ width: `${goalPct}%` }} />
+              <div className="h-full rounded-full bg-[var(--mission-orange)] transition-[width] duration-500" style={{ width: `${goalPct}%` }} />
             </div>
           )}
 

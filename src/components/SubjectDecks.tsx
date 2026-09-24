@@ -51,7 +51,7 @@ export function SubjectDecks({ items, onSelect }: SubjectDecksProps) {
               <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border-2 border-black bg-white shadow-[1.5px_1.5px_0px_0px_#000]">
                 <SubjectIcon subjectId={item.id} color={item.color} size={22} />
               </span>
-              <span className={`rounded-lg border border-black px-2 py-0.5 text-xs font-black text-black shadow-[1px_1px_0px_0px_#000] ${item.isDailyPick ? 'bg-white' : 'bg-amber-300'}`}>
+              <span className={`rounded-lg border border-black px-2 py-0.5 text-xs font-black text-black shadow-[1px_1px_0px_0px_#000] ${item.isDailyPick ? 'bg-white' : 'bg-[var(--sun)]'}`}>
                 {item.isDailyPick ? 'Aujourd’hui' : `Niv. ${item.level}`}
               </span>
             </div>

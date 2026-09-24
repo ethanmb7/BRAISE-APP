@@ -191,7 +191,7 @@ export function HomeView() {
           <motion.div variants={staggerItem} className="space-y-3">
             <div className="flex items-end justify-between gap-3">
               <div>
-                <span className="font-mono text-[0.62rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">Accès rapide</span>
+                <span className="font-mono text-[0.67rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">Accès rapide</span>
                 <h2 className="font-display text-[1.15rem] font-extrabold leading-tight text-[var(--ink)]">Tes matières</h2>
               </div>
               <button type="button" onClick={() => setTab('subjects')} className="text-xs font-black text-[var(--neo-orange)]">Tout voir →</button>

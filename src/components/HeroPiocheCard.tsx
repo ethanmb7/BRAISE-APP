@@ -84,7 +84,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
           piocheTransition.ts) already covers the actual cut; this is a small, safe complement to
           it, not a replacement. */}
       <motion.section
-        className="relative overflow-hidden rounded-2xl border-[3px] border-black bg-[#FF6B35] p-5 shadow-[6px_6px_0px_0px_#000]"
+        className="relative overflow-hidden rounded-2xl border-[3px] border-black bg-[var(--mission-orange)] p-5 shadow-[var(--shadow-card-lg)]"
         aria-label={`Mission du jour : ${chapterTitle}`}
         animate={{ scale: launching ? 1.025 : 1 }}
         // Same full/quick split as everything else in this ceremony (BraiseChest, the reveal
@@ -97,11 +97,11 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
         <motion.div
           aria-hidden="true"
           className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full"
-          style={{ background: 'radial-gradient(circle, #FFE9A8 0%, rgba(255,233,168,0) 70%)' }}
+          style={{ background: 'radial-gradient(circle, var(--gold-soft) 0%, transparent 70%)' }}
           animate={{ opacity: [0.35, 0.85, 0.35], scale: [0.9, 1.15, 0.9] }}
           transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
         />
-        <div aria-hidden="true" className="pointer-events-none absolute -right-6 -top-6 h-16 w-16 rounded-full bg-[#FDC800]" />
+        <div aria-hidden="true" className="pointer-events-none absolute -right-6 -top-6 h-16 w-16 rounded-full bg-[var(--gold)]" />
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 rounded-2xl"
@@ -114,7 +114,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
             ticket, then disappears into the hand-off light. */}
         <motion.div
           aria-hidden="true"
-          className="pointer-events-none absolute right-5 top-[58px] z-0 flex h-14 w-[116px] -rotate-6 flex-col justify-center rounded-lg border-2 border-[#151821] bg-[#FFF8EE] px-2 shadow-[3px_3px_0px_0px_#151821]"
+          className="pointer-events-none absolute right-5 top-[58px] z-0 flex h-14 w-[116px] -rotate-6 flex-col justify-center rounded-lg border-2 border-[var(--neo-ink)] bg-[var(--paper)] px-2 shadow-[var(--shadow-press)]"
           initial={false}
           animate={
             launching
@@ -127,8 +127,8 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
               : { duration: 0.1 }
           }
         >
-          <span className="font-mono text-[0.48rem] font-black tracking-[0.12em] text-[#7C2D12]">MISSION TROUVÉE</span>
-          <span className="mt-0.5 font-display text-[0.66rem] font-black leading-none text-[#151821]">C’est parti !</span>
+          <span className="font-mono text-[0.48rem] font-black tracking-[0.12em] text-[var(--orange-ink)]">MISSION TROUVÉE</span>
+          <span className="mt-0.5 font-display text-[0.66rem] font-black leading-none text-[var(--neo-ink)]">C’est parti !</span>
         </motion.div>
 
         <div className="relative flex items-center gap-3">
@@ -137,7 +137,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
                 the player reaches for the button; the frame and reading order never move. */}
             <motion.span
               aria-hidden="true"
-              className="absolute inset-[5px] rounded-full bg-[#FDC800]/40 blur-md"
+              className="absolute inset-[5px] rounded-full bg-[var(--gold)]/40 blur-md"
               animate={hyped || launching ? { scale: [0.9, 1.22, 0.9], opacity: [0.25, 0.85, 0.25] } : { scale: [0.96, 1.06, 0.96], opacity: [0.22, 0.4, 0.22] }}
               transition={{ duration: hyped || launching ? 0.58 : 3.2, repeat: Infinity, ease: 'easeInOut' }}
             />
@@ -149,24 +149,24 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
                 failure), 6.25:1 for dark ink. Three real fonts: font-mono for the eyebrow
                 (same as every other small-caps label app-wide), font-display for the title,
                 font-sans for the stats line. */}
-            <p className="flex items-center gap-1 font-mono text-[0.67rem] font-black uppercase tracking-wide text-[#151821]">
+            <p className="flex items-center gap-1 font-mono text-[0.67rem] font-black uppercase tracking-wide text-[var(--neo-ink)]">
               <Sparkles size={12} strokeWidth={3} /> {launching ? 'Mission trouvée !' : 'Pioche du jour'}
             </p>
-            <h2 className="line-clamp-2 font-display text-xl font-black leading-tight text-[#151821]">{chapterTitle}</h2>
+            <h2 className="line-clamp-2 font-display text-xl font-black leading-tight text-[var(--neo-ink)]">{chapterTitle}</h2>
           </div>
         </div>
         <div className="relative mt-4 grid grid-cols-3 gap-2" aria-label="Les repères de ta mission">
-          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
+          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[var(--paper)] px-2 py-2 shadow-[var(--shadow-chip)]">
             <Clock3 size={15} strokeWidth={3} aria-hidden="true" />
-            <span className="font-mono text-[0.67rem] font-black text-[#151821]">{duration} MIN</span>
+            <span className="font-mono text-[0.67rem] font-black text-[var(--neo-ink)]">{duration} MIN</span>
           </div>
-          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
-            <span aria-hidden="true" className="h-3 w-3 flex-none rounded-full border-2 border-[#151821]" style={{ background: subjectColor ?? '#FDC800' }} />
-            <span className="truncate font-mono text-[0.67rem] font-black uppercase text-[#151821]">{subjectName ?? 'Mission'}</span>
+          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[var(--paper)] px-2 py-2 shadow-[var(--shadow-chip)]">
+            <span aria-hidden="true" className="h-3 w-3 flex-none rounded-full border-2 border-[var(--neo-ink)]" style={{ background: subjectColor ?? 'var(--gold)' }} />
+            <span className="truncate font-mono text-[0.67rem] font-black uppercase text-[var(--neo-ink)]">{subjectName ?? 'Mission'}</span>
           </div>
-          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
+          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[var(--paper)] px-2 py-2 shadow-[var(--shadow-chip)]">
             <Trophy size={15} strokeWidth={3} aria-hidden="true" />
-            <span className="font-mono text-[0.67rem] font-black text-[#151821]">+50 AURA</span>
+            <span className="font-mono text-[0.67rem] font-black text-[var(--neo-ink)]">+50 AURA</span>
           </div>
         </div>
         <span className="sr-only">
@@ -178,7 +178,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
         {/* Base+face bevel — untouched, the same mechanic SubjectDecks/HeaderHUD use everywhere
             else on Accueil. Pointer events here drive `hyped` on the chest (hover for a mouse,
             pointerdown for a touch — the only reliable "finger's on it" signal on mobile). */}
-        <div className="tw-cta-pulse group relative mt-5">
+        <div className="tw-cta-pulse group relative mt-4">
           <span aria-hidden="true" className="absolute inset-0 translate-y-[3px] rounded-full border-[2.5px] border-black bg-black" />
           <button
             onPointerEnter={() => setHyped(true)}

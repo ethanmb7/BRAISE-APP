@@ -56,7 +56,7 @@ export class ErrorBoundary extends Component<Props, State> {
               <button
                 type="button"
                 onClick={this.props.onGoHome}
-                className="rounded-full border-[2.5px] border-black bg-gradient-to-b from-[#FFE066] to-[#FDC800] px-5 py-3 font-display text-[0.88rem] font-extrabold text-black shadow-[3px_3px_0_#000] transition-transform active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
+                className="rounded-full border-[2.5px] border-black bg-gradient-to-b from-[#FFE066] to-[var(--gold)] px-5 py-3 font-display text-[0.88rem] font-extrabold text-black shadow-[3px_3px_0_#000] transition-transform active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
               >
                 Retour à l'accueil
               </button>

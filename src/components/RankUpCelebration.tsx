@@ -108,7 +108,7 @@ export function RankUpCelebration({
       // fade off the edge of the screen rather than stretch it, the same way a poster doesn't grow
       // to fit its own glow.
       className="absolute inset-0 z-[80] flex flex-col overflow-hidden"
-      style={{ background: `linear-gradient(165deg, ${toRank.colorTo}, #151821 50%)` }}
+      style={{ background: `linear-gradient(165deg, ${toRank.colorTo}, var(--neo-ink) 50%)` }}
       role="dialog"
       aria-modal="true"
       aria-label={`Nouveau rang débloqué : ${toRank.name}`}
@@ -326,7 +326,7 @@ function ImpactBurst({ show }: { show: boolean }) {
       animate={{ scale: [0.2, 1.5, 2], opacity: [0, 1, 0] }}
       transition={{ duration: 0.45, ease: 'easeOut' }}
     >
-      <polygon points={starPoints(200, 200, 8, 190, 85)} fill="#fff" stroke="#151821" strokeWidth="4" />
+      <polygon points={starPoints(200, 200, 8, 190, 85)} fill="#fff" stroke="var(--neo-ink)" strokeWidth="4" />
     </motion.svg>
   );
 }

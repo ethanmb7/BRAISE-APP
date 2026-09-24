@@ -110,12 +110,12 @@ export function SubjectView() {
                       {isDone ? `${c.mastery}% de maîtrise` : isLocked ? `${c.duration} min · verrouillé` : `${c.duration} min`}
                     </span>
                     {c.reinforce && (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-black bg-sapie-coral px-2 py-0.5 text-[0.65rem] font-extrabold uppercase text-white">
+                      <span className="inline-flex items-center gap-1 rounded-full border border-black bg-sapie-coral px-2 py-0.5 text-[0.67rem] font-extrabold uppercase text-white">
                         <AlertCircle size={10} /> À renforcer
                       </span>
                     )}
                     {c.skip && (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-black bg-emerald-400 px-2 py-0.5 text-[0.65rem] font-extrabold uppercase text-black">
+                      <span className="inline-flex items-center gap-1 rounded-full border border-black bg-[var(--mint)] px-2 py-0.5 text-[0.67rem] font-extrabold uppercase text-black">
                         <SkipForward size={10} /> Passage rapide
                       </span>
                     )}
