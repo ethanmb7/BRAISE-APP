@@ -834,7 +834,7 @@ select {
   padding: 14px 14px 16px;
   margin-bottom: 16px;
   border: 2.5px solid #000;
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   background: var(--paper);
   box-shadow: 4px 4px 0 #000;
 }
@@ -997,7 +997,7 @@ select {
 .mastery-section {
   padding: 16px 14px 14px;
   border: 2.5px solid #000;
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   background: var(--paper);
   box-shadow: 4px 4px 0 #000;
 }
@@ -1288,8 +1288,8 @@ select {
   max-height: 92vh;
   overflow-y: auto;
   background: var(--paper);
-  border: 2px solid #000;
-  border-radius: 24px;
+  border: 2.5px solid #000;
+  border-radius: var(--radius-lg);
   box-shadow: 6px 6px 0 #000;
   padding: 18px 18px 20px;
 }
@@ -2214,7 +2214,7 @@ select {
   position: relative;
   background: var(--paper);
   border: 2.5px solid #000;
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   min-height: 380px;
   overflow: hidden;
   display: flex;
@@ -2238,7 +2238,7 @@ select {
 .checkpoint-card {
   background: var(--paper);
   border: 2.5px solid #000;
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   padding: 24px 20px;
   width: 100%;
   max-width: 340px;
@@ -2578,7 +2578,7 @@ select {
   position: relative;
   background: var(--paper);
   border: 2.5px solid #000;
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
   padding: 24px 22px;
   box-shadow: 6px 6px 0 #000;
   animation: cardIn 0.35s ease;
@@ -3223,8 +3223,8 @@ select {
    palette. */
 .profile-hero-card {
   position: relative;
-  border: 3px solid #000;
-  border-radius: 24px;
+  border: 2.5px solid #000;
+  border-radius: var(--radius-lg);
   box-shadow: 5px 5px 0 #000;
   overflow: hidden;
   background: var(--paper);
@@ -3370,7 +3370,7 @@ select {
 /* Carte "Ta tête" — l'identité sort des réglages et prend le même langage que le pass :
    bordure franche, ombre dure, étiquette mono. */
 .profile-face-card {
-  border: 3px solid #000;
+  border: 2.5px solid #000;
   border-radius: 20px;
   box-shadow: 4px 4px 0 #000;
   background: var(--paper);
