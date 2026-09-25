@@ -3,7 +3,7 @@
 ## Cap produit
 
 - [x] Formaliser la promesse, l'architecture cible et la boucle propriétaire dans `PRODUCT_VISION.md`
-- [ ] Tester la promesse et l'architecture « Aujourd'hui / Apprendre / Réviser / Moi » avec 8 à 12 élèves
+- [ ] Tester la promesse et l'architecture « Aujourd'hui / Réviser / Aura / Moi » avec 8 à 12 élèves
 - [ ] Prototyper une conversation « Capte » complète sur une seule notion
 - [ ] Faire valider le prototype par des élèves dyslexiques/TDAH et un expert pédagogique
 
@@ -18,26 +18,12 @@
 
 ## Interface
 
-- [ ] Prototyper les quatre espaces cibles avant une nouvelle passe de code visuel
-codex/analyser-l-application-u3fig7
-=======
-codex/analyser-l-application-2zbvd9
-main
 - [x] Remplacer le HUD-tableau de bord par un en-tête compact centré sur l'identité
 - [x] Compacter la Pioche sans réduire Braise et rapprocher contenu, repères et CTA
-- [ ] Aujourd'hui : rendre la prochaine action contextuelle et alléger le rythme quotidien
-- [ ] Déplacer joker, série détaillée, Aura et rang dans Moi
-codex/analyser-l-application-u3fig7
-- [x] Créer un espace Matières et limiter l'aperçu de l'accueil à deux accès rapides
-=======
-- [ ] Créer un espace Matières/Apprendre et limiter l'aperçu de l'accueil
-=======
 - [ ] Aujourd'hui : une action principale, une Pioche compacte et un rythme discret
-main
-main
-- [ ] Apprendre : conversation guidée, calme et accessible
-- [ ] Réviser : erreurs, notions dues et choix de matière
-- [ ] Moi : réunir progression, Aura, profil, préférences et accessibilité
+- [ ] Réviser : erreurs, notions dues et choix de matière (lobby avec plusieurs modes de session)
+- [ ] Aura : progression, rang et badges — destination principale, jamais un sous-écran de Moi
+- [ ] Moi : profil, préférences et accessibilité
 - [ ] Documenter les composants et les trois niveaux de surface dans un système de design
 
 ## Qualité produit
