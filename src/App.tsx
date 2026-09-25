@@ -1,24 +1,25 @@
-import { useState } from 'react';
-import { AppProvider, useApp } from '@/store';
-import { TabBar } from '@/components/TabBar';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { PiocheRevealVeil } from '@/components/PiocheRevealVeil';
-import { BraiseMascot } from '@/components/BraiseMascot';
-import { RankUpCelebration } from '@/components/RankUpCelebration';
-import { ShareAuraModal } from '@/components/ShareAuraModal';
-import { useMilestoneCelebrations } from '@/lib/useMilestoneCelebrations';
-import { rankUpLine, getAgeGroup } from '@/lib/braiseVoice';
-import { getRankInfo, countMasteredCards } from '@/lib/aura';
-import { FLASHCARDS } from '@/data';
-import { OnboardingView } from '@/views/OnboardingView';
-import { HomeView } from '@/views/HomeView';
-import { RevisionsView } from '@/views/RevisionsView';
-import { ProfilAuraView } from '@/views/ProfilAuraView';
-import { SubjectView } from '@/views/SubjectView';
-import { LessonView } from '@/views/LessonView';
-import { CompleteView } from '@/views/CompleteView';
-import { ProfileView } from '@/views/ProfileView';
-import { SettingsView } from '@/views/SettingsView';
+import { useState } from "react";
+import { AppProvider, useApp } from "@/store";
+import { TabBar } from "@/components/TabBar";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { PiocheRevealVeil } from "@/components/PiocheRevealVeil";
+import { BraiseMascot } from "@/components/BraiseMascot";
+import { RankUpCelebration } from "@/components/RankUpCelebration";
+import { ShareAuraModal } from "@/components/ShareAuraModal";
+import { useMilestoneCelebrations } from "@/lib/useMilestoneCelebrations";
+import { rankUpLine, getAgeGroup } from "@/lib/braiseVoice";
+import { getRankInfo, countMasteredCards } from "@/lib/aura";
+import { FLASHCARDS } from "@/data";
+import { OnboardingView } from "@/views/OnboardingView";
+import { HomeView } from "@/views/HomeView";
+import { LearnView } from "@/views/LearnView";
+import { RevisionsView } from "@/views/RevisionsView";
+import { ProfilAuraView } from "@/views/ProfilAuraView";
+import { SubjectView } from "@/views/SubjectView";
+import { LessonView } from "@/views/LessonView";
+import { CompleteView } from "@/views/CompleteView";
+import { ProfileView } from "@/views/ProfileView";
+import { SettingsView } from "@/views/SettingsView";
 
 function Screen() {
   const { state, setTab, loaded } = useApp();
@@ -30,37 +31,51 @@ function Screen() {
 
   // The floating dock stays through a review session too — it sits under the action row,
   // in its own glass layer, so it never competes with the verdict buttons for the thumb.
-  const showTabBar = ['home', 'revisions', 'progres', 'profile'].includes(state.view);
+  const showTabBar = ["home", "learn", "revisions", "progres", "profile"].includes(state.view);
 
   if (!loaded) {
     return (
       <div className="app-shell">
-        <div className="app-content" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+        <div
+          className="app-content"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 16,
+          }}
+        >
           <BraiseMascot size={80} mood="happy" className="flame-hero" />
-          <p style={{ color: 'var(--ink-soft)', fontSize: '0.85rem' }}>Chargement de ton parcours...</p>
+          <p style={{ color: "var(--ink-soft)", fontSize: "0.85rem" }}>
+            Chargement de ton parcours...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`app-shell ${state.darkMode ? 'dark' : ''} ${state.dyslexiaMode ? 'dyslexia-mode' : ''}`}>
+    <div
+      className={`app-shell ${state.darkMode ? "dark" : ""} ${state.dyslexiaMode ? "dyslexia-mode" : ""}`}
+    >
       <div className="app-content">
         {/* `key={state.view}`: this is what makes the boundary self-healing on navigation — a
             crash on one view sets its internal hasError, and switching to any other view (via
             the tab bar, which lives outside this boundary and stays clickable, or the
             fallback's own "Retour à l'accueil") changes the key, which remounts a fresh
             boundary for wherever the player lands instead of carrying the old error forward. */}
-        <ErrorBoundary key={state.view} onGoHome={() => setTab('home')}>
-          {state.view === 'onboarding' && <OnboardingView />}
-          {state.view === 'home' && <HomeView />}
-          {state.view === 'revisions' && <RevisionsView />}
-          {state.view === 'progres' && <ProfilAuraView />}
-          {state.view === 'subject' && <SubjectView />}
-          {state.view === 'lesson' && <LessonView />}
-          {state.view === 'complete' && <CompleteView />}
-          {state.view === 'profile' && <ProfileView />}
-          {state.view === 'settings' && <SettingsView />}
+        <ErrorBoundary key={state.view} onGoHome={() => setTab("home")}>
+          {state.view === "onboarding" && <OnboardingView />}
+          {state.view === "home" && <HomeView />}
+          {state.view === "learn" && <LearnView />}
+          {state.view === "revisions" && <RevisionsView />}
+          {state.view === "progres" && <ProfilAuraView />}
+          {state.view === "subject" && <SubjectView />}
+          {state.view === "lesson" && <LessonView />}
+          {state.view === "complete" && <CompleteView />}
+          {state.view === "profile" && <ProfileView />}
+          {state.view === "settings" && <SettingsView />}
         </ErrorBoundary>
       </div>
 
@@ -70,13 +85,13 @@ function Screen() {
           it's meant to cover. See PiocheRevealVeil for why. */}
       <PiocheRevealVeil />
 
-      {celebration?.type === 'badge' && (
+      {celebration?.type === "badge" && (
         <div key={`badge-${celebration.badge.id}`} className="milestone-toast">
           {celebration.badge.emoji} Badge débloqué : {celebration.badge.name} !
         </div>
       )}
 
-      {celebration?.type === 'rank' && (
+      {celebration?.type === "rank" && (
         <RankUpCelebration
           key={`rank-${celebration.toRank.id}`}
           fromRank={celebration.fromRank}
@@ -86,12 +101,12 @@ function Screen() {
           // the voice tone were two already-built systems that just never spoke to each other on
           // this screen; a savage-toned message paired with a plain happy face undercut its own
           // punchline.
-          mood={state.user.personality === 'savage' ? 'cool' : 'proud'}
+          mood={state.user.personality === "savage" ? "cool" : "proud"}
           ageGroup={getAgeGroup(state.user.level)}
           message={rankUpLine(
             { personality: state.user.personality, age: getAgeGroup(state.user.level) },
             celebration.toRank.name,
-            celebration.toRank.id
+            celebration.toRank.id,
           )}
           onDismiss={dismiss}
           onShare={() => setShareOpen(true)}
@@ -100,12 +115,14 @@ function Screen() {
 
       {shareOpen && (
         <ShareAuraModal
-          rank={celebration?.type === 'rank' ? celebration.toRank : getRankInfo(state.xp).current}
+          rank={celebration?.type === "rank" ? celebration.toRank : getRankInfo(state.xp).current}
           streak={state.streak}
           xp={state.xp}
           subjectsCount={
             new Set(
-              Object.keys(state.cardReviews).map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)
+              Object.keys(state.cardReviews)
+                .map((id) => FLASHCARDS.find((c) => c.id === id)?.subject)
+                .filter(Boolean),
             ).size
           }
           masteredCards={countMasteredCards(state.cardReviews)}

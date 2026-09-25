@@ -1,22 +1,22 @@
-import { useState } from 'react';
-import { Check } from 'lucide-react';
-import { BraiseMascot, SapiLogo } from '@/components/BraiseMascot';
-import { AvatarGlyph, getAvatarName } from '@/components/AvatarGlyph';
-import { useApp } from '@/store';
-import { sfx } from '@/lib/sound';
-import { LEVELS, SUBJECTS, AVATARS } from '@/data';
-import type { Level } from '@/types';
+import { useState } from "react";
+import { Check } from "lucide-react";
+import { BraiseMascot, SapiLogo } from "@/components/BraiseMascot";
+import { AvatarGlyph, getAvatarName } from "@/components/AvatarGlyph";
+import { useApp } from "@/store";
+import { sfx } from "@/lib/sound";
+import { LEVELS, SUBJECTS, AVATARS } from "@/data";
+import type { Level } from "@/types";
 
-const GOALS = ['15 min/jour', '30 min/jour', '1 heure/jour'];
+const GOALS = ["15 min/jour", "30 min/jour", "1 heure/jour"];
 
 export function OnboardingView() {
   const { state, setUser, setView } = useApp();
   const [step, setStep] = useState(0);
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
   const [level, setLevel] = useState<Level | null>(null);
-  const [goal, setGoal] = useState('');
+  const [goal, setGoal] = useState("");
   const [subjects, setSubjects] = useState<string[]>([]);
-  const [avatar, setAvatar] = useState('fleme');
+  const [avatar, setAvatar] = useState("fleme");
   const [consent, setConsent] = useState(false);
   const [showPrivacyInfo, setShowPrivacyInfo] = useState(false);
 
@@ -34,16 +34,16 @@ export function OnboardingView() {
   const finish = () => {
     sfx.complete(state.soundOn);
     setUser({
-      name: name || 'Alex',
-      level: level?.id ?? '3e',
-      levelLabel: level?.label ?? '3ème',
+      name: name || "Alex",
+      level: level?.id ?? "3e",
+      levelLabel: level?.label ?? "3ème",
       goal,
       subjects,
       avatar,
       personality: state.user.personality,
       joinedAt: Date.now(),
     });
-    setView('home');
+    setView("home");
   };
 
   const toggleSubject = (id: string) => {
@@ -55,14 +55,14 @@ export function OnboardingView() {
     step === 0 ||
     (step === 1 && name.trim().length > 0) ||
     (step === 2 && level !== null) ||
-    (step === 3 && subjects.length > 0 && goal !== '' && consent);
+    (step === 3 && subjects.length > 0 && goal !== "" && consent);
 
   return (
     <div className="app-content">
       {/* Step 0 — Welcome */}
-      <div className={`ob-step ob-welcome ${step === 0 ? 'is-active' : ''}`}>
+      <div className={`ob-step ob-welcome ${step === 0 ? "is-active" : ""}`}>
         <SapiLogo size={52} />
-        <h1>Bienvenue sur SAPIE</h1>
+        <h1>Bienvenue sur BRAISE</h1>
         <p>Réviser comme un pote t'explique le cours. Sans pression, juste la motivation.</p>
         <BraiseMascot size={74} className="flame-hero" mood="happy" />
         <button className="btn-block" onClick={next}>
@@ -71,10 +71,10 @@ export function OnboardingView() {
       </div>
 
       {/* Step 1 — Name + Avatar */}
-      <div className={`ob-step ${step === 1 ? 'is-active' : ''}`}>
+      <div className={`ob-step ${step === 1 ? "is-active" : ""}`}>
         <div className="dots">
           {Array.from({ length: total }).map((_, i) => (
-            <span key={i} className={i === step ? 'on' : ''} />
+            <span key={i} className={i === step ? "on" : ""} />
           ))}
         </div>
         <h2>Comment tu t'appelles ?</h2>
@@ -85,20 +85,28 @@ export function OnboardingView() {
           onChange={(e) => setName(e.target.value)}
           placeholder="Ton prénom"
           style={{
-            background: 'var(--paper)',
-            border: '2px solid var(--line)',
+            background: "var(--paper)",
+            border: "2px solid var(--line)",
             borderRadius: 14,
-            padding: '15px 16px',
-            fontSize: '0.95rem',
+            padding: "15px 16px",
+            fontSize: "0.95rem",
             marginBottom: 16,
-            color: 'var(--ink)',
+            color: "var(--ink)",
           }}
           autoFocus
         />
         <div className="level-group-label" style={{ marginBottom: 8 }}>
           Choisis ton avatar
         </div>
-        <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 'auto' }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 10,
+            justifyContent: "center",
+            flexWrap: "wrap",
+            marginBottom: "auto",
+          }}
+        >
           {/* Only the always-free avatars here — a brand-new account is rank Bronze by
               definition, so every rank-gated one (see data.ts) would show locked on day one.
               Nothing rewarding about a wall of padlocks before the app has even started; those
@@ -114,13 +122,13 @@ export function OnboardingView() {
               style={{
                 width: 52,
                 height: 52,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
                 borderRadius: 14,
-                background: avatar === a.emoji ? 'var(--blue-pale)' : 'var(--paper)',
-                border: `2.5px solid ${avatar === a.emoji ? 'var(--neo-ink)' : 'var(--line)'}`,
-                boxShadow: avatar === a.emoji ? '3px 3px 0 var(--neo-ink)' : 'none',
+                background: avatar === a.emoji ? "var(--blue-pale)" : "var(--paper)",
+                border: `2.5px solid ${avatar === a.emoji ? "var(--neo-ink)" : "var(--line)"}`,
+                boxShadow: avatar === a.emoji ? "3px 3px 0 var(--neo-ink)" : "none",
               }}
             >
               <AvatarGlyph id={a.emoji} size={36} />
@@ -133,23 +141,23 @@ export function OnboardingView() {
       </div>
 
       {/* Step 2 — Level */}
-      <div className={`ob-step ${step === 2 ? 'is-active' : ''}`}>
+      <div className={`ob-step ${step === 2 ? "is-active" : ""}`}>
         <div className="dots">
           {Array.from({ length: total }).map((_, i) => (
-            <span key={i} className={i === step ? 'on' : ''} />
+            <span key={i} className={i === step ? "on" : ""} />
           ))}
         </div>
         <h2>Quel est ton niveau ?</h2>
         <p className="sub">On adapte les leçons à ton programme.</p>
-        <div style={{ marginBottom: 'auto' }}>
-          {['Collège', 'Lycée'].map((g) => (
+        <div style={{ marginBottom: "auto" }}>
+          {["Collège", "Lycée"].map((g) => (
             <div key={g} style={{ marginBottom: 14 }}>
               <div className="level-group-label">{g}</div>
               <div className="level-list">
                 {LEVELS.filter((l) => l.group === g).map((l) => (
                   <button
                     key={l.id}
-                    className={`level-item ${level?.id === l.id ? 'is-selected' : ''}`}
+                    className={`level-item ${level?.id === l.id ? "is-selected" : ""}`}
                     onClick={() => {
                       sfx.tap(state.soundOn);
                       setLevel(l);
@@ -162,25 +170,30 @@ export function OnboardingView() {
             </div>
           ))}
         </div>
-        <div style={{ display: 'flex', gap: 10 }}>
+        <div style={{ display: "flex", gap: 10 }}>
           <button
             className="btn-block"
-            style={{ background: 'var(--paper)', color: 'var(--ink)', marginTop: 0 }}
+            style={{ background: "var(--paper)", color: "var(--ink)", marginTop: 0 }}
             onClick={prev}
           >
             Retour
           </button>
-          <button className="btn-block blue" style={{ marginTop: 0 }} onClick={next} disabled={!canNext}>
+          <button
+            className="btn-block blue"
+            style={{ marginTop: 0 }}
+            onClick={next}
+            disabled={!canNext}
+          >
             Continuer
           </button>
         </div>
       </div>
 
       {/* Step 3 — Subjects + Goal + Consent + Meet Braise */}
-      <div className={`ob-step meet-braise ${step === 3 ? 'is-active' : ''}`}>
+      <div className={`ob-step meet-braise ${step === 3 ? "is-active" : ""}`}>
         <div className="dots">
           {Array.from({ length: total }).map((_, i) => (
-            <span key={i} className={i === step ? 'on' : ''} />
+            <span key={i} className={i === step ? "on" : ""} />
           ))}
         </div>
         <BraiseMascot size={72} mood="proud" />
@@ -193,7 +206,7 @@ export function OnboardingView() {
           {SUBJECTS.map((s) => (
             <button
               key={s.id}
-              className={`schip ${subjects.includes(s.id) ? 'is-selected' : ''}`}
+              className={`schip ${subjects.includes(s.id) ? "is-selected" : ""}`}
               onClick={() => toggleSubject(s.id)}
             >
               {s.emoji} {s.name}
@@ -205,7 +218,7 @@ export function OnboardingView() {
           {GOALS.map((g) => (
             <button
               key={g}
-              className={`chip ${goal === g ? 'is-selected' : ''}`}
+              className={`chip ${goal === g ? "is-selected" : ""}`}
               onClick={() => {
                 sfx.tap(state.soundOn);
                 setGoal(g);
@@ -217,12 +230,16 @@ export function OnboardingView() {
           ))}
         </div>
 
-        <div style={{ marginTop: 'auto', marginBottom: 14 }}>
+        <div style={{ marginTop: "auto", marginBottom: 14 }}>
           <label className="consent-row" style={{ marginBottom: 0 }}>
-            <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+            <input
+              type="checkbox"
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
+            />
             <span>
               J'accepte que mes données de progression soient utilisées pour personnaliser mon
-              apprentissage.{' '}
+              apprentissage.{" "}
               <a
                 href="#"
                 onClick={(e) => {
@@ -236,21 +253,26 @@ export function OnboardingView() {
           </label>
           {showPrivacyInfo && (
             <p className="sub" style={{ marginTop: 8, marginBottom: 0 }}>
-              Ta progression (série, XP, cartes revues) est enregistrée uniquement sur cet
-              appareil, dans ton navigateur — rien n'est envoyé à un serveur externe pour la
-              faire fonctionner.
+              Ta progression est enregistrée sur cet appareil et peut être synchronisée avec le
+              service BRAISE lorsqu'il est configuré. Les messages envoyés à Braise peuvent être
+              traités par notre service d'intelligence artificielle pour produire une explication.
             </p>
           )}
         </div>
-        <div style={{ display: 'flex', gap: 10 }}>
+        <div style={{ display: "flex", gap: 10 }}>
           <button
             className="btn-block"
-            style={{ background: 'var(--paper)', color: 'var(--ink)', marginTop: 0 }}
+            style={{ background: "var(--paper)", color: "var(--ink)", marginTop: 0 }}
             onClick={prev}
           >
             Retour
           </button>
-          <button className="btn-block blue" style={{ marginTop: 0 }} onClick={finish} disabled={!canNext}>
+          <button
+            className="btn-block blue"
+            style={{ marginTop: 0 }}
+            onClick={finish}
+            disabled={!canNext}
+          >
             Commencer
           </button>
         </div>
