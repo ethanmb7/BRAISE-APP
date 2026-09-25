@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-import { Share2, X, Zap } from 'lucide-react';
-import { useApp } from '@/store';
-import { sfx } from '@/lib/sound';
-import type { Rank } from '@/lib/aura';
-import { BRAISE_BODY_PATHS, BRAISE_RANK_COLORS } from '@/components/BraiseCharacter';
-import type { BraiseRankId } from '@/components/BraiseCharacter';
+import { useEffect, useRef, useState } from "react";
+import { Share2, X, Zap } from "lucide-react";
+import { useApp } from "@/store";
+import { sfx } from "@/lib/sound";
+import type { Rank } from "@/lib/aura";
+import { BRAISE_BODY_PATHS, BRAISE_RANK_COLORS } from "@/components/BraiseCharacter";
+import type { BraiseRankId } from "@/components/BraiseCharacter";
 
 // Native Story format (1080x1920) — the canvas is always rasterized at this true resolution
 // for a crisp export; on screen it's scaled down responsively via CSS (width:100%, height:auto
@@ -48,15 +48,15 @@ export function ShareAuraModal({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === "Escape") onClose();
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
   function draw() {
     const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d');
+    const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
     canvas.width = CANVAS_W;
     canvas.height = CANVAS_H;
@@ -68,20 +68,20 @@ export function ShareAuraModal({
     ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
     // Wordmark, top-left
-    neoPill(ctx, 64, 64, 300, 76, '#faf8f3');
+    neoPill(ctx, 64, 64, 300, 76, "#faf8f3");
     drawFlameIcon(ctx, 96, 78, 48);
-    ctx.fillStyle = '#151821';
+    ctx.fillStyle = "#151821";
     ctx.font = '700 34px "IBM Plex Mono", monospace';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('BRAISE', 154, 102);
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillText("BRAISE", 154, 102);
 
     // Main panel
     const panelX = 90;
     const panelY = 320;
     const panelW = CANVAS_W - panelX * 2;
     const panelH = 1230;
-    neoRect(ctx, panelX, panelY, panelW, panelH, 28, '#faf8f3', 10, 7);
+    neoRect(ctx, panelX, panelY, panelW, panelH, 28, "#faf8f3", 10, 7);
 
     // The real mascot, evolved per rank — same construction (flame body, rank accent, sunglasses)
     // as BraiseMascot.tsx, ported to canvas path drawing since canvas can't render a React
@@ -103,13 +103,13 @@ export function ShareAuraModal({
     const groupW = badgeIconSize + badgeGap + labelW;
     const groupX = CANVAS_W / 2 - groupW / 2;
     drawRankIcon(ctx, rank.id, groupX, badgeY + 20, badgeIconSize, rank.colorFrom);
-    ctx.fillStyle = '#151821';
-    ctx.textAlign = 'left';
+    ctx.fillStyle = "#151821";
+    ctx.textAlign = "left";
     ctx.fillText(badgeLabel, groupX + badgeIconSize + badgeGap, badgeY + 46);
 
     // Dynamic hook, tiered by streak/rank
     ctx.font = '800 62px "Baloo 2", sans-serif';
-    ctx.fillStyle = '#151821';
+    ctx.fillStyle = "#151821";
     wrapText(ctx, hookText(rank, streak), CANVAS_W / 2, panelY + 490, panelW - 140, 70);
 
     // Stat chips — same flame/bolt/book vocabulary as the rest of the app (streak flame, XP
@@ -123,29 +123,59 @@ export function ShareAuraModal({
     const chipGap = 28;
     const chipW = (panelW - 120 - chipGap * 2) / 3;
     const chipX0 = panelX + 60;
-    statChip(ctx, chipX0, chipY, chipW, 240, '#c4b5fd', drawBoltIcon, `${xp}`, 'XP TOTAL');
+    statChip(ctx, chipX0, chipY, chipW, 240, "#c4b5fd", drawBoltIcon, `${xp}`, "XP TOTAL");
     if (streak > 0) {
-      statChip(ctx, chipX0 + chipW + chipGap, chipY, chipW, 240, '#ffd166', drawFlameIcon, `${streak}`, 'JOURS');
+      statChip(
+        ctx,
+        chipX0 + chipW + chipGap,
+        chipY,
+        chipW,
+        240,
+        "#ffd166",
+        drawFlameIcon,
+        `${streak}`,
+        "JOURS",
+      );
     } else {
-      statChip(ctx, chipX0 + chipW + chipGap, chipY, chipW, 240, '#ffd166', drawCheckIcon, `${masteredCards}`, 'CARTES SUES');
+      statChip(
+        ctx,
+        chipX0 + chipW + chipGap,
+        chipY,
+        chipW,
+        240,
+        "#ffd166",
+        drawCheckIcon,
+        `${masteredCards}`,
+        "CARTES SUES",
+      );
     }
-    statChip(ctx, chipX0 + (chipW + chipGap) * 2, chipY, chipW, 240, '#a7f3d0', drawBookIcon, `${subjectsCount}`, 'MATIÈRES');
+    statChip(
+      ctx,
+      chipX0 + (chipW + chipGap) * 2,
+      chipY,
+      chipW,
+      240,
+      "#a7f3d0",
+      drawBookIcon,
+      `${subjectsCount}`,
+      "MATIÈRES",
+    );
 
     // CTA bar — a text/wordmark badge rather than a fake QR code: a QR that isn't wired to a
     // real invite link would look functional and not be, which is worse than not having one.
     // Wiring a real one just needs a `qrcode` dep plus a real deep-link once that exists.
     const ctaY = panelY + panelH - 210;
-    ctx.fillStyle = '#151821';
+    ctx.fillStyle = "#151821";
     roundedPath(ctx, panelX + 40, ctaY, panelW - 80, 150, 20);
     ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.textAlign = 'center';
+    ctx.fillStyle = "#fff";
+    ctx.textAlign = "center";
     ctx.font = '800 40px "Baloo 2", sans-serif';
-    ctx.fillText('BATS MON SCORE SUR', CANVAS_W / 2, ctaY + 56);
+    ctx.fillText("BATS MON SCORE SUR", CANVAS_W / 2, ctaY + 56);
     ctx.font = '800 46px "Baloo 2", sans-serif';
-    ctx.fillText('BRAISE →', CANVAS_W / 2, ctaY + 106);
+    ctx.fillText("BRAISE", CANVAS_W / 2, ctaY + 106);
 
-    ctx.textAlign = 'left';
+    ctx.textAlign = "left";
   }
 
   async function handleShare() {
@@ -154,26 +184,30 @@ export function ShareAuraModal({
     setBusy(true);
     sfx.tap(state.soundOn);
     try {
-      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
       if (!blob) return;
-      const file = new File([blob], 'braise-aura.png', { type: 'image/png' });
+      const file = new File([blob], "braise-aura.png", { type: "image/png" });
       const nav = navigator as Navigator & {
         share?: (data: ShareData) => Promise<void>;
         canShare?: (data: ShareData) => boolean;
       };
       if (nav.share && (!nav.canShare || nav.canShare({ files: [file] }))) {
         try {
-          await nav.share({ files: [file], title: 'Mon Aura Braise', text: 'Bats mon score sur Braise !' });
+          await nav.share({
+            files: [file],
+            title: "Mon Aura Braise",
+            text: "Bats mon score sur Braise !",
+          });
           return;
         } catch (err) {
-          if ((err as Error)?.name === 'AbortError') return;
+          if ((err as Error)?.name === "AbortError") return;
           // any other share failure falls through to the plain download below
         }
       }
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = 'braise-aura.png';
+      a.download = "braise-aura.png";
       a.click();
       URL.revokeObjectURL(url);
     } finally {
@@ -194,11 +228,15 @@ export function ShareAuraModal({
           </button>
         </div>
         <div className="share-preview-frame">
-          <canvas ref={canvasRef} className="share-canvas" aria-label="Aperçu de la carte à partager" />
+          <canvas
+            ref={canvasRef}
+            className="share-canvas"
+            aria-label="Aperçu de la carte à partager"
+          />
         </div>
         <button className="btn-block share-export-btn" onClick={handleShare} disabled={busy}>
           <Share2 size={18} />
-          {busy ? 'Génération…' : 'Partager ma carte'}
+          {busy ? "Génération…" : "Partager ma carte"}
         </button>
       </div>
     </div>
@@ -207,28 +245,35 @@ export function ShareAuraModal({
 
 function hookText(rank: Rank, streak: number): string {
   if (streak >= 7) return `${streak} JOURS DE SUITE. INARRÊTABLE.`;
-  if (rank.id === 'bronze') return 'LA MONTÉE COMMENCE ICI.';
+  if (rank.id === "bronze") return "LA MONTÉE COMMENCE ICI.";
   return `RANG ${rank.name.toUpperCase()}. VENEZ ME CHERCHER.`;
 }
 
 function rankBadgeFill(rankId: string): string {
   switch (rankId) {
-    case 'argent':
-      return '#dbe4f0';
-    case 'or':
-      return '#ffd166';
-    case 'platine':
-      return '#b9f3ea';
-    case 'legende':
-      return '#ffb199';
+    case "argent":
+      return "#dbe4f0";
+    case "or":
+      return "#ffd166";
+    case "platine":
+      return "#b9f3ea";
+    case "legende":
+      return "#ffb199";
     default:
-      return '#e8b088';
+      return "#e8b088";
   }
 }
 
-function roundedPath(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+function roundedPath(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+) {
   ctx.beginPath();
-  if (typeof ctx.roundRect === 'function') {
+  if (typeof ctx.roundRect === "function") {
     ctx.roundRect(x, y, w, h, r);
   } else {
     ctx.rect(x, y, w, h);
@@ -246,9 +291,9 @@ function neoRect(
   r: number,
   fill: string,
   shadowOffset = 8,
-  borderWidth = 6
+  borderWidth = 6,
 ) {
-  ctx.fillStyle = '#000';
+  ctx.fillStyle = "#000";
   roundedPath(ctx, x + shadowOffset, y + shadowOffset, w, h, r);
   ctx.fill();
 
@@ -256,11 +301,18 @@ function neoRect(
   ctx.fillStyle = fill;
   ctx.fill();
   ctx.lineWidth = borderWidth;
-  ctx.strokeStyle = '#000';
+  ctx.strokeStyle = "#000";
   ctx.stroke();
 }
 
-function neoPill(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, fill: string) {
+function neoPill(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  fill: string,
+) {
   neoRect(ctx, x, y, w, h, h / 2, fill, 5, 4);
 }
 
@@ -273,12 +325,12 @@ function statChip(
   fill: string,
   drawIcon: (ctx: CanvasRenderingContext2D, x: number, y: number, size: number) => void,
   value: string,
-  label: string
+  label: string,
 ) {
   neoRect(ctx, x, y, w, h, 18, fill, 6, 5);
   drawIcon(ctx, x + w / 2 - 27, y + 24, 54);
-  ctx.textAlign = 'center';
-  ctx.fillStyle = '#151821';
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#151821";
   ctx.font = '800 46px "Baloo 2", sans-serif';
   ctx.fillText(value, x + w / 2, y + 138);
   ctx.font = '700 24px "IBM Plex Mono", monospace';
@@ -293,11 +345,11 @@ function wrapText(
   centerX: number,
   y: number,
   maxWidth: number,
-  lineHeight: number
+  lineHeight: number,
 ) {
-  const words = text.split(' ');
+  const words = text.split(" ");
   const lines: string[] = [];
-  let line = '';
+  let line = "";
   for (const word of words) {
     const test = line ? `${line} ${word}` : word;
     if (ctx.measureText(test).width > maxWidth && line) {
@@ -310,7 +362,7 @@ function wrapText(
   if (line) lines.push(line);
 
   const startY = y - ((lines.length - 1) * lineHeight) / 2;
-  ctx.textAlign = 'center';
+  ctx.textAlign = "center";
   lines.forEach((l, i) => ctx.fillText(l, centerX, startY + i * lineHeight));
 }
 
@@ -323,11 +375,17 @@ function wrapText(
 // nobody had ported the real artwork; it's the one artifact that actually leaves the app and
 // lands on a real feed, so it's the last place that should still look like a placeholder.
 
-const INK = '#151821';
+const INK = "#151821";
 
 function darkenHex(hex: string, amount: number): string {
-  const m = hex.replace('#', '');
-  const full = m.length === 3 ? m.split('').map((c) => c + c).join('') : m;
+  const m = hex.replace("#", "");
+  const full =
+    m.length === 3
+      ? m
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : m;
   const num = parseInt(full, 16);
   const r = Math.round(((num >> 16) & 255) * (1 - amount));
   const g = Math.round(((num >> 8) & 255) * (1 - amount));
@@ -341,7 +399,7 @@ function fillStrokePath(
   fill?: string,
   stroke?: string,
   strokeWidth?: number,
-  opacity = 1
+  opacity = 1,
 ) {
   const path = new Path2D(d);
   const prevAlpha = ctx.globalAlpha;
@@ -353,8 +411,8 @@ function fillStrokePath(
   if (stroke && strokeWidth) {
     ctx.strokeStyle = stroke;
     ctx.lineWidth = strokeWidth;
-    ctx.lineJoin = 'round';
-    ctx.lineCap = 'round';
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
     ctx.stroke(path);
   }
   ctx.globalAlpha = prevAlpha;
@@ -368,7 +426,7 @@ function withIconBox(
   y: number,
   size: number,
   viewBox: number,
-  draw: () => void
+  draw: () => void,
 ) {
   ctx.save();
   ctx.translate(x, y);
@@ -378,80 +436,87 @@ function withIconBox(
 }
 
 const FLAME_OUTER_D =
-  'M12 2 C14.3 5.6 17 8.2 17 12.8 C17 17.4 14.8 20.5 12 20.5 C8.6 20.5 6 17.6 6 13.4 C6 11 7.3 9.4 7.9 7.6 C8.3 9.7 9.2 10.2 9.8 9.3 C8.9 6.3 9.8 3.4 12 2 Z';
+  "M12 2 C14.3 5.6 17 8.2 17 12.8 C17 17.4 14.8 20.5 12 20.5 C8.6 20.5 6 17.6 6 13.4 C6 11 7.3 9.4 7.9 7.6 C8.3 9.7 9.2 10.2 9.8 9.3 C8.9 6.3 9.8 3.4 12 2 Z";
 const FLAME_INNER_D =
-  'M12.2 10.6 C13.4 12.6 14.2 14.1 14.2 16 C14.2 17.7 13.2 18.8 12 18.8 C10.5 18.8 9.5 17.7 9.5 16.1 C9.5 14.8 10.4 14 11 13 C11.3 14.1 11.9 14.3 12.2 13.5 C11.6 12 11.6 11.3 12.2 10.6 Z';
+  "M12.2 10.6 C13.4 12.6 14.2 14.1 14.2 16 C14.2 17.7 13.2 18.8 12 18.8 C10.5 18.8 9.5 17.7 9.5 16.1 C9.5 14.8 10.4 14 11 13 C11.3 14.1 11.9 14.3 12.2 13.5 C11.6 12 11.6 11.3 12.2 10.6 Z";
 
 function drawFlameIcon(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
   withIconBox(ctx, x, y, size, 24, () => {
-    fillStrokePath(ctx, FLAME_OUTER_D, '#ff4500', INK, 1.7);
-    fillStrokePath(ctx, FLAME_INNER_D, '#ffd166');
+    fillStrokePath(ctx, FLAME_OUTER_D, "#ff4500", INK, 1.7);
+    fillStrokePath(ctx, FLAME_INNER_D, "#ffd166");
   });
 }
 
-const BOLT_D = 'M13 1.5 3.5 13.8h6.2l-1 8.7L19.5 9h-6.4l1.2-7.5Z';
-const BOLT_DETAIL_D = 'M13.4 3 9.6 10.2l3.4-0.9';
+const BOLT_D = "M13 1.5 3.5 13.8h6.2l-1 8.7L19.5 9h-6.4l1.2-7.5Z";
+const BOLT_DETAIL_D = "M13.4 3 9.6 10.2l3.4-0.9";
 
 function drawBoltIcon(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
   withIconBox(ctx, x, y, size, 24, () => {
-    fillStrokePath(ctx, BOLT_D, '#ffc700', INK, 1.7);
+    fillStrokePath(ctx, BOLT_D, "#ffc700", INK, 1.7);
     fillStrokePath(ctx, BOLT_DETAIL_D, undefined, INK, 0.8, 0.5);
   });
 }
 
 const BOOK_D =
-  'M12 6.5 C10.3 5 7.7 4.7 5 5.6 L5 18.1 C7.7 17.2 10.3 17.5 12 19 C13.7 17.5 16.3 17.2 19 18.1 L19 5.6 C16.3 4.7 13.7 5 12 6.5 Z';
-const BOOK_SPINE_D = 'M12 6.5 L12 19';
-const BOOK_HL_L_D = 'M6.5 8.3 L9.8 7.8';
-const BOOK_HL_R_D = 'M14.2 7.8 L17.5 8.3';
+  "M12 6.5 C10.3 5 7.7 4.7 5 5.6 L5 18.1 C7.7 17.2 10.3 17.5 12 19 C13.7 17.5 16.3 17.2 19 18.1 L19 5.6 C16.3 4.7 13.7 5 12 6.5 Z";
+const BOOK_SPINE_D = "M12 6.5 L12 19";
+const BOOK_HL_L_D = "M6.5 8.3 L9.8 7.8";
+const BOOK_HL_R_D = "M14.2 7.8 L17.5 8.3";
 
 function drawBookIcon(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
   withIconBox(ctx, x, y, size, 24, () => {
-    fillStrokePath(ctx, BOOK_D, '#818cf8', INK, 1.7);
+    fillStrokePath(ctx, BOOK_D, "#818cf8", INK, 1.7);
     fillStrokePath(ctx, BOOK_SPINE_D, undefined, INK, 1.2);
-    fillStrokePath(ctx, BOOK_HL_L_D, undefined, '#fff', 0.9, 0.7);
-    fillStrokePath(ctx, BOOK_HL_R_D, undefined, '#fff', 0.9, 0.7);
+    fillStrokePath(ctx, BOOK_HL_L_D, undefined, "#fff", 0.9, 0.7);
+    fillStrokePath(ctx, BOOK_HL_R_D, undefined, "#fff", 0.9, 0.7);
   });
 }
 
 // Same filled-circle-with-checkmark motif already used for a completed lesson node on a subject's
 // own path view — reused here for "cartes maîtrisées" so the share card's stand-in for the
 // streak chip (when streak is 0) still reads as an established "done" signal, not a new symbol.
-const CHECK_D = 'M7 12.5 L10.3 16 L17.5 8';
+const CHECK_D = "M7 12.5 L10.3 16 L17.5 8";
 
 function drawCheckIcon(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
   withIconBox(ctx, x, y, size, 24, () => {
     ctx.beginPath();
     ctx.arc(12, 12, 10.5, 0, Math.PI * 2);
-    ctx.fillStyle = '#4ade80';
+    ctx.fillStyle = "#4ade80";
     ctx.fill();
     ctx.lineWidth = 1.7;
     ctx.strokeStyle = INK;
     ctx.stroke();
-    fillStrokePath(ctx, CHECK_D, undefined, '#fff', 2.4);
+    fillStrokePath(ctx, CHECK_D, undefined, "#fff", 2.4);
   });
 }
 
 // Medal (bronze/argent/or): ribboned coin, same silhouette as RankIcon.tsx, differing only by
 // colour — the medal → gem → crown escalation lives entirely in drawRankIcon below.
-const MEDAL_RIBBON_L_D = 'M7.5 2 L10.5 2 L10.5 12.5 L7.5 15 Z';
-const MEDAL_RIBBON_R_D = 'M13.5 2 L16.5 2 L16.5 15 L13.5 12.5 Z';
+const MEDAL_RIBBON_L_D = "M7.5 2 L10.5 2 L10.5 12.5 L7.5 15 Z";
+const MEDAL_RIBBON_R_D = "M13.5 2 L16.5 2 L16.5 15 L13.5 12.5 Z";
 const MEDAL_STAR_D =
-  'M12 11.8 L12.76 13.95 L15.04 14.01 L13.24 15.4 L13.88 17.59 L12 16.3 L10.12 17.59 L10.76 15.4 L8.96 14.01 L11.24 13.95 Z';
-const GEM_D = 'M6 9 L9 4 L15 4 L18 9 L12 20.5 Z';
-const GEM_FACETS_D = 'M6 9 L18 9 M9 4 L12 9 M15 4 L12 9 M12 9 L12 20.5';
-const GEM_SHINE_D = 'M9.3 4.6 L7.4 8.7';
-const CROWN_D = 'M4.5 18 L3 8.5 L7.5 12.5 L12 5 L16.5 12.5 L21 8.5 L19.5 18 Z';
+  "M12 11.8 L12.76 13.95 L15.04 14.01 L13.24 15.4 L13.88 17.59 L12 16.3 L10.12 17.59 L10.76 15.4 L8.96 14.01 L11.24 13.95 Z";
+const GEM_D = "M6 9 L9 4 L15 4 L18 9 L12 20.5 Z";
+const GEM_FACETS_D = "M6 9 L18 9 M9 4 L12 9 M15 4 L12 9 M12 9 L12 20.5";
+const GEM_SHINE_D = "M9.3 4.6 L7.4 8.7";
+const CROWN_D = "M4.5 18 L3 8.5 L7.5 12.5 L12 5 L16.5 12.5 L21 8.5 L19.5 18 Z";
 
-function drawRankIcon(ctx: CanvasRenderingContext2D, rankId: string, x: number, y: number, size: number, color: string) {
+function drawRankIcon(
+  ctx: CanvasRenderingContext2D,
+  rankId: string,
+  x: number,
+  y: number,
+  size: number,
+  color: string,
+) {
   withIconBox(ctx, x, y, size, 24, () => {
-    if (rankId === 'platine') {
+    if (rankId === "platine") {
       fillStrokePath(ctx, GEM_D, color, INK, 1.8);
       fillStrokePath(ctx, GEM_FACETS_D, undefined, INK, 1, 0.55);
-      fillStrokePath(ctx, GEM_SHINE_D, undefined, '#fff', 1, 0.6);
+      fillStrokePath(ctx, GEM_SHINE_D, undefined, "#fff", 1, 0.6);
       return;
     }
-    if (rankId === 'legende') {
+    if (rankId === "legende") {
       fillStrokePath(ctx, CROWN_D, color, INK, 1.8);
       ctx.fillStyle = color;
       ctx.strokeStyle = INK;
@@ -466,7 +531,7 @@ function drawRankIcon(ctx: CanvasRenderingContext2D, rankId: string, x: number, 
       ].forEach(([cx, cy, r]) => {
         ctx.beginPath();
         ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        ctx.fillStyle = '#fff';
+        ctx.fillStyle = "#fff";
         ctx.fill();
         ctx.lineWidth = 1.1;
         ctx.strokeStyle = INK;
@@ -485,33 +550,40 @@ function drawRankIcon(ctx: CanvasRenderingContext2D, rankId: string, x: number, 
     ctx.lineWidth = 1.8;
     ctx.strokeStyle = INK;
     ctx.stroke();
-    fillStrokePath(ctx, MEDAL_STAR_D, '#fff', undefined, undefined, 0.92);
+    fillStrokePath(ctx, MEDAL_STAR_D, "#fff", undefined, undefined, 0.92);
   });
 }
 
 function drawRankAccent(ctx: CanvasRenderingContext2D, rankId: string) {
-  if (rankId === 'argent') {
-    fillStrokePath(ctx, 'M50 0 L55.5 8 L50 16 L44.5 8 Z', '#CFE8FF', INK, 1.4);
-    fillStrokePath(ctx, 'M50 0 L50 16 M44.5 8 L55.5 8', undefined, '#3373D6', 0.6, 0.7);
-  } else if (rankId === 'or') {
+  if (rankId === "argent") {
+    fillStrokePath(ctx, "M50 0 L55.5 8 L50 16 L44.5 8 Z", "#CFE8FF", INK, 1.4);
+    fillStrokePath(ctx, "M50 0 L50 16 M44.5 8 L55.5 8", undefined, "#3373D6", 0.6, 0.7);
+  } else if (rankId === "or") {
     fillStrokePath(
       ctx,
-      'M65 15 C 70.5 20.5, 75 25, 73 33 C 71 39.5, 64.5 41, 61.5 36.5 C 59 32.5, 61 28.5, 63 24.5 C 64.5 21, 64.5 18, 65 15 Z',
-      '#FDE68A',
+      "M65 15 C 70.5 20.5, 75 25, 73 33 C 71 39.5, 64.5 41, 61.5 36.5 C 59 32.5, 61 28.5, 63 24.5 C 64.5 21, 64.5 18, 65 15 Z",
+      "#FDE68A",
       INK,
-      1.5
+      1.5,
     );
     ctx.beginPath();
     ctx.arc(66.5, 24, 1.3, 0, Math.PI * 2);
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = "#fff";
     ctx.globalAlpha = 0.8;
     ctx.fill();
     ctx.globalAlpha = 1;
-  } else if (rankId === 'platine') {
-    fillStrokePath(ctx, 'M33 21 L39.5 27.5 M67 21 L60.5 27.5 M29.5 39 L37 43 M70.5 39 L63 43', undefined, '#0E7490', 1.4, 0.8);
-    fillStrokePath(ctx, 'M50 4 L54 11 L50 18 L46 11 Z', '#CFFAFE', INK, 1.4);
-  } else if (rankId === 'legende') {
-    fillStrokePath(ctx, 'M40 14 L43 2 L50 10 L57 2 L60 14 L58 17 L42 17 Z', '#FFD84B', INK, 1.5);
+  } else if (rankId === "platine") {
+    fillStrokePath(
+      ctx,
+      "M33 21 L39.5 27.5 M67 21 L60.5 27.5 M29.5 39 L37 43 M70.5 39 L63 43",
+      undefined,
+      "#0E7490",
+      1.4,
+      0.8,
+    );
+    fillStrokePath(ctx, "M50 4 L54 11 L50 18 L46 11 Z", "#CFFAFE", INK, 1.4);
+  } else if (rankId === "legende") {
+    fillStrokePath(ctx, "M40 14 L43 2 L50 10 L57 2 L60 14 L58 17 L42 17 Z", "#FFD84B", INK, 1.5);
     [
       [43, 2, 1.5],
       [57, 2, 1.5],
@@ -519,7 +591,7 @@ function drawRankAccent(ctx: CanvasRenderingContext2D, rankId: string) {
     ].forEach(([cx, cy, r]) => {
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.fillStyle = '#FF6F59';
+      ctx.fillStyle = "#FF6F59";
       ctx.fill();
       ctx.lineWidth = 0.8;
       ctx.strokeStyle = INK;
@@ -528,32 +600,66 @@ function drawRankAccent(ctx: CanvasRenderingContext2D, rankId: string) {
   }
 }
 
-function drawMascot(ctx: CanvasRenderingContext2D, cx: number, cy: number, size: number, rankId: string) {
-  const safeRank = (rankId in BRAISE_RANK_COLORS ? rankId : 'bronze') as BraiseRankId;
+function drawMascot(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  size: number,
+  rankId: string,
+) {
+  const safeRank = (rankId in BRAISE_RANK_COLORS ? rankId : "bronze") as BraiseRankId;
   const [outer, middle, inner] = BRAISE_RANK_COLORS[safeRank];
-  const mature = safeRank === 'or' || safeRank === 'platine' || safeRank === 'legende';
+  const mature = safeRank === "or" || safeRank === "platine" || safeRank === "legende";
   ctx.save();
   ctx.translate(cx - size / 2, cy - size / 2);
   ctx.scale(size / 108, size / 116);
 
   fillStrokePath(ctx, BRAISE_BODY_PATHS[safeRank], outer, INK, 4.5);
-  fillStrokePath(ctx, mature ? 'M26 82 C25 59 39 43 53 42 C71 41 86 58 83 82 C81 98 68 105 53 105 C37 105 28 98 26 82 Z' : 'M30 80 C29 61 40 47 53 46 C69 46 80 60 79 80 C78 94 67 101 53 101 C39 101 31 94 30 80 Z', middle);
-  fillStrokePath(ctx, mature ? 'M30 67 C30 52 40 45 53 45 C68 45 78 53 78 68 C78 82 67 89 53 89 C39 89 30 81 30 67 Z' : 'M31 67 C31 53 41 46 53 46 C67 46 77 54 77 68 C77 82 67 89 53 89 C40 89 31 81 31 67 Z', '#FFF2D8', INK, 3.2);
+  fillStrokePath(
+    ctx,
+    mature
+      ? "M26 82 C25 59 39 43 53 42 C71 41 86 58 83 82 C81 98 68 105 53 105 C37 105 28 98 26 82 Z"
+      : "M30 80 C29 61 40 47 53 46 C69 46 80 60 79 80 C78 94 67 101 53 101 C39 101 31 94 30 80 Z",
+    middle,
+  );
+  fillStrokePath(
+    ctx,
+    mature
+      ? "M30 67 C30 52 40 45 53 45 C68 45 78 53 78 68 C78 82 67 89 53 89 C39 89 30 81 30 67 Z"
+      : "M31 67 C31 53 41 46 53 46 C67 46 77 54 77 68 C77 82 67 89 53 89 C40 89 31 81 31 67 Z",
+    "#FFF2D8",
+    INK,
+    3.2,
+  );
 
   // The exported card carries the same brand signature as the app: controlled gaze + live core.
-  if (mature) fillStrokePath(ctx, 'M36 53 L49 55 M58 55 L71 52', undefined, INK, 2.8);
-  fillStrokePath(ctx, safeRank === 'bronze' ? 'M53 76 L58 82 L53 90 L48 82 Z' : safeRank === 'argent' ? 'M53 72 L60 81 L53 92 L46 81 Z' : safeRank === 'or' ? 'M53 69 L62 80 L53 94 L44 80 Z' : safeRank === 'platine' ? 'M53 66 L63 79 L58 94 L48 94 L43 79 Z' : 'M53 64 L65 78 L60 96 L46 96 L41 78 Z', inner, INK, 2.6);
+  if (mature) fillStrokePath(ctx, "M36 53 L49 55 M58 55 L71 52", undefined, INK, 2.8);
+  fillStrokePath(
+    ctx,
+    safeRank === "bronze"
+      ? "M53 76 L58 82 L53 90 L48 82 Z"
+      : safeRank === "argent"
+        ? "M53 72 L60 81 L53 92 L46 81 Z"
+        : safeRank === "or"
+          ? "M53 69 L62 80 L53 94 L44 80 Z"
+          : safeRank === "platine"
+            ? "M53 66 L63 79 L58 94 L48 94 L43 79 Z"
+            : "M53 64 L65 78 L60 96 L46 96 L41 78 Z",
+    inner,
+    INK,
+    2.6,
+  );
 
   // Sunglasses — the same "cool" mood as the Hero medallion, since this card is the same flex.
-  ctx.fillStyle = '#16213A';
+  ctx.fillStyle = "#16213A";
   roundedPath(ctx, 34.5, 49.5, 12, 8, 4);
   ctx.fill();
   roundedPath(ctx, 53.5, 49.5, 12, 8, 4);
   ctx.fill();
   ctx.fillRect(46.5, 52, 7, 2);
-  ctx.strokeStyle = '#16213A';
+  ctx.strokeStyle = "#16213A";
   ctx.lineWidth = 2;
-  ctx.lineCap = 'round';
+  ctx.lineCap = "round";
   ctx.beginPath();
   ctx.moveTo(33, 51);
   ctx.lineTo(28, 49);
@@ -563,7 +669,7 @@ function drawMascot(ctx: CanvasRenderingContext2D, cx: number, cy: number, size:
   ctx.lineTo(72, 49);
   ctx.stroke();
   ctx.globalAlpha = 0.5;
-  ctx.fillStyle = '#fff';
+  ctx.fillStyle = "#fff";
   roundedPath(ctx, 37, 51.5, 4, 2.5, 1);
   ctx.fill();
   roundedPath(ctx, 56, 51.5, 4, 2.5, 1);

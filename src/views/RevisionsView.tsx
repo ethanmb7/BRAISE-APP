@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { useState, useEffect, useMemo, useRef, type ReactNode } from "react";
 import {
   motion,
   AnimatePresence,
@@ -9,37 +9,42 @@ import {
   animate,
   type PanInfo,
   type MotionValue,
-} from 'framer-motion';
-import { Flag, Check, X, Zap, BookOpen, ArrowRight } from 'lucide-react';
-import { useApp } from '@/store';
-import { sfx } from '@/lib/sound';
-import { fireConfetti, fireMicroConfetti } from '@/lib/confetti';
-import { speak, stopSpeaking } from '@/lib/speech';
-import { BraiseRecap } from '@/components/BraiseRecap';
-import { BraiseMascot } from '@/components/BraiseMascot';
-import { CardStack, QuestionCard, AnswerCard } from '@/components/RevisionCards';
-import { getAgeGroup, judgePrompt, missedTruth, quizCorrect, quizWrong, verdictTag } from '@/lib/braiseVoice';
-import { reportCard } from '@/lib/reports';
-import { FLASHCARDS, SUBJECTS } from '@/data';
-import type { Flashcard, Confidence } from '@/types';
+} from "framer-motion";
+import { Flag, Check, X, Zap, BookOpen } from "lucide-react";
+import { useApp } from "@/store";
+import { sfx } from "@/lib/sound";
+import { fireConfetti, fireMicroConfetti } from "@/lib/confetti";
+import { speak, stopSpeaking } from "@/lib/speech";
+import { BraiseRecap } from "@/components/BraiseRecap";
+import { BraiseMascot } from "@/components/BraiseMascot";
+import { CardStack, QuestionCard, AnswerCard } from "@/components/RevisionCards";
+import {
+  getAgeGroup,
+  judgePrompt,
+  missedTruth,
+  quizCorrect,
+  quizWrong,
+  verdictTag,
+} from "@/lib/braiseVoice";
+import { reportCard } from "@/lib/reports";
+import { FLASHCARDS, SUBJECTS } from "@/data";
+import type { Flashcard, Confidence } from "@/types";
 
 // Plain direct localStorage key, deliberately outside the app's main progress-sync system
 // (src/lib/persist.ts) — that store is a typed, debounced model of account progress (XP,
 // streak, completed chapters...), and this is a single one-way "has this device ever seen the
 // tutorial" flag with no need to round-trip through that machinery.
-const TUTORIAL_SEEN_KEY = 'sapie_rev_tutorial_seen';
+const TUTORIAL_SEEN_KEY = "sapie_rev_tutorial_seen";
 // Same one-way "seen it once" pattern, for the joker's first-ever charge-complete explainer.
-const JOKER_SEEN_KEY = 'sapie_joker_seen';
+const JOKER_SEEN_KEY = "sapie_joker_seen";
 
-// A daily session is a sprint, not the whole library: ~15 cards, mixed. The deck used to
-// serve every due card (26 on a fresh install) with no cap at all.
+// A daily session is a short, predictable sprint rather than the whole card library.
 const SESSION_SIZE = 15;
-
 // In-progress session snapshot so "Revoir la notion" (which leaves for the chapter's chat)
 // comes back to the NEXT card with the streak, joker charge and totals intact, instead of
 // remounting a brand-new deck at 1/15. sessionStorage, not localStorage: a session is a
 // single sitting, it has no business surviving the tab.
-const SESSION_SNAPSHOT_KEY = 'sapie_rev_session';
+const SESSION_SNAPSHOT_KEY = "sapie_rev_session";
 const SESSION_SNAPSHOT_TTL = 30 * 60 * 1000;
 type SessionSnapshot = {
   cardIds: string[];
@@ -81,14 +86,13 @@ const JOKER_CHARGE_NEEDED = 2;
 // Compact subject tag in the header pill ("⚗️ PHYSIQUE · ÉNERGIE"), not the full display name
 // — the pill has to stay one line next to the report/quit buttons.
 const SUBJECT_SHORT: Record<string, string> = {
-  maths: 'Maths',
-  francais: 'Français',
-  'histoire-geo': 'Histoire-Géo',
-  svt: 'SVT',
-  physique: 'Physique',
-  anglais: 'Anglais',
+  maths: "Maths",
+  francais: "Français",
+  "histoire-geo": "Histoire-Géo",
+  svt: "SVT",
+  physique: "Physique",
+  anglais: "Anglais",
 };
-
 
 export function RevisionsView() {
   const { state, reviewCard, getDueCards } = useApp();
@@ -122,7 +126,7 @@ export function RevisionsView() {
       let p = Math.random();
       if (dueIds.has(c.id)) p += 2;
       if (chosen.has(c.subject)) p += 0.7;
-      if (age === 'college' ? c.level === 'easy' : c.level === 'hard') p += 0.3;
+      if (age === "college" ? c.level === "easy" : c.level === "hard") p += 0.3;
       return p;
     };
     const picked = [...FLASHCARDS]
@@ -163,8 +167,8 @@ export function RevisionsView() {
   );
 }
 
-type Verdict = 'accept' | 'reject';
-type FlyDir = 'left' | 'right' | 'up';
+type Verdict = "accept" | "reject";
+type FlyDir = "left" | "right" | "up";
 
 function SwipeDeck({
   cards,
@@ -193,13 +197,13 @@ function SwipeDeck({
   const [judgedMode, setJudgedMode] = useState<Verdict | null>(null);
   const [wasCorrect, setWasCorrect] = useState(false);
   const [flying, setFlying] = useState(false);
-  const [flyDir, setFlyDir] = useState<FlyDir>('right');
+  const [flyDir, setFlyDir] = useState<FlyDir>("right");
   // Verdict feedback: emoji tag, Braise's line, and the XP won (0 on a miss) — rendered
   // inside the answer card (verdict bar on top, Braise's line as footer).
   const [feedback, setFeedback] = useState<{ tag: string; text: string; xp: number } | null>(null);
   // Picked once per card (in the index effect), not in render — byCombo() draws at random,
   // so reading it during render would reshuffle the wording on every re-render mid-card.
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState("");
   const [combo, setCombo] = useState(resume?.combo ?? 0);
   const [maxCombo, setMaxCombo] = useState(resume?.maxCombo ?? 0);
   const [xpEarned, setXpEarned] = useState(resume?.xpEarned ?? 0);
@@ -241,7 +245,7 @@ function SwipeDeck({
   // shown again on this device.
   const [jokerExplainerSeen, setJokerExplainerSeen] = useState(() => {
     try {
-      return localStorage.getItem(JOKER_SEEN_KEY) === '1';
+      return localStorage.getItem(JOKER_SEEN_KEY) === "1";
     } catch {
       return false;
     }
@@ -264,7 +268,7 @@ function SwipeDeck({
   useEffect(() => {
     if (!jokerExplainerSeen) return;
     try {
-      localStorage.setItem(JOKER_SEEN_KEY, '1');
+      localStorage.setItem(JOKER_SEEN_KEY, "1");
     } catch {
       // ignore quota/availability errors, same defensive pattern as lib/persist.ts
     }
@@ -284,7 +288,7 @@ function SwipeDeck({
   // it a single time in their life.
   const [tutorialDismissed, setTutorialDismissed] = useState(() => {
     try {
-      return localStorage.getItem(TUTORIAL_SEEN_KEY) === '1';
+      return localStorage.getItem(TUTORIAL_SEEN_KEY) === "1";
     } catch {
       return false;
     }
@@ -352,7 +356,7 @@ function SwipeDeck({
   useEffect(() => {
     if (!tutorialDismissed) return;
     try {
-      localStorage.setItem(TUTORIAL_SEEN_KEY, '1');
+      localStorage.setItem(TUTORIAL_SEEN_KEY, "1");
     } catch {
       // ignore quota/availability errors, same defensive pattern as lib/persist.ts
     }
@@ -378,25 +382,31 @@ function SwipeDeck({
       if (cards.length === 0 || index >= cards.length) return;
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       if (judged) {
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') {
+        if (
+          e.key === "ArrowLeft" ||
+          e.key === "ArrowRight" ||
+          e.key === "ArrowUp" ||
+          e.key === "Enter" ||
+          e.key === " "
+        ) {
           e.preventDefault();
           skipToNext();
         }
         return;
       }
-      if (e.key === 'ArrowLeft') {
+      if (e.key === "ArrowLeft") {
         e.preventDefault();
-        judge('reject');
-      } else if (e.key === 'ArrowRight') {
+        judge("reject");
+      } else if (e.key === "ArrowRight") {
         e.preventDefault();
-        judge('accept');
-      } else if (e.key === 'ArrowUp') {
+        judge("accept");
+      } else if (e.key === "ArrowUp") {
         e.preventDefault();
         toggleArm();
       }
     };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
   });
 
   const handleListen = (text: string) => {
@@ -413,8 +423,10 @@ function SwipeDeck({
       <div className="rev-empty">
         <BraiseMascot size={72} mood="hesitant" />
         <p className="rev-empty-title">Rien à réviser pour l'instant</p>
-        <p className="rev-empty-sub">Termine quelques cours et reviens — je te prépare un nouveau lot de cartes.</p>
-        <button type="button" className="rev-empty-btn" onClick={() => setTab('home')}>
+        <p className="rev-empty-sub">
+          Termine quelques cours et reviens — je te prépare un nouveau lot de cartes.
+        </p>
+        <button type="button" className="rev-empty-btn" onClick={() => setTab("home")}>
           Retour à l'accueil
         </button>
       </div>
@@ -429,7 +441,7 @@ function SwipeDeck({
         maxCombo={maxCombo}
         xpEarned={xpEarned}
         onRestart={onRestartSession}
-        onGoHome={() => setTab('home')}
+        onGoHome={() => setTab("home")}
       />
     );
   }
@@ -451,7 +463,7 @@ function SwipeDeck({
     setTutorialDismissed(true);
     setShowJokerExplainer(false);
     const useSuper = armed && jokerReady;
-    const acceptedAsTrue = mode === 'accept';
+    const acceptedAsTrue = mode === "accept";
     const correctJudgment = acceptedAsTrue === isTrueAnswer;
     setJudged(true);
     setJudgedMode(mode);
@@ -467,10 +479,14 @@ function SwipeDeck({
       if (bonus > 0) addXp(bonus);
       const total = base + bonus;
       setXpEarned((v) => v + total);
-      setFeedback({ tag: verdictTag(voiceCtx, useSuper ? 'super' : 'carre'), text: quizCorrect(voiceCtx), xp: total });
+      setFeedback({
+        tag: verdictTag(voiceCtx, useSuper ? "super" : "carre"),
+        text: quizCorrect(voiceCtx),
+        xp: total,
+      });
       // Immediate, physical: a small burst fires from the side of the dock that was pressed
       // (INTOX left / CARRÉ right), the whole stack shivers, the result strip pops in.
-      if (!reducedMotion) fireMicroConfetti(mode === 'accept' ? 0.76 : 0.24, 0.9, useSuper);
+      if (!reducedMotion) fireMicroConfetti(mode === "accept" ? 0.76 : 0.24, 0.9, useSuper);
       // Spending the joker empties its charge; otherwise a correct answer charges it.
       setJokerCharge((c) => (useSuper ? 0 : Math.min(JOKER_CHARGE_NEEDED, c + 1)));
       setCombo((c) => {
@@ -494,13 +510,13 @@ function SwipeDeck({
       setWrongCount((w) => w + 1);
       setFeedback(
         isTrueAnswer
-          ? { tag: verdictTag(voiceCtx, 'aie'), text: missedTruth(voiceCtx), xp: 0 }
-          : { tag: verdictTag(voiceCtx, 'grille'), text: quizWrong(voiceCtx, card.topic), xp: 0 }
+          ? { tag: verdictTag(voiceCtx, "aie"), text: missedTruth(voiceCtx), xp: 0 }
+          : { tag: verdictTag(voiceCtx, "grille"), text: quizWrong(voiceCtx, card.topic), xp: 0 },
       );
       setCombo(0);
       setJokerCharge(0);
     }
-    onReview(card.id, correctJudgment ? 'sure' : 'not-sure');
+    onReview(card.id, correctJudgment ? "sure" : "not-sure");
     // No auto-advance, on purpose. The dock is pinned in one place, so a timer that swapped
     // "Suivant" for INTOX/CARRÉ under a thumb already reaching for it would turn that tap
     // into a verdict on the next card. The student always moves on themselves: "Suivant",
@@ -528,7 +544,7 @@ function SwipeDeck({
 
   const skipToNext = () => {
     if (!judged || flying) return;
-    advance('right');
+    advance("right");
   };
 
   // "Revoir la notion": drops the student into the chapter's chat with Braise, first person,
@@ -551,7 +567,7 @@ function SwipeDeck({
     const ask = wasCorrect
       ? `Tu peux m'en dire un peu plus sur ${card.topic} ? Je veux être sûr de bien capter.`
       : `Je viens de me planter sur « ${card.q} ». Tu peux me réexpliquer ${card.topic}, vite fait ?`;
-    bridgeToChat(card.subject, card.chapterId, ask, 'revisions');
+    bridgeToChat(card.subject, card.chapterId, ask, "revisions");
   };
 
   const progressPct = ((index + (judged ? 1 : 0.5)) / cards.length) * 100;
@@ -573,13 +589,15 @@ function SwipeDeck({
         <div className="flash-stage" aria-hidden="true">
           <AnimatePresence>
             <motion.div
-              key={subject?.id ?? 'default'}
+              key={subject?.id ?? "default"}
               className="flash-stage-layer"
-              style={{ '--subject-color': subject?.color || 'var(--neo-blue)' } as React.CSSProperties}
+              style={
+                { "--subject-color": subject?.color || "var(--neo-blue)" } as React.CSSProperties
+              }
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.5, ease: 'easeInOut' }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
             />
           </AnimatePresence>
           <div className="flash-stage-dots" />
@@ -588,23 +606,28 @@ function SwipeDeck({
             when a streak starts or breaks) · report · quit. Report lives up here now, styled
             as a sibling of the quit button, off the card's reading area. */}
         <div className="rev-top-row">
-          <span className="rev-count">{index + 1}/{cards.length}</span>
+          <span className="rev-count">
+            {index + 1}/{cards.length}
+          </span>
           <div className="rev-progress-track">
             {/* Persistent element (no remount key) — a spring needs a previous value to
                 interpolate from, and a fresh mount would just snap to the new width instead of
                 filling. The win-flash ring below only needs the class to go absent → present,
                 which restarts its CSS animation on its own, no remount required either. */}
-            <div className={`rev-progress-bar ${judged && wasCorrect ? 'is-win-flash' : ''}`}>
+            <div className={`rev-progress-bar ${judged && wasCorrect ? "is-win-flash" : ""}`}>
               <motion.span
                 initial={false}
                 animate={{ width: `${progressPct}%` }}
-                transition={{ type: 'spring', stiffness: 300, damping: 26 }}
+                transition={{ type: "spring", stiffness: 300, damping: 26 }}
               />
             </div>
           </div>
           <span className="rev-combo-slot" aria-live="polite">
             {combo >= 1 && (
-              <span key={combo} className={`rev-combo rev-combo-shake ${combo >= 3 ? 'is-hot' : ''}`}>
+              <span
+                key={combo}
+                className={`rev-combo rev-combo-shake ${combo >= 3 ? "is-hot" : ""}`}
+              >
                 🔥 ×{combo}
               </span>
             )}
@@ -618,14 +641,14 @@ function SwipeDeck({
                   initial={{ opacity: 0, y: -6, scale: 0.92 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -4, scale: 0.95 }}
-                  transition={{ type: 'spring', stiffness: 480, damping: 30 }}
+                  transition={{ type: "spring", stiffness: 480, damping: 30 }}
                 >
                   Merci, on regarde ça !
                 </motion.div>
               )}
             </AnimatePresence>
             <button
-              className={`rev-icon-btn ${reported ? 'is-reported' : ''}`}
+              className={`rev-icon-btn ${reported ? "is-reported" : ""}`}
               onClick={() => {
                 if (reported) return;
                 sfx.tap(soundOn);
@@ -633,9 +656,13 @@ function SwipeDeck({
                 setShowReportTip(true);
                 reportCard(card.id, card.q);
               }}
-              aria-label={reported ? 'Signalé, merci' : 'Signaler un problème sur cette carte'}
+              aria-label={reported ? "Signalé, merci" : "Signaler un problème sur cette carte"}
             >
-              {reported ? <Check size={15} strokeWidth={3} /> : <Flag size={15} strokeWidth={2.5} />}
+              {reported ? (
+                <Check size={15} strokeWidth={3} />
+              ) : (
+                <Flag size={15} strokeWidth={2.5} />
+              )}
             </button>
           </div>
           <button
@@ -643,7 +670,7 @@ function SwipeDeck({
             onClick={() => {
               sfx.tap(soundOn);
               writeSnapshot(null);
-              setTab('home');
+              setTab("home");
             }}
             aria-label="Quitter la série"
           >
@@ -672,7 +699,7 @@ function SwipeDeck({
                 colour, without competing with the cards sitting on top of it (z-index below
                 CardStack, which stakes its own stacking context). */}
             <span className="fc-watermark" aria-hidden="true">
-              {subject?.emoji ?? '📚'}
+              {subject?.emoji ?? "📚"}
             </span>
             {/* The centre of the screen: question, claim, then the result strip once judged —
                 one column, centred both ways, `layout` so the stack re-flows smoothly as the
@@ -681,32 +708,32 @@ function SwipeDeck({
               className="relative flex w-full flex-1 flex-col"
               layout
               animate={judged && wasCorrect ? { x: [0, -5, 5, -3, 3, 0] } : { x: 0 }}
-              transition={{ duration: 0.42, ease: 'easeOut' }}
+              transition={{ duration: 0.42, ease: "easeOut" }}
             >
               <CardStack>
                 <QuestionCard
                   question={card.q}
-                  emoji={subject?.emoji ?? '📚'}
-                  color={subject?.color ?? 'var(--sun)'}
-                  subjectLabel={SUBJECT_SHORT[card.subject] ?? subject?.name ?? ''}
+                  emoji={subject?.emoji ?? "📚"}
+                  color={subject?.color ?? "var(--sun)"}
+                  subjectLabel={SUBJECT_SHORT[card.subject] ?? subject?.name ?? ""}
                   topic={card.topic}
                 />
                 <AnimatePresence mode="wait" initial={false}>
                   <AnswerCard
-                    key={typing ? 'typing' : 'claim'}
+                    key={typing ? "typing" : "claim"}
                     typing={typing}
                     claim={shownAnswer}
                     truth={card.a}
                     wasLie={!isTrueAnswer}
                     judged={judged}
-                    verdict={judged ? (wasCorrect ? 'win' : 'miss') : null}
+                    verdict={judged ? (wasCorrect ? "win" : "miss") : null}
                     prompt={prompt}
-                    subjectColor={subject?.color ?? 'var(--sun)'}
+                    subjectColor={subject?.color ?? "var(--sun)"}
                     tutorial={showTutorial}
                     result={
                       judged && feedback
                         ? {
-                            verdict: wasCorrect ? 'win' : 'miss',
+                            verdict: wasCorrect ? "win" : "miss",
                             tag: feedback.tag,
                             text: feedback.text,
                             xp: feedback.xp,
@@ -734,7 +761,7 @@ function SwipeDeck({
                 key="verdict"
                 className="rev-dock-inner"
                 exit={{ opacity: 0, y: 6 }}
-                transition={{ duration: 0.14, ease: 'easeIn' }}
+                transition={{ duration: 0.14, ease: "easeIn" }}
               >
                 <div className="rev-actions">
                   <motion.div className="flex-1" style={{ scale: rejectLift }}>
@@ -742,9 +769,9 @@ function SwipeDeck({
                       className="w-full"
                       base="bg-[var(--coral-2)]"
                       face="bg-[var(--coral)] text-white"
-                      onClick={() => judge('reject')}
+                      onClick={() => judge("reject")}
                       label="Intox — c'est faux"
-                      badge={armed ? '+30' : '+15'}
+                      badge={armed ? "+30" : "+15"}
                     >
                       <X size={20} strokeWidth={3.2} />
                       <span>Intox</span>
@@ -755,7 +782,9 @@ function SwipeDeck({
                         charge completes in the same commit that swaps the dock away, so this
                         button (and this ring) don't exist yet at that instant. This flag
                         survives to the next time they do. */}
-                    {jokerJustCharged && <span key="joker-burst" className="joker-burst-ring" aria-hidden="true" />}
+                    {jokerJustCharged && (
+                      <span key="joker-burst" className="joker-burst-ring" aria-hidden="true" />
+                    )}
                     <AnimatePresence>
                       {showJokerExplainer && (
                         <motion.div
@@ -764,7 +793,7 @@ function SwipeDeck({
                           initial={{ opacity: 0, y: 6, scale: 0.92 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 4, scale: 0.95 }}
-                          transition={{ type: 'spring', stiffness: 480, damping: 30 }}
+                          transition={{ type: "spring", stiffness: 480, damping: 30 }}
                         >
                           Il est prêt ! ×2 sur ta prochaine bonne réponse.
                         </motion.div>
@@ -773,25 +802,25 @@ function SwipeDeck({
                     <BevelButton
                       className="w-[62px]"
                       round
-                      base={armed ? 'bg-black' : jokerReady ? 'bg-[var(--sun-ink)]' : 'bg-black/30'}
+                      base={armed ? "bg-black" : jokerReady ? "bg-[var(--sun-ink)]" : "bg-black/30"}
                       face={
                         armed
-                          ? 'bg-black text-[var(--sun)]'
+                          ? "bg-black text-[var(--sun)]"
                           : jokerReady
-                            ? 'bg-gradient-to-b from-[#FFE066] to-[#FDC800] text-black'
-                            : 'bg-[var(--rev-paper)] text-black/40 border-dashed'
+                            ? "bg-gradient-to-b from-[#FFE066] to-[#FDC800] text-black"
+                            : "bg-[var(--rev-paper)] text-black/40 border-dashed"
                       }
                       onClick={toggleArm}
                       pressed={armed}
                       label={
                         jokerReady
                           ? armed
-                            ? 'Joker armé : ×2 sur ta prochaine réponse'
-                            : 'Joker — double les points de ta prochaine réponse'
+                            ? "Joker armé : ×2 sur ta prochaine réponse"
+                            : "Joker — double les points de ta prochaine réponse"
                           : `Joker — se charge avec ${JOKER_CHARGE_NEEDED} bonnes réponses d'affilée`
                       }
-                      badge={jokerReady ? '×2' : `${jokerCharge}/${JOKER_CHARGE_NEEDED}`}
-                      badgeTone={jokerReady ? 'hot' : 'muted'}
+                      badge={jokerReady ? "×2" : `${jokerCharge}/${JOKER_CHARGE_NEEDED}`}
+                      badgeTone={jokerReady ? "hot" : "muted"}
                     >
                       <Zap size={22} strokeWidth={2.6} />
                     </BevelButton>
@@ -801,9 +830,9 @@ function SwipeDeck({
                       className="w-full"
                       base="bg-[var(--mint-text)]"
                       face="bg-[var(--mint)] text-black"
-                      onClick={() => judge('accept')}
+                      onClick={() => judge("accept")}
                       label="Carré — c'est vrai"
-                      badge={armed ? '+30' : '+15'}
+                      badge={armed ? "+30" : "+15"}
                     >
                       <Check size={20} strokeWidth={3.2} />
                       <span>Carré</span>
@@ -842,7 +871,7 @@ function SwipeDeck({
                     className="flex-1"
                     initial={{ scale: 1 }}
                     animate={{ scale: [1, 1.045, 1] }}
-                    transition={{ duration: 0.5, delay: 0.55, ease: 'easeOut' }}
+                    transition={{ duration: 0.5, delay: 0.55, ease: "easeOut" }}
                   >
                     <BevelButton
                       className="w-full"
@@ -852,7 +881,6 @@ function SwipeDeck({
                       label="Carte suivante"
                     >
                       <span>Suivant</span>
-                      <ArrowRight size={20} strokeWidth={3.2} />
                     </BevelButton>
                   </motion.div>
                 </div>
@@ -875,11 +903,11 @@ function BevelButton({
   base,
   face,
   badge,
-  badgeTone = 'hot',
+  badgeTone = "hot",
   round = false,
   compact = false,
   pressed,
-  className = '',
+  className = "",
 }: {
   children: ReactNode;
   onClick: () => void;
@@ -887,13 +915,13 @@ function BevelButton({
   base: string;
   face: string;
   badge?: string;
-  badgeTone?: 'hot' | 'muted';
+  badgeTone?: "hot" | "muted";
   round?: boolean;
   compact?: boolean;
   pressed?: boolean;
   className?: string;
 }) {
-  const radius = round ? 'rounded-full' : 'rounded-[22px]';
+  const radius = round ? "rounded-full" : "rounded-[22px]";
   return (
     <button
       type="button"
@@ -902,7 +930,10 @@ function BevelButton({
       aria-pressed={pressed}
       className={`group relative block min-w-0 ${className}`}
     >
-      <span aria-hidden="true" className={`absolute inset-0 translate-y-[4px] ${radius} border-[2.5px] border-black ${base}`} />
+      <span
+        aria-hidden="true"
+        className={`absolute inset-0 translate-y-[4px] ${radius} border-[2.5px] border-black ${base}`}
+      />
       <span
         // Mouse-only lift (the `[@media(hover:hover)]` guard is what keeps this from sticking
         // after a tap on touch devices, where Tailwind's plain `hover:` would otherwise latch
@@ -910,7 +941,7 @@ function BevelButton({
         // the keyboard shortcuts, and until now nothing told a mouse it was over a button
         // before the click landed. Rises toward the cursor, the mirror of the press-down.
         className={`relative flex h-[58px] items-center justify-center gap-2 ${radius} border-[2.5px] border-black px-3 font-display font-black uppercase tracking-wide shadow-[4px_4px_0_#000,inset_0_1.5px_0_rgba(255,255,255,0.5)] transition-transform duration-100 [@media(hover:hover)]:group-hover:-translate-y-0.5 [@media(hover:hover)]:group-hover:shadow-[5px_5px_0_#000,inset_0_1.5px_0_rgba(255,255,255,0.5)] group-active:translate-y-[4px] group-active:scale-[0.97] group-active:shadow-none ${
-          compact ? 'text-[0.82rem] normal-case tracking-normal' : 'text-[1.02rem]'
+          compact ? "text-[0.82rem] normal-case tracking-normal" : "text-[1.02rem]"
         } ${face}`}
       >
         {children}
@@ -919,7 +950,7 @@ function BevelButton({
         <span
           aria-hidden="true"
           className={`absolute -top-2.5 right-2 rounded-md border-2 border-black px-1.5 py-0.5 font-display text-[0.62rem] font-black shadow-[2px_2px_0_#000] ${
-            badgeTone === 'hot' ? 'bg-[var(--sun)] text-black' : 'bg-white text-black/60'
+            badgeTone === "hot" ? "bg-[var(--sun)] text-black" : "bg-white text-black/60"
           }`}
         >
           {badge}
@@ -967,7 +998,7 @@ function SwipeCard({
 
   // Border tints green/red as the drag leans toward accept/reject, fully saturated well
   // before the 90px release threshold so the color itself previews the outcome.
-  const borderColor = useTransform(x, [-140, 0, 140], ['#E8564B', '#000000', '#0F9E6E']);
+  const borderColor = useTransform(x, [-140, 0, 140], ["#E8564B", "#000000", "#0F9E6E"]);
   // Full-card color wash layered on top of the content (see .fc-swipe-wash) — the border tint
   // alone reads as a thin accent; this makes the whole stage visibly lean red/green as you
   // drag. Together with the dock button lifting (SwipeDeck), that's the whole drag preview:
@@ -975,15 +1006,15 @@ function SwipeCard({
   const washColor = useTransform(
     x,
     [-140, 0, 140],
-    ['rgba(232, 86, 75, 0.28)', 'rgba(0, 0, 0, 0)', 'rgba(15, 158, 110, 0.28)']
+    ["rgba(232, 86, 75, 0.28)", "rgba(0, 0, 0, 0)", "rgba(15, 158, 110, 0.28)"],
   );
 
   const springBack = () => {
     // Released without crossing a threshold. With dragMomentum off and no dragConstraints,
     // framer freezes x/y wherever the finger lifted — forcing the spring back explicitly is
     // what keeps an aborted swipe from leaving the card stuck off-center and tilted.
-    animate(x, 0, { type: 'spring', stiffness: 420, damping: 32 });
-    animate(y, 0, { type: 'spring', stiffness: 420, damping: 32 });
+    animate(x, 0, { type: "spring", stiffness: 420, damping: 32 });
+    animate(y, 0, { type: "spring", stiffness: 420, damping: 32 });
   };
 
   const handleDragEnd = (_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
@@ -994,9 +1025,9 @@ function SwipeCard({
     if (judged) {
       // After the verdict the swipe never blocks: any direction past the threshold moves on,
       // flying the card out the way it was thrown.
-      if (vertical) onDragNext('up');
-      else if (offset.x > 90) onDragNext('right');
-      else if (offset.x < -90) onDragNext('left');
+      if (vertical) onDragNext("up");
+      else if (offset.x > 90) onDragNext("right");
+      else if (offset.x < -90) onDragNext("left");
       else springBack();
       return;
     }
@@ -1005,9 +1036,9 @@ function SwipeCard({
       onDragArm();
       springBack();
     } else if (offset.x > 90) {
-      onDragJudge('accept');
+      onDragJudge("accept");
     } else if (offset.x < -90) {
-      onDragJudge('reject');
+      onDragJudge("reject");
     } else {
       springBack();
     }
@@ -1016,18 +1047,19 @@ function SwipeCard({
   // Verdict lock: once a direction is committed, the card animates to a fixed off-screen
   // target rather than continuing on drag momentum — the outcome (and its color) needs to
   // be deterministic, not dependent on exactly how hard the release throw was.
-  const verdictColor = judgedMode === 'accept' ? '#0F9E6E' : judgedMode === 'reject' ? '#E8564B' : '#000000';
+  const verdictColor =
+    judgedMode === "accept" ? "#0F9E6E" : judgedMode === "reject" ? "#E8564B" : "#000000";
   const target = !flying
-    ? { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1, borderColor: '#000000' }
-    : flyDir === 'up'
+    ? { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1, borderColor: "#000000" }
+    : flyDir === "up"
       ? { x: 0, y: -700, rotate: 0, scale: 1, opacity: 0, borderColor: verdictColor }
-      : flyDir === 'left'
+      : flyDir === "left"
         ? { x: -480, y: -30, rotate: -22, scale: 1, opacity: 0, borderColor: verdictColor }
         : { x: 480, y: -30, rotate: 22, scale: 1, opacity: 0, borderColor: verdictColor };
 
   return (
     <motion.div
-      className={`flashcard ${judged ? 'is-judged' : ''}`}
+      className={`flashcard ${judged ? "is-judged" : ""}`}
       style={{ x, y, rotate, borderColor }}
       // Draggable before AND after the verdict — post-verdict drags advance instead of judging
       // (see handleDragEnd). Only the typing beat is off-limits.
@@ -1055,7 +1087,7 @@ function SwipeCard({
       transition={
         flying
           ? { duration: 0.4, ease: [0.5, 0, 0.85, 0.35] }
-          : { type: 'spring', stiffness: 420, damping: 32 }
+          : { type: "spring", stiffness: 420, damping: 32 }
       }
       onAnimationComplete={() => {
         if (flying) onFlyComplete();
