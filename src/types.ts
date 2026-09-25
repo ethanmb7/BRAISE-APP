@@ -1,4 +1,5 @@
 export type ViewId =
+codex/analyser-l-application-pour-ameliorer-l-education-08xhhj
   | "onboarding"
   | "home"
   | "learn"
@@ -12,6 +13,22 @@ export type ViewId =
   | "settings";
 
 export type TabId = "home" | "learn" | "revisions" | "profile";
+=======
+  | 'onboarding'
+  | 'home'
+  | 'subjects'
+  | 'revisions'
+  | 'progres'
+  | 'subject'
+  | 'lesson'
+  | 'complete'
+  | 'share'
+  | 'profile'
+  | 'settings';
+
+/** `progres` remains accepted for migration/back-navigation from pre-Matières installs. */
+export type TabId = 'home' | 'subjects' | 'revisions' | 'profile' | 'progres';
+main
 
 export type Level = {
   id: string;
@@ -124,6 +141,12 @@ export type AppState = {
   bestCombo: number;
   freezes: number;
   freezeArmed: boolean;
+  /** True the moment a freeze has actually absorbed a missed day (see ensureSession in
+   *  store.tsx) — never true just from arming one, and never reset back to false. The "Gel
+   *  utilisé" badge reads this instead of live freeze state, which used to flip back to
+   *  false the moment a freeze got disarmed or refunded, making an already-earned badge
+   *  disappear and re-celebrate later. */
+  everUsedFreeze: boolean;
   dailyGoalMet: boolean;
   darkMode: boolean;
   dyslexiaMode: boolean;

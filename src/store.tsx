@@ -30,7 +30,6 @@ type Ctx = {
   setPersonality: (p: Personality) => void;
   addXp: (n: number) => void;
   updateBestCombo: (n: number) => void;
-  setStreak: (n: number) => void;
   setFreezes: (n: number) => void;
   toggleFreeze: () => void;
   setDailyGoalMet: (v: boolean) => void;
@@ -43,12 +42,17 @@ type Ctx = {
   reviewCard: (cardId: string, confidence: Confidence) => void;
   getDueCards: () => string[];
   goBack: () => void;
+codex/analyser-l-application-pour-ameliorer-l-education-08xhhj
   bridgeToChat: (
     subjectId: string,
     chapterId: string,
     bridgeMessage: string,
     returnTo?: ViewId,
   ) => void;
+=======
+  bridgeToChat: (subjectId: string, chapterId: string, bridgeMessage: string, returnTo?: ViewId) => void;
+  clearChatBridge: () => void;
+main
 };
 
 const AppCtx = createContext<Ctx | null>(null);
@@ -114,14 +118,22 @@ export function countDoneChapters(completedChapters: string[]): number {
  *  duplicated inline in ProfileView with its own `chaptersDone`, which read the static chapter
  *  status directly and could therefore never see a real "done" chapter post-resolveChapters. */
 export function computeUnlockedBadges(
+codex/analyser-l-application-pour-ameliorer-l-education-08xhhj
   s: Pick<AppState, "streak" | "xp" | "freezeArmed" | "freezes" | "completedChapters">,
+=======
+  s: Pick<AppState, 'streak' | 'xp' | 'everUsedFreeze' | 'completedChapters'>
+main
 ): Record<string, boolean> {
   const chaptersDone = countDoneChapters(s.completedChapters);
   return {
     b1: s.streak >= 3,
     b2: s.xp >= 100,
     b3: chaptersDone >= 1,
-    b4: s.freezeArmed || s.freezes < 2,
+    // Was `freezeArmed || freezes < 2` — both live, both flip back to false the moment a freeze
+    // gets disarmed or refunded (see ensureSession), so un-arming made an already-earned badge
+    // vanish and re-arming later re-triggered the same "unlocked!" celebration for it. This field
+    // only ever goes true once, at the one real moment a freeze actually absorbed a missed day.
+    b4: s.everUsedFreeze,
     b5: s.streak >= 7,
     b6: s.xp >= 1000,
   };
@@ -141,6 +153,7 @@ function resolveRestoredView(saved: Partial<AppState>): ViewId {
       return "home";
     return view;
   }
+codex/analyser-l-application-pour-ameliorer-l-education-08xhhj
   if (
     view === "learn" ||
     view === "revisions" ||
@@ -150,6 +163,10 @@ function resolveRestoredView(saved: Partial<AppState>): ViewId {
   )
     return view;
   return "home";
+=======
+  if (view === 'subjects' || view === 'revisions' || view === 'progres' || view === 'profile' || view === 'settings') return view;
+  return 'home';
+main
 }
 
 // `tab` drives the bottom nav highlight independently of `view` (SubjectView/SettingsView both
@@ -157,10 +174,17 @@ function resolveRestoredView(saved: Partial<AppState>): ViewId {
 // just `view` — otherwise resuming into e.g. Revisions would show the right screen with the wrong
 // tab lit up, and a subsequent "back" from Subject/Settings would return to the wrong place.
 function resolveRestoredTab(view: ViewId, savedTab: TabId | undefined): TabId {
+codex/analyser-l-application-pour-ameliorer-l-education-08xhhj
   if (view === "home" || view === "learn" || view === "revisions" || view === "profile")
     return view;
   // `progres` used to be a main tab. It now lives inside Moi; migrate old local saves safely.
   return (savedTab as string | undefined) === "progres" ? "profile" : (savedTab ?? "home");
+=======
+  if (view === 'home' || view === 'subjects' || view === 'revisions' || view === 'profile') return view;
+  if (savedTab === 'home' || savedTab === 'subjects' || savedTab === 'revisions' || savedTab === 'profile') return savedTab;
+  // `progres` used to be a tab. Old localStorage values now land on Moi, where Aura belongs.
+  return view === 'progres' ? 'profile' : 'home';
+main
 }
 
 function sm2(review: CardReview | undefined, confidence: Confidence): CardReview {
@@ -192,8 +216,15 @@ function sm2(review: CardReview | undefined, confidence: Confidence): CardReview
   };
 }
 
-function ensureSession(s: AppState): Partial<AppState> {
+// The one real piece of streak logic in the whole app — everywhere else just reads `state.streak`
+// as if something, somewhere, already keeps it honest. Nothing did: `setStreak` existed but had
+// no caller outside this file, so the count shown on Home/Aura/Profil/the share card never
+// actually moved no matter how many real days a student came back. Fixed here, at the one place
+// that already detects a day boundary for every other session field, rather than adding a second,
+// separately-timed check elsewhere that could drift out of sync with this one.
+export function ensureSession(s: AppState): Partial<AppState> {
   const today = new Date().toDateString();
+codex/analyser-l-application-pour-ameliorer-l-education-08xhhj
   if (s.sessionDate !== today) {
     return {
       sessionDate: today,
@@ -201,8 +232,45 @@ function ensureSession(s: AppState): Partial<AppState> {
       sessionChaptersDone: 0,
       dailyGoalMet: false,
     };
+=======
+  if (s.sessionDate === today) return {};
+
+  const reset = { sessionDate: today, sessionCardsReviewed: 0, sessionChaptersDone: 0, dailyGoalMet: false };
+
+  // `sessionDate` is a fresh install's own toDateString() (see INITIAL) or a real prior day —
+  // never truly unparseable, but a defensive fallback for a corrupted/pre-migration localStorage
+  // value costs nothing and avoids NaN ever reaching `streak`.
+  const lastActive = new Date(s.sessionDate);
+  if (Number.isNaN(lastActive.getTime())) return reset;
+
+  const daysSinceLastActive = Math.round((new Date(today).getTime() - lastActive.getTime()) / DAY_MS);
+
+  // Exactly one calendar day since the last real session: the normal nightly boundary every
+  // returning student crosses. Anything wider (2+ days with zero activity) is a real gap a single
+  // freeze was never meant to cover — the streak breaks regardless of freezeArmed, same as
+  // Duolingo's own freeze only ever protecting one missed day, not an open-ended absence.
+  if (daysSinceLastActive !== 1) {
+    return { ...reset, streak: 0, freezeArmed: false };
+main
   }
-  return {};
+
+  if (s.dailyGoalMet) {
+    // Met the goal yesterday. A freeze armed defensively for a day that turned out fine was
+    // never actually spent — hand it back instead of quietly keeping it consumed.
+    return s.freezeArmed
+      ? { ...reset, streak: s.streak + 1, freezeArmed: false, freezes: s.freezes + 1 }
+      : { ...reset, streak: s.streak + 1 };
+  }
+
+  if (s.freezeArmed) {
+    // The miss it was armed for — the freeze just genuinely did its job. Streak survives; the
+    // freeze itself was already spent the moment it was armed (see toggleFreeze), so only the
+    // armed flag needs clearing here. `everUsedFreeze` flips once, permanently: this is the one
+    // real "Gel utilisé" moment, never just arming/disarming one experimentally.
+    return { ...reset, freezeArmed: false, everUsedFreeze: true };
+  }
+
+  return { ...reset, streak: 0 };
 }
 
 // streak/xp were 5/340 here — demo-convenience values so testing didn't start from zero every
@@ -224,6 +292,7 @@ const INITIAL: AppState = {
   bestCombo: 0,
   freezes: 2,
   freezeArmed: false,
+  everUsedFreeze: false,
   dailyGoalMet: false,
   darkMode: false,
   dyslexiaMode: false,
@@ -307,10 +376,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
-  const setStreak = useCallback((n: number) => {
-    setState((s) => ({ ...s, ...ensureSession(s), streak: n }));
-  }, []);
-
   const setFreezes = useCallback((n: number) => {
     setState((s) => ({ ...s, ...ensureSession(s), freezes: n }));
   }, []);
@@ -391,6 +456,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
     },
     [],
   );
+
+  // ChatMode used to track "already sent" with its own local useRef, which reset to false on
+  // every remount — toggling to "Vocal Animé" and back to "Échanger" unmounts/remounts ChatMode,
+  // and state.chatBridgeMessage itself was only ever cleared by openLesson (a fresh lesson entry),
+  // so the same bridged question got auto-sent and duplicated in the transcript on every toggle.
+  // Clearing it in the store, right when ChatMode actually consumes it, means the message is gone
+  // for good the moment it's been sent once — no local ref needed to survive a remount.
+  const clearChatBridge = useCallback(() => {
+    setState((s) => ({ ...s, ...ensureSession(s), chatBridgeMessage: null }));
+  }, []);
 
   const completeChapter = useCallback((chapterId: string) => {
     setState((s) => {
@@ -477,7 +552,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setPersonality,
         addXp,
         updateBestCombo,
-        setStreak,
         setFreezes,
         toggleFreeze,
         setDailyGoalMet,
@@ -487,6 +561,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         openSubject,
         openLesson,
         bridgeToChat,
+        clearChatBridge,
         completeChapter,
         reviewCard,
         getDueCards,

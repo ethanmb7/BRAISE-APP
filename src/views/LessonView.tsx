@@ -357,7 +357,7 @@ function ChatMode({
   bridgeMessage: string | null;
   onComplete: () => void;
 }) {
-  const { state } = useApp();
+  const { state, clearChatBridge } = useApp();
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -407,13 +407,23 @@ function ChatMode({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chapterId, bridgeMessage]);
 
-  // Handle quiz→chat bridge: auto-send the bridge message
+  // Handle quiz→chat bridge: auto-send the bridge message. Clearing it in the store (not just
+  // the local `bridgeHandled` ref below) is what actually prevents a resend: toggling to "Vocal
+  // Animé" and back unmounts/remounts this whole component, which would reset a local-only ref
+  // to false again, but state.chatBridgeMessage stays null across that remount — see
+  // clearChatBridge's own comment in store.tsx.
   useEffect(() => {
     if (bridgeMessage && !bridgeHandled.current) {
       bridgeHandled.current = true;
       openerStarted.current = true;
+codex/analyser-l-application-pour-ameliorer-l-education-08xhhj
       setMessages((m) => [...m, { from: "me", text: bridgeMessage }]);
       setInput("");
+=======
+      clearChatBridge();
+      setMessages((m) => [...m, { from: 'me', text: bridgeMessage }]);
+      setInput('');
+main
       setTyping(true);
       setError(null);
 

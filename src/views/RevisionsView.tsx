@@ -252,11 +252,22 @@ function SwipeDeck({
   });
   const [showJokerExplainer, setShowJokerExplainer] = useState(false);
   const jokerWasReady = useRef(false);
+  // Read, never a dependency: `jokerExplainerSeen` used to sit in the effect below's own
+  // dependency array, so calling `setJokerExplainerSeen(true)` from inside it re-ran the very
+  // same effect before the 700ms reset timeout it had just scheduled ever fired — React's cleanup
+  // cancelled that timeout on the way to the re-run, and the re-run's own guard (jokerReady still
+  // true, jokerWasReady.current already true) never rescheduled it. `jokerJustCharged` stayed
+  // true forever after a player's very first real charge. Mirroring the value in a ref lets the
+  // effect check it without depending on it, so setting it can't cancel its own timeout anymore.
+  const jokerExplainerSeenRef = useRef(jokerExplainerSeen);
+  useEffect(() => {
+    jokerExplainerSeenRef.current = jokerExplainerSeen;
+  }, [jokerExplainerSeen]);
   useEffect(() => {
     if (jokerReady && !jokerWasReady.current) {
       setJokerJustCharged(true);
       const t = setTimeout(() => setJokerJustCharged(false), 700);
-      if (!jokerExplainerSeen) {
+      if (!jokerExplainerSeenRef.current) {
         setShowJokerExplainer(true);
         setJokerExplainerSeen(true);
       }
@@ -264,7 +275,7 @@ function SwipeDeck({
       return () => clearTimeout(t);
     }
     jokerWasReady.current = jokerReady;
-  }, [jokerReady, jokerExplainerSeen]);
+  }, [jokerReady]);
   useEffect(() => {
     if (!jokerExplainerSeen) return;
     try {

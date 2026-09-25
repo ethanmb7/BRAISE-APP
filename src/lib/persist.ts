@@ -10,6 +10,7 @@ type StoredProgress = {
   bestCombo: number;
   freezes: number;
   freezeArmed: boolean;
+  everUsedFreeze: boolean;
   dailyGoalMet: boolean;
   darkMode: boolean;
   dyslexiaMode: boolean;
@@ -89,6 +90,9 @@ function toAppState(p: StoredProgress, cardReviews: Record<string, CardReview>):
     bestCombo: p.bestCombo ?? 0,
     freezes: p.freezes,
     freezeArmed: p.freezeArmed,
+    // `?? false`: a device that saved its progress before this field existed has never had the
+    // chance to earn it — never assume it's already true for an older save.
+    everUsedFreeze: p.everUsedFreeze ?? false,
     dailyGoalMet: p.dailyGoalMet,
     darkMode: p.darkMode,
     dyslexiaMode: p.dyslexiaMode,
@@ -146,6 +150,8 @@ export async function loadProgress(): Promise<Partial<AppState> | null> {
             bestCombo: local?.bestCombo ?? 0,
             freezes: cloudRow.freezes,
             freezeArmed: cloudRow.freeze_armed,
+            // Not in device_progress either — same reasoning as bestCombo above.
+            everUsedFreeze: local?.everUsedFreeze ?? false,
             dailyGoalMet: cloudRow.daily_goal_met,
             darkMode: cloudRow.dark_mode,
             dyslexiaMode: cloudRow.dyslexia_mode,
@@ -182,6 +188,8 @@ export async function saveProgress(state: AppState): Promise<void> {
     bestCombo: state.bestCombo,
     freezes: state.freezes,
     freezeArmed: state.freezeArmed,
+    // Local-only, like bestCombo/view/tab below — device_progress has no matching column yet.
+    everUsedFreeze: state.everUsedFreeze,
     dailyGoalMet: state.dailyGoalMet,
     darkMode: state.darkMode,
     dyslexiaMode: state.dyslexiaMode,
