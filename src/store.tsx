@@ -449,7 +449,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const now = Date.now();
     return FLASHCARDS.filter((c) => {
       const r = state.cardReviews[c.id];
-      if (!r) return true;
+      // An unseen card is available for discovery, but it is not "due": consolidation only
+      // exists after a first attempt has created a review schedule.
+      if (!r) return false;
       return r.nextReviewAt <= now;
     }).map((c) => c.id);
   }, [state.cardReviews]);

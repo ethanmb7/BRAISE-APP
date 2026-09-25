@@ -10,7 +10,18 @@ import {
   type PanInfo,
   type MotionValue,
 } from "framer-motion";
-import { Flag, Check, X, Zap, BookOpen } from "lucide-react";
+import {
+  Flag,
+  Check,
+  X,
+  Zap,
+  BookOpen,
+  Shuffle,
+  Timer,
+  ShieldCheck,
+  RotateCcw,
+  Gamepad2,
+} from "lucide-react";
 import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
 import { fireConfetti, fireMicroConfetti } from "@/lib/confetti";
@@ -37,10 +48,6 @@ import type { Flashcard, Confidence } from "@/types";
 const TUTORIAL_SEEN_KEY = "sapie_rev_tutorial_seen";
 // Same one-way "seen it once" pattern, for the joker's first-ever charge-complete explainer.
 const JOKER_SEEN_KEY = "sapie_joker_seen";
-
-// A daily session is a sprint, not the whole library: ~15 cards, mixed. The deck used to
-// serve every due card (26 on a fresh install) with no cap at all.
-const SESSION_SIZE = 15;
 
 // In-progress session snapshot so "Revoir la notion" (which leaves for the chapter's chat)
 // comes back to the NEXT card with the streak, joker charge and totals intact, instead of
@@ -96,6 +103,9 @@ const SUBJECT_SHORT: Record<string, string> = {
   anglais: "Anglais",
 };
 
+type RevisionMode = "resume" | "mix" | "express" | "due" | "mistakes" | "subject";
+type RevisionConfig = { mode: RevisionMode; size: number; subjectId?: string };
+
 export function RevisionsView() {
   const { state, reviewCard, getDueCards } = useApp();
   // Bumped on "Enchaîner une autre série" to force a fresh draw below AND, via `key` on
@@ -103,12 +113,19 @@ export function RevisionsView() {
   // reset of only some state fields could leave a verdict from the previous session showing on
   // the new first card. A remount can't leave anything half-reset.
   const [sessionKey, setSessionKey] = useState(0);
+  const initialResume = useMemo(() => readSnapshot(), []);
+  const [config, setConfig] = useState<RevisionConfig | null>(() =>
+    initialResume ? { mode: "resume", size: initialResume.cardIds.length } : null,
+  );
+  const [selectedSubject, setSelectedSubject] = useState(
+    state.user.subjects[0] ?? SUBJECTS[0]?.id ?? "maths",
+  );
 
   // A fresh, in-progress snapshot (coming back from "Revoir la notion") resumes that exact
   // deck; otherwise a new draw. Read once per session key, so a restart always re-draws.
-  const resume = useMemo(() => (sessionKey === 0 ? readSnapshot() : null), [sessionKey]);
+  const resume = config?.mode === "resume" ? initialResume : null;
 
-  // One session = SESSION_SIZE cards, drawn once (re-drawn on restart via `sessionKey`) so
+  // A session uses the size chosen on the setup screen and is drawn once, so
   // reviewing a card mid-session can't shift the deck under a running index. Priority, then
   // shuffle: due cards first (spaced repetition), then the subjects the student picked in
   // onboarding (weighted, not exclusive — the Home screen still shows all six decks, and an
@@ -116,14 +133,26 @@ export function RevisionsView() {
   // group. Cards carry a difficulty, not a school grade, so this is the honest limit of
   // "adapted to their level" until the content has a grades field.
   const cards = useMemo(() => {
+    if (!config) return [];
     if (resume) {
       const byId = new Map(FLASHCARDS.map((c) => [c.id, c]));
       const restored = resume.cardIds.map((id) => byId.get(id)).filter((c): c is Flashcard => !!c);
       if (restored.length === resume.cardIds.length) return restored;
     }
     const dueIds = new Set(getDueCards());
+    const missedIds = new Set(
+      Object.entries(state.cardReviews)
+        .filter(([, review]) => review.lastConfidence === "not-sure")
+        .map(([id]) => id),
+    );
     const chosen = new Set(state.user.subjects);
     const age = getAgeGroup(state.user.level);
+    let candidates = [...FLASHCARDS];
+    if (config.mode === "due") candidates = candidates.filter((card) => dueIds.has(card.id));
+    if (config.mode === "mistakes")
+      candidates = candidates.filter((card) => missedIds.has(card.id));
+    if (config.mode === "subject" && config.subjectId)
+      candidates = candidates.filter((card) => card.subject === config.subjectId);
     const priority = (c: Flashcard) => {
       let p = Math.random();
       if (dueIds.has(c.id)) p += 2;
@@ -131,18 +160,44 @@ export function RevisionsView() {
       if (age === "college" ? c.level === "easy" : c.level === "hard") p += 0.3;
       return p;
     };
-    const picked = [...FLASHCARDS]
+    const picked = candidates
       .map((c) => ({ c, p: priority(c) }))
       .sort((a, b) => b.p - a.p)
-      .slice(0, SESSION_SIZE)
+      .slice(0, config.size)
       .map(({ c }) => c);
     for (let i = picked.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [picked[i], picked[j]] = [picked[j], picked[i]];
     }
     return picked;
+    // Session inputs are intentionally frozen at launch: reviewing a card must not reshuffle the
+    // deck under the current index. A new config/sessionKey creates the next draw.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionKey, resume]);
+  }, [sessionKey, resume, config]);
+
+  const dueCount = getDueCards().length;
+  const mistakesCount = Object.values(state.cardReviews).filter(
+    (review) => review.lastConfidence === "not-sure",
+  ).length;
+
+  const start = (next: RevisionConfig) => {
+    writeSnapshot(null);
+    sfx.tap(state.soundOn);
+    setConfig(next);
+    setSessionKey((key) => key + 1);
+  };
+
+  if (!config) {
+    return (
+      <RevisionSetup
+        dueCount={dueCount}
+        mistakesCount={mistakesCount}
+        selectedSubject={selectedSubject}
+        onSelectSubject={setSelectedSubject}
+        onStart={start}
+      />
+    );
+  }
 
   return (
     <div className="view is-active rev-view">
@@ -161,11 +216,127 @@ export function RevisionsView() {
           onReview={reviewCard}
           onRestartSession={() => {
             writeSnapshot(null);
-            setSessionKey((k) => k + 1);
+            setConfig(null);
           }}
         />
       </MotionConfig>
     </div>
+  );
+}
+
+function RevisionSetup({
+  dueCount,
+  mistakesCount,
+  selectedSubject,
+  onSelectSubject,
+  onStart,
+}: {
+  dueCount: number;
+  mistakesCount: number;
+  selectedSubject: string;
+  onSelectSubject: (id: string) => void;
+  onStart: (config: RevisionConfig) => void;
+}) {
+  const subjectCardCount = FLASHCARDS.filter((card) => card.subject === selectedSubject).length;
+  const subjectSessionSize = Math.min(10, subjectCardCount);
+
+  return (
+    <main className="view is-active revision-setup">
+      <section className="revision-setup-hero">
+        <div>
+          <span className="revision-setup-kicker">Intox ou Carré</span>
+          <h1>Choisis ton mood</h1>
+          <p>Une affirmation, un doute, un swipe. Se tromper sert à repérer le prochain piège.</p>
+        </div>
+        <div className="revision-setup-mascot" aria-hidden="true">
+          <BraiseMascot size={74} mood="cool" />
+        </div>
+      </section>
+
+      <section className="revision-mode-list" aria-labelledby="revision-mode-title">
+        <div className="revision-setup-title">
+          <Gamepad2 size={20} aria-hidden="true" />
+          <h2 id="revision-mode-title">Lancer une partie</h2>
+        </div>
+
+        <button
+          className="revision-mode-card is-featured"
+          onClick={() => onStart({ mode: "mix", size: 15 })}
+        >
+          <span className="revision-mode-icon">
+            <Shuffle size={23} />
+          </span>
+          <span>
+            <b>Mix surprise</b>
+            <small>15 cartes · toutes les matières · environ 6 min</small>
+          </span>
+          <em>Signature</em>
+        </button>
+
+        <div className="revision-mode-grid">
+          <button onClick={() => onStart({ mode: "express", size: 5 })}>
+            <span className="revision-mode-icon is-yellow">
+              <Timer size={21} />
+            </span>
+            <b>Express</b>
+            <small>5 cartes · environ 2 min</small>
+          </button>
+          <button
+            disabled={!dueCount}
+            onClick={() => onStart({ mode: "due", size: Math.min(15, dueCount) })}
+          >
+            <span className="revision-mode-icon is-blue">
+              <RotateCcw size={21} />
+            </span>
+            <b>À consolider</b>
+            <small>{dueCount ? `${dueCount} prêtes à revoir` : "Rien pour l'instant"}</small>
+          </button>
+          <button
+            disabled={!mistakesCount}
+            onClick={() => onStart({ mode: "mistakes", size: Math.min(15, mistakesCount) })}
+          >
+            <span className="revision-mode-icon is-coral">
+              <ShieldCheck size={21} />
+            </span>
+            <b>Mes erreurs</b>
+            <small>
+              {mistakesCount ? `${mistakesCount} pièges à reprendre` : "Aucune erreur récente"}
+            </small>
+          </button>
+        </div>
+      </section>
+
+      <section className="revision-subject-pick" aria-labelledby="revision-subject-title">
+        <div>
+          <span>Terrain de jeu</span>
+          <h2 id="revision-subject-title">Une matière</h2>
+        </div>
+        <div className="revision-subject-chips">
+          {SUBJECTS.map((subject) => (
+            <button
+              type="button"
+              key={subject.id}
+              className={selectedSubject === subject.id ? "is-selected" : ""}
+              aria-pressed={selectedSubject === subject.id}
+              onClick={() => onSelectSubject(subject.id)}
+            >
+              <span aria-hidden="true">{subject.emoji}</span>
+              {SUBJECT_SHORT[subject.id]}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          className="revision-subject-start"
+          onClick={() =>
+            onStart({ mode: "subject", size: subjectSessionSize, subjectId: selectedSubject })
+          }
+        >
+          <BookOpen size={18} /> Jouer {subjectSessionSize} carte
+          {subjectSessionSize > 1 ? "s" : ""}
+        </button>
+      </section>
+    </main>
   );
 }
 
