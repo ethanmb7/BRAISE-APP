@@ -4,6 +4,7 @@
    la spécificité. En le plaçant dans la couche components, les styles maison restent la base et
    les utilitaires Tailwind posés dans le JSX reprennent le dessus. */
 @import "./braise.css" layer(components);
+@import "./subjects.css" layer(components);
 
 @custom-variant dark (&:is(.dark *));
 

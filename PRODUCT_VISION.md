@@ -27,7 +27,12 @@ Cette architecture rassemble les points de vue nécessaires avant toute nouvelle
 
 ## 3. Architecture cible
 
-La navigation principale comporte quatre espaces.
+La navigation principale comporte quatre espaces : **Aujourd'hui, Réviser, Aura, Moi.** Cette
+liste (et l'ordre Aujourd'hui → Réviser → Aura → Moi) est une décision produit tranchée
+directement par le porteur du projet, pas une proposition à réévaluer à chaque itération —
+toute future refonte de la navigation doit partir de ces quatre espaces, jamais les remplacer
+par un cinquième (« Matières », « Apprendre » ou autre) sans que ce document soit d'abord
+corrigé à la main par le porteur du projet lui-même.
 
 ### Aujourd'hui
 
@@ -38,20 +43,29 @@ Le point d'entrée quotidien. L'écran ne montre que :
 3. le rythme du jour ;
 4. une reprise simple si l'élève revient après une absence.
 
-### Apprendre
-
-Le cœur propriétaire de BRAISE. Une conversation guidée part de ce que l'élève pense avoir
-compris, détecte le blocage, explique autrement, puis lui demande de reformuler.
-
 ### Réviser
 
 Un outil complémentaire : revoir ses erreurs, consolider les notions dues ou choisir une matière.
 Le swipe est un mode de rappel actif, pas la méthode principale.
 
+### Aura
+
+**Une destination principale à part entière, pas un sous-écran de Moi.** C'est la preuve de
+progrès et le pilier d'identité de BRAISE — rangs, série, notions maîtrisées par matière, badges
+réels et prochain palier. Aucune donnée inventée, jamais de classement entre élèves.
+
 ### Moi
 
-Le profil rassemble progression, Aura, rang, préférences, accessibilité et identité. « Aura » ne
-doit plus être une destination concurrente du parcours d'apprentissage.
+Identité, préférences (ton de Braise, matières favorites), accessibilité et réglages. Édition,
+pas consultation de la progression — Aura reste l'endroit où on va pour voir son parcours.
+
+### Idée non tranchée : une conversation guidée de type « Apprendre »
+
+Un mode conversationnel où BRAISE part de ce que l'élève pense avoir compris, détecte le
+blocage, explique autrement puis demande une reformulation, correspond au vrai trou identifié
+dans le parcours actuel (le « moment Eureka »). C'est une piste sérieuse — mais une
+fonctionnalité à l'intérieur d'un espace existant (probablement Réviser), pas un cinquième
+onglet, et pas un remplacement d'Aura ou de la navigation validée ci-dessus.
 
 ## 4. Boucle centrale « Capte » (nom de travail)
 
@@ -89,22 +103,15 @@ question de vérification validés éditorialement.
 - progression du jour ;
 - aucune grille de tableaux de bord au-dessus de l'action principale.
 
-### Apprendre
-
-- une bulle ou une idée à la fois ;
-- réponses rapides toujours disponibles ;
-- saisie texte et voix optionnelles ;
-- bouton permanent « Explique autrement » ;
-- transcript et lecture audio ;
-- aucune limite de temps par défaut.
-
 ### Réviser
 
 - « À consolider » en premier ;
 - « Revoir mes erreurs » ;
 - « Choisir une matière » ;
 - session courte annoncée avant de commencer ;
-- feedback explicatif après chaque décision.
+- feedback explicatif après chaque décision ;
+- future piste « Apprendre » (voir section 3) : une conversation guidée, si elle se construit un
+  jour, vit comme un mode à l'intérieur de cet espace, pas comme un onglet séparé.
 
 ### Résultat
 
@@ -115,14 +122,20 @@ Ordre obligatoire :
 3. ce que BRAISE reproposera ;
 4. récompenses et série seulement ensuite.
 
+### Aura
+
+- rangs, série et notions maîtrisées par matière ;
+- badges réels (jamais un compteur inventé) et prochain palier une fois le rang maximum atteint ;
+- observation personnalisée tirée du vrai historique de révision ;
+- le partage de son parcours vit ici, nulle part ailleurs.
+
 ### Moi
 
-- progression par notions ;
-- mémoire consolidée dans le temps ;
-- Aura, rang et cosmétiques ;
-- ton de Braise ;
+- identité (avatar, prénom) ;
+- ton de Braise, matières favorites ;
 - préférences de lecture, audio et mouvement ;
-- données, confidentialité et compte.
+- données, confidentialité et compte ;
+- lien vers Aura pour la progression — jamais dupliquée ici.
 
 ## 6. Système d'interface
 
@@ -214,6 +227,7 @@ au reste sans répéter les mêmes informations.
 
 ### Placement de chaque fonction
 
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
 | Fonction                     | Lieu principal      | Rappel autorisé sur Aujourd'hui                |
 | ---------------------------- | ------------------- | ---------------------------------------------- |
 | Activité en cours            | Matière ou activité | Carte prioritaire « Reprendre »                |
@@ -227,6 +241,21 @@ au reste sans répéter les mêmes informations.
 | Badges et apparences         | Moi                 | Célébration au déblocage                       |
 | Préférences et accessibilité | Moi > Mon confort   | Aucun raccourci permanent sur l'accueil        |
 | Partage                      | Résultat ou Moi     | Jamais comme action concurrente sur l'accueil  |
+=======
+| Fonction | Lieu principal | Rappel autorisé sur Aujourd'hui |
+| --- | --- | --- |
+| Activité en cours | Matière ou activité | Carte prioritaire « Reprendre » |
+| Pioche du Jour | Aujourd'hui | Carte compacte si rien n'est en cours |
+| Objectif quotidien | Aujourd'hui | Ligne de progression légère |
+| Notions dues | Réviser | Une relance « À consolider » si nécessaire |
+| Matières et chapitres | Aujourd'hui (aperçu) | Aperçu limité et accès « Tout voir » |
+| Série | Aura | Compteur compact dans l'en-tête |
+| Aura et rang | Aura | Destination principale, jamais un sous-écran de Moi |
+| Joker de série | Moi > Série | Seulement lorsqu'il est consommé ou nécessaire |
+| Badges et apparences | Moi | Célébration au déblocage |
+| Préférences et accessibilité | Moi > Mon confort | Aucun raccourci permanent sur l'accueil |
+| Partage | Résultat ou Moi | Jamais comme action concurrente sur l'accueil |
+main
 
 ### Priorité contextuelle d'Aujourd'hui
 
@@ -263,3 +292,9 @@ plusieurs grandes cartes concurrentes.
 Le joker, le bouton Réviser, les réglages et les statistiques détaillées ne vivent plus dans le
 HUD. La Pioche conserve Braise à 88 px mais place matière, titre, durée, volume et CTA dans une
 composition horizontale compacte.
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+=======
+
+« Navigation persistante » ci-dessus désigne les quatre onglets de la section 3 (Aujourd'hui,
+Réviser, Aura, Moi) — pas une cinquième destination à inventer.
+main

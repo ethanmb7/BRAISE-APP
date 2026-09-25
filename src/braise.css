@@ -583,6 +583,9 @@ select {
   margin-bottom: auto;
 }
 .schip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 10px 15px;
   border-radius: 999px;
   background: var(--paper);
@@ -1040,70 +1043,11 @@ select {
 .rank-rail {
   margin-bottom: 16px;
 }
-.braise-evolution-line {
+/* RankJourney (ProfilAuraView) sits inside the shared .mastery-section card shell — this only
+   resets the bit of that shell's own padding/tab spacing that would otherwise double up with
+   .rank-rail-caption's own margin right below it. */
+.rank-journey {
   margin-bottom: 16px;
-  padding: 10px 10px 8px;
-  background: var(--paper);
-  border: 3px solid var(--neo-ink);
-  border-radius: 8px;
-  box-shadow: 4px 4px 0 var(--neo-ink);
-}
-.braise-evolution-heading {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding: 0 3px 7px;
-}
-.braise-evolution-heading span {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.6rem;
-  font-weight: 700;
-  color: var(--ink-soft);
-}
-.braise-evolution-heading strong {
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 0.9rem;
-  color: var(--neo-orange);
-}
-.braise-evolution-cast {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  align-items: end;
-  gap: 3px;
-  min-height: 76px;
-}
-.braise-evolution-stage {
-  min-width: 0;
-  min-height: 70px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 2px;
-  border-bottom: 3px solid transparent;
-  transition: transform 180ms ease, opacity 180ms ease;
-}
-.braise-evolution-stage svg {
-  max-width: 100%;
-  height: auto;
-}
-.braise-evolution-stage span {
-  width: 100%;
-  overflow: hidden;
-  color: var(--ink);
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.48rem;
-  font-weight: 700;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.braise-evolution-stage.is-current {
-  border-color: var(--neo-orange);
-}
-.braise-evolution-stage.is-locked {
-  filter: grayscale(1);
-  opacity: 0.28;
 }
 .braise-mascot .braise-outfit {
   transform-origin: 54px 76px;
@@ -2057,6 +2001,9 @@ select {
    celebration alongside confetti, not a small utility confirmation. Mounted in App.tsx rather than
    a single view, since a rank or badge can be earned from any screen. */
 .milestone-toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   position: fixed;
   top: 84px;
   left: 50%;
@@ -2905,6 +2852,27 @@ select {
   color: var(--neo-ink);
   box-shadow: 1px 1px 0 #000;
 }
+/* "Je ne sais pas" — étape 2 (positionnement) de la boucle Capte : un positionnement honnête
+   n'est pas une réponse fausse, donc son bouton ne doit jamais rivaliser visuellement avec les
+   vraies options — pas d'ombre dure, pas de remplissage, juste un contour discret. */
+.quiz-dontknow-btn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: transparent;
+  border: 2px dashed var(--line);
+  border-radius: 14px;
+  padding: 10px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 4px;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.quiz-dontknow-btn:active {
+  border-color: var(--ink-soft);
+  color: var(--ink);
+}
 .quiz-vf2 {
   display: flex;
   gap: 10px;
@@ -3008,6 +2976,37 @@ select {
 .quiz-bridge-btn:active {
   transform: translate(2px, 2px);
   box-shadow: 1px 1px 0 #000;
+}
+/* Étape 5 de la boucle Capte : "choix d'aide" — 4 puces courtes plutôt qu'un unique bouton, pour
+   laisser l'élève choisir le type d'aide dont il a vraiment besoin. Volontairement plus discrètes
+   que .quiz-bridge-btn (la reformulation qui suit reste l'action la plus visible du bloc). */
+.quiz-help-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.quiz-help-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid #000;
+  border-radius: 999px;
+  padding: 8px 13px;
+  font-weight: 700;
+  font-size: 0.76rem;
+  box-shadow: 2px 2px 0 #000;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease;
+}
+.quiz-help-chip:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 #000;
+}
+.quiz-help-chip.is-active {
+  background: var(--sun);
+  color: var(--sun-ink);
 }
 .quiz-summary2 {
   text-align: center;
@@ -4331,6 +4330,12 @@ select {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* Same bevel language as the avatar right next to it (border-2, hard 2px shadow) and as the
+   Pioche card's own info pills below this header — before this, the streak/Aura pills used a
+   thin 1px translucent-glass style found nowhere else in the app, while the avatar already used
+   the real neo-brutalist border+shadow. Two visual systems sitting side by side in the same 52px
+   bar read as a mistake, not a choice. `var(--paper)`, not a hardcoded fill, so it still adapts
+   under dark mode the same way the avatar already does. */
 .home-header-streak,
 .home-header-aura {
   display: flex;
@@ -4338,12 +4343,13 @@ select {
   align-items: center;
   justify-content: center;
   gap: 5px;
-  border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  border: 2px solid var(--neo-ink);
   border-radius: 13px;
-  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  background: var(--paper);
   color: var(--ink);
   font-size: 0.78rem;
   font-weight: 800;
+  box-shadow: 2px 2px 0 var(--neo-ink);
 }
 .home-header-streak { padding: 0 9px; }
 .home-header-aura { padding: 0 8px 0 5px; }
@@ -4352,175 +4358,83 @@ select {
   width: 28px;
   height: 28px;
   place-items: center;
-  border: 1.5px solid var(--neo-ink);
+  border: 2px solid var(--neo-ink);
   border-radius: 9px;
 }
-.home-header-identity:active,
-.home-header-aura:active { transform: scale(0.96); }
-
-.mission-topbar {
-  display: grid;
-  gap: 10px;
-}
-.mission-topbar-head {
-  display: grid;
-  grid-template-columns: 52px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
-}
-.mission-profile-button {
-  position: relative;
-  height: 52px;
-  padding: 0 3px 3px 0;
-}
-.mission-profile-avatar {
-  display: grid;
-  width: 49px;
-  height: 49px;
-  place-items: center;
-  border: 2.5px solid #000;
-  border-radius: 17px;
-  background: var(--paper);
-  box-shadow: 3px 3px 0 #000;
-  font-size: 1.45rem;
+/* Press feedback matches every other bordered+shadowed tap target in the app (HeroPiocheCard's
+   CTA, TabBar): the element sinks by exactly its own shadow offset and the shadow disappears,
+   instead of a generic scale-down borrowed from a different, softer design language. */
+.home-header-identity,
+.home-header-aura {
   transition: transform 120ms ease, box-shadow 120ms ease;
 }
-.mission-profile-button:active .mission-profile-avatar {
-  transform: translate(3px, 3px);
+.home-header-identity:active .home-header-avatar {
+  transform: translate(2px, 2px);
   box-shadow: none;
 }
-.mission-profile-rank {
-  position: absolute;
-  right: -1px;
-  bottom: -1px;
-  display: grid;
-  width: 19px;
-  height: 19px;
-  place-items: center;
-  border: 2px solid var(--paper);
-  border-radius: 50%;
-  box-shadow: 0 0 0 1px #000;
+.home-header-aura:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
 }
-.mission-welcome { min-width: 0; }
-.mission-welcome p {
-  overflow: hidden;
-  margin: 0;
-  color: var(--ink);
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 1.15rem;
-  font-weight: 800;
-  line-height: 1.05;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.mission-welcome span,
-.mission-rhythm small,
-.mission-tool-copy small {
-  display: block;
-  overflow: hidden;
-  margin-top: 3px;
-  color: var(--ink-soft);
-  font-size: 0.67rem;
-  font-weight: 650;
-  line-height: 1.15;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.mission-aura-button {
+
+/* ===== Matières — exploration volontaire ===== */
+.subjects-view { padding-top: 18px; }
+.subjects-heading {
   display: flex;
-  min-height: 43px;
-  align-items: center;
-  gap: 5px;
-  padding: 3px 7px 3px 4px;
-  border: 2px solid #000;
-  border-radius: 15px;
-  background: var(--paper);
-  box-shadow: 2px 2px 0 #000;
-  color: var(--ink);
-  transition: transform 120ms ease, box-shadow 120ms ease;
+  align-items: flex-start;
+  gap: 12px;
 }
-.mission-aura-button:active { transform: translate(2px, 2px); box-shadow: none; }
-.mission-aura-medal,
-.mission-tool-icon {
+.subjects-heading-icon {
   display: grid;
-  place-items: center;
-  border-radius: 10px;
-}
-.mission-aura-medal { width: 30px; height: 30px; border: 1.5px solid #000; }
-.mission-aura-button > span:last-child { display: grid; text-align: left; }
-.mission-aura-button b,
-.mission-tool-copy b,
-.mission-rhythm b {
-  overflow: hidden;
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 0.82rem;
-  font-weight: 800;
-  line-height: 1.08;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.mission-aura-button small {
-  color: var(--ink-soft);
-  font-size: 0.58rem;
-  font-weight: 800;
-  line-height: 1.15;
-  text-transform: uppercase;
-}
-.mission-rhythm {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 7px 10px;
-  border: 1.5px solid rgba(21, 24, 33, 0.14);
-  border-radius: 16px;
-  background: linear-gradient(100deg, #fff4c8, var(--paper));
-  color: var(--ink);
-}
-.mission-rhythm-flame {
-  display: grid;
-  width: 33px;
-  height: 35px;
+  width: 46px;
+  height: 46px;
   flex: 0 0 auto;
   place-items: center;
-  border-radius: 12px;
-  background: #ffd650;
-  font-size: 1.2rem;
+  border: 2px solid var(--neo-ink);
+  border-radius: 15px;
+  background: var(--sun);
+  color: #151821;
+  box-shadow: 2px 2px 0 var(--neo-ink);
 }
-.mission-rhythm > span:last-child,
-.mission-tool-copy { display: grid; min-width: 0; }
-.mission-tools { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
-.mission-tool-button {
-  position: relative;
-  display: flex;
-  min-width: 0;
-  min-height: 53px;
-  align-items: center;
-  gap: 7px;
-  padding: 7px 8px;
-  border: 2px solid #000;
-  border-radius: 16px;
-  background: var(--paper);
-  box-shadow: 3px 3px 0 #000;
+.subjects-heading p {
+  margin: 0 0 1px;
+  color: var(--neo-orange);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.subjects-heading h1 {
   color: var(--ink);
-  text-align: left;
-  transition: transform 120ms ease, box-shadow 120ms ease, background 180ms ease;
+  font-size: 1.65rem;
+  font-weight: 850;
 }
-.mission-tool-button:active { transform: translate(3px, 3px); box-shadow: none; }
-.mission-tool-icon { width: 30px; height: 30px; flex: 0 0 auto; }
-.mission-freeze-button .mission-tool-icon { background: #d7f8ff; color: #075985; }
-.mission-review-button .mission-tool-icon { background: #e9edff; color: #263f96; }
-.mission-freeze-button.is-armed { border-color: #007c9e; background: linear-gradient(120deg, #d6f8ff, var(--paper)); box-shadow: 3px 3px 0 #007c9e; }
-.mission-freeze-button.is-armed .mission-tool-icon { background: #50d6e9; color: #053f4d; }
-.mission-tool-end,
-.mission-tool-arrow { margin-left: auto; flex: 0 0 auto; }
-.mission-tool-end { color: var(--ink-soft); font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; font-weight: 800; }
-.mission-freeze-button.is-armed .mission-tool-end { color: #007c9e; }
-.mission-tool-arrow { color: var(--ink-soft); }
-.mission-freeze-button.is-bumping { animation: missionToolBump 300ms cubic-bezier(0.34, 1.56, 0.64, 1); }
-@keyframes missionToolBump { 50% { transform: scale(1.045); } }
+.subjects-heading > div > span {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+.subjects-summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--paper) 78%, transparent);
+  color: var(--ink-soft);
+  font-size: 0.75rem;
+}
+.subjects-summary span { display: flex; align-items: center; gap: 5px; }
+.subjects-summary b { color: var(--ink); }
 
 .home-view { position: relative; }
 .home-mission-zone { position: relative; isolation: isolate; }
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
 @media (max-width: 360px) {
   .mission-topbar-head { gap: 7px; }
   .mission-welcome p { font-size: 1.05rem; }
@@ -4708,3 +4622,5 @@ select {
   .learn-view *::before,
   .learn-view *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
+=======
+main

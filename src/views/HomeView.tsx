@@ -1,3 +1,4 @@
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useApp, computeGoalPct, remainingToGoal, resolveChapters } from "@/store";
@@ -15,6 +16,25 @@ import { dailyPickLine, getAgeGroup } from "@/lib/braiseVoice";
 import { getRankInfo, countMasteredCards } from "@/lib/aura";
 import { getIntoxDismissedCount, setIntoxDismissedCount } from "@/lib/celebrations";
 import type { Level, Subject, Chapter } from "@/types";
+=======
+import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { useApp, computeGoalPct, remainingToGoal, resolveChapters } from '@/store';
+import { sfx } from '@/lib/sound';
+import { fireConfetti } from '@/lib/confetti';
+import { LevelSheet } from '@/components/LevelSheet';
+import { HeaderHUD } from '@/components/HeaderHUD';
+import { HeroPiocheCard } from '@/components/HeroPiocheCard';
+import { MissedCardsBanner } from '@/components/MissedCardsBanner';
+import { SubjectDecks } from '@/components/SubjectDecks';
+import { TodayStrip } from '@/components/TodayStrip';
+import { ShareAuraModal } from '@/components/ShareAuraModal';
+import { SUBJECTS, FLASHCARDS } from '@/data';
+import { dailyPickLine, getAgeGroup } from '@/lib/braiseVoice';
+import { getRankInfo, countMasteredCards } from '@/lib/aura';
+import { getIntoxDismissedCount, setIntoxDismissedCount } from '@/lib/celebrations';
+import type { Level, Subject, Chapter } from '@/types';
+main
 
 // Same choreography language as Ton Aura: a calm stagger fade for each block.
 const staggerContainer = {
@@ -245,19 +265,22 @@ export function HomeView() {
           <motion.div variants={staggerItem} className="space-y-3">
             <div className="flex items-end justify-between gap-3">
               <div>
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
                 <span className="font-mono text-[0.62rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">
                   Quand tu veux aller plus loin
                 </span>
                 <h2 className="font-display text-[1.15rem] font-extrabold leading-tight text-[var(--ink)]">
                   Tes univers
                 </h2>
+=======
+                <span className="font-mono text-[0.62rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">Accès rapide</span>
+                <h2 className="font-display text-[1.15rem] font-extrabold leading-tight text-[var(--ink)]">Tes matières</h2>
+main
               </div>
-              <span className="rounded-lg border border-black bg-[var(--neo-orange)] px-2 py-0.5 text-xs font-black text-white shadow-[1px_1px_0px_0px_#000]">
-                {SUBJECTS.length}
-              </span>
+              <button type="button" onClick={() => setTab('subjects')} className="text-xs font-black text-[var(--neo-orange)]">Tout voir →</button>
             </div>
             <SubjectDecks
-              items={subjectDecks}
+              items={subjectDecks.slice(0, 2)}
               onSelect={(id) => {
                 const deck = subjectDecks.find((d) => d.id === id);
                 goToChapter(id, deck?.currentChapterId);
@@ -265,6 +288,7 @@ export function HomeView() {
             />
           </motion.div>
 
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
           <motion.div variants={staggerItem} className="text-center">
             <button
               onClick={() => setView("settings")}
@@ -273,6 +297,8 @@ export function HomeView() {
               Paramètres
             </button>
           </motion.div>
+=======
+main
         </motion.div>
       </div>
 
