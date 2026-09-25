@@ -13,8 +13,16 @@ const TEXT_EXTENSIONS = new Set([
   ".mjs",
   ".ts",
   ".tsx",
+  ".txt",
+  ".svg",
+  ".toml",
+  ".yaml",
+  ".yml",
 ]);
-const CONFLICT_LINE = /^(?:<{7}|={7}|>{7})(?:\s|$)/;
+// Also reject markers accidentally indented by an editor. Git writes them at column zero, but
+// copied conflict blocks can otherwise slip through the prebuild check after being pasted into
+// JSX, Markdown or a configuration file.
+const CONFLICT_LINE = /^\s*(?:<{7}|={7}|>{7})(?:\s|$)/;
 
 async function findConflicts(directory) {
   const conflicts = [];
