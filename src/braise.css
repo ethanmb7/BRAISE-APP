@@ -92,6 +92,172 @@
   }
 }
 
+/* ===== CAPTE — guided conversation tools ===== */
+.capte-intro {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 9px 11px;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 16%, transparent);
+  border-radius: 16px;
+  background: linear-gradient(105deg, #fff2bf, var(--paper));
+}
+.capte-intro > span {
+  padding: 5px 7px;
+  border: 1.5px solid #151821;
+  border-radius: 8px;
+  background: #ffd650;
+  color: #151821;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+.capte-intro > div { display: grid; min-width: 0; }
+.capte-intro b { font-family: 'Baloo 2', sans-serif; font-size: 0.82rem; font-weight: 800; line-height: 1.05; }
+.capte-intro small { margin-top: 2px; color: var(--ink-soft); font-size: 0.62rem; }
+.capte-tools {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  margin: 2px 0 10px;
+}
+.capte-tools button {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 8px;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  border-radius: 13px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 0.7rem;
+  font-weight: 800;
+  transition: transform 120ms ease, background 120ms ease;
+}
+.capte-tools button:hover { background: color-mix(in srgb, var(--blue-pale) 65%, var(--paper)); }
+.capte-tools button:active { transform: scale(0.98); }
+.capte-tools button[aria-pressed='true'] { border-color: var(--blue); background: var(--blue-pale); color: var(--blue-2); }
+.capte-reformulate {
+  display: flex;
+  width: 100%;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-bottom: 10px;
+  border: 2px solid #151821;
+  border-radius: 14px;
+  background: #ffd650;
+  box-shadow: 3px 3px 0 #151821;
+  color: #151821;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+.capte-reformulate:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #151821; }
+.capte-reformulation-hint {
+  margin: 0 4px 8px;
+  color: var(--ink-soft);
+  font-size: 0.68rem;
+  line-height: 1.35;
+  text-align: center;
+}
+
+/* Learning evidence comes before rewards on the result screen. */
+.complete-overline,
+.complete-reward-label {
+  display: block;
+  color: var(--ink-soft);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.complete-learning-summary { display: grid; width: 100%; gap: 8px; margin: 14px 0 16px; text-align: left; }
+.complete-learning-summary > div { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: 9px; padding: 11px; border: 1.5px solid color-mix(in srgb, var(--ink) 17%, transparent); border-radius: 16px; background: var(--paper); }
+.complete-learning-summary > div > span { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 11px; background: #dcfce7; color: #08764d; }
+.complete-learning-summary > div:last-child > span { background: #e9edff; color: #344caa; }
+.complete-learning-summary p { display: grid; gap: 2px; margin: 0; }
+.complete-learning-summary b { font-family: 'Baloo 2', sans-serif; font-size: 0.8rem; line-height: 1.1; }
+.complete-learning-summary small { color: var(--ink-soft); font-size: 0.66rem; line-height: 1.35; }
+.complete-reward-label { margin-bottom: 5px; }
+
+/* ===== RÉVISER — session lobby ===== */
+.revision-setup { padding-top: 16px; padding-bottom: 112px; }
+.revision-setup-hero {
+  position: relative;
+  display: flex;
+  min-height: 152px;
+  align-items: center;
+  overflow: hidden;
+  padding: 20px 18px;
+  border: 2.5px solid #151821;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #7c5cff, #5a38d6);
+  box-shadow: 5px 5px 0 #151821;
+  color: #fff;
+}
+.revision-setup-hero::after { position: absolute; width: 160px; height: 160px; border: 2px solid rgba(255,255,255,.18); border-radius: 50%; content: ''; inset: -68px -50px auto auto; }
+.revision-setup-hero > div:first-child { position: relative; z-index: 1; max-width: 72%; }
+.revision-setup-kicker { font-family: 'IBM Plex Mono', monospace; font-size: .62rem; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; }
+.revision-setup-hero h1 { margin-top: 3px; font-size: 1.75rem; font-weight: 850; }
+.revision-setup-hero p { margin: 8px 0 0; font-size: .76rem; font-weight: 650; line-height: 1.4; }
+.revision-setup-mascot { position: absolute; right: 8px; bottom: 5px; z-index: 1; }
+.revision-mode-list { margin-top: 23px; }
+.revision-setup-title { display: flex; align-items: center; gap: 7px; margin-bottom: 10px; color: var(--ink); }
+.revision-setup-title h2,
+.revision-subject-pick h2 { margin: 0; font-family: 'Baloo 2', sans-serif; font-size: 1.12rem; font-weight: 850; }
+.revision-mode-card {
+  display: grid;
+  width: 100%;
+  min-height: 78px;
+  grid-template-columns: auto minmax(0,1fr) auto;
+  align-items: center;
+  gap: 11px;
+  padding: 12px;
+  border: 2px solid #151821;
+  border-radius: 20px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 #151821;
+  color: var(--ink);
+  text-align: left;
+}
+.revision-mode-card.is-featured { background: linear-gradient(110deg, #ffdf64, #fff4bc); color: #151821; }
+.revision-mode-card > span:nth-child(2),
+.revision-mode-grid button { min-width: 0; }
+.revision-mode-card b,
+.revision-mode-card small,
+.revision-mode-grid b,
+.revision-mode-grid small { display: block; }
+.revision-mode-card b,
+.revision-mode-grid b { font-family: 'Baloo 2', sans-serif; font-size: .88rem; font-weight: 850; line-height: 1.05; }
+.revision-mode-card small,
+.revision-mode-grid small { margin-top: 3px; color: rgba(21,24,33,.68); font-size: .62rem; line-height: 1.25; }
+.revision-mode-card em { padding: 4px 6px; border: 1.5px solid #151821; border-radius: 7px; background: #fff; color: #151821; font-family: 'IBM Plex Mono', monospace; font-size: .52rem; font-style: normal; font-weight: 900; text-transform: uppercase; }
+.revision-mode-icon { display: grid; width: 44px; height: 44px; place-items: center; border: 2px solid #151821; border-radius: 14px; background: #fff; color: #5a38d6; }
+.revision-mode-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; margin-top: 10px; }
+.revision-mode-grid button { min-height: 122px; padding: 11px; border: 1.5px solid color-mix(in srgb,var(--ink) 20%,transparent); border-radius: 18px; background: var(--paper); color: var(--ink); text-align: left; }
+.revision-mode-grid button:last-child { grid-column: 1 / -1; min-height: 82px; }
+.revision-mode-grid button:disabled { cursor: not-allowed; opacity: .48; }
+.revision-mode-grid .revision-mode-icon { width: 38px; height: 38px; margin-bottom: 10px; border-width: 1.5px; }
+.revision-mode-icon.is-yellow { background: #fff1a8; color: #8b5600; }
+.revision-mode-icon.is-blue { background: #e7edff; color: #344caa; }
+.revision-mode-icon.is-coral { background: #ffe1dc; color: #b73e30; }
+.revision-mode-card:active,
+.revision-mode-grid button:not(:disabled):active { transform: translate(2px,2px); box-shadow: none; }
+.revision-subject-pick { margin-top: 24px; padding: 14px; border: 1.5px solid color-mix(in srgb,var(--ink) 18%,transparent); border-radius: 21px; background: var(--paper); }
+.revision-subject-pick > div:first-child > span { color: var(--ink-soft); font-family: 'IBM Plex Mono', monospace; font-size: .58rem; font-weight: 850; text-transform: uppercase; }
+.revision-subject-chips { display: flex; gap: 7px; margin-top: 11px; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: none; }
+.revision-subject-chips::-webkit-scrollbar { display: none; }
+.revision-subject-chips button { display: flex; min-height: 38px; flex: 0 0 auto; align-items: center; gap: 5px; padding: 7px 9px; border: 1.5px solid color-mix(in srgb,var(--ink) 18%,transparent); border-radius: 12px; background: var(--bg); color: var(--ink); font-size: .68rem; font-weight: 800; }
+.revision-subject-chips button.is-selected { border: 2px solid #151821; background: #ffd650; box-shadow: 2px 2px 0 #151821; color: #151821; }
+.revision-subject-start { display: flex; width: 100%; min-height: 46px; align-items: center; justify-content: center; gap: 7px; margin-top: 9px; border: 2px solid #151821; border-radius: 14px; background: #ff6b35; box-shadow: 3px 3px 0 #151821; color: #151821; font-family: 'Baloo 2', sans-serif; font-size: .84rem; font-weight: 850; }
+
 html,
 body {
   height: 100%;

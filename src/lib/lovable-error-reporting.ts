@@ -14,14 +14,15 @@ type LovableEvents = {
 };
 
 declare global {
-  interface Window {
-    __lovableEvents?: LovableEvents;
-    __lovableReportRuntimeError?: (payload: {
-      message: string;
-      stack?: string;
-      filename?: string;
-    }) => void;
-  }
+  // `var`, not `let`/`const`: this is what makes these show up on `globalThis`'s type, which is
+  // what the reporting code below actually reads from (not `window` — this file also runs
+  // server-side during SSR, where `window` doesn't exist but `globalThis` does).
+  // eslint-disable-next-line no-var
+  var __lovableEvents: LovableEvents | undefined;
+  // eslint-disable-next-line no-var
+  var __lovableReportRuntimeError:
+    | ((payload: { message: string; stack?: string; filename?: string }) => void)
+    | undefined;
 }
 
 export function reportLovableError(error: unknown, context: Record<string, unknown> = {}) {
