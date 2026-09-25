@@ -1,8 +1,8 @@
-import { useEffect, useRef, type ReactNode } from 'react';
-import { motion, AnimatePresence, useAnimationControls } from 'framer-motion';
-import { Volume2 } from 'lucide-react';
-import { RichText } from '@/components/RichText';
-import { BraiseMascot } from '@/components/BraiseMascot';
+import { useEffect, useRef, type ReactNode } from "react";
+import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
+import { Volume2 } from "lucide-react";
+import { RichText } from "@/components/RichText";
+import { BraiseMascot } from "@/components/BraiseMascot";
 
 // The centre of the Réviser screen: "Tactile 3D" neo-brutalism — opaque paper cards, generous
 // rounding, a hard extruded shadow (the same construction as every button in the app) — with
@@ -17,20 +17,25 @@ import { BraiseMascot } from '@/components/BraiseMascot';
 // near-black navy under .dark, which would leave this card's hardcoded-black text sitting on a
 // near-black card.
 const CARD =
-  'w-full rounded-[28px] border-[2.5px] border-black bg-[var(--rev-paper)] shadow-[6px_6px_0_#000,inset_0_1.5px_0_rgba(255,255,255,0.7)]';
+  "w-full rounded-[28px] border-[2.5px] border-black bg-[var(--rev-paper)] shadow-[6px_6px_0_#000,inset_0_1.5px_0_rgba(255,255,255,0.7)]";
 
 // A real highlighter stroke, not a box: the bottom 45% of the line is painted yellow behind
 // the words (a gradient with a hard stop, see .rev-marker), text stays ink, and it flows
 // across a line break as one continuous fluid block — never chopped word by word.
-const HIGHLIGHT = 'rev-marker font-black text-black';
-const STRONG = 'font-black text-black underline decoration-[3px] underline-offset-[3px] decoration-black';
+const HIGHLIGHT = "rev-marker font-black text-black";
+const STRONG =
+  "font-black text-black underline decoration-[3px] underline-offset-[3px] decoration-black";
 
-const SPRING = { type: 'spring', stiffness: 520, damping: 26 } as const;
+const SPRING = { type: "spring", stiffness: 520, damping: 26 } as const;
 
 /** Centred column for the cards (`my-auto`: a card taller than the viewport scrolls from its
  *  top instead of being clipped, which `justify-center` on the parent would do). */
 export function CardStack({ children }: { children: ReactNode }) {
-  return <div className="relative z-[1] mx-auto my-auto flex w-full max-w-md flex-col items-center gap-4">{children}</div>;
+  return (
+    <div className="relative z-[1] mx-auto my-auto flex w-full max-w-md flex-col items-center gap-4">
+      {children}
+    </div>
+  );
 }
 
 export function QuestionCard({
@@ -74,7 +79,7 @@ export function QuestionCard({
   );
 }
 
-type Verdict = 'win' | 'miss' | null;
+type Verdict = "win" | "miss" | null;
 
 export type ResultProps = {
   verdict: Exclude<Verdict, null>;
@@ -120,11 +125,11 @@ export function AnswerCard({
 }) {
   // The verdict lands on the card itself: border + shadow take the colour.
   const verdictClass =
-    verdict === 'win'
-      ? 'border-[var(--mint-text)] shadow-[6px_6px_0_var(--mint-text),inset_0_1.5px_0_rgba(255,255,255,0.7)]'
-      : verdict === 'miss'
-        ? 'border-[var(--coral-2)] shadow-[6px_6px_0_var(--coral-2),inset_0_1.5px_0_rgba(255,255,255,0.7)]'
-        : '';
+    verdict === "win"
+      ? "border-[var(--mint-text)] shadow-[6px_6px_0_var(--mint-text),inset_0_1.5px_0_rgba(255,255,255,0.7)]"
+      : verdict === "miss"
+        ? "border-[var(--coral-2)] shadow-[6px_6px_0_var(--coral-2),inset_0_1.5px_0_rgba(255,255,255,0.7)]"
+        : "";
 
   // Imperative controls, not a declarative `animate` object: the entrance (on mount) and the
   // verdict "punch" (once, exactly when `judged` flips true) are two different events on the
@@ -144,7 +149,10 @@ export function AnswerCard({
     if (judged && !wasJudged.current) {
       // The verdict lands: a quick physical punch, distinct from the border/shadow colour
       // fade — a win or a miss should feel like something hit the card, not just recoloured it.
-      controls.start({ scale: [1, 0.965, 1.02, 1], transition: { duration: 0.34, ease: 'easeOut' } });
+      controls.start({
+        scale: [1, 0.965, 1.02, 1],
+        transition: { duration: 0.34, ease: "easeOut" },
+      });
     }
     wasJudged.current = judged;
   }, [judged, controls]);
@@ -189,7 +197,7 @@ export function AnswerCard({
       className={`${CARD} relative px-5 py-5 text-left transition-[border-color,box-shadow] duration-300 ${verdictClass}`}
       initial={{ opacity: 0, y: -14, scaleY: 0.94, scale: 1 }}
       animate={controls}
-      style={{ transformOrigin: 'top center' }}
+      style={{ transformOrigin: "top center" }}
     >
       {/* Verdict bar: a reserved header slot INSIDE the card — never a sticker over the
           neighbouring card. Chips: the verdict, the XP won. */}
@@ -205,7 +213,11 @@ export function AnswerCard({
               ruler-drawn vector line — the same "hand-made" imperfection as the tilted cards. */}
           <div className="relative inline-block max-w-full">
             <p className="truncate font-sans text-[0.98rem] font-semibold text-black/40">
-              <RichText text={claim} markClass="bg-transparent font-semibold" strongClass="font-semibold" />
+              <RichText
+                text={claim}
+                markClass="bg-transparent font-semibold"
+                strongClass="font-semibold"
+              />
             </p>
             <motion.span
               aria-hidden="true"
@@ -213,8 +225,10 @@ export function AnswerCard({
               style={{
                 originX: 0,
                 rotate: -1.2,
-                maskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
-                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
+                maskImage:
+                  "linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)",
+                WebkitMaskImage:
+                  "linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)",
               }}
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
@@ -225,20 +239,27 @@ export function AnswerCard({
           <motion.div
             className="mt-3 border-t-2 border-dashed border-black/20 pt-3"
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            transition={{ height: { type: 'spring', stiffness: 320, damping: 30, delay: 0.36 }, opacity: { duration: 0.3, delay: 0.42 } }}
-            style={{ overflow: 'hidden' }}
+            animate={{ height: "auto", opacity: 1 }}
+            transition={{
+              height: { type: "spring", stiffness: 320, damping: 30, delay: 0.36 },
+              opacity: { duration: 0.3, delay: 0.42 },
+            }}
+            style={{ overflow: "hidden" }}
           >
             <span className="inline-block rounded-md bg-black px-2 py-0.5 font-mono text-[0.62rem] font-bold uppercase tracking-[0.08em] text-white">
               En vrai
             </span>
-            <p className={`mt-2 font-sans font-bold text-black ${truthIsLong ? 'text-[1.1rem] leading-tight' : 'text-[1.3rem] leading-snug'}`}>
+            <p
+              className={`mt-2 font-sans font-bold text-black ${truthIsLong ? "text-[1.1rem] leading-tight" : "text-[1.3rem] leading-snug"}`}
+            >
               <RichText text={truth} markClass={HIGHLIGHT} strongClass={STRONG} />
             </p>
           </motion.div>
         </>
       ) : (
-        <p className={`font-sans font-bold text-black ${claimIsLong ? 'text-[1.1rem] leading-tight' : 'text-[1.3rem] leading-snug'}`}>
+        <p
+          className={`font-sans font-bold text-black ${claimIsLong ? "text-[1.1rem] leading-tight" : "text-[1.3rem] leading-snug"}`}
+        >
           <RichText text={claim} markClass={HIGHLIGHT} strongClass={STRONG} />
         </p>
       )}
@@ -281,12 +302,12 @@ function TutorialHint() {
       <motion.span
         className="text-2xl leading-none"
         animate={{ x: [-14, 14, -14], rotate: [-8, 8, -8] }}
-        transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+        transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
       >
         ✋
       </motion.span>
       <span className="rounded-xl border-2 border-black bg-[var(--mint)] px-2.5 py-1 font-display text-[0.72rem] font-black uppercase tracking-wide text-black shadow-[2px_2px_0_#000]">
-        Carré →
+        Carré
       </span>
     </motion.div>
   );
@@ -327,9 +348,9 @@ function DareBadge({ prompt, color }: { prompt: string; color: string }) {
  *  app's sticker (border + hard shadow + a glossy inner edge); they pop in one after another
  *  with spring overshoot, like a real reward landing rather than a UI element fading in. */
 function VerdictBar({ verdict, tag, xp }: ResultProps) {
-  const win = verdict === 'win';
+  const win = verdict === "win";
   const chip =
-    'rounded-xl border-2 border-black px-2.5 py-1 font-display text-[0.72rem] font-black uppercase tracking-wide shadow-[2px_2px_0_#000,inset_0_1px_0_rgba(255,255,255,0.55)]';
+    "rounded-xl border-2 border-black px-2.5 py-1 font-display text-[0.72rem] font-black uppercase tracking-wide shadow-[2px_2px_0_#000,inset_0_1px_0_rgba(255,255,255,0.55)]";
   const pop = (delay: number) => ({
     initial: { opacity: 0, scale: 0.5, y: -6 },
     animate: { opacity: 1, scale: [0.5, 1.15, 1], y: 0 },
@@ -339,8 +360,14 @@ function VerdictBar({ verdict, tag, xp }: ResultProps) {
     // No streak chip here anymore — it duplicated the header's own persistent .rev-combo pill
     // (always on screen, judged or not) for zero information gain, at the cost of a whole extra
     // row exactly on the cards most likely to already be tall (a long correction, mid-streak).
-    <div className="mb-3 flex flex-wrap items-center gap-2 border-b-2 border-dashed border-black/15 pb-3" aria-live="polite">
-      <motion.span className={`${chip} ${win ? 'bg-[var(--mint)] text-black' : 'bg-[var(--coral-2)] text-white'}`} {...pop(0.08)}>
+    <div
+      className="mb-3 flex flex-wrap items-center gap-2 border-b-2 border-dashed border-black/15 pb-3"
+      aria-live="polite"
+    >
+      <motion.span
+        className={`${chip} ${win ? "bg-[var(--mint)] text-black" : "bg-[var(--coral-2)] text-white"}`}
+        {...pop(0.08)}
+      >
         {tag}
       </motion.span>
       {xp > 0 && <XpChip xp={xp} chip={chip} />}
@@ -363,9 +390,9 @@ function XpChip({ xp, chip }: { xp: number; chip: string }) {
       <motion.span
         aria-hidden="true"
         className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 bg-gradient-to-r from-transparent via-white/70 to-transparent"
-        initial={{ x: '-40%' }}
-        animate={{ x: '280%' }}
-        transition={{ duration: 0.65, delay: 0.55, ease: 'easeOut' }}
+        initial={{ x: "-40%" }}
+        animate={{ x: "280%" }}
+        transition={{ duration: 0.65, delay: 0.55, ease: "easeOut" }}
       />
     </motion.span>
   );
@@ -386,8 +413,14 @@ function ResultStrip({ verdict, text, speaking, onListen }: ResultProps) {
             space this footer already reserves rather than adding a new one: this is the only
             place all session Braise actually shows a face reacting to the verdict, instead of
             colour and text carrying the whole feeling alone. */}
-        <BraiseMascot size={30} mood={verdict === 'win' ? 'happy' : 'hesitant'} className="flex-shrink-0" />
-        <p className={`flex-1 font-display text-[0.95rem] font-bold leading-snug ${verdict === 'win' ? 'text-black' : 'text-black/80'}`}>
+        <BraiseMascot
+          size={30}
+          mood={verdict === "win" ? "happy" : "hesitant"}
+          className="flex-shrink-0"
+        />
+        <p
+          className={`flex-1 font-display text-[0.95rem] font-bold leading-snug ${verdict === "win" ? "text-black" : "text-black/80"}`}
+        >
           {text}
         </p>
         {/* Listen sits beside Braise's line, not under it — one less line on a card that is
@@ -396,10 +429,10 @@ function ResultStrip({ verdict, text, speaking, onListen }: ResultProps) {
           type="button"
           onClick={onListen}
           onPointerDown={(e) => e.stopPropagation()}
-          aria-label={speaking ? 'Lecture en cours' : 'Écouter la bonne réponse'}
+          aria-label={speaking ? "Lecture en cours" : "Écouter la bonne réponse"}
           aria-pressed={speaking}
           className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border-2 border-black shadow-[2px_2px_0_#000] transition-transform active:translate-y-[2px] active:shadow-none ${
-            speaking ? 'bg-[var(--sun)] text-black' : 'bg-white text-black'
+            speaking ? "bg-[var(--sun)] text-black" : "bg-white text-black"
           }`}
         >
           <Volume2 size={17} strokeWidth={2.4} />
