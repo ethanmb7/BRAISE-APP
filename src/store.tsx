@@ -6,11 +6,20 @@ import {
   useEffect,
   useRef,
   type ReactNode,
-} from 'react';
-import type { ViewId, TabId, UserProfile, AppState, Confidence, CardReview, Personality, Chapter } from '@/types';
-import { DEFAULT_USER, FLASHCARDS, SUBJECTS } from '@/data';
-import { sfx } from '@/lib/sound';
-import { loadProgress, saveProgress, saveCardReview } from '@/lib/persist';
+} from "react";
+import type {
+  ViewId,
+  TabId,
+  UserProfile,
+  AppState,
+  Confidence,
+  CardReview,
+  Personality,
+  Chapter,
+} from "@/types";
+import { DEFAULT_USER, FLASHCARDS, SUBJECTS } from "@/data";
+import { sfx } from "@/lib/sound";
+import { loadProgress, saveProgress, saveCardReview } from "@/lib/persist";
 
 type Ctx = {
   state: AppState;
@@ -28,22 +37,27 @@ type Ctx = {
   toggleDyslexia: () => void;
   toggleSound: () => void;
   openSubject: (subjectId: string, chapterId?: string) => void;
-  openLesson: (subjectId: string, chapterId: string, mode?: 'vocal' | 'echanger') => void;
+  openLesson: (subjectId: string, chapterId: string, mode?: "vocal" | "echanger") => void;
   completeChapter: (chapterId: string) => void;
   flagStruggle: (chapterId: string) => void;
   reviewCard: (cardId: string, confidence: Confidence) => void;
   getDueCards: () => string[];
   goBack: () => void;
-  bridgeToChat: (subjectId: string, chapterId: string, bridgeMessage: string, returnTo?: ViewId) => void;
+  bridgeToChat: (
+    subjectId: string,
+    chapterId: string,
+    bridgeMessage: string,
+    returnTo?: ViewId,
+  ) => void;
 };
 
 const AppCtx = createContext<Ctx | null>(null);
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const GOAL_TARGETS: Record<string, number> = {
-  '15 min/jour': 6,
-  '30 min/jour': 10,
-  '1 heure/jour': 18,
+  "15 min/jour": 6,
+  "30 min/jour": 10,
+  "1 heure/jour": 18,
 };
 const DEFAULT_GOAL_TARGET = 10;
 
@@ -85,10 +99,16 @@ export function remainingToGoal(s: AppState): number {
 export function resolveChapters(chapters: Chapter[], completedChapters: string[], struggledChapters: string[] = []): Chapter[] {
   const firstOpenIndex = chapters.findIndex((c) => !completedChapters.includes(c.id));
   return chapters.map((c, i) => {
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+    if (completedChapters.includes(c.id)) return { ...c, status: "done", mastery: 100 };
+    if (i === firstOpenIndex) return { ...c, status: "current", mastery: 0 };
+    return { ...c, status: "locked", mastery: 0 };
+=======
     if (completedChapters.includes(c.id)) return { ...c, status: 'done', mastery: 100, reinforce: false };
     const reinforce = struggledChapters.includes(c.id);
     if (i === firstOpenIndex) return { ...c, status: 'current', mastery: 0, reinforce };
     return { ...c, status: 'locked', mastery: 0, reinforce };
+main
   });
 }
 
@@ -97,8 +117,10 @@ export function resolveChapters(chapters: Chapter[], completedChapters: string[]
  *  it directly here would silently undercount every real user's progress). */
 export function countDoneChapters(completedChapters: string[]): number {
   return SUBJECTS.reduce(
-    (acc, s) => acc + resolveChapters(s.chapters, completedChapters).filter((c) => c.status === 'done').length,
-    0
+    (acc, s) =>
+      acc +
+      resolveChapters(s.chapters, completedChapters).filter((c) => c.status === "done").length,
+    0,
   );
 }
 
@@ -107,7 +129,7 @@ export function countDoneChapters(completedChapters: string[]): number {
  *  duplicated inline in ProfileView with its own `chaptersDone`, which read the static chapter
  *  status directly and could therefore never see a real "done" chapter post-resolveChapters. */
 export function computeUnlockedBadges(
-  s: Pick<AppState, 'streak' | 'xp' | 'freezeArmed' | 'freezes' | 'completedChapters'>
+  s: Pick<AppState, "streak" | "xp" | "freezeArmed" | "freezes" | "completedChapters">,
 ): Record<string, boolean> {
   const chaptersDone = countDoneChapters(s.completedChapters);
   return {
@@ -127,14 +149,27 @@ export function computeUnlockedBadges(
  *  every other resumable view is self-contained and doesn't reference content by id. */
 function resolveRestoredView(saved: Partial<AppState>): ViewId {
   const view = saved.view;
-  if (view === 'lesson' || view === 'subject') {
+  if (view === "lesson" || view === "subject") {
     const subject = SUBJECTS.find((s) => s.id === saved.currentSubjectId);
-    if (!subject) return 'home';
-    if (view === 'lesson' && !subject.chapters.find((c) => c.id === saved.currentChapterId)) return 'home';
+    if (!subject) return "home";
+    if (view === "lesson" && !subject.chapters.find((c) => c.id === saved.currentChapterId))
+      return "home";
     return view;
   }
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+  if (
+    view === "learn" ||
+    view === "revisions" ||
+    view === "progres" ||
+    view === "profile" ||
+    view === "settings"
+  )
+    return view;
+  return "home";
+=======
   if (view === 'subjects' || view === 'revisions' || view === 'progres' || view === 'profile' || view === 'settings') return view;
   return 'home';
+main
 }
 
 // `tab` drives the bottom nav highlight independently of `view` (SubjectView/SettingsView both
@@ -142,15 +177,22 @@ function resolveRestoredView(saved: Partial<AppState>): ViewId {
 // just `view` — otherwise resuming into e.g. Revisions would show the right screen with the wrong
 // tab lit up, and a subsequent "back" from Subject/Settings would return to the wrong place.
 function resolveRestoredTab(view: ViewId, savedTab: TabId | undefined): TabId {
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+  if (view === "home" || view === "learn" || view === "revisions" || view === "profile")
+    return view;
+  // `progres` used to be a main tab. It now lives inside Moi; migrate old local saves safely.
+  return (savedTab as string | undefined) === "progres" ? "profile" : (savedTab ?? "home");
+=======
   if (view === 'home' || view === 'subjects' || view === 'revisions' || view === 'profile') return view;
   if (savedTab === 'home' || savedTab === 'subjects' || savedTab === 'revisions' || savedTab === 'profile') return savedTab;
   // `progres` used to be a tab. Old localStorage values now land on Moi, where Aura belongs.
   return view === 'progres' ? 'profile' : 'home';
+main
 }
 
 function sm2(review: CardReview | undefined, confidence: Confidence): CardReview {
   const now = Date.now();
-  const quality = confidence === 'sure' ? 5 : confidence === 'doubt' ? 3 : 1;
+  const quality = confidence === "sure" ? 5 : confidence === "doubt" ? 3 : 1;
 
   let { repetitions, interval, ease } = review
     ? { repetitions: review.repetitions, interval: review.interval, ease: review.ease }
@@ -185,6 +227,15 @@ function sm2(review: CardReview | undefined, confidence: Confidence): CardReview
 // separately-timed check elsewhere that could drift out of sync with this one.
 export function ensureSession(s: AppState): Partial<AppState> {
   const today = new Date().toDateString();
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+  if (s.sessionDate !== today) {
+    return {
+      sessionDate: today,
+      sessionCardsReviewed: 0,
+      sessionChaptersDone: 0,
+      dailyGoalMet: false,
+    };
+=======
   if (s.sessionDate === today) return {};
 
   const reset = { sessionDate: today, sessionCardsReviewed: 0, sessionChaptersDone: 0, dailyGoalMet: false };
@@ -217,6 +268,7 @@ export function ensureSession(s: AppState): Partial<AppState> {
     // The miss it was armed for. Streak survives; the freeze itself was already spent the moment
     // it was armed (see toggleFreeze), so only the armed flag needs clearing here.
     return { ...reset, freezeArmed: false };
+main
   }
 
   return { ...reset, streak: 0 };
@@ -233,8 +285,8 @@ const INITIAL: AppState = {
   // need to click through it on every fresh session while iterating on the rest of the app.
   // OnboardingView and its route in App.tsx are untouched; flip this back to 'onboarding' (or add
   // a real "has the user finished onboarding before" check) when it's back in scope.
-  view: 'home',
-  tab: 'home',
+  view: "home",
+  tab: "home",
   user: DEFAULT_USER,
   streak: 0,
   xp: 0,
@@ -249,7 +301,7 @@ const INITIAL: AppState = {
   currentChapterId: null,
   lastSubjectId: null,
   lastChapterId: null,
-  currentLessonMode: 'vocal' as const,
+  currentLessonMode: "vocal" as const,
   completedChapters: [],
   struggledChapters: [],
   chatBridgeMessage: null,
@@ -320,7 +372,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const updateBestCombo = useCallback((n: number) => {
-    setState((s) => (n > s.bestCombo ? { ...s, ...ensureSession(s), bestCombo: n } : { ...s, ...ensureSession(s) }));
+    setState((s) =>
+      n > s.bestCombo ? { ...s, ...ensureSession(s), bestCombo: n } : { ...s, ...ensureSession(s) },
+    );
   }, []);
 
   const setFreezes = useCallback((n: number) => {
@@ -363,27 +417,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setState((s) => ({
       ...s,
       ...ensureSession(s),
-      view: 'subject',
+      view: "subject",
       currentSubjectId: subjectId,
       currentChapterId: chapterId ?? null,
     }));
   }, []);
 
   const openLesson = useCallback(
-    (subjectId: string, chapterId: string, mode?: 'vocal' | 'echanger') => {
+    (subjectId: string, chapterId: string, mode?: "vocal" | "echanger") => {
       setState((s) => ({
         ...s,
         ...ensureSession(s),
-        view: 'lesson',
+        view: "lesson",
         currentSubjectId: subjectId,
         currentChapterId: chapterId,
         lastSubjectId: subjectId,
         lastChapterId: chapterId,
-        currentLessonMode: mode ?? 'vocal',
+        currentLessonMode: mode ?? "vocal",
         chatBridgeMessage: null,
       }));
     },
-    []
+    [],
   );
 
   const bridgeToChat = useCallback(
@@ -391,17 +445,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setState((s) => ({
         ...s,
         ...ensureSession(s),
-        view: 'lesson',
+        view: "lesson",
         currentSubjectId: subjectId,
         currentChapterId: chapterId,
-        currentLessonMode: 'echanger',
+        currentLessonMode: "echanger",
         chatBridgeMessage: bridgeMessage,
         // "Revoir la notion" from a Réviser session comes back to the session, not to the
         // subject page it was never on.
         lessonReturnTo: returnTo ?? null,
       }));
     },
-    []
+    [],
   );
 
   const completeChapter = useCallback((chapterId: string) => {
@@ -411,11 +465,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const session = { ...s, ...ensureSession(s) };
       const already = session.completedChapters.includes(chapterId);
       const xpGained = already ? 0 : 50;
-      const sessionChaptersDone = already ? session.sessionChaptersDone : session.sessionChaptersDone + 1;
+      const sessionChaptersDone = already
+        ? session.sessionChaptersDone
+        : session.sessionChaptersDone + 1;
       const activity = session.sessionCardsReviewed + sessionChaptersDone * 3;
       return {
         ...session,
-        completedChapters: already ? session.completedChapters : [...session.completedChapters, chapterId],
+        completedChapters: already
+          ? session.completedChapters
+          : [...session.completedChapters, chapterId],
         sessionChaptersDone,
         xp: session.xp + xpGained,
         dailyGoalMet: activity >= goalTarget(session),
@@ -453,7 +511,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // never mentioned it, and BraiseRecap's own +XP total only ever summed correct answers.
       // The real account XP (this field) and the celebratory total shown at the end of a
       // session could silently drift apart by 3 XP per mistake with no explanation offered.
-      const xpGain = confidence === 'sure' ? 15 : confidence === 'doubt' ? 8 : 0;
+      const xpGain = confidence === "sure" ? 15 : confidence === "doubt" ? 8 : 0;
       const activity = sessionCardsReviewed + session.sessionChaptersDone * 3;
       void saveCardReview(cardId, updated);
       return {
@@ -470,18 +528,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const now = Date.now();
     return FLASHCARDS.filter((c) => {
       const r = state.cardReviews[c.id];
-      if (!r) return true;
+      // An unseen card is available for discovery, but it is not "due": consolidation only
+      // exists after a first attempt has created a review schedule.
+      if (!r) return false;
       return r.nextReviewAt <= now;
     }).map((c) => c.id);
   }, [state.cardReviews]);
 
   const goBack = useCallback(() => {
     setState((s) => {
-      if (s.view === 'lesson' && s.lessonReturnTo) {
+      if (s.view === "lesson" && s.lessonReturnTo) {
         return { ...s, view: s.lessonReturnTo, lessonReturnTo: null };
       }
-      if (s.view === 'lesson' || s.view === 'complete') return { ...s, view: 'subject' };
-      if (s.view === 'subject' || s.view === 'settings' || s.view === 'share')
+      if (s.view === "lesson" || s.view === "complete") return { ...s, view: "subject" };
+      if (s.view === "subject" || s.view === "settings" || s.view === "share")
         return { ...s, view: s.tab };
       return s;
     });
@@ -521,6 +581,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
 export function useApp() {
   const ctx = useContext(AppCtx);
-  if (!ctx) throw new Error('useApp must be used within AppProvider');
+  if (!ctx) throw new Error("useApp must be used within AppProvider");
   return ctx;
 }

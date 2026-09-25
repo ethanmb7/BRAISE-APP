@@ -1,4 +1,8 @@
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+import { useState, useRef, useEffect, useCallback } from "react";
+=======
 import { useState, useRef, useEffect, useCallback } from 'react';
+main
 import {
   Play,
   Pause,
@@ -9,6 +13,25 @@ import {
   X,
   Flame,
   MessageSquare,
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+  Volume2,
+  Lightbulb,
+  HelpCircle,
+  RefreshCw,
+  PenLine,
+} from "lucide-react";
+import { useApp } from "@/store";
+import { sfx } from "@/lib/sound";
+import { TopBar } from "@/components/TopBar";
+import { BraiseMascot } from "@/components/BraiseMascot";
+import { sendChatMessage } from "@/lib/chat";
+import { speak, stopSpeaking } from "@/lib/speech";
+import { getAgeGroup, quizCorrect, quizWrong, lessonOpenerCheckIn } from "@/lib/braiseVoice";
+import { SUBJECTS, STORIES, AUDIO_TRANSCRIPTS, LESSON_INTRO } from "@/data";
+import type { QuizQuestion, ChatMessage } from "@/types";
+
+type Mode = "vocal" | "echanger";
+=======
   Wand2,
   Lightbulb,
   Volume2,
@@ -26,6 +49,7 @@ import { SUBJECTS, STORIES, AUDIO_TRANSCRIPTS, LESSON_INTRO } from '@/data';
 import type { QuizQuestion, ChatMessage } from '@/types';
 
 type Mode = 'vocal' | 'echanger';
+        main
 
 export function LessonView() {
   const { state, goBack, completeChapter, setView, bridgeToChat } = useApp();
@@ -46,7 +70,7 @@ export function LessonView() {
   const handleComplete = () => {
     sfx.complete(state.soundOn);
     completeChapter(chapter.id);
-    setView('complete');
+    setView("complete");
   };
 
   return (
@@ -56,20 +80,20 @@ export function LessonView() {
         {storyData && (
           <div className="lesson-modes">
             <button
-              className={`lesson-mode-btn ${mode === 'vocal' ? 'is-on' : ''}`}
+              className={`lesson-mode-btn ${mode === "vocal" ? "is-on" : ""}`}
               onClick={() => {
                 sfx.tap(state.soundOn);
-                setMode('vocal');
+                setMode("vocal");
               }}
             >
               <Headphones size={13} />
               Vocal Animé
             </button>
             <button
-              className={`lesson-mode-btn ${mode === 'echanger' ? 'is-on' : ''}`}
+              className={`lesson-mode-btn ${mode === "echanger" ? "is-on" : ""}`}
               onClick={() => {
                 sfx.tap(state.soundOn);
-                setMode('echanger');
+                setMode("echanger");
               }}
             >
               <MessageCircle size={13} />
@@ -78,7 +102,7 @@ export function LessonView() {
           </div>
         )}
 
-        {mode === 'vocal' && storyData && (
+        {mode === "vocal" && storyData && (
           <div className="lesson-panel is-on">
             <VocalMode
               slides={storyData.slides}
@@ -89,7 +113,7 @@ export function LessonView() {
           </div>
         )}
 
-        {(mode === 'echanger' || !storyData) && (
+        {(mode === "echanger" || !storyData) && (
           <div className="lesson-panel is-on">
             <ChatMode
               chapterId={chapter.id}
@@ -101,7 +125,7 @@ export function LessonView() {
           </div>
         )}
 
-        {storyData && mode === 'vocal' && (
+        {storyData && mode === "vocal" && (
           <div style={{ marginTop: 24 }}>
             <div className="section-title">Vérifie tes acquis</div>
             <Quiz
@@ -111,7 +135,17 @@ export function LessonView() {
               subjectName={subject.name}
               topic={chapter.title}
               onComplete={handleComplete}
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+              onBridge={(question: string, userAnswer: string) =>
+                bridgeToChat(
+                  subject.id,
+                  chapter.id,
+                  `J'ai répondu "${userAnswer}" à cette question mais j'ai faux : ${question}. Tu peux m'expliquer le piège ?`,
+                )
+              }
+=======
               onBridge={(message: string) => bridgeToChat(subject.id, chapter.id, message)}
+main
             />
           </div>
         )}
@@ -171,7 +205,7 @@ function VocalMode({
         timers.current.push(timer);
       }
     },
-    [slides, clearTimers, soundOn, checkpointIndex, checkpointAnswered]
+    [slides, clearTimers, soundOn, checkpointIndex, checkpointAnswered],
   );
 
   useEffect(() => {
@@ -231,7 +265,7 @@ function VocalMode({
             <div className="checkpoint-q">{checkpoint[0].q}</div>
             {!checkpointAnswered ? (
               <div className="checkpoint-opts">
-                {['Faux', 'Vrai'].map((label, i) => (
+                {["Faux", "Vrai"].map((label, i) => (
                   <button key={i} className="checkpoint-opt" onClick={() => answerCheckpoint(i)}>
                     {label}
                   </button>
@@ -239,11 +273,15 @@ function VocalMode({
               </div>
             ) : (
               <>
-                <div className={`checkpoint-fb ${checkpointCorrect ? 'ok' : 'ko'}`}>
-                  {checkpointCorrect ? 'Bien vu ! ' : 'Pas grave, retiens ça : '}
+                <div className={`checkpoint-fb ${checkpointCorrect ? "ok" : "ko"}`}>
+                  {checkpointCorrect ? "Bien vu ! " : "Pas grave, retiens ça : "}
                   {checkpoint[0].explain}
                 </div>
-                <button className="btn-block blue" style={{ marginTop: 14 }} onClick={continueAfterCheckpoint}>
+                <button
+                  className="btn-block blue"
+                  style={{ marginTop: 14 }}
+                  onClick={continueAfterCheckpoint}
+                >
                   Continuer
                 </button>
               </>
@@ -255,10 +293,10 @@ function VocalMode({
       <div className="story-stage">
         <div className="story-progress-row">
           {slides.map((_, i) => (
-            <div key={i} className={`story-seg ${i < idx ? 'done' : ''}`}>
+            <div key={i} className={`story-seg ${i < idx ? "done" : ""}`}>
               <span
                 style={{
-                  width: i < idx ? '100%' : i === idx && playing ? `${progressPct}%` : '0%',
+                  width: i < idx ? "100%" : i === idx && playing ? `${progressPct}%` : "0%",
                 }}
               />
             </div>
@@ -289,7 +327,7 @@ function VocalMode({
           <div className="story-text">{slides[idx].text}</div>
         </div>
         <div className="story-hint">
-          {playing ? 'Touche gauche/droite pour naviguer' : "Touche play pour lancer l'animation"}
+          {playing ? "Touche gauche/droite pour naviguer" : "Touche play pour lancer l'animation"}
         </div>
       </div>
 
@@ -298,9 +336,9 @@ function VocalMode({
         <button className="audio-play-btn" onClick={toggle}>
           {playing ? <Pause size={22} /> : <Play size={22} style={{ marginLeft: 3 }} />}
         </button>
-        <div className={`audio-wave ${playing ? 'is-playing' : ''}`}>
+        <div className={`audio-wave ${playing ? "is-playing" : ""}`}>
           {Array.from({ length: 18 }).map((_, i) => (
-            <span key={i} style={{ animationPlayState: playing ? 'running' : 'paused' }} />
+            <span key={i} style={{ animationPlayState: playing ? "running" : "paused" }} />
           ))}
         </div>
         <span className="audio-meta">
@@ -310,19 +348,24 @@ function VocalMode({
 
       {/* Transcript */}
       {transcript && (
-        <div className="audio-transcript" style={{ background: 'var(--blue-pale)', borderRadius: 14, padding: '14px 16px' }}>
+        <div
+          className="audio-transcript"
+          style={{ background: "var(--blue-pale)", borderRadius: 14, padding: "14px 16px" }}
+        >
           <div
             style={{
               fontFamily: '"IBM Plex Mono", monospace',
-              fontSize: '0.66rem',
-              textTransform: 'uppercase',
-              color: 'var(--ink-soft)',
+              fontSize: "0.66rem",
+              textTransform: "uppercase",
+              color: "var(--ink-soft)",
               marginBottom: 8,
             }}
           >
             Transcription
           </div>
-          <div style={{ fontSize: '0.86rem', lineHeight: 1.6, color: 'var(--ink)' }}>{transcript}</div>
+          <div style={{ fontSize: "0.86rem", lineHeight: 1.6, color: "var(--ink)" }}>
+            {transcript}
+          </div>
         </div>
       )}
     </div>
@@ -330,7 +373,7 @@ function VocalMode({
 }
 
 /* ===== Échanger — Chat with Braise (Gemini RAG) ===== */
-type Msg = { from: 'braise' | 'me'; text: string };
+type Msg = { from: "braise" | "me"; text: string };
 
 function ChatMode({
   chapterId,
@@ -348,16 +391,28 @@ function ChatMode({
   const { state } = useApp();
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
   const [messages, setMessages] = useState<Msg[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [reformulationRequested, setReformulationRequested] = useState(false);
+  const [hasReformulated, setHasReformulated] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const bridgeHandled = useRef(false);
   const openerStarted = useRef(false);
+  const openerTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, typing]);
+
+  useEffect(() => {
+    const timers = openerTimers.current;
+    return () => {
+      timers.forEach(clearTimeout);
+      stopSpeaking();
+    };
+  }, []);
 
   // Braise takes the lead: she narrates the chapter first instead of waiting for a question.
   useEffect(() => {
@@ -370,12 +425,14 @@ function ChatMode({
     let cumulative = 300;
     lines.forEach((line) => {
       const typingTime = 500 + Math.min(line.length * 12, 1100);
-      setTimeout(() => setTyping(true), cumulative);
+      openerTimers.current.push(setTimeout(() => setTyping(true), cumulative));
       cumulative += typingTime;
-      setTimeout(() => {
-        setTyping(false);
-        setMessages((m) => [...m, { from: 'braise', text: line }]);
-      }, cumulative);
+      openerTimers.current.push(
+        setTimeout(() => {
+          setTyping(false);
+          setMessages((m) => [...m, { from: "braise", text: line }]);
+        }, cumulative),
+      );
       cumulative += 250;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -386,21 +443,26 @@ function ChatMode({
     if (bridgeMessage && !bridgeHandled.current) {
       bridgeHandled.current = true;
       openerStarted.current = true;
-      setMessages((m) => [...m, { from: 'me', text: bridgeMessage }]);
-      setInput('');
+      setMessages((m) => [...m, { from: "me", text: bridgeMessage }]);
+      setInput("");
       setTyping(true);
       setError(null);
 
-      sendChatMessage([{ role: 'user' as const, text: bridgeMessage }], chapterId, subjectId, voiceCtx).then((res) => {
+      sendChatMessage(
+        [{ role: "user" as const, text: bridgeMessage }],
+        chapterId,
+        subjectId,
+        voiceCtx,
+      ).then((res) => {
         setTyping(false);
-        if ('text' in res) {
+        if ("text" in res) {
           sfx.correct(soundOn);
-          setMessages((m) => [...m, { from: 'braise', text: res.text }]);
+          setMessages((m) => [...m, { from: "braise", text: res.text }]);
         } else {
           setError(res.error);
           setMessages((m) => [
             ...m,
-            { from: 'braise', text: "Oups, j'ai eu un petit bug. Tu peux reformuler ?" },
+            { from: "braise", text: "Oups, j'ai eu un petit bug. Tu peux reformuler ?" },
           ]);
         }
       });
@@ -408,46 +470,103 @@ function ChatMode({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bridgeMessage, chapterId, subjectId, soundOn]);
 
-  const send = async () => {
-    const text = input.trim();
+  const sendText = async (rawText: string, isReformulation = false) => {
+    const text = rawText.trim();
     if (!text || typing) return;
     sfx.tap(soundOn);
     setError(null);
-    const nextMessages: Msg[] = [...messages, { from: 'me', text }];
+    const nextMessages: Msg[] = [...messages, { from: "me", text }];
     setMessages(nextMessages);
-    setInput('');
+    setInput("");
     setTyping(true);
 
     const apiMessages: ChatMessage[] = nextMessages.map((m) => ({
-      role: (m.from === 'me' ? 'user' : 'model') as 'user' | 'model',
+      role: (m.from === "me" ? "user" : "model") as "user" | "model",
       text: m.text,
     }));
 
-    const res = await sendChatMessage(apiMessages, chapterId, subjectId, voiceCtx);
+    const res = await sendChatMessage(
+      apiMessages,
+      chapterId,
+      subjectId,
+      voiceCtx,
+      isReformulation
+        ? "L'élève reformule maintenant la notion avec ses mots. Identifie précisément l'idée correcte, puis corrige uniquement le point encore flou. Ne valide pas une réponse vide, hors sujet ou factuellement fausse. Termine par une micro-question différente pour vérifier la compréhension."
+        : undefined,
+    );
     setTyping(false);
-    if ('text' in res) {
+    if ("text" in res) {
       sfx.correct(soundOn);
-      setMessages((m) => [...m, { from: 'braise', text: res.text }]);
+      setMessages((m) => [...m, { from: "braise", text: res.text }]);
+      if (isReformulation) {
+        setHasReformulated(true);
+        setReformulationRequested(false);
+      }
     } else {
       setError(res.error);
       setMessages((m) => [
         ...m,
-        { from: 'braise', text: "Oups, j'ai eu un petit bug. Tu peux reformuler ?" },
+        { from: "braise", text: "Oups, j'ai eu un petit bug. Tu peux reformuler ?" },
       ]);
+    }
+  };
+
+  const send = () => void sendText(input, reformulationRequested);
+
+  const askForHelp = (prompt: string) => {
+    stopSpeaking();
+    setSpeaking(false);
+    setReformulationRequested(false);
+    void sendText(prompt);
+  };
+
+  const readLastExplanation = () => {
+    if (speaking) {
+      stopSpeaking();
+      setSpeaking(false);
+      return;
+    }
+    const last = [...messages].reverse().find((message) => message.from === "braise");
+    if (!last) return;
+    setSpeaking(true);
+    const started = speak(last.text, () => setSpeaking(false));
+    if (!started) {
+      setSpeaking(false);
+      setError("La lecture audio n'est pas disponible sur cet appareil.");
     }
   };
 
   return (
     <div>
+      <div className="capte-intro" aria-label="Étape actuelle">
+        <span>CAPTE</span>
+        <div>
+          <b>
+            {hasReformulated
+              ? "Idée reformulée"
+              : reformulationRequested
+                ? "À toi de l’expliquer"
+                : "Comprendre une idée"}
+          </b>
+          <small>
+            {hasReformulated
+              ? "Tu peux terminer ou continuer à poser des questions."
+              : "Une idée à la fois, sans chrono."}
+          </small>
+        </div>
+      </div>
       <div
         ref={scrollRef}
-        style={{ maxHeight: 'calc(100vh - 320px)', overflowY: 'auto', marginBottom: 12 }}
+        role="log"
+        aria-live="polite"
+        aria-busy={typing}
+        style={{ maxHeight: "calc(100vh - 320px)", overflowY: "auto", marginBottom: 12 }}
       >
         <div className="peer-chat">
           {messages.map((m, i) => (
-            <div key={i} className={`peer-msg ${m.from === 'me' ? 'me' : ''}`}>
-              {m.from === 'braise' && (
-                <div className="peer-avatar" style={{ background: 'var(--coral)' }}>
+            <div key={i} className={`peer-msg ${m.from === "me" ? "me" : ""}`}>
+              {m.from === "braise" && (
+                <div className="peer-avatar" style={{ background: "var(--coral)" }}>
                   <BraiseMascot size={20} mood="happy" />
                 </div>
               )}
@@ -456,11 +575,11 @@ function ChatMode({
           ))}
           {typing && (
             <div className="peer-msg">
-              <div className="peer-avatar" style={{ background: 'var(--coral)' }}>
+              <div className="peer-avatar" style={{ background: "var(--coral)" }}>
                 <BraiseMascot size={20} />
               </div>
               <div className="peer-bubble">
-                <span style={{ fontSize: '0.82rem', color: 'var(--ink-soft)' }}>
+                <span style={{ fontSize: "0.82rem", color: "var(--ink-soft)" }}>
                   Braise réfléchit... 🔥
                 </span>
                 <div className="typing-dots" style={{ marginTop: 4 }}>
@@ -473,12 +592,65 @@ function ChatMode({
           )}
         </div>
         {error && (
-          <p style={{ fontSize: '0.76rem', color: 'var(--coral-2)', textAlign: 'center', marginTop: 8 }}>
+          <p
+            style={{
+              fontSize: "0.76rem",
+              color: "var(--coral-2)",
+              textAlign: "center",
+              marginTop: 8,
+            }}
+          >
             {error}
           </p>
         )}
       </div>
-      {messages.length > 0 && !typing && (
+      {messages.length > 0 && !typing && !reformulationRequested && !hasReformulated && (
+        <div className="capte-tools" aria-label="Demander une autre explication">
+          <button
+            type="button"
+            onClick={() =>
+              askForHelp("Je ne sais pas encore. Repars de zéro, sans supposer que j'ai compris.")
+            }
+          >
+            <HelpCircle size={15} /> Je ne sais pas
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              askForHelp("Explique-moi cette idée plus simplement, avec des mots très courts.")
+            }
+          >
+            <RefreshCw size={15} /> Plus simple
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              askForHelp(
+                "Donne-moi un exemple concret différent, puis pose-moi une petite question.",
+              )
+            }
+          >
+            <Lightbulb size={15} /> Un exemple
+          </button>
+          <button type="button" onClick={readLastExplanation} aria-pressed={speaking}>
+            <Volume2 size={15} /> {speaking ? "Lecture…" : "Lis-le"}
+          </button>
+        </div>
+      )}
+      {messages.length > 0 && !typing && !hasReformulated && (
+        <button
+          type="button"
+          className="capte-reformulate"
+          onClick={() => {
+            sfx.tap(soundOn);
+            setReformulationRequested(true);
+            setInput("");
+          }}
+        >
+          <PenLine size={16} /> J'ai compris, je reformule
+        </button>
+      )}
+      {hasReformulated && !typing && (
         <button
           className="explain-btn"
           style={{ marginBottom: 10 }}
@@ -488,16 +660,23 @@ function ChatMode({
           }}
         >
           <Check size={15} />
-          Terminer le chapitre
+          Valider cette compréhension
         </button>
+      )}
+      {reformulationRequested && !hasReformulated && (
+        <p className="capte-reformulation-hint">
+          Explique l'idée avec tes mots. Braise te dira ce qui est juste et ce qui reste flou.
+        </p>
       )}
       <div className="peer-input-row">
         <input
           type="text"
-          placeholder="Pose ta question à Braise..."
+          placeholder={
+            reformulationRequested ? "Explique avec tes mots…" : "Pose ta question à Braise…"
+          }
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && send()}
+          onKeyDown={(e) => e.key === "Enter" && send()}
           disabled={typing}
         />
         <button className="peer-send" onClick={send} disabled={typing || !input.trim()}>
@@ -536,10 +715,15 @@ function Quiz({
   const [showStreak, setShowStreak] = useState(false);
   const [done, setDone] = useState(false);
   const [xpPop, setXpPop] = useState<{ x: number; y: number } | null>(null);
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+  const [feedbackLine, setFeedbackLine] = useState("");
+  const { state } = useApp();
+=======
   const [feedbackLine, setFeedbackLine] = useState('');
   const [reading, setReading] = useState(false);
   const [feynmanOpen, setFeynmanOpen] = useState(false);
   const { state, addXp, flagStruggle } = useApp();
+main
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
   // A completed chapter's quiz can still be replayed (SubjectView never locks a 'done' node) —
   // without this guard, replaying it would mint free XP on every correct tap, forever. The first
@@ -573,6 +757,17 @@ function Quiz({
         }
         return ns;
       });
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+      const parentRect = (
+        event.currentTarget as HTMLElement
+      ).parentElement?.getBoundingClientRect();
+      setXpPop({
+        x: rect.left - (parentRect?.left ?? 0) + rect.width / 2,
+        y: rect.top - (parentRect?.top ?? 0),
+      });
+      setTimeout(() => setXpPop(null), 900);
+=======
       // A replayed, already-completed chapter earns nothing (see alreadyCompleted above) — the
       // +10 popup used to fire unconditionally here, which used to be a harmless lie back when
       // addXp was never called either way, but would become a real one now that a first pass
@@ -587,6 +782,7 @@ function Quiz({
         });
         setTimeout(() => setXpPop(null), 900);
       }
+main
     } else {
       sfx.wrong(soundOn);
       setFeedbackLine(quizWrong(voiceCtx));
@@ -651,20 +847,20 @@ function Quiz({
       setIdx((i) => i + 1);
       setSelected(null);
       setShowExplain(false);
-      setFeedbackLine('');
+      setFeedbackLine("");
     }
   };
 
   if (done) {
-    const stars = score >= questions.length ? '★★★' : score >= questions.length * 0.6 ? '★★' : '★';
+    const stars = score >= questions.length ? "★★★" : score >= questions.length * 0.6 ? "★★" : "★";
     return (
       <div className="quiz-summary2">
         <div className="stars">{stars}</div>
         <div className="big-score">
           {score}/{questions.length}
         </div>
-        <p style={{ color: 'var(--ink-soft)', fontSize: '0.85rem' }}>
-          {score >= questions.length * 0.6 ? 'Beau travail !' : 'Continue, tu vas progresser !'}
+        <p style={{ color: "var(--ink-soft)", fontSize: "0.85rem" }}>
+          {score >= questions.length * 0.6 ? "Beau travail !" : "Continue, tu vas progresser !"}
         </p>
         <button className="btn-block blue" style={{ marginTop: 20 }} onClick={onComplete}>
           Terminer la leçon
@@ -673,6 +869,30 @@ function Quiz({
     );
   }
 
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+  const userAnswerText =
+    q.type === "mcq" && q.options
+      ? (q.options[selected ?? -1] ?? "")
+      : selected === 1
+        ? "Vrai"
+        : "Faux";
+
+  return (
+    <div className="quiz-card" style={{ position: "relative" }}>
+      {xpPop && (
+        <div className="xp-pop" style={{ left: xpPop.x, top: xpPop.y }}>
+          +10 XP
+        </div>
+      )}
+      <div className="quiz-head">
+        <div className="quiz-dots">
+          {questions.map((_, i) => (
+            <span key={i} className={i < idx ? "done" : i === idx ? "now" : ""} />
+          ))}
+        </div>
+        <div className={`quiz-streak-badge ${showStreak ? "show" : ""}`}>
+          <Flame size={14} /> {streak} de suite !
+=======
   return (
     <>
       <div className="quiz-card" style={{ position: 'relative' }}>
@@ -690,6 +910,7 @@ function Quiz({
           <div className={`quiz-streak-badge ${showStreak ? 'show' : ''}`}>
             <Flame size={14} /> {streak} de suite !
           </div>
+main
         </div>
         <div className="quiz-tag2">Question {idx + 1}</div>
         <div className="quiz-q2">{q.q}</div>
@@ -716,6 +937,47 @@ function Quiz({
           </div>
         )}
 
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+      {q.type === "mcq" && q.options && (
+        <div>
+          {q.options.map((opt, i) => (
+            <button
+              key={i}
+              className={`quiz-opt2 ${
+                selected !== null && i === q.answer ? "correct" : selected === i ? "wrong" : ""
+              }`}
+              onClick={(e) => handleAnswer(i, e)}
+              disabled={selected !== null}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {q.type === "vf" && (
+        <div className="quiz-vf2">
+          <button
+            className={
+              selected !== null && q.answer === 1 ? "correct" : selected === 1 ? "wrong" : ""
+            }
+            onClick={(e) => handleAnswer(1, e)}
+            disabled={selected !== null}
+          >
+            <Check size={16} />
+            Vrai
+          </button>
+          <button
+            className={
+              selected !== null && q.answer === 0 ? "correct" : selected === 0 ? "wrong" : ""
+            }
+            onClick={(e) => handleAnswer(0, e)}
+            disabled={selected !== null}
+          >
+            <X size={16} />
+            Faux
+          </button>
+=======
         {q.type === 'vf' && (
           <div>
             <div className="quiz-vf2">
@@ -751,8 +1013,29 @@ function Quiz({
 
         <div className={`quiz-fb2 ${selected === q.answer ? 'ok' : ''}`}>
           {selected !== null && feedbackLine}
+main
         </div>
 
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+      <div className={`quiz-fb2 ${selected === q.answer ? "ok" : ""}`}>
+        {selected !== null && feedbackLine}
+      </div>
+
+      <div className={`braise-explain ${showExplain ? "show" : ""}`}>
+        <BraiseMascot
+          size={34}
+          mood={selected !== null && selected !== q.answer ? "hesitant" : "happy"}
+        />
+        <div>
+          <div className="bx-title">Braise t'explique</div>
+          <div className="bx-text">{q.explain}</div>
+          {selected !== null && selected !== q.answer && (
+            <button className="quiz-bridge-btn" onClick={() => onBridge(q.q, userAnswerText)}>
+              <MessageSquare size={15} />
+              Comprendre ce piège avec Braise
+            </button>
+          )}
+=======
         <div className={`braise-explain ${showExplain ? 'show' : ''}`}>
           <BraiseMascot size={34} mood={needsHelp ? 'hesitant' : 'happy'} />
           <div style={{ minWidth: 0 }}>
@@ -789,6 +1072,7 @@ function Quiz({
               </>
             )}
           </div>
+main
         </div>
 
         {showExplain && (
@@ -798,6 +1082,12 @@ function Quiz({
         )}
       </div>
 
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+      {showExplain && (
+        <button className="btn-block blue" style={{ marginTop: 16 }} onClick={next}>
+          {idx + 1 >= questions.length ? "Voir mon score" : "Question suivante"}
+        </button>
+=======
       {feynmanOpen && (
         <BraiseFeynmanDrawer
           topic={topic}
@@ -807,6 +1097,7 @@ function Quiz({
           soundOn={soundOn}
           onClose={() => setFeynmanOpen(false)}
         />
+main
       )}
     </>
   );

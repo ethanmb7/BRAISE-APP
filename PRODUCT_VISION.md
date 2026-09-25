@@ -227,6 +227,21 @@ au reste sans répéter les mêmes informations.
 
 ### Placement de chaque fonction
 
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+| Fonction                     | Lieu principal      | Rappel autorisé sur Aujourd'hui                |
+| ---------------------------- | ------------------- | ---------------------------------------------- |
+| Activité en cours            | Matière ou activité | Carte prioritaire « Reprendre »                |
+| Pioche du Jour               | Aujourd'hui         | Carte compacte si rien n'est en cours          |
+| Objectif quotidien           | Aujourd'hui         | Ligne de progression légère                    |
+| Notions dues                 | Réviser             | Une relance « À consolider » si nécessaire     |
+| Matières et chapitres        | Apprendre           | Aperçu limité et accès « Tout voir »           |
+| Série                        | Moi                 | Compteur compact dans l'en-tête                |
+| Aura et rang                 | Moi                 | Résumé discret lié au profil                   |
+| Joker de série               | Moi > Série         | Seulement lorsqu'il est consommé ou nécessaire |
+| Badges et apparences         | Moi                 | Célébration au déblocage                       |
+| Préférences et accessibilité | Moi > Mon confort   | Aucun raccourci permanent sur l'accueil        |
+| Partage                      | Résultat ou Moi     | Jamais comme action concurrente sur l'accueil  |
+=======
 | Fonction | Lieu principal | Rappel autorisé sur Aujourd'hui |
 | --- | --- | --- |
 | Activité en cours | Matière ou activité | Carte prioritaire « Reprendre » |
@@ -240,6 +255,7 @@ au reste sans répéter les mêmes informations.
 | Badges et apparences | Moi | Célébration au déblocage |
 | Préférences et accessibilité | Moi > Mon confort | Aucun raccourci permanent sur l'accueil |
 | Partage | Résultat ou Moi | Jamais comme action concurrente sur l'accueil |
+main
 
 ### Priorité contextuelle d'Aujourd'hui
 
@@ -276,6 +292,9 @@ plusieurs grandes cartes concurrentes.
 Le joker, le bouton Réviser, les réglages et les statistiques détaillées ne vivent plus dans le
 HUD. La Pioche conserve Braise à 88 px mais place matière, titre, durée, volume et CTA dans une
 composition horizontale compacte.
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+=======
 
 « Navigation persistante » ci-dessus désigne les quatre onglets de la section 3 (Aujourd'hui,
 Réviser, Aura, Moi) — pas une cinquième destination à inventer.
+main

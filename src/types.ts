@@ -1,4 +1,19 @@
 export type ViewId =
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+  | "onboarding"
+  | "home"
+  | "learn"
+  | "revisions"
+  | "progres"
+  | "subject"
+  | "lesson"
+  | "complete"
+  | "share"
+  | "profile"
+  | "settings";
+
+export type TabId = "home" | "learn" | "revisions" | "profile";
+=======
   | 'onboarding'
   | 'home'
   | 'subjects'
@@ -13,6 +28,7 @@ export type ViewId =
 
 /** `progres` remains accepted for migration/back-navigation from pre-Matières installs. */
 export type TabId = 'home' | 'subjects' | 'revisions' | 'profile' | 'progres';
+main
 
 export type Level = {
   id: string;
@@ -32,7 +48,7 @@ export type Subject = {
 export type Chapter = {
   id: string;
   title: string;
-  status: 'done' | 'current' | 'locked';
+  status: "done" | "current" | "locked";
   mastery: number;
   reinforce?: boolean;
   skip?: boolean;
@@ -53,7 +69,7 @@ export type LessonIntro = {
 };
 
 export type QuizQuestion = {
-  type: 'mcq' | 'vf';
+  type: "mcq" | "vf";
   q: string;
   options?: string[];
   answer: number;
@@ -69,7 +85,7 @@ export type Flashcard = {
   topic: string;
   /** Chapter this card drills, so "Revoir la notion" can open the exact lesson. */
   chapterId: string;
-  level: 'easy' | 'medium' | 'hard';
+  level: "easy" | "medium" | "hard";
 };
 
 export type Badge = {
@@ -79,9 +95,9 @@ export type Badge = {
   cond: string;
 };
 
-export type ChatMessage = { role: 'user' | 'model'; text: string };
+export type ChatMessage = { role: "user" | "model"; text: string };
 
-export type Confidence = 'not-sure' | 'doubt' | 'sure';
+export type Confidence = "not-sure" | "doubt" | "sure";
 
 export type CardReview = {
   repetitions: number;
@@ -91,9 +107,9 @@ export type CardReview = {
   lastConfidence: Confidence;
 };
 
-export type Personality = 'chill' | 'savage';
+export type Personality = "chill" | "savage";
 
-export type AgeGroup = 'college' | 'lycee';
+export type AgeGroup = "college" | "lycee";
 
 export type UserProfile = {
   name: string;
@@ -133,7 +149,7 @@ export type AppState = {
   currentChapterId: string | null;
   lastSubjectId: string | null;
   lastChapterId: string | null;
-  currentLessonMode: 'vocal' | 'echanger';
+  currentLessonMode: "vocal" | "echanger";
   completedChapters: string[];
   /** Chapters whose lesson quiz revealed a real miss (wrong answer or an honest "Je ne sais
    *  pas") and hasn't been resolved since — the real signal behind Chapter.reinforce, computed

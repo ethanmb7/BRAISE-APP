@@ -1,9 +1,9 @@
-import { LEVELS } from '@/data';
-import type { AgeGroup, Personality } from '@/types';
+import { LEVELS } from "@/data";
+import type { AgeGroup, Personality } from "@/types";
 
 export function getAgeGroup(levelId: string | null | undefined): AgeGroup {
   const lvl = LEVELS.find((l) => l.id === levelId);
-  return lvl?.group === 'Lycée' ? 'lycee' : 'college';
+  return lvl?.group === "Lycée" ? "lycee" : "college";
 }
 
 export type VoiceCtx = { personality: Personality; age: AgeGroup };
@@ -19,10 +19,26 @@ function byCombo(ctx: VoiceCtx, table: Record<string, string[]>): string {
 
 export function quizCorrect(ctx: VoiceCtx): string {
   return byCombo(ctx, {
-    'chill-college': ['Nickel, bien joué ! 🎉', 'Yes ! T\'as capté du premier coup.', 'Trop bien, continue comme ça !'],
-    'chill-lycee': ['Clean. T\'as le niveau.', 'Bien vu, c\'est du solide.', 'Nickel, tu maîtrises le sujet.'],
-    'savage-college': ['Ah quand même, j\'commençais à stresser.', 'Pas mal pour un mardi.', 'Ok là je suis bluffé, avoue.'],
-    'savage-lycee': ['Tiens, un neurone qui bosse. Respect.', 'Correct. Le bac te dit merci.', 'Bon ok, t\'as le droit d\'être fier de toi.'],
+    "chill-college": [
+      "Nickel, bien joué ! 🎉",
+      "Yes ! T'as capté du premier coup.",
+      "Trop bien, continue comme ça !",
+    ],
+    "chill-lycee": [
+      "Clean. T'as le niveau.",
+      "Bien vu, c'est du solide.",
+      "Nickel, tu maîtrises le sujet.",
+    ],
+    "savage-college": [
+      "Bien joué, tu as trouvé le bon réflexe.",
+      "Ça, c’est une réponse solide.",
+      "Oui ! Tu tiens le raisonnement.",
+    ],
+    "savage-lycee": [
+      "Bien vu, le raisonnement est propre.",
+      "Correct. Tu peux être fier de ce résultat.",
+      "Solide : tu as repéré l’idée essentielle.",
+    ],
   });
 }
 
@@ -32,10 +48,26 @@ export function quizCorrect(ctx: VoiceCtx): string {
 // quizWrong, its sibling for the other kind of miss (falling for an actual trap).
 export function missedTruth(ctx: VoiceCtx): string {
   return byCombo(ctx, {
-    'chill-college': ['Pas de piège cette fois, celle-là était vraie !', 'Fausse alerte : elle était bonne, en fait.', 'Aucune intox ici, tu as flairé un piège qui n\'existait pas.'],
-    'chill-lycee': ['Pas de piège, celle-là était correcte.', 'Fausse alerte, cette fois c\'était la vérité.', 'Tu as flairé un piège qui n\'était pas là.'],
-    'savage-college': ['Ah non, celle-là était clean, fallait me faire confiance.', 'Trop de méfiance : elle était vraie, cette fois.', 'Raté, y\'avait pas d\'arnaque sur ce coup.'],
-    'savage-lycee': ['Celle-là était réglo, fallait valider.', 'Excès de méfiance : elle était vraie.', 'Pas d\'embrouille ici, juste la vérité toute simple.'],
+    "chill-college": [
+      "Pas de piège cette fois, celle-là était vraie !",
+      "Fausse alerte : elle était bonne, en fait.",
+      "Aucune intox ici, tu as flairé un piège qui n'existait pas.",
+    ],
+    "chill-lycee": [
+      "Pas de piège, celle-là était correcte.",
+      "Fausse alerte, cette fois c'était la vérité.",
+      "Tu as flairé un piège qui n'était pas là.",
+    ],
+    "savage-college": [
+      "Ah non, celle-là était clean, fallait me faire confiance.",
+      "Trop de méfiance : elle était vraie, cette fois.",
+      "Raté, y'avait pas d'arnaque sur ce coup.",
+    ],
+    "savage-lycee": [
+      "Celle-là était réglo, fallait valider.",
+      "Excès de méfiance : elle était vraie.",
+      "Pas d'embrouille ici, juste la vérité toute simple.",
+    ],
   });
 }
 
@@ -52,21 +84,49 @@ export function quizDontKnow(ctx: VoiceCtx): string {
 }
 
 export function quizWrong(ctx: VoiceCtx, topic?: string): string {
-  const t = topic ? ` sur ${topic}` : '';
+  const t = topic ? ` sur ${topic}` : "";
   return byCombo(ctx, {
-    'chill-college': [`Pas grave${t}, on retient juste l'astuce pour la prochaine fois !`, 'Oups, ça arrive à tout le monde. On regarde pourquoi ?', 'Aucun stress, c\'est comme ça qu\'on progresse.'],
-    'chill-lycee': [`Raté${t}, mais c'est un classique. On décortique.`, 'Pas de souci, c\'est exactement le genre de piège à repérer.', 'Ok, petite erreur — regardons ce qui a coincé.'],
-    'savage-college': [`Aïe${t}... on va dire que c'était un tir d'échauffement.`, 'Bon, celle-là on l\'efface de ta mémoire, ok ?', 'Areuh. Même Braise a mal pour toi là.'],
-    'savage-lycee': [`Sérieux${t}, tu m'as fait mal au cœur là...`, 'Alors ça, c\'est ce qu\'on appelle un classique du contrôle raté.', 'Le correcteur du bac aurait pleuré. On corrige, vite.'],
+    "chill-college": [
+      `Pas grave${t}, on retient juste l'astuce pour la prochaine fois !`,
+      "Oups, ça arrive à tout le monde. On regarde pourquoi ?",
+      "Aucun stress, c'est comme ça qu'on progresse.",
+    ],
+    "chill-lycee": [
+      `Raté${t}, mais c'est un classique. On décortique.`,
+      "Pas de souci, c'est exactement le genre de piège à repérer.",
+      "Ok, petite erreur — regardons ce qui a coincé.",
+    ],
+    "savage-college": [
+      `Le piège était bien caché${t}. On le démonte ensemble.`,
+      "Celle-là était trompeuse. Regarde le détail qui change tout.",
+      "Pas grave : cette erreur nous montre exactement quoi retravailler.",
+    ],
+    "savage-lycee": [
+      `Le piège était subtil${t}. On regarde ce qui a coincé.`,
+      "C’est une confusion classique. On la corrige maintenant.",
+      "On a trouvé le point fragile. Deux étapes et ce sera plus clair.",
+    ],
   });
 }
 
 export function lessonComplete(ctx: VoiceCtx, name: string): string {
   return byCombo(ctx, {
-    'chill-college': [`Trop bien, "${name}" est pliée ! T'as géré.`, `"${name}" dans la poche, bravo à toi.`],
-    'chill-lycee': [`"${name}" bouclée. Beau travail, sérieusement.`, `Chapitre "${name}" validé. Tu tiens le rythme.`],
-    'savage-college': [`"${name}" terminée. J'avoue, j'suis fier (un peu).`, `Ok t'as survécu à "${name}". Pas si nul finalement.`],
-    'savage-lycee': [`"${name}" pliée. Le bac recule d'un pas, terrifié.`, `Bon, "${name}" c'est réglé. On efface, on passe à la suite.`],
+    "chill-college": [
+      `Trop bien, "${name}" est pliée ! T'as géré.`,
+      `"${name}" dans la poche, bravo à toi.`,
+    ],
+    "chill-lycee": [
+      `"${name}" bouclée. Beau travail, sérieusement.`,
+      `Chapitre "${name}" validé. Tu tiens le rythme.`,
+    ],
+    "savage-college": [
+      `"${name}" terminée. Tu as gardé le rythme jusqu’au bout.`,
+      `"${name}" est bouclée. Beau travail.`,
+    ],
+    "savage-lycee": [
+      `"${name}" pliée. Une notion de plus que tu tiens vraiment.`,
+      `"${name}" est réglée. Beau travail, on garde cette énergie.`,
+    ],
   });
 }
 
@@ -80,10 +140,22 @@ export function lessonComplete(ctx: VoiceCtx, name: string): string {
  *  clipped for a long name, it should be the flavour text, never the name itself. */
 export function dailyHookLine(ctx: VoiceCtx, userName: string): string {
   return byCombo(ctx, {
-    'chill-college': [`Salut ${userName} ! Ta pioche du jour est prête 🧠`, `${userName}, ton casse-tête du jour t'attend 🧠`],
-    'chill-lycee': [`${userName}, ta session du jour, tranquille 🧠`, `Salut ${userName}, pioche du jour à ton rythme 🧠`],
-    'savage-college': [`${userName}, le sort a tranché. Bouge-toi 🔥`, `${userName}, ta pioche du jour. Pas d'échappatoire 🔥`],
-    'savage-lycee': [`${userName}, tirage du jour. Le hasard ne négocie pas 🔥`, `${userName}, pioche du jour, aucune excuse 🔥`],
+    "chill-college": [
+      `Salut ${userName} ! Ta pioche du jour est prête 🧠`,
+      `${userName}, ton casse-tête du jour t'attend 🧠`,
+    ],
+    "chill-lycee": [
+      `${userName}, ta session du jour, tranquille 🧠`,
+      `Salut ${userName}, pioche du jour à ton rythme 🧠`,
+    ],
+    "savage-college": [
+      `${userName}, ta pioche est prête. On la débloque ensemble 🔥`,
+      `${userName}, défi du jour : une notion, à ton rythme 🔥`,
+    ],
+    "savage-lycee": [
+      `${userName}, ta session du jour est prête 🔥`,
+      `${userName}, une notion courte pour garder le rythme 🔥`,
+    ],
   });
 }
 
@@ -92,9 +164,9 @@ export function dailyHookLine(ctx: VoiceCtx, userName: string): string {
 // only needs "what unlocks at this rank", a much smaller fact. Les Flambés : la fuse (Or),
 // la glace (Platine), le phénix (Légende).
 const AVATAR_UNLOCK_BY_RANK: Record<string, string> = {
-  or: 'la fuse',
-  platine: 'la glace',
-  legende: 'le phénix',
+  or: "la fuse",
+  platine: "la glace",
+  legende: "le phénix",
 };
 
 /** The line under Braise's transformation when a real rank threshold (getRankInfo) is crossed —
@@ -107,29 +179,41 @@ export function rankUpLine(ctx: VoiceCtx, rankName: string, rankId?: string): st
   const avatarUnlock = rankId ? AVATAR_UNLOCK_BY_RANK[rankId] : undefined;
   if (avatarUnlock) {
     return byCombo(ctx, {
-      'chill-college': [
+      "chill-college": [
         `Nouveau rang débloqué : ${rankName} ! Et ${avatarUnlock} pour ton avatar en bonus.`,
         `Tu passes ${rankName} ! Va vite jeter un œil à ton avatar, ${avatarUnlock} t'attend.`,
       ],
-      'chill-lycee': [
+      "chill-lycee": [
         `Rang ${rankName} débloqué, avec ${avatarUnlock} pour ton avatar en prime.`,
         `Nouveau rang : ${rankName}. Ton avatar vient de gagner ${avatarUnlock}.`,
       ],
-      'savage-college': [
+      "savage-college": [
         `${rankName} débloqué, et ${avatarUnlock} avec. Même moi je suis impressionné.`,
         `Rang ${rankName}. Ton avatar récupère ${avatarUnlock} au passage.`,
       ],
-      'savage-lycee': [
+      "savage-lycee": [
         `Rang ${rankName}. Le classement tremble, et ton avatar aussi — ${avatarUnlock} t'attend.`,
         `${rankName} débloqué. Ton avatar gagne ${avatarUnlock}, le bac recule encore d'un pas.`,
       ],
     });
   }
   return byCombo(ctx, {
-    'chill-college': [`Nouveau rang débloqué : ${rankName} ! Trop fort.`, `Tu passes ${rankName} ! Continue comme ça.`],
-    'chill-lycee': [`Rang ${rankName} débloqué. Beau parcours.`, `Nouveau rang : ${rankName}. Bien joué.`],
-    'savage-college': [`${rankName} débloqué. Même moi je suis impressionné.`, `Rang ${rankName}. Pas mal pour un mardi.`],
-    'savage-lycee': [`Rang ${rankName}. Le classement tremble.`, `${rankName} débloqué. Le bac recule encore d'un pas.`],
+    "chill-college": [
+      `Nouveau rang débloqué : ${rankName} ! Trop fort.`,
+      `Tu passes ${rankName} ! Continue comme ça.`,
+    ],
+    "chill-lycee": [
+      `Rang ${rankName} débloqué. Beau parcours.`,
+      `Nouveau rang : ${rankName}. Bien joué.`,
+    ],
+    "savage-college": [
+      `${rankName} débloqué. Même moi je suis impressionné.`,
+      `Rang ${rankName}. Pas mal pour un mardi.`,
+    ],
+    "savage-lycee": [
+      `Rang ${rankName}. Le classement tremble.`,
+      `${rankName} débloqué. Le bac recule encore d'un pas.`,
+    ],
   });
 }
 
@@ -139,10 +223,10 @@ export function rankUpLine(ctx: VoiceCtx, rankName: string, rankId?: string): st
 // call him out, not as an exercise header.
 export function judgePrompt(ctx: VoiceCtx): string {
   return byCombo(ctx, {
-    'chill-college': ['Je dis vrai ou je raconte n\'importe quoi ?', 'Tu me crois, ou pas ?'],
-    'chill-lycee': ['Vrai, ou je raconte n\'importe quoi ?', 'Tu valides ou tu me cales ?'],
-    'savage-college': ['Alors, je bluffe ou pas ?', 'Ose me dire que c\'est faux.'],
-    'savage-lycee': ['Je bluffe, ou pas ?', 'Vas-y, cale-moi si tu peux.'],
+    "chill-college": ["Je dis vrai ou je raconte n'importe quoi ?", "Tu me crois, ou pas ?"],
+    "chill-lycee": ["Vrai, ou je raconte n'importe quoi ?", "Tu valides ou tu me cales ?"],
+    "savage-college": ["Alors, je bluffe ou pas ?", "Ose me dire que c'est faux."],
+    "savage-lycee": ["Je bluffe, ou pas ?", "Vas-y, cale-moi si tu peux."],
   });
 }
 
@@ -151,88 +235,157 @@ export function judgePrompt(ctx: VoiceCtx): string {
 // nine times identically; Braise's own line underneath already rotates, the tag it sits next to
 // didn't. Same byCombo system as the rest of this file, so the tag's energy tracks the chosen
 // personality/age too, not just the outcome.
-export function verdictTag(ctx: VoiceCtx, kind: 'carre' | 'super' | 'aie' | 'grille'): string {
+export function verdictTag(ctx: VoiceCtx, kind: "carre" | "super" | "aie" | "grille"): string {
   const tables: Record<typeof kind, Record<string, string[]>> = {
     carre: {
-      'chill-college': ["💯 C'est carré", '🎯 Dans le mille', '🔥 Nickel', '✅ Carton plein'],
-      'chill-lycee': ["💯 C'est carré", '🎯 En plein dans le mille', '✅ Solide', '🔥 Propre'],
-      'savage-college': ["💯 C'est carré", '🎯 Boum, dans le mille', '😎 Pas mal du tout', '🔥 Ça envoie'],
-      'savage-lycee': ["💯 C'est carré", '🎯 Dans le mille', '😏 Pas si nul finalement', '🔥 Ça poutre'],
+      "chill-college": ["💯 C'est carré", "🎯 Dans le mille", "🔥 Nickel", "✅ Carton plein"],
+      "chill-lycee": ["💯 C'est carré", "🎯 En plein dans le mille", "✅ Solide", "🔥 Propre"],
+      "savage-college": [
+        "💯 C'est carré",
+        "🎯 Boum, dans le mille",
+        "😎 Pas mal du tout",
+        "🔥 Ça envoie",
+      ],
+      "savage-lycee": [
+        "💯 C'est carré",
+        "🎯 Dans le mille",
+        "😏 Pas si nul finalement",
+        "🔥 Ça poutre",
+      ],
     },
     super: {
-      'chill-college': ['⚡ Super Braise', '⚡ Double ou rien, gagné', '⚡ Boum, ×2'],
-      'chill-lycee': ['⚡ Super Braise', '⚡ Coup double réussi', '⚡ ×2, propre'],
-      'savage-college': ['⚡ Super Braise', '⚡ Coup critique !', "⚡ Boum, ×2, t'as osé"],
-      'savage-lycee': ['⚡ Super Braise', '⚡ Coup critique', '⚡ ×2 assumé'],
+      "chill-college": ["⚡ Super Braise", "⚡ Double ou rien, gagné", "⚡ Boum, ×2"],
+      "chill-lycee": ["⚡ Super Braise", "⚡ Coup double réussi", "⚡ ×2, propre"],
+      "savage-college": ["⚡ Super Braise", "⚡ Coup critique !", "⚡ Boum, ×2, t'as osé"],
+      "savage-lycee": ["⚡ Super Braise", "⚡ Coup critique", "⚡ ×2 assumé"],
     },
     aie: {
-      'chill-college': ['🙈 Aïe', '😬 Raté de peu', "🙊 Dommage, c'était vrai"],
-      'chill-lycee': ['🙈 Aïe', '😬 Presque', '🙊 Celle-là était bonne pourtant'],
-      'savage-college': ['🙈 Aïe', '😬 Tu doutes trop', '🙊 Fallait me faire confiance'],
-      'savage-lycee': ['🙈 Aïe', '😬 Trop de méfiance, là', '🙊 Elle était clean pourtant'],
+      "chill-college": ["🙈 Aïe", "😬 Raté de peu", "🙊 Dommage, c'était vrai"],
+      "chill-lycee": ["🙈 Aïe", "😬 Presque", "🙊 Celle-là était bonne pourtant"],
+      "savage-college": ["🙈 Presque", "😬 Bien tenté", "🙊 Pas de piège ici"],
+      "savage-lycee": ["🙈 Presque", "😬 Doute légitime", "🙊 Elle était correcte"],
     },
     grille: {
-      'chill-college': ['💀 Grillé', '🎭 Dans le panneau', '🙃 Roulé'],
-      'chill-lycee': ['💀 Grillé', '🎭 Piégé en beauté', '🙃 Roulé dans la farine'],
-      'savage-college': ['💀 Grillé', '🎭 Direct dans le panneau', '😵 Piégé comme un débutant'],
-      'savage-lycee': ['💀 Grillé', '🎭 Tombé dans le panneau', '😵 Roulé sans forcer'],
+      "chill-college": ["💀 Grillé", "🎭 Dans le panneau", "🙃 Roulé"],
+      "chill-lycee": ["💀 Grillé", "🎭 Piégé en beauté", "🙃 Roulé dans la farine"],
+      "savage-college": ["💡 Piège repéré", "🎭 Bien caché", "😵 À revoir ensemble"],
+      "savage-lycee": ["💡 Piège repéré", "🎭 Confusion trouvée", "😵 On décortique"],
     },
   };
   return byCombo(ctx, tables[kind]);
 }
 
-export function dailyPickLine(ctx: VoiceCtx, userName: string, subjectName: string, chapterTitle: string, duration: number): string {
+export function dailyPickLine(
+  ctx: VoiceCtx,
+  userName: string,
+  subjectName: string,
+  chapterTitle: string,
+  duration: number,
+): string {
   return byCombo(ctx, {
-    'chill-college': [`Salut ${userName} ! Aujourd'hui, Braise a pioché "${chapterTitle}" (${subjectName}) pour toi. ${duration} min, zéro pression.`],
-    'chill-lycee': [`${userName}, pioche du jour : "${chapterTitle}" en ${subjectName}. ${duration} minutes, tranquille.`],
-    'savage-college': [`${userName}, le sort en a décidé : "${chapterTitle}" (${subjectName}). Tu peux pas fuir, désolé.`],
-    'savage-lycee': [`${userName}, tirage au sort du jour : "${chapterTitle}" en ${subjectName}. Le hasard ne négocie pas.`],
+    "chill-college": [
+      `Salut ${userName} ! Aujourd'hui, Braise a pioché "${chapterTitle}" (${subjectName}) pour toi. ${duration} min, zéro pression.`,
+    ],
+    "chill-lycee": [
+      `${userName}, pioche du jour : "${chapterTitle}" en ${subjectName}. ${duration} minutes, tranquille.`,
+    ],
+    "savage-college": [
+      `${userName}, défi du jour : "${chapterTitle}" (${subjectName}). On le débloque ensemble.`,
+    ],
+    "savage-lycee": [
+      `${userName}, session du jour : "${chapterTitle}" en ${subjectName}. Courte et ciblée.`,
+    ],
   });
 }
 
 export function duelIntro(ctx: VoiceCtx): string {
   return byCombo(ctx, {
-    'chill-college': ['Petit défi entre nous : qui répond juste le plus vite ?', 'On fait la course ? Toi contre moi, 60 secondes.'],
-    'chill-lycee': ['Un petit duel chrono, histoire de pimenter la révision ?', '60 secondes, toi contre Braise. Prêt ?'],
-    'savage-college': ['Duel officiel : toi vs moi. Spoiler, je gagne souvent.', 'On va voir si t\'as vraiment révisé ou juste ouvert le cahier.'],
-    'savage-lycee': ['Duel chrono. Si tu perds contre une IA, on n\'en parle à personne.', '60 secondes pour me prouver que t\'as pas juste scrollé tes révisions.'],
+    "chill-college": [
+      "Petit défi entre nous : qui répond juste le plus vite ?",
+      "On fait la course ? Toi contre moi, 60 secondes.",
+    ],
+    "chill-lycee": [
+      "Un petit duel chrono, histoire de pimenter la révision ?",
+      "60 secondes, toi contre Braise. Prêt ?",
+    ],
+    "savage-college": [
+      "Duel officiel : toi vs moi. Spoiler, je gagne souvent.",
+      "On teste tes réflexes ? Une minute, sans pression.",
+    ],
+    "savage-lycee": [
+      "Duel chrono : une minute pour tester ce qui tient déjà.",
+      "60 secondes pour repérer tes acquis et le prochain point à revoir.",
+    ],
   });
 }
 
 export function duelResult(ctx: VoiceCtx, won: boolean): string {
   if (won) {
     return byCombo(ctx, {
-      'chill-college': ['T\'as gagné, franchement bien joué !', 'GG ! Tu m\'as mis une belle raclée.'],
-      'chill-lycee': ['Victoire méritée, bien joué.', 'GG, la révision a payé.'],
-      'savage-college': ['Ok ok tu gagnes. Cette fois.', 'Bon d\'accord, t\'es fort. Content ?'],
-      'savage-lycee': ['Tu gagnes. Je vais recalculer mes probabilités.', 'GG. Le bac a intérêt à se méfier.'],
+      "chill-college": [
+        "T'as gagné, franchement bien joué !",
+        "GG ! Tu m'as mis une belle raclée.",
+      ],
+      "chill-lycee": ["Victoire méritée, bien joué.", "GG, la révision a payé."],
+      "savage-college": ["Ok ok tu gagnes. Cette fois.", "Bon d'accord, t'es fort. Content ?"],
+      "savage-lycee": [
+        "Tu gagnes. Je vais recalculer mes probabilités.",
+        "GG. Le bac a intérêt à se méfier.",
+      ],
     });
   }
   return byCombo(ctx, {
-    'chill-college': ['Perdu de peu, on retente ?', 'Presque ! Encore un petit effort.'],
-    'chill-lycee': ['Défaite honorable, on refait un round ?', 'Pas cette fois, mais c\'était serré.'],
-    'savage-college': ['J\'ai gagné. Sans surprise, mais gg quand même.', 'Perdu ! Bon, c\'était couru d\'avance.'],
-    'savage-lycee': ['Victoire de Braise. La machine ne dort jamais.', 'Perdu. Le café ce soir, tu le mérites pas.'],
+    "chill-college": ["Perdu de peu, on retente ?", "Presque ! Encore un petit effort."],
+    "chill-lycee": [
+      "Défaite honorable, on refait un round ?",
+      "Pas cette fois, mais c'était serré.",
+    ],
+    "savage-college": [
+      "Cette manche est pour moi. On retente ?",
+      "Pas cette fois, mais tu sais maintenant quoi retravailler.",
+    ],
+    "savage-lycee": [
+      "Cette manche est pour Braise. On inverse au prochain tour ?",
+      "Pas cette fois. On revoit le point fragile et on retente.",
+    ],
   });
 }
 
 /** Closing check-in line after Braise proactively opens a lesson conversation. */
 export function lessonOpenerCheckIn(ctx: VoiceCtx): string {
   return byCombo(ctx, {
-    'chill-college': ['Ça te parle ou tu veux que je réexplique un bout ?', 'Dis-moi si un truc est flou, on reprend ensemble.'],
-    'chill-lycee': ['Ça va, t\'as suivi ? Dis-moi si un point mérite d\'être creusé.', 'Tout est clair ou il y a un passage à revoir ?'],
-    'savage-college': ['Bon, t\'as suivi ou je parle dans le vide ?', 'Alors, ça capte ou faut un dessin ?'],
-    'savage-lycee': ['T\'as capté ou faut que je répète comme si t\'avais 6 ans ?', 'Bon spoiler : c\'est pas si dur. T\'en es où ?'],
+    "chill-college": [
+      "Ça te parle ou tu veux que je réexplique un bout ?",
+      "Dis-moi si un truc est flou, on reprend ensemble.",
+    ],
+    "chill-lycee": [
+      "Ça va, t'as suivi ? Dis-moi si un point mérite d'être creusé.",
+      "Tout est clair ou il y a un passage à revoir ?",
+    ],
+    "savage-college": [
+      "Ça clique ou tu veux un autre exemple ?",
+      "Dis-moi ce qui bloque encore, on change d’approche.",
+    ],
+    "savage-lycee": [
+      "Tu veux une autre façon de l’expliquer ?",
+      "Dis-moi le passage qui reste flou, on le reprend autrement.",
+    ],
   });
 }
 
 /** Invitation for the student to explain a concept back to Braise in their own words (Feynman technique). */
 export function feynmanInvite(ctx: VoiceCtx, topic: string): string {
   return byCombo(ctx, {
-    'chill-college': [`Fais comme si j'avais 10 ans et que je connaissais rien à "${topic}" — tu m'expliques ?`],
-    'chill-lycee': [`Explique-moi "${topic}" comme si je découvrais complètement le sujet, vas-y je t'écoute.`],
-    'savage-college': [`Allez, prouve-moi que t'as pas juste zappé le cours. Explique-moi "${topic}" façon débutant total.`],
-    'savage-lycee': [`Vas-y, convaincs-moi que t'as vraiment compris "${topic}" — explique comme si j'avais zéro base.`],
+    "chill-college": [
+      `Fais comme si j'avais 10 ans et que je connaissais rien à "${topic}" — tu m'expliques ?`,
+    ],
+    "chill-lycee": [
+      `Explique-moi "${topic}" comme si je découvrais complètement le sujet, vas-y je t'écoute.`,
+    ],
+    "savage-college": [`À toi de jouer : explique-moi "${topic}" comme si je le découvrais.`],
+    "savage-lycee": [
+      `Vas-y, convaincs-moi que t'as vraiment compris "${topic}" — explique comme si j'avais zéro base.`,
+    ],
   });
 }
 
@@ -241,25 +394,25 @@ export function feynmanInvite(ctx: VoiceCtx, topic: string): string {
  *  now, giving a real reason to check back instead of a static caption. */
 export function profileReactionLine(
   ctx: VoiceCtx,
-  facts: { rankName: string; streak: number; badgesUnlocked: number; badgesTotal: number }
+  facts: { rankName: string; streak: number; badgesUnlocked: number; badgesTotal: number },
 ): string {
   const { rankName, streak, badgesUnlocked, badgesTotal } = facts;
   if (streak > 0) {
     return byCombo(ctx, {
-      'chill-college': [
-        `${rankName}, ${streak} jour${streak > 1 ? 's' : ''} de suite, ${badgesUnlocked}/${badgesTotal} badges. Tu construis un truc solide.`,
-        `Série de ${streak} jour${streak > 1 ? 's' : ''} en cours, rang ${rankName}. J'suis fan de la régularité.`,
+      "chill-college": [
+        `${rankName}, ${streak} jour${streak > 1 ? "s" : ""} de suite, ${badgesUnlocked}/${badgesTotal} badges. Tu construis un truc solide.`,
+        `Série de ${streak} jour${streak > 1 ? "s" : ""} en cours, rang ${rankName}. J'suis fan de la régularité.`,
       ],
-      'chill-lycee': [
-        `Rang ${rankName}, ${streak} jour${streak > 1 ? 's' : ''} d'affilée. La régularité paie, continue.`,
+      "chill-lycee": [
+        `Rang ${rankName}, ${streak} jour${streak > 1 ? "s" : ""} d'affilée. La régularité paie, continue.`,
         `${badgesUnlocked}/${badgesTotal} badges, série de ${streak}. Beau parcours jusqu'ici.`,
       ],
-      'savage-college': [
-        `${streak} jour${streak > 1 ? 's' : ''} de suite et rang ${rankName}. Ok, je suis un peu impressionné.`,
+      "savage-college": [
+        `${streak} jour${streak > 1 ? "s" : ""} de suite et rang ${rankName}. Ok, je suis un peu impressionné.`,
         `${rankName}, série de ${streak}. T'as pas lâché, respect.`,
       ],
-      'savage-lycee': [
-        `Rang ${rankName}, ${streak} jour${streak > 1 ? 's' : ''} de suite. Le bac commence à avoir peur.`,
+      "savage-lycee": [
+        `Rang ${rankName}, ${streak} jour${streak > 1 ? "s" : ""} de suite. Le bac commence à avoir peur.`,
         `${badgesUnlocked}/${badgesTotal} badges, série de ${streak} jours. Pas mal pour quelqu'un qui prétend s'en ficher.`,
       ],
     });
@@ -271,19 +424,19 @@ export function profileReactionLine(
   // (already built, just never wired to this state) and a real "reprendre" action in the UI —
   // resting, not disappointed.
   return byCombo(ctx, {
-    'chill-college': [
+    "chill-college": [
       `Rang ${rankName}, ${badgesUnlocked}/${badgesTotal} badges. Une carte suffit pour relancer une série.`,
       `${rankName} avec ${badgesUnlocked}/${badgesTotal} badges déjà en poche. Prêt pour une nouvelle série ?`,
     ],
-    'chill-lycee': [
+    "chill-lycee": [
       `Rang ${rankName}, ${badgesUnlocked}/${badgesTotal} badges au compteur. Une carte suffit pour relancer une série.`,
       `${badgesUnlocked}/${badgesTotal} badges, rang ${rankName}. Une série de plus et le tableau est complet.`,
     ],
-    'savage-college': [
+    "savage-college": [
       `${rankName}, ${badgesUnlocked}/${badgesTotal} badges, aucune série en cours. Une carte, et on repart.`,
       `Rang ${rankName}, zéro série active. Une carte suffit pour la relancer.`,
     ],
-    'savage-lycee': [
+    "savage-lycee": [
       `${rankName}, ${badgesUnlocked}/${badgesTotal} badges, aucune série active. Une carte, et c'est reparti.`,
       `Rang ${rankName} sans série en cours. T'as le niveau — une carte pour la relancer.`,
     ],
@@ -294,17 +447,29 @@ export function profileReactionLine(
 export function progressAdvice(ctx: VoiceCtx, weakSubject?: string, weakTopic?: string): string {
   if (weakSubject && weakTopic) {
     return byCombo(ctx, {
-      'chill-college': [`T'assures sur le reste ! Cette semaine, donne 10 min par jour à "${weakTopic}" en ${weakSubject}, ça va vite débloquer.`],
-      'chill-lycee': [`Belle régularité. Concentre 10 min par jour sur "${weakTopic}" (${weakSubject}) cette semaine, c'est ton point de bascule.`],
-      'savage-college': [`Pas mal dans l'ensemble. Mais "${weakTopic}" en ${weakSubject}... on va dire que ça mérite un peu plus d'attention.`],
-      'savage-lycee': [`Solide globalement. "${weakTopic}" (${weakSubject}) reste ton talon d'Achille — 10 min par jour et c'est réglé.`],
+      "chill-college": [
+        `T'assures sur le reste ! Cette semaine, donne 10 min par jour à "${weakTopic}" en ${weakSubject}, ça va vite débloquer.`,
+      ],
+      "chill-lycee": [
+        `Belle régularité. Concentre 10 min par jour sur "${weakTopic}" (${weakSubject}) cette semaine, c'est ton point de bascule.`,
+      ],
+      "savage-college": [
+        `Pas mal dans l'ensemble. Mais "${weakTopic}" en ${weakSubject}... on va dire que ça mérite un peu plus d'attention.`,
+      ],
+      "savage-lycee": [
+        `Solide globalement. "${weakTopic}" (${weakSubject}) reste ton talon d'Achille — 10 min par jour et c'est réglé.`,
+      ],
     });
   }
   return byCombo(ctx, {
-    'chill-college': ['Aucun point faible détecté, tu gères tout ! Continue comme ça, petit à petit.'],
-    'chill-lycee': ['Rien à signaler côté points faibles — belle régularité, garde le rythme.'],
-    'savage-college': ['Aucun point faible pour l\'instant. Je note, j\'ai les yeux ouverts.'],
-    'savage-lycee': ['Zéro point faible détecté. Impressionnant — ou alors t\'as pas encore essayé les trucs durs.'],
+    "chill-college": [
+      "Aucun point faible détecté, tu gères tout ! Continue comme ça, petit à petit.",
+    ],
+    "chill-lycee": ["Rien à signaler côté points faibles — belle régularité, garde le rythme."],
+    "savage-college": ["Aucun point faible pour l'instant. Je note, j'ai les yeux ouverts."],
+    "savage-lycee": [
+      "Zéro point faible détecté. Impressionnant — ou alors t'as pas encore essayé les trucs durs.",
+    ],
   });
 }
 
@@ -312,12 +477,25 @@ export function progressAdvice(ctx: VoiceCtx, weakSubject?: string, weakTopic?: 
  *  branch, only ever called with a real subject the student has actually mastered at least half of
  *  (see computeBraiseInsight in aura.ts) — never a generic "bravo", always the real subject name
  *  and the real "X/Y cartes" count. */
-export function strongSubjectLine(ctx: VoiceCtx, subjectName: string, masteredCount: number, totalCount: number): string {
+export function strongSubjectLine(
+  ctx: VoiceCtx,
+  subjectName: string,
+  masteredCount: number,
+  totalCount: number,
+): string {
   return byCombo(ctx, {
-    'chill-college': [`En ${subjectName}, t'es solide : ${masteredCount}/${totalCount} cartes maîtrisées. Ça se voit que ça rentre.`],
-    'chill-lycee': [`${subjectName} : ${masteredCount}/${totalCount} cartes maîtrisées. Cette matière-là, tu la tiens.`],
-    'savage-college': [`${masteredCount}/${totalCount} cartes maîtrisées en ${subjectName}. Ok, là je suis obligé d'admettre que tu gères.`],
-    'savage-lycee': [`${subjectName}, ${masteredCount}/${totalCount} cartes. C'est le genre de matière où tu peux plus jouer la modestie.`],
+    "chill-college": [
+      `En ${subjectName}, t'es solide : ${masteredCount}/${totalCount} cartes maîtrisées. Ça se voit que ça rentre.`,
+    ],
+    "chill-lycee": [
+      `${subjectName} : ${masteredCount}/${totalCount} cartes maîtrisées. Cette matière-là, tu la tiens.`,
+    ],
+    "savage-college": [
+      `${masteredCount}/${totalCount} cartes maîtrisées en ${subjectName}. Ok, là je suis obligé d'admettre que tu gères.`,
+    ],
+    "savage-lycee": [
+      `${subjectName}, ${masteredCount}/${totalCount} cartes. C'est le genre de matière où tu peux plus jouer la modestie.`,
+    ],
   });
 }
 
@@ -331,17 +509,26 @@ export function strongSubjectLine(ctx: VoiceCtx, subjectName: string, masteredCo
 export function recapCardsLine(ctx: VoiceCtx, wrongCount: number): string {
   if (wrongCount === 0) {
     return byCombo(ctx, {
-      'chill-college': ['Sans-faute, direct !', 'Zéro erreur, trop fort.'],
-      'chill-lycee': ['Sans-faute. Du solide.', 'Zéro erreur, bien joué.'],
-      'savage-college': ['Sans-faute ? Ok là je suis bluffé.', 'Zéro erreur. Suspect, mais bravo.'],
-      'savage-lycee': ['Sans-faute. Le bac peut trembler.', "Zéro erreur, même moi j'avoue."],
+      "chill-college": ["Sans-faute, direct !", "Zéro erreur, trop fort."],
+      "chill-lycee": ["Sans-faute. Du solide.", "Zéro erreur, bien joué."],
+      "savage-college": ["Sans-faute ? Ok là je suis bluffé.", "Zéro erreur. Suspect, mais bravo."],
+      "savage-lycee": ["Sans-faute. Le bac peut trembler.", "Zéro erreur, même moi j'avoue."],
     });
   }
   return byCombo(ctx, {
-    'chill-college': ['Pas grave, on progresse.', 'Ça arrive à tout le monde, continue.'],
-    'chill-lycee': ["Pas de souci, c'est comme ça qu'on apprend.", 'Ça arrive, on garde le rythme.'],
-    'savage-college': ["Bon, personne n'est parfait. Sauf moi.", 'Quelques loupés, on efface et on repart.'],
-    'savage-lycee': ["Y'a du déchet, mais on avance.", "Pas parfait, mais t'as pas lâché."],
+    "chill-college": ["Pas grave, on progresse.", "Ça arrive à tout le monde, continue."],
+    "chill-lycee": [
+      "Pas de souci, c'est comme ça qu'on apprend.",
+      "Ça arrive, on garde le rythme.",
+    ],
+    "savage-college": [
+      "Bon, personne n'est parfait. Sauf moi.",
+      "Quelques loupés, on efface et on repart.",
+    ],
+    "savage-lycee": [
+      "Quelques points à reprendre, mais on avance.",
+      "Pas parfait, mais tu n'as pas lâché.",
+    ],
   });
 }
 
@@ -349,17 +536,17 @@ export function recapCardsLine(ctx: VoiceCtx, wrongCount: number): string {
 export function recapComboLine(ctx: VoiceCtx, maxCombo: number): string {
   if (maxCombo >= 4) {
     return byCombo(ctx, {
-      'chill-college': ['INARRÊTABLE.', 'T\'ÉTAIS EN FEU.'],
-      'chill-lycee': ['INARRÊTABLE.', 'DU LOURD.'],
-      'savage-college': ['OK LÀ J\'AVOUE.', 'MÊME MOI J\'AI EU PEUR.'],
-      'savage-lycee': ['LE BAC A TREMBLÉ.', 'INARRÊTABLE, ÇA FAIT PEUR.'],
+      "chill-college": ["INARRÊTABLE.", "T'ÉTAIS EN FEU."],
+      "chill-lycee": ["INARRÊTABLE.", "DU LOURD."],
+      "savage-college": ["OK LÀ J'AVOUE.", "MÊME MOI J'AI EU PEUR."],
+      "savage-lycee": ["LE BAC A TREMBLÉ.", "INARRÊTABLE, ÇA FAIT PEUR."],
     });
   }
   return byCombo(ctx, {
-    'chill-college': ['EN FEU.', 'BEAU RYTHME.'],
-    'chill-lycee': ['EN FEU.', 'SOLIDE ENCHAÎNEMENT.'],
-    'savage-college': ['PAS MAL.', 'ÇA VA, ÇA VA.'],
-    'savage-lycee': ['CORRECT.', 'ON A VU MIEUX, ON A VU PIRE.'],
+    "chill-college": ["EN FEU.", "BEAU RYTHME."],
+    "chill-lycee": ["EN FEU.", "SOLIDE ENCHAÎNEMENT."],
+    "savage-college": ["PAS MAL.", "ÇA VA, ÇA VA."],
+    "savage-lycee": ["CORRECT.", "ON A VU MIEUX, ON A VU PIRE."],
   });
 }
 
@@ -369,16 +556,19 @@ export function recapComboLine(ctx: VoiceCtx, maxCombo: number): string {
 export function recapTrophyLine(ctx: VoiceCtx): { title: string; sub: string } {
   return {
     title: byCombo(ctx, {
-      'chill-college': ["C'EST DANS LA POCHE.", 'SESSION VALIDÉE.'],
-      'chill-lycee': ["C'EST DANS LA POCHE.", 'SESSION BOUCLÉE.'],
-      'savage-college': ["BON, C'EST FAIT.", "VOILÀ, C'EST RÉGLÉ."],
-      'savage-lycee': ["C'EST PLIÉ.", 'ENCORE UNE DE FAITE.'],
+      "chill-college": ["C'EST DANS LA POCHE.", "SESSION VALIDÉE."],
+      "chill-lycee": ["C'EST DANS LA POCHE.", "SESSION BOUCLÉE."],
+      "savage-college": ["BON, C'EST FAIT.", "VOILÀ, C'EST RÉGLÉ."],
+      "savage-lycee": ["C'EST PLIÉ.", "ENCORE UNE DE FAITE."],
     }),
     sub: byCombo(ctx, {
-      'chill-college': ["Reviens demain, ta série t'attend.", 'À demain pour la suite !'],
-      'chill-lycee': ["Reviens demain, ta série t'attend.", 'Rendez-vous demain pour continuer.'],
-      'savage-college': ['Demain, même heure. Je compte les jours.', 'Reviens demain, sinon je le saurai.'],
-      'savage-lycee': ['Demain, sans excuse.', 'Reviens demain — ta série te surveille.'],
+      "chill-college": ["Reviens demain, ta série t'attend.", "À demain pour la suite !"],
+      "chill-lycee": ["Reviens demain, ta série t'attend.", "Rendez-vous demain pour continuer."],
+      "savage-college": ["On reprend quand tu veux.", "La suite t’attend, sans pression."],
+      "savage-lycee": [
+        "On continue quand tu veux.",
+        "La prochaine session sera là quand tu seras prêt.",
+      ],
     }),
   };
 }
@@ -386,12 +576,12 @@ export function recapTrophyLine(ctx: VoiceCtx): { title: string; sub: string } {
 /** Extra instructions appended to the Mistral system prompt so free-text chat matches the chosen tone. */
 export function toneSystemPrompt(ctx: VoiceCtx): string {
   const ageLine =
-    ctx.age === 'college'
-      ? 'L\'élève est au collège (6ème-3ème) : mots simples, analogies très visuelles (jeux, snacks, réseaux sociaux), phrases courtes.'
-      : 'L\'élève est au lycée (2nde-Terminale) : ton un peu plus mature, références un peu plus fines, mais toujours décontracté et jamais scolaire.';
+    ctx.age === "college"
+      ? "L'élève est au collège (6ème-3ème) : mots simples, analogies très visuelles (jeux, snacks, réseaux sociaux), phrases courtes."
+      : "L'élève est au lycée (2nde-Terminale) : ton un peu plus mature, références un peu plus fines, mais toujours décontracté et jamais scolaire.";
   const personaLine =
-    ctx.personality === 'savage'
-      ? 'Mode "Coach Savage" activé : second degré assumé, petites piques amicales et sarcasme léger quand l\'élève se trompe, mais jamais méchant ni décourageant — ça reste un pote qui charrie, pas un prof qui humilie.'
+    ctx.personality === "savage"
+      ? 'Mode "Coach énergie" activé : ton rythmé, direct et positif. Tu peux challenger le piège ou le raisonnement, mais jamais l’intelligence de l’élève. Aucun sarcasme, aucune humiliation et aucune culpabilisation.'
       : 'Mode "Pote Chill" activé : encourageant, doux, décontracté, zéro pression, toujours bienveillant même face à une erreur.';
   return `${ageLine}\n${personaLine}`;
 }

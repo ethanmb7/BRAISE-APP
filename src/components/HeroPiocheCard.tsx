@@ -1,3 +1,12 @@
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+import { useEffect, useRef, useState } from "react";
+import { motion, MotionConfig } from "framer-motion";
+import { Clock3, Layers3 } from "lucide-react";
+import { BraisePioche } from "@/components/BraisePioche";
+import { sfx } from "@/lib/sound";
+import { getLastPiocheOpenDate, setLastPiocheOpenDate } from "@/lib/celebrations";
+import { firePiocheReveal, getPiocheRevealTiming } from "@/lib/piocheTransition";
+=======
 import { useEffect, useRef, useState } from 'react';
 import { motion, MotionConfig } from 'framer-motion';
 import { Clock3, Play, Sparkles, Trophy } from 'lucide-react';
@@ -5,6 +14,7 @@ import { BraisePioche } from '@/components/BraisePioche';
 import { sfx } from '@/lib/sound';
 import { getLastPiocheOpenDate, setLastPiocheOpenDate } from '@/lib/celebrations';
 import { firePiocheReveal, getPiocheRevealTiming } from '@/lib/piocheTransition';
+main
 
 interface HeroPiocheCardProps {
   /** Fuller sentence (from `dailyPickLine()`) announced to screen readers only — folds the
@@ -23,6 +33,7 @@ interface HeroPiocheCardProps {
   cardCount: number;
   soundOn: boolean;
   onStart: () => void;
+  variant?: "daily" | "resume";
 }
 
 // Eleventh pass — Braise's spot in the card is now a small chest (BraiseChest), built from the
@@ -38,22 +49,40 @@ interface HeroPiocheCardProps {
 // written here rather than lifted to HomeView because both the read and the write have to happen
 // at the exact instant of the click, before the animation choice is made; HomeView's onStart prop
 // only fires later, at the delayed navigation.
-export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterTitle, duration, cardCount, soundOn, onStart }: HeroPiocheCardProps) {
+export function HeroPiocheCard({
+  bubbleLine,
+  subjectName,
+  subjectColor,
+  chapterTitle,
+  duration,
+  cardCount,
+  soundOn,
+  onStart,
+  variant = "daily",
+}: HeroPiocheCardProps) {
   const [hyped, setHyped] = useState(false);
   const [launching, setLaunching] = useState(false);
   const [quick, setQuick] = useState(false);
   const launchTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const revealTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  useEffect(() => () => {
-    if (launchTimer.current) clearTimeout(launchTimer.current);
-    if (revealTimer.current) clearTimeout(revealTimer.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (launchTimer.current) clearTimeout(launchTimer.current);
+      if (revealTimer.current) clearTimeout(revealTimer.current);
+    },
+    [],
+  );
 
   const unhype = () => setHyped(false);
 
   const handleStart = () => {
     if (launching) return;
+    if (variant === "resume") {
+      sfx.tap(soundOn);
+      onStart();
+      return;
+    }
     const firstToday = getLastPiocheOpenDate() !== new Date().toDateString();
     setLastPiocheOpenDate();
     setQuick(!firstToday);
@@ -67,7 +96,10 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
     // Fires PiocheRevealVeil's light burst timed to peak right as the view actually swaps — see
     // piocheTransition.ts for why this and launchTimer share one timing source instead of two
     // separately-guessed numbers.
-    revealTimer.current = setTimeout(() => firePiocheReveal(totalMs), totalMs - getPiocheRevealTiming(totalMs).fadeInMs);
+    revealTimer.current = setTimeout(
+      () => firePiocheReveal(totalMs),
+      totalMs - getPiocheRevealTiming(totalMs).fadeInMs,
+    );
   };
 
   return (
@@ -84,14 +116,31 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
           piocheTransition.ts) already covers the actual cut; this is a small, safe complement to
           it, not a replacement. */}
       <motion.section
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+        className="relative overflow-hidden rounded-[20px] border-[2.5px] border-black bg-[#FF6B35] p-3.5 shadow-[3px_3px_0px_0px_#000]"
+        aria-label={`${variant === "resume" ? "Reprendre" : "Mission du jour"} : ${chapterTitle}`}
+=======
         className="relative overflow-hidden rounded-2xl border-[3px] border-black bg-[#FF6B35] p-5 shadow-[6px_6px_0px_0px_#000]"
         aria-label={`Mission du jour : ${chapterTitle}`}
+main
         animate={{ scale: launching ? 1.025 : 1 }}
         // Same full/quick split as everything else in this ceremony (BraiseChest, the reveal
         // veil): a same-day reopen unmounts this component at 420ms, well before a 500ms scale-up
         // would finish — matching the shorter window here instead of leaving it visibly cut off.
         transition={{ duration: quick ? 0.22 : 0.5, ease: [0.16, 1, 0.3, 1] }}
       >
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+        <div className="relative flex items-center justify-between gap-2">
+          <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.1em] text-[#151821]">
+            {variant === "resume" ? "À reprendre" : "Pioche du jour"}
+          </p>
+          <span className="font-mono text-[0.58rem] font-black uppercase tracking-wide text-[#151821]/55">
+            {variant === "resume" ? "Là où tu étais" : "Pour toi"}
+          </span>
+        </div>
+
+        <div className="relative mt-1 flex items-end gap-3">
+=======
         {/* Intermittent heat glow near the sun sliver — a light effect, not the frame moving, so
             it stays even though the card itself is static. */}
         <motion.div
@@ -132,6 +181,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
         </motion.div>
 
         <div className="relative flex items-center gap-3">
+main
           <div className="relative flex h-[92px] w-[92px] flex-shrink-0 items-end justify-center">
             {/* One slow aura makes the chest feel warm and rare at rest. It wakes up only when
                 the player reaches for the button; the frame and reading order never move. */}
@@ -149,6 +199,52 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
                 failure), 6.25:1 for dark ink. Three real fonts: font-mono for the eyebrow
                 (same as every other small-caps label app-wide), font-display for the title,
                 font-sans for the stats line. */}
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+            <p className="mb-0.5 flex items-center gap-1.5 text-[0.68rem] font-black text-[#151821]/70">
+              <span
+                aria-hidden="true"
+                className="h-2.5 w-2.5 flex-none rounded-full border border-[#151821]"
+                style={{ background: subjectColor ?? "#FDC800" }}
+              />
+              <span className="truncate">{subjectName ?? "Mission du jour"}</span>
+            </p>
+            <h2 className="line-clamp-2 font-display text-[1.08rem] font-black leading-[1.05] text-[#151821]">
+              {chapterTitle}
+            </h2>
+            <div
+              className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[#151821]/75"
+              aria-label="Les repères de ta mission"
+            >
+              <span className="flex items-center gap-1 font-mono text-[0.61rem] font-black">
+                <Clock3 size={13} strokeWidth={3} aria-hidden="true" /> {duration} MIN
+              </span>
+              <span className="flex items-center gap-1 font-mono text-[0.61rem] font-black">
+                <Layers3 size={13} strokeWidth={3} aria-hidden="true" /> {cardCount} CARTE
+                {cardCount > 1 ? "S" : ""}
+              </span>
+            </div>
+
+            {/* Compact and colocated with the mission copy: no separate footer stretching a
+                secondary tool into a hero. The 44px target remains comfortable on touch. */}
+            <div className="group relative mt-2.5">
+              <span
+                aria-hidden="true"
+                className="absolute inset-0 translate-y-[2px] rounded-xl border-2 border-black bg-black"
+              />
+              <button
+                onPointerEnter={() => setHyped(true)}
+                onPointerDown={() => setHyped(true)}
+                onPointerUp={unhype}
+                onPointerLeave={unhype}
+                onPointerCancel={unhype}
+                onClick={handleStart}
+                disabled={launching}
+                className="relative flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border-2 border-black bg-[#FFF8EE] px-3 py-2 font-display text-[0.86rem] font-black text-black shadow-[2px_2px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[2px] group-active:shadow-none disabled:opacity-95"
+              >
+                {launching ? "OUVERTURE…" : variant === "resume" ? "CONTINUER" : "COMMENCER"}
+              </button>
+            </div>
+=======
             <p className="flex items-center gap-1 font-mono text-[0.67rem] font-black uppercase tracking-wide text-[#151821]">
               <Sparkles size={12} strokeWidth={3} /> {launching ? 'Mission trouvée !' : 'Pioche du jour'}
             </p>
@@ -167,12 +263,21 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
           <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
             <Trophy size={15} strokeWidth={3} aria-hidden="true" />
             <span className="font-mono text-[0.67rem] font-black text-[#151821]">+50 AURA</span>
+main
           </div>
         </div>
         <span className="sr-only">
-          {bubbleLine} Cette mission contient {cardCount} carte{cardCount > 1 ? 's' : ''}, dure environ {duration} minutes et rapporte 50 points d'Aura à sa première validation.
+          {bubbleLine} Cette mission contient {cardCount} carte{cardCount > 1 ? "s" : ""}, dure
+          environ {duration} minutes et rapporte 50 points d'Aura à sa première validation.
         </span>
 
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+        {launching && (
+          <span className="sr-only" role="status">
+            Braise révèle ta mission.
+          </span>
+        )}
+=======
         {launching && <span className="sr-only" role="status">Braise révèle ta mission.</span>}
 
         {/* Base+face bevel — untouched, the same mechanic SubjectDecks/HeaderHUD use everywhere
@@ -194,6 +299,7 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
             JE PIOCHE !
           </button>
         </div>
+main
       </motion.section>
     </MotionConfig>
   );
