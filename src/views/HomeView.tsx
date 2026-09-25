@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
+import { Dices, Zap } from "lucide-react";
 import { useApp, computeGoalPct, remainingToGoal, resolveChapters } from "@/store";
 import { sfx } from "@/lib/sound";
 import { fireConfetti } from "@/lib/confetti";
@@ -14,6 +15,7 @@ import { SUBJECTS, FLASHCARDS } from "@/data";
 import { dailyPickLine, getAgeGroup } from "@/lib/braiseVoice";
 import { getRankInfo, countMasteredCards } from "@/lib/aura";
 import { getIntoxDismissedCount, setIntoxDismissedCount } from "@/lib/celebrations";
+import { selectRevisionMode, type RevisionMode } from "@/lib/revisionMode";
 import type { Level, Subject, Chapter } from "@/types";
 
 // Same choreography language as Ton Aura: a calm stagger fade for each block.
@@ -72,15 +74,8 @@ export function HomeView() {
   for (let i = 0; i < todaySeed.length; i++) hash = (hash * 31 + todaySeed.charCodeAt(i)) >>> 0;
   const dailyPick =
     priorityChapters.length > 0 ? priorityChapters[hash % priorityChapters.length] : null;
-  const resumableSubject = SUBJECTS.find((subject) => subject.id === state.lastSubjectId);
-  const resumableChapter = resumableSubject
-    ? resolveChapters(resumableSubject.chapters, state.completedChapters).find(
-        (chapter) => chapter.id === state.lastChapterId && chapter.status !== "done",
-      )
-    : undefined;
-  const hasActivityToResume = Boolean(resumableSubject && resumableChapter);
-  const currentSubject = hasActivityToResume ? resumableSubject : dailyPick?.subject;
-  const currentChapter = hasActivityToResume ? resumableChapter : dailyPick?.chapter;
+  const currentSubject = dailyPick?.subject;
+  const currentChapter = dailyPick?.chapter;
   // Real per-chapter deck size (FLASHCARDS filtered by chapterId) — the card used to show a
   // fixed "10 cartes" for every chapter; every chapter actually has its own real count.
   const currentChapterCardCount = currentChapter
@@ -103,16 +98,20 @@ export function HomeView() {
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
   const bubbleLine =
     currentSubject && currentChapter
-      ? hasActivityToResume
-        ? `${state.user.name}, reprends ${currentChapter.title} en ${currentSubject.name} là où tu t'étais arrêté.`
-        : dailyPickLine(
-            voiceCtx,
-            state.user.name,
-            currentSubject.name,
-            currentChapter.title,
-            currentChapter.duration,
-          )
+      ? dailyPickLine(
+          voiceCtx,
+          state.user.name,
+          currentSubject.name,
+          currentChapter.title,
+          currentChapter.duration,
+        )
       : `${state.user.name}, série de ${state.streak} jours. On lâche rien !`;
+
+  const launchRevision = (mode: RevisionMode) => {
+    sfx.tap(state.soundOn);
+    selectRevisionMode(mode);
+    setTab("revisions");
+  };
 
   // Each card's "Niv." is the current chapter's real position in the subject's own sequence
   // (no separate per-subject level field exists), and its label is that chapter's own title
@@ -169,7 +168,9 @@ export function HomeView() {
     <>
       <div className="view is-active home-view pt-3">
         {!state.user.level && (
-          <div className="setup-banner">Configure ton niveau pour des leçons sur mesure.</div>
+          <button type="button" className="setup-banner" onClick={() => setSheetOpen(true)}>
+            CHOISIS TON NIVEAU →
+          </button>
         )}
 
         <motion.div
@@ -206,9 +207,50 @@ export function HomeView() {
                 if (currentSubject && currentChapter)
                   openLesson(currentSubject.id, currentChapter.id);
               }}
-              variant={hasActivityToResume ? "resume" : "daily"}
+              variant="daily"
             />
           </motion.div>
+
+          <motion.section
+            variants={staggerItem}
+            className="arcade-modes"
+            aria-labelledby="arcade-modes-title"
+          >
+            <div className="arcade-modes-title">
+              <h2 id="arcade-modes-title">MODE DE JEU</h2>
+              <span>À TOI DE JOUER</span>
+            </div>
+            <div className="arcade-mode-grid">
+              <button
+                type="button"
+                className="arcade-mode-card is-mix"
+                onClick={() => launchRevision("mix")}
+              >
+                <span className="arcade-mode-icon" aria-hidden="true">
+                  <Dices size={32} strokeWidth={3} />
+                </span>
+                <span className="arcade-mode-copy">
+                  <b>MIX SURPRISE</b>
+                  <small>15 cartes · full chaos</small>
+                </span>
+                <span className="arcade-mode-badge">HOT</span>
+              </button>
+              <button
+                type="button"
+                className="arcade-mode-card is-express"
+                onClick={() => launchRevision("express")}
+              >
+                <span className="arcade-mode-icon" aria-hidden="true">
+                  <Zap size={32} strokeWidth={3} />
+                </span>
+                <span className="arcade-mode-copy">
+                  <b>EXPRESS</b>
+                  <small>5 cartes · droit au but</small>
+                </span>
+                <span className="arcade-mode-badge">5X</span>
+              </button>
+            </div>
+          </motion.section>
 
           <motion.div variants={staggerItem}>
             <TodayStrip

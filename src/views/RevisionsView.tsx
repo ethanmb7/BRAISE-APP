@@ -27,6 +27,7 @@ import {
   verdictTag,
 } from "@/lib/braiseVoice";
 import { reportCard } from "@/lib/reports";
+import { getRevisionMode, REVISION_MODE_SIZE, REVISION_SNAPSHOT_KEY } from "@/lib/revisionMode";
 import { FLASHCARDS, SUBJECTS } from "@/data";
 import type { Flashcard, Confidence } from "@/types";
 
@@ -38,15 +39,13 @@ const TUTORIAL_SEEN_KEY = "sapie_rev_tutorial_seen";
 // Same one-way "seen it once" pattern, for the joker's first-ever charge-complete explainer.
 const JOKER_SEEN_KEY = "sapie_joker_seen";
 
-// A daily session is a sprint, not the whole library: ~15 cards, mixed. The deck used to
-// serve every due card (26 on a fresh install) with no cap at all.
-const SESSION_SIZE = 15;
-
+// A session is a sprint, not the whole library: the Home arcade card chooses 15-card Mix or
+// 5-card Express. Opening the Réviser tab directly keeps Mix as the zero-setup default.
 // In-progress session snapshot so "Revoir la notion" (which leaves for the chapter's chat)
 // comes back to the NEXT card with the streak, joker charge and totals intact, instead of
 // remounting a brand-new deck at 1/15. sessionStorage, not localStorage: a session is a
 // single sitting, it has no business surviving the tab.
-const SESSION_SNAPSHOT_KEY = "sapie_rev_session";
+const SESSION_SNAPSHOT_KEY = REVISION_SNAPSHOT_KEY;
 const SESSION_SNAPSHOT_TTL = 30 * 60 * 1000;
 type SessionSnapshot = {
   cardIds: string[];
@@ -98,6 +97,8 @@ const SUBJECT_SHORT: Record<string, string> = {
 
 export function RevisionsView() {
   const { state, reviewCard, getDueCards } = useApp();
+  const [mode] = useState(getRevisionMode);
+  const sessionSize = REVISION_MODE_SIZE[mode];
   // Bumped on "Enchaîner une autre série" to force a fresh draw below AND, via `key` on
   // SwipeDeck, a full remount — that second part matters as much as the reshuffle: a manual
   // reset of only some state fields could leave a verdict from the previous session showing on
@@ -134,7 +135,7 @@ export function RevisionsView() {
     const picked = [...FLASHCARDS]
       .map((c) => ({ c, p: priority(c) }))
       .sort((a, b) => b.p - a.p)
-      .slice(0, SESSION_SIZE)
+      .slice(0, sessionSize)
       .map(({ c }) => c);
     for (let i = picked.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -142,7 +143,7 @@ export function RevisionsView() {
     }
     return picked;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionKey, resume]);
+  }, [sessionKey, resume, sessionSize]);
 
   return (
     <div className="view is-active rev-view">

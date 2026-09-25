@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, MotionConfig } from "framer-motion";
 import { Clock3, Layers3 } from "lucide-react";
-import { BraisePioche } from "@/components/BraisePioche";
+import { BraiseMascot } from "@/components/BraiseMascot";
 import { sfx } from "@/lib/sound";
 import { getLastPiocheOpenDate, setLastPiocheOpenDate } from "@/lib/celebrations";
 import { firePiocheReveal, getPiocheRevealTiming } from "@/lib/piocheTransition";
@@ -26,10 +26,8 @@ interface HeroPiocheCardProps {
   variant?: "daily" | "resume";
 }
 
-// The daily pick stays deliberately compact: Braise and the deck carry the identity, while the
-// frame itself remains a familiar utility card. The mission title, subject, duration and real card
-// count are the only primary signals; reward and ceremony stay secondary so opening Home never
-// feels like entering a crowded game lobby.
+// The daily pick is the Home screen's arcade cabinet: one oversized tactile block, a living
+// Braise in the middle and one unmissable action. Supporting data stays in small game-like chips.
 //
 // The click fires the real audio/haptic sequence itself (sfx.chestOpen/chestOpenQuick, both new,
 // each internally timed to the chest's own beats — see BraiseChest's file header) rather than a
@@ -41,7 +39,6 @@ interface HeroPiocheCardProps {
 export function HeroPiocheCard({
   bubbleLine,
   subjectName,
-  subjectColor,
   chapterTitle,
   duration,
   cardCount,
@@ -93,101 +90,83 @@ export function HeroPiocheCard({
 
   return (
     <MotionConfig reducedMotion="user">
-      {/* The frame stays immobile for as long as there's anything to read: no jitter, no idle
-          drift, nothing that costs a DYS/TDAH reader attention while they're actually looking at
-          the mission. The one exception is deliberate and one-way — a small scale-up exactly
-          while `launching` is true, already the "committed to leaving" state, so the card leans
-          into the handoff instead of just vanishing. A real cross-view shared-element morph
-          (layoutId into whatever LessonView shows) isn't attempted: App.tsx's view switch is a
-          plain conditional with no AnimatePresence, so the outgoing view unmounts before any
-          such animation could run — wiring that in would mean restructuring the mount/unmount
-          timing for every view transition in the app, not just this one. PiocheRevealVeil (see
-          piocheTransition.ts) already covers the actual cut; this is a small, safe complement to
-          it, not a replacement. */}
       <motion.section
-        className="relative overflow-hidden rounded-[20px] border-[2.5px] border-black bg-[#FF6B35] p-3.5 shadow-[3px_3px_0px_0px_#000]"
-        aria-label={`${variant === "resume" ? "Reprendre" : "Mission du jour"} : ${chapterTitle}`}
+        className="relative min-h-[330px] overflow-hidden rounded-[28px] border-[3px] border-black bg-[#FF6B35] p-4 shadow-[6px_6px_0px_0px_#000]"
+        aria-label={`${variant === "resume" ? "Reprendre" : "Pioche du jour"} : ${chapterTitle}`}
         animate={{ scale: launching ? 1.025 : 1 }}
-        // Same full/quick split as everything else in this ceremony (BraiseChest, the reveal
-        // veil): a same-day reopen unmounts this component at 420ms, well before a 500ms scale-up
-        // would finish — matching the shorter window here instead of leaving it visibly cut off.
         transition={{ duration: quick ? 0.22 : 0.5, ease: [0.16, 1, 0.3, 1] }}
       >
-        <div className="relative flex items-center justify-between gap-2">
-          <p className="font-mono text-[0.68rem] font-black uppercase tracking-[0.1em] text-[#151821]">
-            {variant === "resume" ? "À reprendre" : "Pioche du jour"}
-          </p>
-          <span className="font-mono text-[0.58rem] font-black uppercase tracking-wide text-[#151821]/55">
-            {variant === "resume" ? "Là où tu étais" : "Pour toi"}
+        <span
+          className="absolute -right-10 -top-12 h-40 w-40 rounded-full border-[18px] border-[#FFD43B]/70"
+          aria-hidden="true"
+        />
+        <span
+          className="absolute -bottom-16 -left-10 h-44 w-44 rounded-full border-[22px] border-[#7C3AED]/25"
+          aria-hidden="true"
+        />
+
+        <div className="relative z-10 flex items-start justify-between gap-3">
+          <div>
+            <p className="inline-flex -rotate-2 rounded-full border-[3px] border-black bg-[#FFD43B] px-3 py-1 font-mono text-[0.68rem] font-black uppercase tracking-[0.08em] shadow-[3px_3px_0px_0px_#000]">
+              {variant === "resume" ? "RETOUR EN JEU" : "PIOCHE DU JOUR"}
+            </p>
+            <h2 className="mt-3 max-w-[210px] font-display text-[1.55rem] font-black leading-[0.95] text-[#151821]">
+              {chapterTitle}
+            </h2>
+          </div>
+          <span className="rounded-xl border-[3px] border-black bg-white px-2 py-1 font-mono text-[0.58rem] font-black uppercase shadow-[3px_3px_0px_0px_#000]">
+            {subjectName ?? "SURPRISE"}
           </span>
         </div>
 
-        <div className="relative mt-1 flex items-end gap-3">
-          <div className="relative flex h-[92px] w-[92px] flex-shrink-0 items-end justify-center">
-            {/* A quiet, static stage separates Braise from the copy without adding another card.
-                BraisePioche owns the meaningful motion; the background never competes with it. */}
-            <span
-              aria-hidden="true"
-              className="absolute inset-[5px] rounded-full border-2 border-black/10 bg-[#FDC800]/45"
-            />
-            <BraisePioche size={88} hyped={hyped} diving={launching} quick={quick} />
-          </div>
-          <div className="min-w-0 flex-1 pb-0.5">
-            {/* Dark ink, not white — #FF6B35 measures 2.84:1 for white text (a hard AA
-                failure), 6.25:1 for dark ink. Three real fonts: font-mono for the eyebrow
-                (same as every other small-caps label app-wide), font-display for the title,
-                font-sans for the stats line. */}
-            <p className="mb-0.5 flex items-center gap-1.5 text-[0.68rem] font-black text-[#151821]/70">
-              <span
-                aria-hidden="true"
-                className="h-2.5 w-2.5 flex-none rounded-full border border-[#151821]"
-                style={{ background: subjectColor ?? "#FDC800" }}
-              />
-              <span className="truncate">{subjectName ?? "Mission du jour"}</span>
-            </p>
-            <h2 className="line-clamp-2 font-display text-[1.08rem] font-black leading-[1.05] text-[#151821]">
-              {chapterTitle}
-            </h2>
-            <div
-              className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[#151821]/75"
-              aria-label="Les repères de ta mission"
-            >
-              <span className="flex items-center gap-1 font-mono text-[0.61rem] font-black">
-                <Clock3 size={13} strokeWidth={3} aria-hidden="true" /> {duration} MIN
-              </span>
-              <span className="flex items-center gap-1 font-mono text-[0.61rem] font-black">
-                <Layers3 size={13} strokeWidth={3} aria-hidden="true" /> {cardCount} CARTE
-                {cardCount > 1 ? "S" : ""}
-              </span>
-            </div>
+        <motion.div
+          className="absolute bottom-[67px] left-1/2 z-0 -translate-x-1/2"
+          animate={
+            launching
+              ? { y: [0, 8, -20], rotate: [0, 4, -5], scale: [1, 0.92, 1.14] }
+              : hyped
+                ? { y: -8, rotate: -3, scale: 1.06 }
+                : { y: [0, -4, 0] }
+          }
+          transition={
+            launching
+              ? { duration: quick ? 0.35 : 0.7 }
+              : hyped
+                ? { type: "spring", stiffness: 500, damping: 18 }
+                : { duration: 2.4, repeat: Infinity }
+          }
+          aria-hidden="true"
+        >
+          <BraiseMascot size={148} mood="cool" />
+        </motion.div>
 
-            {/* Compact and colocated with the mission copy: no separate footer stretching a
-                secondary tool into a hero. The 44px target remains comfortable on touch. */}
-            <div className="group relative mt-2.5">
-              <span
-                aria-hidden="true"
-                className="absolute inset-0 translate-y-[2px] rounded-xl border-2 border-black bg-black"
-              />
-              <button
-                onPointerEnter={() => setHyped(true)}
-                onPointerDown={() => setHyped(true)}
-                onPointerUp={unhype}
-                onPointerLeave={unhype}
-                onPointerCancel={unhype}
-                onClick={handleStart}
-                disabled={launching}
-                className="relative flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border-2 border-black bg-[#FFF8EE] px-3 py-2 font-display text-[0.86rem] font-black text-black shadow-[2px_2px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[2px] group-active:shadow-none disabled:opacity-95"
-              >
-                {launching ? "OUVERTURE…" : variant === "resume" ? "CONTINUER" : "COMMENCER"}
-              </button>
-            </div>
-          </div>
+        <div className="absolute bottom-[76px] left-4 z-10 flex flex-col gap-2">
+          <span className="flex items-center gap-1 rounded-lg border-2 border-black bg-white px-2 py-1 font-mono text-[0.6rem] font-black shadow-[2px_2px_0px_0px_#000]">
+            <Clock3 size={13} strokeWidth={3} /> {duration} MIN
+          </span>
+          <span className="flex items-center gap-1 rounded-lg border-2 border-black bg-[#7C3AED] px-2 py-1 font-mono text-[0.6rem] font-black text-white shadow-[2px_2px_0px_0px_#000]">
+            <Layers3 size={13} strokeWidth={3} /> {cardCount} CARTES
+          </span>
         </div>
-        <span className="sr-only">
-          {bubbleLine} Cette mission contient {cardCount} carte{cardCount > 1 ? "s" : ""}, dure
-          environ {duration} minutes et rapporte 50 points d'Aura à sa première validation.
-        </span>
 
+        <button
+          type="button"
+          onPointerEnter={() => setHyped(true)}
+          onPointerDown={() => setHyped(true)}
+          onPointerUp={unhype}
+          onPointerLeave={unhype}
+          onPointerCancel={unhype}
+          onClick={handleStart}
+          disabled={launching}
+          className="absolute inset-x-4 bottom-4 z-20 flex min-h-14 items-center justify-center rounded-2xl border-[3px] border-black bg-[#FFD43B] px-4 font-display text-[1.05rem] font-black text-black shadow-[4px_4px_0px_0px_#000] transition-transform duration-100 active:translate-x-1 active:translate-y-1 active:shadow-none disabled:opacity-95"
+        >
+          {launching ? "ÇA PART…" : variant === "resume" ? "JE REPRENDS !" : "JE PIOCHE !"}
+        </button>
+
+        <span className="sr-only">
+          {bubbleLine} Cette mission contient {cardCount} carte{cardCount > 1 ? "s" : ""} et dure
+          environ {duration} minutes.
+        </span>
         {launching && (
           <span className="sr-only" role="status">
             Braise révèle ta mission.
