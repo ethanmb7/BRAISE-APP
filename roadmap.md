@@ -19,11 +19,36 @@
 ## Interface
 
 - [ ] Prototyper les quatre espaces cibles avant une nouvelle passe de code visuel
+codex/analyser-l-application-pour-ameliorer-l-education-yelgdt
+=======
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+=======
+codex/analyser-l-application-u3fig7
+=======
+codex/analyser-l-application-2zbvd9
+main
+main
+main
 - [x] Remplacer le HUD-tableau de bord par un en-tête compact centré sur l'identité
 - [x] Compacter la Pioche sans réduire Braise et rapprocher contenu, repères et CTA
 - [ ] Aujourd'hui : rendre la prochaine action contextuelle et alléger le rythme quotidien
 - [ ] Déplacer joker, série détaillée, Aura et rang dans Moi
+codex/analyser-l-application-pour-ameliorer-l-education-yelgdt
 - [x] Créer un espace Matières/Apprendre et limiter l'aperçu de l'accueil
+=======
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+- [x] Créer un espace Matières/Apprendre et limiter l'aperçu de l'accueil
+=======
+codex/analyser-l-application-u3fig7
+- [x] Créer un espace Matières et limiter l'aperçu de l'accueil à deux accès rapides
+=======
+- [ ] Créer un espace Matières/Apprendre et limiter l'aperçu de l'accueil
+=======
+- [ ] Aujourd'hui : une action principale, une Pioche compacte et un rythme discret
+main
+main
+main
+main
 - [ ] Apprendre : conversation guidée, calme et accessible
 - [ ] Réviser : erreurs, notions dues et choix de matière
 - [ ] Moi : réunir progression, Aura, profil, préférences et accessibilité

@@ -13,6 +13,7 @@ const TEXT_EXTENSIONS = new Set([
   ".mjs",
   ".ts",
   ".tsx",
+codex/analyser-l-application-pour-ameliorer-l-education-yelgdt
   ".txt",
   ".svg",
   ".toml",
@@ -23,6 +24,10 @@ const TEXT_EXTENSIONS = new Set([
 // copied conflict blocks can otherwise slip through the prebuild check after being pasted into
 // JSX, Markdown or a configuration file.
 const CONFLICT_LINE = /^\s*(?:<{7}|={7}|>{7})(?:\s|$)/;
+=======
+]);
+const CONFLICT_LINE = /^(?:<{7}|={7}|>{7})(?:\s|$)/;
+main
 
 async function findConflicts(directory) {
   const conflicts = [];

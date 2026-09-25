@@ -40,7 +40,15 @@ export function CompleteView() {
               <BraiseMascot size={70} mood="proud" />
               <div className="share-streak">{state.streak} jours 🔥</div>
               <div className="share-sub">Série de révision sur BRAISE</div>
+codex/analyser-l-application-pour-ameliorer-l-education-yelgdt
               <div className="share-brand">BRAISE · tes cours expliqués autrement</div>
+=======
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+              <div className="share-brand">BRAISE · tes cours expliqués autrement</div>
+=======
+              <div className="share-brand">BRAISE · l'app qui réveille les neurones</div>
+main
+main
             </div>
           </div>
           <div style={{ display: "flex", gap: 10, marginTop: 28 }}>

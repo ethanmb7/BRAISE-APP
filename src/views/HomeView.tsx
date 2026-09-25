@@ -1,6 +1,12 @@
+codex/analyser-l-application-pour-ameliorer-l-education-yelgdt
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Dices, Zap } from "lucide-react";
+=======
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+main
 import { useApp, computeGoalPct, remainingToGoal, resolveChapters } from "@/store";
 import { sfx } from "@/lib/sound";
 import { fireConfetti } from "@/lib/confetti";
@@ -15,8 +21,31 @@ import { SUBJECTS, FLASHCARDS } from "@/data";
 import { dailyPickLine, getAgeGroup } from "@/lib/braiseVoice";
 import { getRankInfo, countMasteredCards } from "@/lib/aura";
 import { getIntoxDismissedCount, setIntoxDismissedCount } from "@/lib/celebrations";
+codex/analyser-l-application-pour-ameliorer-l-education-yelgdt
 import { selectRevisionMode, type RevisionMode } from "@/lib/revisionMode";
 import type { Level, Subject, Chapter } from "@/types";
+=======
+import type { Level, Subject, Chapter } from "@/types";
+=======
+import { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { useApp, computeGoalPct, remainingToGoal, resolveChapters } from '@/store';
+import { sfx } from '@/lib/sound';
+import { fireConfetti } from '@/lib/confetti';
+import { LevelSheet } from '@/components/LevelSheet';
+import { HeaderHUD } from '@/components/HeaderHUD';
+import { HeroPiocheCard } from '@/components/HeroPiocheCard';
+import { MissedCardsBanner } from '@/components/MissedCardsBanner';
+import { SubjectDecks } from '@/components/SubjectDecks';
+import { TodayStrip } from '@/components/TodayStrip';
+import { ShareAuraModal } from '@/components/ShareAuraModal';
+import { SUBJECTS, FLASHCARDS } from '@/data';
+import { dailyPickLine, getAgeGroup } from '@/lib/braiseVoice';
+import { getRankInfo, countMasteredCards } from '@/lib/aura';
+import { getIntoxDismissedCount, setIntoxDismissedCount } from '@/lib/celebrations';
+import type { Level, Subject, Chapter } from '@/types';
+main
+main
 
 // Same choreography language as Ton Aura: a calm stagger fade for each block.
 const staggerContainer = {
@@ -74,8 +103,20 @@ export function HomeView() {
   for (let i = 0; i < todaySeed.length; i++) hash = (hash * 31 + todaySeed.charCodeAt(i)) >>> 0;
   const dailyPick =
     priorityChapters.length > 0 ? priorityChapters[hash % priorityChapters.length] : null;
+codex/analyser-l-application-pour-ameliorer-l-education-yelgdt
   const currentSubject = dailyPick?.subject;
   const currentChapter = dailyPick?.chapter;
+=======
+  const resumableSubject = SUBJECTS.find((subject) => subject.id === state.lastSubjectId);
+  const resumableChapter = resumableSubject
+    ? resolveChapters(resumableSubject.chapters, state.completedChapters).find(
+        (chapter) => chapter.id === state.lastChapterId && chapter.status !== "done",
+      )
+    : undefined;
+  const hasActivityToResume = Boolean(resumableSubject && resumableChapter);
+  const currentSubject = hasActivityToResume ? resumableSubject : dailyPick?.subject;
+  const currentChapter = hasActivityToResume ? resumableChapter : dailyPick?.chapter;
+main
   // Real per-chapter deck size (FLASHCARDS filtered by chapterId) — the card used to show a
   // fixed "10 cartes" for every chapter; every chapter actually has its own real count.
   const currentChapterCardCount = currentChapter
@@ -98,6 +139,7 @@ export function HomeView() {
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
   const bubbleLine =
     currentSubject && currentChapter
+codex/analyser-l-application-pour-ameliorer-l-education-yelgdt
       ? dailyPickLine(
           voiceCtx,
           state.user.name,
@@ -105,6 +147,17 @@ export function HomeView() {
           currentChapter.title,
           currentChapter.duration,
         )
+=======
+      ? hasActivityToResume
+        ? `${state.user.name}, reprends ${currentChapter.title} en ${currentSubject.name} là où tu t'étais arrêté.`
+        : dailyPickLine(
+            voiceCtx,
+            state.user.name,
+            currentSubject.name,
+            currentChapter.title,
+            currentChapter.duration,
+          )
+main
       : `${state.user.name}, série de ${state.streak} jours. On lâche rien !`;
 
   const launchRevision = (mode: RevisionMode) => {
@@ -207,7 +260,11 @@ export function HomeView() {
                 if (currentSubject && currentChapter)
                   openLesson(currentSubject.id, currentChapter.id);
               }}
+codex/analyser-l-application-pour-ameliorer-l-education-yelgdt
               variant="daily"
+=======
+              variant={hasActivityToResume ? "resume" : "daily"}
+main
             />
           </motion.div>
 
@@ -287,19 +344,28 @@ export function HomeView() {
           <motion.div variants={staggerItem} className="space-y-3">
             <div className="flex items-end justify-between gap-3">
               <div>
+codex/analyser-l-application-pour-ameliorer-l-education-yelgdt
+=======
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+main
                 <span className="font-mono text-[0.62rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">
                   Quand tu veux aller plus loin
                 </span>
                 <h2 className="font-display text-[1.15rem] font-extrabold leading-tight text-[var(--ink)]">
                   Tes univers
                 </h2>
+codex/analyser-l-application-pour-ameliorer-l-education-yelgdt
+=======
+=======
+                <span className="font-mono text-[0.62rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">Accès rapide</span>
+                <h2 className="font-display text-[1.15rem] font-extrabold leading-tight text-[var(--ink)]">Tes matières</h2>
+main
+main
               </div>
-              <span className="rounded-lg border border-black bg-[var(--neo-orange)] px-2 py-0.5 text-xs font-black text-white shadow-[1px_1px_0px_0px_#000]">
-                {SUBJECTS.length}
-              </span>
+              <button type="button" onClick={() => setTab('subjects')} className="text-xs font-black text-[var(--neo-orange)]">Tout voir →</button>
             </div>
             <SubjectDecks
-              items={subjectDecks}
+              items={subjectDecks.slice(0, 2)}
               onSelect={(id) => {
                 const deck = subjectDecks.find((d) => d.id === id);
                 goToChapter(id, deck?.currentChapterId);
@@ -307,6 +373,7 @@ export function HomeView() {
             />
           </motion.div>
 
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
           <motion.div variants={staggerItem} className="text-center">
             <button
               onClick={() => setView("settings")}
@@ -315,6 +382,8 @@ export function HomeView() {
               Paramètres
             </button>
           </motion.div>
+=======
+main
         </motion.div>
       </div>
 

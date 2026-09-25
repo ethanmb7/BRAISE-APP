@@ -68,6 +68,21 @@ export function missedTruth(ctx: VoiceCtx): string {
       "Excès de méfiance : elle était vraie.",
       "Pas d'embrouille ici, juste la vérité toute simple.",
     ],
+codex/analyser-l-application-pour-ameliorer-l-education-yelgdt
+=======
+  });
+}
+
+// Étape 2 ("positionnement") de la boucle Capte : dire honnêtement "je ne sais pas" n'est pas une
+// erreur à corriger, c'est l'information la plus utile que l'élève puisse donner à Braise — la
+// voix doit donc rester clairement distincte de quizWrong, jamais une variante déguisée de "raté".
+export function quizDontKnow(ctx: VoiceCtx): string {
+  return byCombo(ctx, {
+    'chill-college': ["Pas de souci, on regarde ça ensemble.", "Aucun problème, c'est fait pour ça.", 'Ok, on découvre ça ensemble alors !'],
+    'chill-lycee': ["Pas de souci, c'est exactement pour ça qu'on est là.", 'Ok, on regarde ça calmement.', "Aucun stress, c'est une vraie question à creuser."],
+    'savage-college': ["Honnête, j'aime ça. On répare le trou tout de suite.", 'Ok, au moins tu triches pas. On regarde.', "Assumé. On corrige ça vite fait."],
+    'savage-lycee': ["Au moins t'es honnête. On répare ça maintenant.", "Ok, pas de bluff. On regarde ce qui coince.", "Assumé, c'est déjà bien. On creuse."],
+main
   });
 }
 

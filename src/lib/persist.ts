@@ -16,6 +16,7 @@ type StoredProgress = {
   soundOn: boolean;
   user: UserProfile;
   completedChapters: string[];
+  struggledChapters: string[];
   lastSubjectId: string | null;
   lastChapterId: string | null;
   sessionDate: string;
@@ -95,6 +96,7 @@ function toAppState(p: StoredProgress, cardReviews: Record<string, CardReview>):
     soundOn: p.soundOn,
     user: { ...p.user, personality: p.user?.personality ?? 'chill' },
     completedChapters: p.completedChapters ?? [],
+    struggledChapters: p.struggledChapters ?? [],
     lastSubjectId: p.lastSubjectId ?? null,
     lastChapterId: p.lastChapterId ?? null,
     cardReviews,
@@ -152,6 +154,9 @@ export async function loadProgress(): Promise<Partial<AppState> | null> {
             soundOn: cloudRow.sound_on,
             user: cloudRow.profile,
             completedChapters: cloudRow.completed_chapters ?? [],
+            // Not in device_progress either — same "carry over the local cache" reasoning as
+            // bestCombo above.
+            struggledChapters: local?.struggledChapters ?? [],
             lastSubjectId: local?.lastSubjectId ?? null,
             lastChapterId: local?.lastChapterId ?? null,
             sessionDate: cloudRow.session_date,
@@ -188,6 +193,7 @@ export async function saveProgress(state: AppState): Promise<void> {
     soundOn: state.soundOn,
     user: state.user,
     completedChapters: state.completedChapters,
+    struggledChapters: state.struggledChapters,
     lastSubjectId: state.lastSubjectId,
     lastChapterId: state.lastChapterId,
     sessionDate: state.sessionDate,

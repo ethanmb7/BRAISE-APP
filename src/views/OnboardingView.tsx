@@ -1,3 +1,7 @@
+codex/analyser-l-application-pour-ameliorer-l-education-yelgdt
+=======
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+main
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { BraiseMascot, SapiLogo } from "@/components/BraiseMascot";
@@ -6,6 +10,20 @@ import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
 import { LEVELS, SUBJECTS, AVATARS } from "@/data";
 import type { Level } from "@/types";
+codex/analyser-l-application-pour-ameliorer-l-education-yelgdt
+=======
+=======
+import { useState } from 'react';
+import { Check } from 'lucide-react';
+import { BraiseMascot } from '@/components/BraiseMascot';
+import { AvatarGlyph, getAvatarName } from '@/components/AvatarGlyph';
+import { SubjectIcon } from '@/components/SubjectIcon';
+import { useApp } from '@/store';
+import { sfx } from '@/lib/sound';
+import { LEVELS, SUBJECTS, AVATARS } from '@/data';
+import type { Level } from '@/types';
+main
+main
 
 const GOALS = ["15 min/jour", "30 min/jour", "1 heure/jour"];
 
@@ -60,11 +78,20 @@ export function OnboardingView() {
   return (
     <div className="app-content">
       {/* Step 0 — Welcome */}
+codex/analyser-l-application-pour-ameliorer-l-education-yelgdt
       <div className={`ob-step ob-welcome ${step === 0 ? "is-active" : ""}`}>
         <SapiLogo size={52} />
+=======
+codex/analyser-l-application-pour-ameliorer-l-education-f1gxx5
+      <div className={`ob-step ob-welcome ${step === 0 ? "is-active" : ""}`}>
+        <SapiLogo size={52} />
+=======
+      <div className={`ob-step ob-welcome ${step === 0 ? 'is-active' : ''}`}>
+        <BraiseMascot size={88} className="flame-hero" mood="happy" />
+main
+main
         <h1>Bienvenue sur BRAISE</h1>
         <p>Réviser comme un pote t'explique le cours. Sans pression, juste la motivation.</p>
-        <BraiseMascot size={74} className="flame-hero" mood="happy" />
         <button className="btn-block" onClick={next}>
           C'est parti !
         </button>
@@ -209,7 +236,8 @@ export function OnboardingView() {
               className={`schip ${subjects.includes(s.id) ? "is-selected" : ""}`}
               onClick={() => toggleSubject(s.id)}
             >
-              {s.emoji} {s.name}
+              <SubjectIcon subjectId={s.id} color={s.color} size={16} />
+              {s.name}
             </button>
           ))}
         </div>
