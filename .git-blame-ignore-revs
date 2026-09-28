@@ -1,0 +1,3 @@
+# Formatting-only commits. Use with: git config blame.ignoreRevsFile .git-blame-ignore-revs
+# Apply the repo's own Prettier config to every file
+411441762325d10f409e2be7f686322ea9f4e5b9
