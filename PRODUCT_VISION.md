@@ -9,7 +9,8 @@ confiance : sans jugement, sans récitation et sans surcharge.
 > **Promesse : tes cours, enfin expliqués comme par un pote.**
 
 Le moment signature n'est ni le gain d'XP ni le swipe. C'est le passage de « je ne comprends pas »
-à « ah oui, j'ai capté » après une explication adaptée et une reformulation de l'élève.
+à « ah oui, j'ai capté » après une explication adaptée et une reformulation de l'élève — BRAISE
+nomme ce moment **le Déclic** (voir la boucle complète, section 4).
 
 ## 2. Comité produit simulé
 
@@ -59,31 +60,75 @@ réels et prochain palier. Aucune donnée inventée, jamais de classement entre 
 Identité, préférences (ton de Braise, matières favorites), accessibilité et réglages. Édition,
 pas consultation de la progression — Aura reste l'endroit où on va pour voir son parcours.
 
-### Idée non tranchée : une conversation guidée de type « Apprendre »
+### Apprendre — la conversation guidée « Le Déclic »
 
-Un mode conversationnel où BRAISE part de ce que l'élève pense avoir compris, détecte le
-blocage, explique autrement puis demande une reformulation, correspond au vrai trou identifié
-dans le parcours actuel (le « moment Eureka »). C'est une piste sérieuse — mais une
-fonctionnalité à l'intérieur d'un espace existant (probablement Réviser), pas un cinquième
-onglet, et pas un remplacement d'Aura ou de la navigation validée ci-dessus.
+Le trou identifié dans le parcours actuel (le « moment Eureka ») n'est plus une piste ouverte :
+c'est la boucle **Le Déclic**, détaillée section 4, validée comme méthode d'apprentissage
+principale de BRAISE. Ce qui reste à trancher est uniquement son emplacement dans
+l'interface — une fonctionnalité à l'intérieur d'un espace existant (probablement Réviser), pas
+un cinquième onglet, et pas un remplacement d'Aura ou de la navigation validée ci-dessus.
 
-## 4. Boucle centrale « Capte » (nom de travail)
+## 4. Boucle centrale « Le Déclic »
+
+Le principe fondamental : BRAISE ne cherche pas seulement à savoir si une réponse est juste. Elle
+cherche comment cet élève précis va réussir à comprendre — puis elle s'en souvient. Se tromper ou
+hésiter n'est jamais un échec : c'est l'information qui indique où se situe le blocage.
 
 Une session dure de 90 secondes à 5 minutes.
 
-1. **Accroche** — Braise pose une question courte sur une seule idée.
-2. **Positionnement** — l'élève répond, hésite ou choisit explicitement « Je ne sais pas ».
-3. **Diagnostic** — BRAISE identifie la confusion probable, sans afficher une sanction.
-4. **Explication** — une formulation courte, un mot-clé et un exemple concret.
-5. **Choix d'aide** — « Plus simple », « Un exemple », « Lis-le », « Pourquoi ? ».
-6. **Reformulation** — l'élève explique avec ses mots, oralement ou par écrit.
-7. **Validation** — Braise reconnaît l'idée comprise et corrige seulement ce qui reste flou.
-8. **Ancrage** — une micro-question vérifie immédiatement la compréhension.
-9. **Consolidation** — la notion revient plus tard selon la confiance et les aides utilisées.
+1. **Essayer** — Braise pose une question, une situation ou un petit problème sur une seule
+   notion. L'élève doit essayer, même sans être sûr — répondre, hésiter ou dire « je sais pas »
+   sont trois réponses également valables.
+2. **Diagnostic** — sur une réponse fausse ou hésitante, Braise ne corrige pas tout de suite. Elle
+   demande pourquoi (« pourquoi tu penses ça ? ») pour identifier la représentation erronée, pas
+   seulement la mauvaise réponse. Exemple : « 2/4 est plus grand que 1/2 » n'est pas une erreur
+   de calcul mais un signe que l'élève lit la taille des nombres comme la taille de la quantité.
+3. **Explication autrement** — Braise choisit, parmi plusieurs formes validées pour cette notion
+   (image, analogie, exemple concret, mini-histoire, schéma, manipulation guidée), celle qui
+   répond au blocage identifié — jamais la même formulation répétée à l'identique.
+4. **Le Déclic** 🔥 — le moment où l'élève passe de « je ne comprends pas » à « ah oui, j'ai
+   capté ». C'est la récompense principale de BRAISE ; XP et badges peuvent l'accompagner, jamais
+   la remplacer.
+5. **Reformulation** — l'élève explique la notion avec ses propres mots, oralement ou par écrit.
+   Cette phrase est conservée : c'est la preuve du Déclic, dans le langage de cet élève.
+6. **Réutilisation vérifiée** — jamais « t'as compris ? ». Braise propose une situation nouvelle
+   sur la même notion, pour vérifier que la compréhension tient et pas seulement qu'elle a été
+   entendue. Un échec à cette étape rouvre le diagnostic (étape 2) plutôt que de répéter
+   l'explication précédente.
+7. **Retrait progressif de l'aide** — la même notion revient ensuite sans l'analogie de départ,
+   puis sous forme abstraite, puis dans un problème réel. Le but n'est jamais que l'élève ait
+   durablement besoin de l'image de départ pour raisonner.
+8. **Consolidation différée** — la notion revient le lendemain, puis à quelques jours d'écart,
+   puis dans des contextes différents, sur le même moteur de répétition espacée que Réviser (pas
+   un second système parallèle), jusqu'à ce que l'élève sache la reconnaître, la retrouver sans
+   aide et l'utiliser.
 
-L'IA adapte la formulation mais ne décide pas seule de la vérité pédagogique. Chaque notion
-possède un objectif, des confusions fréquentes, des exemples, des formulations acceptables et une
-question de vérification validés éditorialement.
+### Si l'explication ne suffit pas
+
+Dire « j'ai pas capté » ou « explique autrement » doit être aussi simple et normal que répondre à
+la question elle-même. Braise change alors réellement de forme d'explication — jamais le même
+texte redit plus lentement. Rien dans l'interface ne doit laisser croire à l'élève que redemander
+est un échec.
+
+### La mémoire du Déclic
+
+Pour chaque notion et chaque élève, BRAISE conserve ce qui a réellement fonctionné : l'erreur
+initiale, le blocage identifié, l'explication qui a mené au Déclic et la reformulation de
+l'élève. Si la notion redevient floue plus tard, Braise peut s'appuyer sur ce qui a déjà marché
+pour cet élève précis (« tu te rappelles notre histoire avec les pizzas ? ») plutôt que de
+repartir de zéro. C'est un compagnon qui se souvient, pas un historique affiché tel quel, et cette
+mémoire reste soumise à la même collecte minimale que le reste de l'application (section 7).
+
+### Ce qui reste à trancher avant construction
+
+- **L'origine des explications alternatives.** Si l'IA les improvise entièrement à la volée, une
+  analogie fausse peut atteindre un élève sans validation préalable — contraire à la génération
+  non validée déjà exclue en section 9. Direction retenue par défaut : chaque notion porte
+  plusieurs explications rédigées et validées à l'avance par l'équipe pédagogique (objectif,
+  confusions fréquentes, exemples, contre-exemple, formulations de reformulation acceptables) ;
+  l'IA choisit, adapte le ton et personnalise, elle n'invente pas le fond pédagogique.
+- **Le format de stockage de la mémoire du Déclic** (par élève et par notion) doit être défini
+  avant toute implémentation, avec la même exigence de collecte minimale que le reste de l'app.
 
 ## 5. Carte complète des écrans
 
@@ -110,8 +155,8 @@ question de vérification validés éditorialement.
 - « Choisir une matière » ;
 - session courte annoncée avant de commencer ;
 - feedback explicatif après chaque décision ;
-- future piste « Apprendre » (voir section 3) : une conversation guidée, si elle se construit un
-  jour, vit comme un mode à l'intérieur de cet espace, pas comme un onglet séparé.
+- la conversation guidée « Le Déclic » (sections 3 et 4), quand elle sera construite, vit comme
+  un mode à l'intérieur de cet espace, pas comme un onglet séparé.
 
 ### Résultat
 
@@ -186,7 +231,9 @@ vitesse de lecture.
 ## 8. Progression et métrique principale
 
 Une notion suit cinq états : découverte, en cours, comprise avec aide, comprise seul, consolidée.
-Finir un chapitre ne signifie pas automatiquement le maîtriser.
+Finir un chapitre ne signifie pas automatiquement le maîtriser. Ces cinq états sont les jalons
+mêmes de la boucle « Le Déclic » (section 4) : le Déclic amène « comprise avec aide », le retrait
+progressif de l'aide mène à « comprise seul », la consolidation différée à « consolidée ».
 
 La métrique principale de BRAISE est :
 
