@@ -1,27 +1,33 @@
-import { useState, type ReactNode } from 'react';
-import { AnimatePresence, MotionConfig, motion, useReducedMotion } from 'framer-motion';
+import { useEffect, useState, type ReactNode } from 'react';
+import { AnimatePresence, LayoutGroup, MotionConfig, motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, Check, MessageCircle, Smartphone } from 'lucide-react';
 import { BraiseMascot } from '@/components/BraiseMascot';
+import { StreakFlameIcon } from '@/components/StreakFlameIcon';
 import { useApp } from '@/store';
 import { sfx } from '@/lib/sound';
 import { fireConfetti } from '@/lib/confetti';
-import { LEVELS, SUBJECTS } from '@/data';
+import { LEVELS } from '@/data';
 import type { Level, Personality } from '@/types';
 
 type Mood = 'happy' | 'proud' | 'cool' | 'eager';
 
-const RHYTHMS = [
-  { id: 'tranquille', title: 'Tranquille', desc: 'Quelques cartes, sans prise de tête.' },
-  { id: 'regulier', title: 'Régulier', desc: 'Le bon rythme pour progresser.' },
-  { id: 'a-fond', title: 'À fond', desc: 'Pour les périodes de contrôles.' },
-];
+const STEPS = ['welcome', 'name', 'level', 'tone', 'rhythm', 'consent', 'ready'] as const;
+type StepId = (typeof STEPS)[number];
+// Steps that show the progress bar: every question, not the two "hero" moments around them.
+const QUESTION_COUNT = STEPS.length - 1;
+
+const LEVEL_INFO: Record<string, { tag: string; reaction: string }> = {
+  '2nde': { tag: 'Nouveau lycée', reaction: 'La 2nde, nouveau rythme. On pose de bonnes bases ensemble.' },
+  '1ere': { tag: 'Bac de français', reaction: 'La 1ère, avec le bac de français au bout. On va s’organiser.' },
+  term: { tag: 'Année du bac', reaction: 'Terminale, l’année du bac. On va gérer ça ensemble.' },
+};
 
 const TONES: { id: Personality; title: string; desc: string; sample: string; mood: Mood }[] = [
   {
     id: 'chill',
     title: 'Pote Chill',
     desc: 'Doux, rassurant, zéro pression.',
-    sample: 'Pas de stress, on reprend ça tranquille, une étape à la fois.',
+    sample: 'Pas de stress. On reprend ça tranquille, une étape à la fois.',
     mood: 'happy',
   },
   {
@@ -33,10 +39,18 @@ const TONES: { id: Personality; title: string; desc: string; sample: string; moo
   },
 ];
 
-const STEP_COUNT = 7;
+const RHYTHMS = [
+  { id: 'tranquille', title: 'Tranquille', desc: 'Un peu chaque jour, sans prise de tête.', flames: 1, reaction: 'Tranquille, ça marche. Un peu chaque jour, c’est déjà énorme.' },
+  { id: 'regulier', title: 'Régulier', desc: 'Le bon rythme pour progresser.', flames: 2, reaction: 'Régulier, le bon plan. C’est comme ça qu’on retient pour de vrai.' },
+  { id: 'a-fond', title: 'À fond', desc: 'Pour les périodes de contrôles.', flames: 3, reaction: 'À fond ! Je te préviens, je vais te suivre de près.' },
+];
 
-// One question per screen, asked by Braise in a speech bubble rather than as a form label: the
-// first minute should feel like meeting a pote, not filling in a school registration sheet.
+const SPRING = { type: 'spring', stiffness: 380, damping: 32 } as const;
+
+// Onboarding as a first conversation with Braise, not a form: one question per screen, Braise
+// stays on stage the whole time (it morphs from the welcome hero into the speaker's seat instead of
+// being redrawn), types its lines, and reacts to every answer — the tone choice literally switches
+// how it talks. Ends on a "pass" that reflects the student's answers back before the app opens.
 export function OnboardingView() {
   const { state, completeOnboarding } = useApp();
   const reducedMotion = useReducedMotion();
@@ -44,110 +58,143 @@ export function OnboardingView() {
   const [direction, setDirection] = useState(1);
   const [name, setName] = useState('');
   const [level, setLevel] = useState<Level | null>(null);
-  const [subjects, setSubjects] = useState<string[]>([]);
   const [personality, setPersonality] = useState<Personality | null>(null);
   const [goal, setGoal] = useState<string | null>(null);
   const [consent, setConsent] = useState(false);
+  // Braise's reply to the answer just given on this screen — cleared on every screen change.
+  const [reaction, setReaction] = useState<{ text: string; mood: Mood } | null>(null);
 
+  const stepId: StepId = STEPS[step];
+  const hero = stepId === 'welcome' || stepId === 'ready';
   const trimmedName = name.trim();
-  const canContinue = [
-    true,
-    trimmedName.length > 0,
-    level !== null,
-    subjects.length > 0,
-    personality !== null,
-    goal !== null,
+  const tone = TONES.find((t) => t.id === personality);
+  const rhythm = RHYTHMS.find((r) => r.id === goal);
+
+  const canContinue: Record<StepId, boolean> = {
+    welcome: true,
+    name: trimmedName.length > 0,
+    level: level !== null,
+    tone: personality !== null,
+    rhythm: goal !== null,
     consent,
-  ][step];
+    ready: true,
+  };
+
+  const question: Record<StepId, { text: string; mood: Mood }> = {
+    welcome: { text: '', mood: 'happy' },
+    name: { text: 'Comment je t’appelle ?', mood: 'eager' },
+    level: { text: `Enchanté, ${trimmedName} ! T’es en quelle classe ?`, mood: 'happy' },
+    tone: { text: 'Et tu me préfères comment ? Touche pour m’entendre.', mood: 'eager' },
+    rhythm: { text: 'Tu passes me voir à quel rythme ?', mood: 'happy' },
+    consent: { text: 'Dernière chose avant d’y aller.', mood: 'proud' },
+    ready: { text: '', mood: 'proud' },
+  };
+  const line = reaction ?? question[stepId];
 
   const tap = () => sfx.tap(state.soundOn);
 
+  const goTo = (next: number) => {
+    setDirection(next > step ? 1 : -1);
+    setReaction(null);
+    setStep(next);
+  };
+
+  const next = () => {
+    if (!canContinue[stepId]) return;
+    if (stepId === 'ready') return finish();
+    if (STEPS[step + 1] === 'ready') sfx.complete(state.soundOn);
+    else sfx.whoosh(state.soundOn);
+    goTo(step + 1);
+  };
+
+  const back = () => {
+    tap();
+    goTo(step - 1);
+  };
+
   const finish = () => {
     if (!level || !personality || !goal) return;
-    sfx.complete(state.soundOn);
-    if (!reducedMotion) fireConfetti();
+    tap();
     completeOnboarding({
       ...state.user,
       name: trimmedName,
       level: level.id,
       levelLabel: level.label,
-      subjects,
+      // No subject question any more: an empty list means "no preference", and Moi still lets
+      // the student pick later. Pre-filling defaults here would be a preference they never gave.
+      subjects: [],
       personality,
       goal,
       joinedAt: Date.now(),
     });
   };
 
-  const next = () => {
-    if (!canContinue) return;
-    if (step === STEP_COUNT - 1) return finish();
-    sfx.whoosh(state.soundOn);
-    setDirection(1);
-    setStep(step + 1);
-  };
+  useEffect(() => {
+    if (stepId === 'ready' && !reducedMotion) fireConfetti();
+  }, [stepId, reducedMotion]);
 
-  const back = () => {
-    tap();
-    setDirection(-1);
-    setStep(step - 1);
+  const ctaLabel: Record<StepId, string> = {
+    welcome: 'On y va !',
+    name: 'Continuer',
+    level: 'Continuer',
+    tone: 'Continuer',
+    rhythm: 'Continuer',
+    consent: 'Valider',
+    ready: 'C’est parti !',
   };
-
-  const toggleSubject = (id: string) => {
-    tap();
-    setSubjects((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
-  };
-
-  const isWelcome = step === 0;
-  const ctaLabel = isWelcome ? 'On y va !' : step === STEP_COUNT - 1 ? "C'est parti !" : 'Continuer';
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className={`onb ${isWelcome ? 'onb--welcome' : ''}`}>
-        {!isWelcome && (
-          <header className="onb-top">
-            <button type="button" className="onb-back" onClick={back} aria-label="Retour">
-              <ArrowLeft size={20} strokeWidth={2.6} />
-            </button>
-            <div
-              className="onb-progress"
-              role="progressbar"
-              aria-label="Progression de l'inscription"
-              aria-valuemin={1}
-              aria-valuemax={STEP_COUNT - 1}
-              aria-valuenow={step}
-            >
-              <span style={{ width: `${(step / (STEP_COUNT - 1)) * 100}%` }} />
-            </div>
-          </header>
-        )}
-
-        <AnimatePresence mode="wait" initial={false} custom={direction}>
-          <motion.section
-            key={step}
-            className="onb-body"
-            custom={direction}
-            initial={{ opacity: 0, x: 28 * direction }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -28 * direction }}
-            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-          >
-            {step === 0 && (
-              <div className="onb-welcome">
-                <span className="onb-welcome-sun" aria-hidden="true" />
-                {/* Braise is orange too — without its own cream stage it melts into the page. */}
-                <div className="onb-welcome-stage">
-                  <div className="onb-welcome-braise">
-                    <BraiseMascot size={132} mood="happy" />
-                  </div>
-                </div>
-                <h1>Salut, moi c'est Braise.</h1>
-                <p>Tes cours, expliqués comme par un pote.</p>
+      <LayoutGroup>
+        <div className={`onb onb--${stepId}`}>
+          {!hero && (
+            <header className="onb-top">
+              <button type="button" className="onb-back" onClick={back} aria-label="Retour">
+                <ArrowLeft size={20} strokeWidth={2.6} />
+              </button>
+              <div
+                className="onb-progress"
+                role="progressbar"
+                aria-label="Progression"
+                aria-valuemin={1}
+                aria-valuemax={QUESTION_COUNT - 1}
+                aria-valuenow={step}
+              >
+                <motion.span
+                  initial={false}
+                  animate={{ width: `${(step / QUESTION_COUNT) * 100}%` }}
+                  transition={SPRING}
+                />
               </div>
-            )}
+            </header>
+          )}
 
-            {step === 1 && (
-              <>
-                <BraiseAsks mood="eager">Comment je t'appelle ?</BraiseAsks>
+          <div className={`onb-scene ${hero ? 'is-hero' : ''}`}>
+            {/* One persistent element across every screen: `layout` animates it between the big
+                welcome stage and the small speaker seat instead of unmounting and redrawing. */}
+            <motion.div layout transition={SPRING} className="onb-avatar">
+              <motion.div layout transition={SPRING} className="onb-avatar-inner">
+                <BraiseMascot size={hero ? 132 : 50} mood={line.mood} />
+              </motion.div>
+            </motion.div>
+
+            {stepId === 'welcome' && (
+              <HeroCopy title="Salut, moi c’est Braise." subtitle="Tes cours, expliqués comme par un pote." />
+            )}
+            {stepId === 'ready' && <HeroCopy title={`Bienvenue, ${trimmedName} !`} subtitle="Ton Braise est prêt." />}
+            {!hero && <Bubble key={line.text} text={line.text} />}
+          </div>
+
+          <AnimatePresence mode="wait" initial={false} custom={direction}>
+            <motion.section
+              key={step}
+              className="onb-body"
+              initial={{ opacity: 0, x: 32 * direction }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -32 * direction }}
+              transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+            >
+              {stepId === 'name' && (
                 <input
                   className="onb-input"
                   type="text"
@@ -162,167 +209,244 @@ export function OnboardingView() {
                   autoComplete="given-name"
                   autoFocus
                 />
-              </>
-            )}
+              )}
 
-            {step === 2 && (
-              <>
-                <BraiseAsks mood="happy">Enchanté, {trimmedName} ! T'es en quelle classe ?</BraiseAsks>
+              {stepId === 'level' && (
                 <div className="onb-stack">
                   {LEVELS.map((l) => (
-                    <button
+                    <Tile
                       key={l.id}
-                      type="button"
-                      className={`onb-tile onb-tile--level ${level?.id === l.id ? 'is-selected' : ''}`}
-                      aria-pressed={level?.id === l.id}
-                      onClick={() => {
+                      selected={level?.id === l.id}
+                      className="onb-tile--row"
+                      onSelect={() => {
                         tap();
                         setLevel(l);
+                        setReaction({ text: LEVEL_INFO[l.id]?.reaction ?? 'Noté !', mood: 'proud' });
                       }}
                     >
-                      {l.label}
-                    </button>
+                      <b>{l.label}</b>
+                      <small>{LEVEL_INFO[l.id]?.tag}</small>
+                    </Tile>
                   ))}
                 </div>
-              </>
-            )}
+              )}
 
-            {step === 3 && (
-              <>
-                <BraiseAsks mood="proud">Sur quoi je t'aide en priorité ?</BraiseAsks>
-                <p className="onb-hint">Choisis-en autant que tu veux.</p>
-                <div className="onb-grid cols-2">
-                  {SUBJECTS.map((s) => {
-                    const selected = subjects.includes(s.id);
-                    return (
-                      <button
-                        key={s.id}
-                        type="button"
-                        className={`onb-tile onb-tile--subject ${selected ? 'is-selected' : ''}`}
-                        aria-pressed={selected}
-                        onClick={() => toggleSubject(s.id)}
-                      >
-                        <span className="onb-subject-icon" style={{ background: s.color }} aria-hidden="true">
-                          {s.emoji}
-                        </span>
-                        <span className="onb-subject-name">{s.name}</span>
-                        {selected && (
-                          <span className="onb-tick" aria-hidden="true">
-                            <Check size={14} strokeWidth={3.5} />
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </>
-            )}
-
-            {step === 4 && (
-              <>
-                <BraiseAsks mood="cool">Tu me préfères comment ?</BraiseAsks>
+              {stepId === 'tone' && (
                 <div className="onb-stack">
                   {TONES.map((t) => (
-                    <button
+                    <Tile
                       key={t.id}
-                      type="button"
-                      className={`onb-tile onb-tile--tone ${personality === t.id ? 'is-selected' : ''}`}
-                      aria-pressed={personality === t.id}
-                      onClick={() => {
+                      selected={personality === t.id}
+                      className="onb-tile--row onb-tile--tone"
+                      onSelect={() => {
                         tap();
                         setPersonality(t.id);
+                        setReaction({ text: t.sample, mood: t.mood });
                       }}
                     >
-                      <span className="onb-tone-head">
-                        <BraiseMascot size={48} mood={t.mood} />
-                        <span>
-                          <b>{t.title}</b>
-                          <small>{t.desc}</small>
-                        </span>
+                      <span className="onb-tone-face" aria-hidden="true">
+                        <BraiseMascot size={44} mood={t.mood} />
                       </span>
-                      <span className="onb-tone-sample">« {t.sample} »</span>
-                    </button>
+                      <span>
+                        <b>{t.title}</b>
+                        <small>{t.desc}</small>
+                      </span>
+                    </Tile>
                   ))}
+                  <p className="onb-hint">Tu pourras changer ça quand tu veux, dans Moi.</p>
                 </div>
-                <p className="onb-hint">Tu pourras changer ça quand tu veux, dans Moi.</p>
-              </>
-            )}
+              )}
 
-            {step === 5 && (
-              <>
-                <BraiseAsks mood="happy">Tu passes me voir à quel rythme ?</BraiseAsks>
+              {stepId === 'rhythm' && (
                 <div className="onb-stack">
                   {RHYTHMS.map((r) => (
-                    <button
+                    <Tile
                       key={r.id}
-                      type="button"
-                      className={`onb-tile onb-tile--row ${goal === r.id ? 'is-selected' : ''}`}
-                      aria-pressed={goal === r.id}
-                      onClick={() => {
+                      selected={goal === r.id}
+                      className="onb-tile--row onb-tile--rhythm"
+                      onSelect={() => {
                         tap();
                         setGoal(r.id);
+                        setReaction({ text: r.reaction, mood: r.id === 'a-fond' ? 'cool' : 'happy' });
                       }}
                     >
-                      <b>{r.title}</b>
-                      <small>{r.desc}</small>
-                    </button>
+                      <span>
+                        <b>{r.title}</b>
+                        <small>{r.desc}</small>
+                      </span>
+                      <span className="onb-flames" aria-label={`Intensité ${r.flames} sur 3`}>
+                        {[1, 2, 3].map((i) => (
+                          <span key={i} className={i <= r.flames ? 'is-lit' : ''}>
+                            <StreakFlameIcon size={18} />
+                          </span>
+                        ))}
+                      </span>
+                    </Tile>
                   ))}
                 </div>
-              </>
-            )}
+              )}
 
-            {step === 6 && (
-              <>
-                <BraiseAsks mood="proud">Dernière chose avant d'y aller.</BraiseAsks>
-                {/* Must stay literally true: when accounts/cloud sync land, the first line changes. */}
-                <div className="onb-info">
-                  <p>
-                    <Smartphone size={20} aria-hidden="true" />
-                    <span>Ta progression est enregistrée sur cet appareil.</span>
-                  </p>
-                  <p>
-                    <MessageCircle size={20} aria-hidden="true" />
-                    <span>
-                      Quand tu me parles, tes messages passent par un service d'IA pour que je puisse te
-                      répondre. Évite d'y mettre des infos perso.
+              {stepId === 'consent' && (
+                <>
+                  {/* Must stay literally true: when accounts/cloud sync land, the first line changes. */}
+                  <div className="onb-info">
+                    <p>
+                      <Smartphone size={20} aria-hidden="true" />
+                      <span>Ta progression est enregistrée sur cet appareil.</span>
+                    </p>
+                    <p>
+                      <MessageCircle size={20} aria-hidden="true" />
+                      <span>
+                        Quand tu me parles, tes messages passent par un service d’IA pour que je puisse te
+                        répondre. Évite d’y mettre des infos perso.
+                      </span>
+                    </p>
+                  </div>
+                  <motion.button
+                    type="button"
+                    role="checkbox"
+                    aria-checked={consent}
+                    className={`onb-check ${consent ? 'is-checked' : ''}`}
+                    whileTap={{ x: 2, y: 2 }}
+                    onClick={() => {
+                      tap();
+                      setConsent((c) => !c);
+                      setReaction(consent ? null : { text: 'Merci. On y va ?', mood: 'happy' });
+                    }}
+                  >
+                    <span className="onb-check-box" aria-hidden="true">
+                      <AnimatePresence>
+                        {consent && (
+                          <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={SPRING}>
+                            <Check size={16} strokeWidth={3.5} />
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
                     </span>
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  role="checkbox"
-                  aria-checked={consent}
-                  className={`onb-check ${consent ? 'is-checked' : ''}`}
-                  onClick={() => {
-                    tap();
-                    setConsent((c) => !c);
-                  }}
-                >
-                  <span className="onb-check-box" aria-hidden="true">
-                    {consent && <Check size={16} strokeWidth={3.5} />}
-                  </span>
-                  C'est bon pour moi
-                </button>
-              </>
-            )}
-          </motion.section>
-        </AnimatePresence>
+                    C’est bon pour moi
+                  </motion.button>
+                </>
+              )}
 
-        <footer className="onb-footer">
-          <button type="button" className="onb-cta" onClick={next} disabled={!canContinue}>
-            {ctaLabel}
-          </button>
-        </footer>
-      </div>
+              {stepId === 'ready' && level && tone && rhythm && (
+                <motion.div
+                  className="onb-pass"
+                  initial={{ opacity: 0, y: 60, rotate: -4 }}
+                  animate={{ opacity: 1, y: 0, rotate: -1.5 }}
+                  transition={{ ...SPRING, delay: 0.15 }}
+                >
+                  <span className="onb-pass-kicker">Ton pass Braise</span>
+                  <dl>
+                    <div>
+                      <dt>Prénom</dt>
+                      <dd>{trimmedName}</dd>
+                    </div>
+                    <div>
+                      <dt>Classe</dt>
+                      <dd>{level.label}</dd>
+                    </div>
+                    <div>
+                      <dt>Ton de Braise</dt>
+                      <dd>{tone.title}</dd>
+                    </div>
+                    <div>
+                      <dt>Rythme</dt>
+                      <dd>{rhythm.title}</dd>
+                    </div>
+                  </dl>
+                </motion.div>
+              )}
+            </motion.section>
+          </AnimatePresence>
+
+          <footer className="onb-footer">
+            <motion.button
+              type="button"
+              className="onb-cta"
+              onClick={next}
+              disabled={!canContinue[stepId]}
+              whileTap={canContinue[stepId] ? { x: 3, y: 3 } : undefined}
+            >
+              {ctaLabel[stepId]}
+            </motion.button>
+          </footer>
+        </div>
+      </LayoutGroup>
     </MotionConfig>
   );
 }
 
-function BraiseAsks({ mood, children }: { mood: Mood; children: ReactNode }) {
+function HeroCopy({ title, subtitle }: { title: string; subtitle: string }) {
   return (
-    <div className="onb-ask">
-      <BraiseMascot size={68} mood={mood} />
-      <h2 className="onb-bubble">{children}</h2>
-    </div>
+    <motion.div
+      className="onb-hero-copy"
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <h1>{title}</h1>
+      <p>{subtitle}</p>
+    </motion.div>
+  );
+}
+
+// Braise "types" its line, like a message arriving. The full text sits invisibly underneath so the
+// bubble takes its final size at once (no layout jump while typing), and screen readers get the
+// whole sentence immediately through the sr-only copy. Keyed by text in the parent, so every new
+// line starts from zero without resetting state inside an effect.
+function Bubble({ text }: { text: string }) {
+  const reducedMotion = useReducedMotion();
+  const [count, setCount] = useState(reducedMotion ? text.length : 0);
+
+  useEffect(() => {
+    if (count >= text.length) return;
+    const t = setTimeout(() => setCount((c) => c + 1), 18);
+    return () => clearTimeout(t);
+  }, [count, text.length]);
+
+  return (
+    <motion.h2
+      className="onb-bubble"
+      initial={{ opacity: 0, scale: 0.92 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={SPRING}
+      style={{ transformOrigin: 'bottom left' }}
+    >
+      <span className="onb-bubble-ghost" aria-hidden="true">
+        {text}
+      </span>
+      <span className="onb-bubble-live" aria-hidden="true">
+        {text.slice(0, count)}
+      </span>
+      <span className="sr-only" aria-live="polite">
+        {text}
+      </span>
+    </motion.h2>
+  );
+}
+
+function Tile({
+  selected,
+  className,
+  onSelect,
+  children,
+}: {
+  selected: boolean;
+  className?: string;
+  onSelect: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <motion.button
+      type="button"
+      className={`onb-tile ${className ?? ''} ${selected ? 'is-selected' : ''}`}
+      aria-pressed={selected}
+      onClick={onSelect}
+      whileTap={{ x: 2, y: 2 }}
+      animate={selected ? { scale: [1, 1.035, 1] } : { scale: 1 }}
+      transition={{ duration: 0.28 }}
+    >
+      {children}
+    </motion.button>
   );
 }
