@@ -1,260 +1,333 @@
-import { useState } from 'react';
-import { Check } from 'lucide-react';
-import { BraiseMascot, SapiLogo } from '@/components/BraiseMascot';
-import { AvatarGlyph, getAvatarName } from '@/components/AvatarGlyph';
+import { useState, type ReactNode } from 'react';
+import { AnimatePresence, MotionConfig, motion, useReducedMotion } from 'framer-motion';
+import { ArrowLeft, Check, MessageCircle, Smartphone } from 'lucide-react';
+import { BraiseMascot } from '@/components/BraiseMascot';
 import { useApp } from '@/store';
 import { sfx } from '@/lib/sound';
-import { LEVELS, SUBJECTS, AVATARS } from '@/data';
-import type { Level } from '@/types';
+import { fireConfetti } from '@/lib/confetti';
+import { LEVELS, SUBJECTS } from '@/data';
+import type { Level, Personality } from '@/types';
 
-const GOALS = ['15 min/jour', '30 min/jour', '1 heure/jour'];
+type Mood = 'happy' | 'proud' | 'cool' | 'eager';
 
+const RHYTHMS = [
+  { id: 'tranquille', title: 'Tranquille', desc: 'Quelques cartes, sans prise de tête.' },
+  { id: 'regulier', title: 'Régulier', desc: 'Le bon rythme pour progresser.' },
+  { id: 'a-fond', title: 'À fond', desc: 'Pour les périodes de contrôles.' },
+];
+
+const TONES: { id: Personality; title: string; desc: string; sample: string; mood: Mood }[] = [
+  {
+    id: 'chill',
+    title: 'Pote Chill',
+    desc: 'Doux, rassurant, zéro pression.',
+    sample: 'Pas de stress, on reprend ça tranquille, une étape à la fois.',
+    mood: 'happy',
+  },
+  {
+    id: 'savage',
+    title: 'Coach Savage',
+    desc: 'Direct, énergique, second degré.',
+    sample: 'Ce piège-là attrape tout le monde. Pas toi, cette fois.',
+    mood: 'cool',
+  },
+];
+
+const STEP_COUNT = 7;
+
+// One question per screen, asked by Braise in a speech bubble rather than as a form label: the
+// first minute should feel like meeting a pote, not filling in a school registration sheet.
 export function OnboardingView() {
-  const { state, setUser, setView } = useApp();
+  const { state, completeOnboarding } = useApp();
+  const reducedMotion = useReducedMotion();
   const [step, setStep] = useState(0);
+  const [direction, setDirection] = useState(1);
   const [name, setName] = useState('');
   const [level, setLevel] = useState<Level | null>(null);
-  const [goal, setGoal] = useState('');
   const [subjects, setSubjects] = useState<string[]>([]);
-  const [avatar, setAvatar] = useState('fleme');
+  const [personality, setPersonality] = useState<Personality | null>(null);
+  const [goal, setGoal] = useState<string | null>(null);
   const [consent, setConsent] = useState(false);
-  const [showPrivacyInfo, setShowPrivacyInfo] = useState(false);
 
-  const total = 4;
-  const next = () => {
-    sfx.whoosh(state.soundOn);
-    if (step < total - 1) setStep(step + 1);
-    else finish();
-  };
-  const prev = () => {
-    sfx.tap(state.soundOn);
-    if (step > 0) setStep(step - 1);
-  };
+  const trimmedName = name.trim();
+  const canContinue = [
+    true,
+    trimmedName.length > 0,
+    level !== null,
+    subjects.length > 0,
+    personality !== null,
+    goal !== null,
+    consent,
+  ][step];
+
+  const tap = () => sfx.tap(state.soundOn);
 
   const finish = () => {
+    if (!level || !personality || !goal) return;
     sfx.complete(state.soundOn);
-    setUser({
-      name: name || 'Alex',
-      level: level?.id ?? '3e',
-      levelLabel: level?.label ?? '3ème',
-      goal,
+    if (!reducedMotion) fireConfetti();
+    completeOnboarding({
+      ...state.user,
+      name: trimmedName,
+      level: level.id,
+      levelLabel: level.label,
       subjects,
-      avatar,
-      personality: state.user.personality,
+      personality,
+      goal,
       joinedAt: Date.now(),
     });
-    setView('home');
+  };
+
+  const next = () => {
+    if (!canContinue) return;
+    if (step === STEP_COUNT - 1) return finish();
+    sfx.whoosh(state.soundOn);
+    setDirection(1);
+    setStep(step + 1);
+  };
+
+  const back = () => {
+    tap();
+    setDirection(-1);
+    setStep(step - 1);
   };
 
   const toggleSubject = (id: string) => {
-    sfx.tap(state.soundOn);
+    tap();
     setSubjects((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
   };
 
-  const canNext =
-    step === 0 ||
-    (step === 1 && name.trim().length > 0) ||
-    (step === 2 && level !== null) ||
-    (step === 3 && subjects.length > 0 && goal !== '' && consent);
+  const isWelcome = step === 0;
+  const ctaLabel = isWelcome ? 'On y va !' : step === STEP_COUNT - 1 ? "C'est parti !" : 'Continuer';
 
   return (
-    <div className="app-content">
-      {/* Step 0 — Welcome */}
-      <div className={`ob-step ob-welcome ${step === 0 ? 'is-active' : ''}`}>
-        <SapiLogo size={52} />
-        <h1>Bienvenue sur SAPIE</h1>
-        <p>Réviser comme un pote t'explique le cours. Sans pression, juste la motivation.</p>
-        <BraiseMascot size={74} className="flame-hero" mood="happy" />
-        <button className="btn-block" onClick={next}>
-          C'est parti !
-        </button>
-      </div>
-
-      {/* Step 1 — Name + Avatar */}
-      <div className={`ob-step ${step === 1 ? 'is-active' : ''}`}>
-        <div className="dots">
-          {Array.from({ length: total }).map((_, i) => (
-            <span key={i} className={i === step ? 'on' : ''} />
-          ))}
-        </div>
-        <h2>Comment tu t'appelles ?</h2>
-        <p className="sub">Braise a besoin d'un prénom pour te parler comme un vrai pote.</p>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Ton prénom"
-          style={{
-            background: 'var(--paper)',
-            border: '2px solid var(--line)',
-            borderRadius: 14,
-            padding: '15px 16px',
-            fontSize: '0.95rem',
-            marginBottom: 16,
-            color: 'var(--ink)',
-          }}
-          autoFocus
-        />
-        <div className="level-group-label" style={{ marginBottom: 8 }}>
-          Choisis ton avatar
-        </div>
-        <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 'auto' }}>
-          {/* Only the always-free avatars here — a brand-new account is rank Bronze by
-              definition, so every rank-gated one (see data.ts) would show locked on day one.
-              Nothing rewarding about a wall of padlocks before the app has even started; those
-              stay a real thing to discover later, from Profil. */}
-          {AVATARS.filter((a) => !a.minRankId).map((a) => (
-            <button
-              key={a.emoji}
-              onClick={() => {
-                sfx.tap(state.soundOn);
-                setAvatar(a.emoji);
-              }}
-              aria-label={`Choisir l'avatar ${getAvatarName(a.emoji)}`}
-              style={{
-                width: 52,
-                height: 52,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 14,
-                background: avatar === a.emoji ? 'var(--blue-pale)' : 'var(--paper)',
-                border: `2.5px solid ${avatar === a.emoji ? 'var(--neo-ink)' : 'var(--line)'}`,
-                boxShadow: avatar === a.emoji ? '3px 3px 0 var(--neo-ink)' : 'none',
-              }}
-            >
-              <AvatarGlyph id={a.emoji} size={36} />
+    <MotionConfig reducedMotion="user">
+      <div className={`onb ${isWelcome ? 'onb--welcome' : ''}`}>
+        {!isWelcome && (
+          <header className="onb-top">
+            <button type="button" className="onb-back" onClick={back} aria-label="Retour">
+              <ArrowLeft size={20} strokeWidth={2.6} />
             </button>
-          ))}
-        </div>
-        <button className="btn-block blue" onClick={next} disabled={!canNext}>
-          Continuer
-        </button>
-      </div>
-
-      {/* Step 2 — Level */}
-      <div className={`ob-step ${step === 2 ? 'is-active' : ''}`}>
-        <div className="dots">
-          {Array.from({ length: total }).map((_, i) => (
-            <span key={i} className={i === step ? 'on' : ''} />
-          ))}
-        </div>
-        <h2>Quel est ton niveau ?</h2>
-        <p className="sub">On adapte les leçons à ton programme.</p>
-        <div style={{ marginBottom: 'auto' }}>
-          {['Collège', 'Lycée'].map((g) => (
-            <div key={g} style={{ marginBottom: 14 }}>
-              <div className="level-group-label">{g}</div>
-              <div className="level-list">
-                {LEVELS.filter((l) => l.group === g).map((l) => (
-                  <button
-                    key={l.id}
-                    className={`level-item ${level?.id === l.id ? 'is-selected' : ''}`}
-                    onClick={() => {
-                      sfx.tap(state.soundOn);
-                      setLevel(l);
-                    }}
-                  >
-                    {l.label}
-                  </button>
-                ))}
-              </div>
+            <div
+              className="onb-progress"
+              role="progressbar"
+              aria-label="Progression de l'inscription"
+              aria-valuemin={1}
+              aria-valuemax={STEP_COUNT - 1}
+              aria-valuenow={step}
+            >
+              <span style={{ width: `${(step / (STEP_COUNT - 1)) * 100}%` }} />
             </div>
-          ))}
-        </div>
-        <div style={{ display: 'flex', gap: 10 }}>
-          <button
-            className="btn-block"
-            style={{ background: 'var(--paper)', color: 'var(--ink)', marginTop: 0 }}
-            onClick={prev}
+          </header>
+        )}
+
+        <AnimatePresence mode="wait" initial={false} custom={direction}>
+          <motion.section
+            key={step}
+            className="onb-body"
+            custom={direction}
+            initial={{ opacity: 0, x: 28 * direction }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -28 * direction }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
           >
-            Retour
+            {step === 0 && (
+              <div className="onb-welcome">
+                <span className="onb-welcome-sun" aria-hidden="true" />
+                {/* Braise is orange too — without its own cream stage it melts into the page. */}
+                <div className="onb-welcome-stage">
+                  <div className="onb-welcome-braise">
+                    <BraiseMascot size={132} mood="happy" />
+                  </div>
+                </div>
+                <h1>Salut, moi c'est Braise.</h1>
+                <p>Tes cours, expliqués comme par un pote.</p>
+              </div>
+            )}
+
+            {step === 1 && (
+              <>
+                <BraiseAsks mood="eager">Comment je t'appelle ?</BraiseAsks>
+                <input
+                  className="onb-input"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') next();
+                  }}
+                  placeholder="Ton prénom"
+                  aria-label="Ton prénom"
+                  maxLength={24}
+                  autoComplete="given-name"
+                  autoFocus
+                />
+              </>
+            )}
+
+            {step === 2 && (
+              <>
+                <BraiseAsks mood="happy">Enchanté, {trimmedName} ! T'es en quelle classe ?</BraiseAsks>
+                {(['Collège', 'Lycée'] as const).map((group) => (
+                  <div key={group} className="onb-group" role="group" aria-label={group}>
+                    <span className="onb-group-label">{group}</span>
+                    <div className={`onb-grid ${group === 'Collège' ? 'cols-4' : 'cols-3'}`}>
+                      {LEVELS.filter((l) => l.group === group).map((l) => (
+                        <button
+                          key={l.id}
+                          type="button"
+                          className={`onb-tile onb-tile--level ${level?.id === l.id ? 'is-selected' : ''}`}
+                          aria-pressed={level?.id === l.id}
+                          onClick={() => {
+                            tap();
+                            setLevel(l);
+                          }}
+                        >
+                          {l.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+
+            {step === 3 && (
+              <>
+                <BraiseAsks mood="proud">Sur quoi je t'aide en priorité ?</BraiseAsks>
+                <p className="onb-hint">Choisis-en autant que tu veux.</p>
+                <div className="onb-grid cols-2">
+                  {SUBJECTS.map((s) => {
+                    const selected = subjects.includes(s.id);
+                    return (
+                      <button
+                        key={s.id}
+                        type="button"
+                        className={`onb-tile onb-tile--subject ${selected ? 'is-selected' : ''}`}
+                        aria-pressed={selected}
+                        onClick={() => toggleSubject(s.id)}
+                      >
+                        <span className="onb-subject-icon" style={{ background: s.color }} aria-hidden="true">
+                          {s.emoji}
+                        </span>
+                        <span className="onb-subject-name">{s.name}</span>
+                        {selected && (
+                          <span className="onb-tick" aria-hidden="true">
+                            <Check size={14} strokeWidth={3.5} />
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+
+            {step === 4 && (
+              <>
+                <BraiseAsks mood="cool">Tu me préfères comment ?</BraiseAsks>
+                <div className="onb-stack">
+                  {TONES.map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      className={`onb-tile onb-tile--tone ${personality === t.id ? 'is-selected' : ''}`}
+                      aria-pressed={personality === t.id}
+                      onClick={() => {
+                        tap();
+                        setPersonality(t.id);
+                      }}
+                    >
+                      <span className="onb-tone-head">
+                        <BraiseMascot size={48} mood={t.mood} />
+                        <span>
+                          <b>{t.title}</b>
+                          <small>{t.desc}</small>
+                        </span>
+                      </span>
+                      <span className="onb-tone-sample">« {t.sample} »</span>
+                    </button>
+                  ))}
+                </div>
+                <p className="onb-hint">Tu pourras changer ça quand tu veux, dans Moi.</p>
+              </>
+            )}
+
+            {step === 5 && (
+              <>
+                <BraiseAsks mood="happy">Tu passes me voir à quel rythme ?</BraiseAsks>
+                <div className="onb-stack">
+                  {RHYTHMS.map((r) => (
+                    <button
+                      key={r.id}
+                      type="button"
+                      className={`onb-tile onb-tile--row ${goal === r.id ? 'is-selected' : ''}`}
+                      aria-pressed={goal === r.id}
+                      onClick={() => {
+                        tap();
+                        setGoal(r.id);
+                      }}
+                    >
+                      <b>{r.title}</b>
+                      <small>{r.desc}</small>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {step === 6 && (
+              <>
+                <BraiseAsks mood="proud">Dernière chose avant d'y aller.</BraiseAsks>
+                {/* Must stay literally true: when accounts/cloud sync land, the first line changes. */}
+                <div className="onb-info">
+                  <p>
+                    <Smartphone size={20} aria-hidden="true" />
+                    <span>Ta progression est enregistrée sur cet appareil.</span>
+                  </p>
+                  <p>
+                    <MessageCircle size={20} aria-hidden="true" />
+                    <span>
+                      Quand tu me parles, tes messages passent par un service d'IA pour que je puisse te
+                      répondre. Évite d'y mettre des infos perso.
+                    </span>
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  role="checkbox"
+                  aria-checked={consent}
+                  className={`onb-check ${consent ? 'is-checked' : ''}`}
+                  onClick={() => {
+                    tap();
+                    setConsent((c) => !c);
+                  }}
+                >
+                  <span className="onb-check-box" aria-hidden="true">
+                    {consent && <Check size={16} strokeWidth={3.5} />}
+                  </span>
+                  C'est bon pour moi
+                </button>
+              </>
+            )}
+          </motion.section>
+        </AnimatePresence>
+
+        <footer className="onb-footer">
+          <button type="button" className="onb-cta" onClick={next} disabled={!canContinue}>
+            {ctaLabel}
           </button>
-          <button className="btn-block blue" style={{ marginTop: 0 }} onClick={next} disabled={!canNext}>
-            Continuer
-          </button>
-        </div>
+        </footer>
       </div>
+    </MotionConfig>
+  );
+}
 
-      {/* Step 3 — Subjects + Goal + Consent + Meet Braise */}
-      <div className={`ob-step meet-braise ${step === 3 ? 'is-active' : ''}`}>
-        <div className="dots">
-          {Array.from({ length: total }).map((_, i) => (
-            <span key={i} className={i === step ? 'on' : ''} />
-          ))}
-        </div>
-        <BraiseMascot size={72} mood="proud" />
-        <h2>Salut, moi c'est Braise !</h2>
-        <p className="sub">
-          Je suis ton pote de classe. Choisis tes matières et ton objectif, et on y va !
-        </p>
-
-        <div className="subject-chips" style={{ marginTop: 4 }}>
-          {SUBJECTS.map((s) => (
-            <button
-              key={s.id}
-              className={`schip ${subjects.includes(s.id) ? 'is-selected' : ''}`}
-              onClick={() => toggleSubject(s.id)}
-            >
-              {s.emoji} {s.name}
-            </button>
-          ))}
-        </div>
-
-        <div className="chip-grid" style={{ marginTop: 14 }}>
-          {GOALS.map((g) => (
-            <button
-              key={g}
-              className={`chip ${goal === g ? 'is-selected' : ''}`}
-              onClick={() => {
-                sfx.tap(state.soundOn);
-                setGoal(g);
-              }}
-            >
-              {g}
-              <span className="chk">{goal === g && <Check size={14} />}</span>
-            </button>
-          ))}
-        </div>
-
-        <div style={{ marginTop: 'auto', marginBottom: 14 }}>
-          <label className="consent-row" style={{ marginBottom: 0 }}>
-            <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
-            <span>
-              J'accepte que mes données de progression soient utilisées pour personnaliser mon
-              apprentissage.{' '}
-              <a
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setShowPrivacyInfo((v) => !v);
-                }}
-              >
-                En savoir plus
-              </a>
-            </span>
-          </label>
-          {showPrivacyInfo && (
-            <p className="sub" style={{ marginTop: 8, marginBottom: 0 }}>
-              Ta progression (série, XP, cartes revues) est enregistrée uniquement sur cet
-              appareil, dans ton navigateur — rien n'est envoyé à un serveur externe pour la
-              faire fonctionner.
-            </p>
-          )}
-        </div>
-        <div style={{ display: 'flex', gap: 10 }}>
-          <button
-            className="btn-block"
-            style={{ background: 'var(--paper)', color: 'var(--ink)', marginTop: 0 }}
-            onClick={prev}
-          >
-            Retour
-          </button>
-          <button className="btn-block blue" style={{ marginTop: 0 }} onClick={finish} disabled={!canNext}>
-            Commencer
-          </button>
-        </div>
-      </div>
+function BraiseAsks({ mood, children }: { mood: Mood; children: ReactNode }) {
+  return (
+    <div className="onb-ask">
+      <BraiseMascot size={68} mood={mood} />
+      <h2 className="onb-bubble">{children}</h2>
     </div>
   );
 }

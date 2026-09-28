@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ensureSession } from '@/store';
+import { ensureSession, resolveRestoredView } from '@/store';
 import { DEFAULT_USER } from '@/data';
 import type { AppState } from '@/types';
 
@@ -16,6 +16,7 @@ function baseState(overrides: Partial<AppState>): AppState {
     freezes: 2,
     freezeArmed: false,
     everUsedFreeze: false,
+    onboardingCompleted: true,
     dailyGoalMet: false,
     darkMode: false,
     dyslexiaMode: false,
@@ -93,5 +94,16 @@ describe('ensureSession', () => {
     const result = ensureSession(s);
     expect(Number.isNaN(result.streak)).toBe(false);
     expect(result.sessionCardsReviewed).toBe(0);
+  });
+});
+
+describe('resolveRestoredView', () => {
+  it('sends a student who reloaded mid-onboarding back to onboarding', () => {
+    expect(resolveRestoredView({ onboardingCompleted: false, view: 'home' })).toBe('onboarding');
+  });
+
+  it('never sends a student who finished onboarding back through it', () => {
+    expect(resolveRestoredView({ onboardingCompleted: true, view: 'onboarding' })).toBe('home');
+    expect(resolveRestoredView({ onboardingCompleted: true, view: 'revisions' })).toBe('revisions');
   });
 });

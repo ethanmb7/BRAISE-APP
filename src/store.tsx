@@ -18,6 +18,7 @@ type Ctx = {
   setView: (v: ViewId) => void;
   setTab: (t: TabId) => void;
   setUser: (u: UserProfile) => void;
+  completeOnboarding: (u: UserProfile) => void;
   setPersonality: (p: Personality) => void;
   addXp: (n: number) => void;
   updateBestCombo: (n: number) => void;
@@ -41,6 +42,10 @@ const AppCtx = createContext<Ctx | null>(null);
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const GOAL_TARGETS: Record<string, number> = {
+  tranquille: 6,
+  regulier: 10,
+  'a-fond': 18,
+  // Labels saved by the old onboarding, kept so existing students keep the same daily target.
   '15 min/jour': 6,
   '30 min/jour': 10,
   '1 heure/jour': 18,
@@ -120,7 +125,9 @@ export function computeUnlockedBadges(
  *  hand LessonView/SubjectView an id that resolves to nothing, and both just render null: a blank
  *  screen forever, worse than the reset it replaces. Only 'lesson'/'subject' need this check —
  *  every other resumable view is self-contained and doesn't reference content by id. */
-function resolveRestoredView(saved: Partial<AppState>): ViewId {
+export function resolveRestoredView(saved: Partial<AppState>): ViewId {
+  // A reload mid-onboarding restarts it rather than dropping a half-set-up student on Home.
+  if (saved.onboardingCompleted === false) return 'onboarding';
   const view = saved.view;
   if (view === 'lesson' || view === 'subject') {
     const subject = SUBJECTS.find((s) => s.id === saved.currentSubjectId);
@@ -226,11 +233,9 @@ export function ensureSession(s: AppState): Partial<AppState> {
 // real welcome gift (a resource handed to you, not a fabricated record of past use), same logic
 // game onboarding flows use for starting currency.
 const INITIAL: AppState = {
-  // Temporarily skips straight to 'home' — onboarding itself isn't being worked on right now, no
-  // need to click through it on every fresh session while iterating on the rest of the app.
-  // OnboardingView and its route in App.tsx are untouched; flip this back to 'onboarding' (or add
-  // a real "has the user finished onboarding before" check) when it's back in scope.
-  view: 'home',
+  // Only a device with no saved progress at all ever starts from INITIAL — i.e. a genuinely new
+  // student. Anyone with a save is routed by resolveRestoredView instead.
+  view: 'onboarding',
   tab: 'home',
   user: DEFAULT_USER,
   streak: 0,
@@ -239,6 +244,7 @@ const INITIAL: AppState = {
   freezes: 2,
   freezeArmed: false,
   everUsedFreeze: false,
+  onboardingCompleted: false,
   dailyGoalMet: false,
   darkMode: false,
   dyslexiaMode: false,
@@ -306,6 +312,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const setUser = useCallback((u: UserProfile) => {
     setState((s) => ({ ...s, ...ensureSession(s), user: u }));
+  }, []);
+
+  const completeOnboarding = useCallback((u: UserProfile) => {
+    setState((s) => ({ ...s, ...ensureSession(s), user: u, onboardingCompleted: true, view: 'home', tab: 'home' }));
   }, []);
 
   const setPersonality = useCallback((p: Personality) => {
@@ -491,6 +501,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setView,
         setTab,
         setUser,
+        completeOnboarding,
         setPersonality,
         addXp,
         updateBestCombo,

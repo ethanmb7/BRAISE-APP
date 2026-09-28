@@ -365,58 +365,401 @@ select {
   box-shadow: none;
 }
 
-/* ===== Onboarding ===== */
-.ob-step {
-  display: none;
+/* ===== Onboarding — one question per screen, asked by Braise ===== */
+.app-content:has(.onb) {
+  padding-bottom: 0;
+}
+.onb {
+  min-height: 100%;
+  display: flex;
   flex-direction: column;
-  height: 100%;
-  min-height: 100vh;
-  padding: 40px 24px 24px;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) var(--page-gutter) 0;
+  /* Quick taps on tiles otherwise select their text like a web page instead of an app. */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
-.ob-step.is-active {
+.onb .onb-input {
+  -webkit-user-select: text;
+  user-select: text;
+}
+/* Same brand orange as the Pioche du Jour card, with dark ink on top: white on #ff6b35 fails
+   WCAG AA (2.8:1), #151821 passes (6.3:1). */
+.onb--welcome {
+  background: #ff6b35;
+  color: #151821;
+}
+.onb-top {
   display: flex;
-  animation: fadeUp 0.3s ease;
-}
-.dots {
-  display: flex;
-  gap: 6px;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-.dots span {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--line);
-}
-.dots span.on {
-  background: var(--blue);
-  width: 16px;
-  border-radius: 4px;
-}
-.ob-welcome {
-  background: radial-gradient(130% 130% at 20% -10%, #1c3a9c, var(--blue-ink) 60%);
-  color: var(--paper);
-  justify-content: center;
   align-items: center;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+.onb-back {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 2px 2px 0 var(--neo-ink);
+}
+.onb-back:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+.onb-progress {
+  flex: 1;
+  height: 14px;
+  overflow: hidden;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 999px;
+  background: var(--paper);
+}
+.onb-progress span {
+  display: block;
+  height: 100%;
+  background: var(--neo-orange);
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.onb-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Braise asks: mascot + a speech bubble whose low corner points back at it. */
+.onb-ask {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+.onb-ask > svg,
+.onb-ask > div {
+  flex-shrink: 0;
+}
+.onb-bubble {
+  flex: 1;
+  padding: 14px 16px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 20px 20px 20px 6px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: var(--ink);
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.28rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+.onb-hint {
+  margin: -10px 0 14px;
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+}
+.onb-stack + .onb-hint {
+  margin: 14px 0 0;
   text-align: center;
 }
-.ob-welcome svg.logo {
-  width: 52px;
-  height: 52px;
-  margin-bottom: 16px;
+
+/* Welcome */
+.onb-welcome {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
-.ob-welcome h1 {
-  font-size: 1.6rem;
-  max-width: 15ch;
+.onb-welcome-sun {
+  position: absolute;
+  top: -40px;
+  right: -60px;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  background: #fdc800;
+  opacity: 0.85;
 }
-.ob-welcome p {
-  color: rgba(234, 241, 255, 0.82);
+.onb-welcome-stage {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin-bottom: 26px;
+  display: grid;
+  place-items: center;
+  border: 3px solid #151821;
+  border-radius: 50%;
+  background: #fffdf8;
+  box-shadow: 6px 6px 0 #151821;
+}
+.onb-welcome-braise {
+  animation: flameFloat 3s ease-in-out infinite;
+}
+.onb-welcome h1 {
+  position: relative;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 2.1rem;
+  font-weight: 800;
+  line-height: 1.02;
+  max-width: 11ch;
+}
+.onb-welcome p {
+  position: relative;
   margin-top: 12px;
-  max-width: 26ch;
-  line-height: 1.5;
-  font-size: 0.9rem;
+  max-width: 22ch;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
 }
+
+/* Name */
+.onb-input {
+  width: 100%;
+  padding: 16px 18px;
+  border: 3px solid var(--neo-ink);
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: 4px 4px 0 var(--neo-ink);
+  color: var(--ink);
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+.onb-input::placeholder {
+  color: var(--ink-soft);
+  opacity: 0.6;
+}
+.onb-input:focus {
+  outline: none;
+  box-shadow: 4px 4px 0 var(--neo-orange);
+}
+
+/* Tiles — shared by every choice screen */
+.onb-group {
+  margin-bottom: 18px;
+}
+.onb-group-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--ink-soft);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.onb-grid {
+  display: grid;
+  gap: 10px;
+}
+.onb-grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.onb-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.onb-grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.onb-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.onb-tile {
+  position: relative;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: var(--ink);
+  text-align: left;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+.onb-tile:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--neo-ink);
+}
+.onb-tile.is-selected {
+  background: #ffd43b;
+  color: #151821;
+  box-shadow: 4px 4px 0 var(--neo-ink);
+}
+.onb-tile--level {
+  min-height: 60px;
+  text-align: center;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+.onb-tile--subject {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 64px;
+  padding: 10px;
+}
+.onb-subject-icon {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 2px solid #151821;
+  border-radius: 11px;
+  font-size: 1.15rem;
+}
+.onb-subject-name {
+  min-width: 0;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+.onb-tick {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #151821;
+  border-radius: 50%;
+  background: #fff;
+  color: #151821;
+}
+.onb-tile--tone {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px 14px;
+}
+.onb-tone-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.onb-tone-head b,
+.onb-tile--row b {
+  display: block;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+.onb-tone-head small,
+.onb-tile--row small {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+.onb-tone-sample {
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.onb-tile--row {
+  padding: 15px 16px;
+}
+
+/* Consent */
+.onb-info {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 16px;
+  background: var(--paper);
+}
+.onb-info p {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--ink);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.onb-info svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.onb-check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 16px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  text-align: left;
+}
+.onb-check.is-checked {
+  background: #ffd43b;
+  color: #151821;
+}
+.onb-check-box {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 2.5px solid #151821;
+  border-radius: 8px;
+  background: #fff;
+  color: #151821;
+}
+
+/* Footer CTA — sticks to the bottom so the next step is always one thumb away. */
+.onb-footer {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  padding: 18px 0 calc(18px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to bottom, transparent, var(--bg) 35%);
+}
+.onb--welcome .onb-footer {
+  background: none;
+}
+.onb-cta {
+  width: 100%;
+  min-height: 58px;
+  border: 3px solid #151821;
+  border-radius: 16px;
+  background: var(--neo-orange);
+  box-shadow: 4px 4px 0 #151821;
+  color: #151821;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+}
+.onb--welcome .onb-cta {
+  background: #fff;
+}
+.onb-cta:not(:disabled):active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 #151821;
+}
+.onb-cta:disabled {
+  opacity: 0.4;
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .onb-welcome-braise { animation: none; }
+}
+
+/* Still used by App's loading screen. */
 .flame-hero {
   width: 74px;
   height: 74px;
@@ -442,8 +785,8 @@ select {
   transform: scale(0.97);
 }
 /* The app's other primary CTA class (Quiz "Continuer"/"Question suivante", checkpoint
-   "Continuer", Onboarding/CompleteView "Suivant"/"Terminer") — same signature orange and same
-   hard-shadow physical press as every other major action button in the app. */
+   "Continuer", CompleteView "Suivant"/"Terminer") — same signature orange and same hard-shadow
+   physical press as every other major action button in the app. */
 .btn-block.blue {
   background: var(--neo-orange);
   color: #fff;
@@ -457,115 +800,13 @@ select {
 .btn-block:disabled {
   opacity: 0.4;
 }
-.ob-step h2 {
-  font-size: 1.35rem;
-  margin-bottom: 6px;
-}
-.ob-step .sub {
-  color: var(--ink-soft);
-  font-size: 0.88rem;
-  margin-bottom: 22px;
-  line-height: 1.5;
-}
-.chip-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: auto;
-}
-.chip {
-  background: var(--paper);
-  border: 2px solid transparent;
-  border-radius: 16px;
-  padding: 15px 16px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  text-align: left;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: border-color 0.15s ease, background 0.15s ease;
-}
-.chip.is-selected {
-  border-color: var(--blue);
-  background: rgba(47, 95, 227, 0.06);
-}
-.chip .chk {
-  width: 20px;
-  height: 20px;
-  border-radius: 6px;
-  border: 2px solid var(--line);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-}
-.chip.is-selected .chk {
-  background: var(--blue);
-  border-color: var(--blue);
-  color: var(--paper);
-}
-.subject-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 9px;
-  margin-bottom: auto;
-}
-.schip {
-  padding: 10px 15px;
-  border-radius: 999px;
-  background: var(--paper);
-  font-size: 0.86rem;
-  font-weight: 600;
-  border: 2px solid transparent;
-  transition: border-color 0.15s ease;
-}
-.schip.is-selected {
-  border-color: var(--blue);
-  background: rgba(47, 95, 227, 0.08);
-}
+/* Used by LevelSheet. */
 .level-group-label {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.68rem;
   text-transform: uppercase;
   color: var(--ink-soft);
   margin-bottom: 8px;
-}
-.meet-braise {
-  text-align: center;
-  align-items: center;
-}
-.meet-braise svg {
-  width: 100px;
-  height: 100px;
-  margin: 6px auto 18px;
-}
-.meet-braise h2 {
-  font-size: 1.3rem;
-}
-.meet-braise p {
-  color: var(--ink-soft);
-  margin-top: 8px;
-  line-height: 1.55;
-  font-size: 0.9rem;
-}
-.consent-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 9px;
-  font-size: 0.72rem;
-  color: var(--ink-soft);
-  line-height: 1.4;
-  margin-top: 16px;
-  text-align: left;
-}
-.consent-row input {
-  margin-top: 2px;
-  flex-shrink: 0;
-}
-.consent-row a {
-  color: var(--blue-2);
-  text-decoration: underline;
 }
 
 /* ===== Bottom sheet (level picker) ===== */

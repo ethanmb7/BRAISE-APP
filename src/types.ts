@@ -131,6 +131,8 @@ export type AppState = {
    *  false the moment a freeze got disarmed or refunded, making an already-earned badge
    *  disappear and re-celebrate later. */
   everUsedFreeze: boolean;
+  /** False only for a brand-new device until the onboarding flow is finished. */
+  onboardingCompleted: boolean;
   dailyGoalMet: boolean;
   darkMode: boolean;
   dyslexiaMode: boolean;

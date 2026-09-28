@@ -170,7 +170,7 @@ export const DEFAULT_USER: UserProfile = {
   name: 'Alex',
   level: '3e',
   levelLabel: '3ème',
-  goal: '30 min/jour',
+  goal: 'regulier',
   subjects: ['maths', 'francais', 'histoire-geo', 'svt'],
   avatar: 'fleme',
   personality: 'chill',

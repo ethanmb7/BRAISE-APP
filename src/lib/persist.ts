@@ -11,6 +11,7 @@ type StoredProgress = {
   freezes: number;
   freezeArmed: boolean;
   everUsedFreeze: boolean;
+  onboardingCompleted?: boolean;
   dailyGoalMet: boolean;
   darkMode: boolean;
   dyslexiaMode: boolean;
@@ -93,6 +94,9 @@ function toAppState(p: StoredProgress, cardReviews: Record<string, CardReview>):
     // `?? false`: a device that saved its progress before this field existed has never had the
     // chance to earn it — never assume it's already true for an older save.
     everUsedFreeze: p.everUsedFreeze ?? false,
+    // `?? true`: a save from before this field existed belongs to someone already using the app —
+    // sending them back through onboarding would be wrong. Only a real `false` means "not done".
+    onboardingCompleted: p.onboardingCompleted ?? true,
     dailyGoalMet: p.dailyGoalMet,
     darkMode: p.darkMode,
     dyslexiaMode: p.dyslexiaMode,
@@ -152,6 +156,7 @@ export async function loadProgress(): Promise<Partial<AppState> | null> {
             freezeArmed: cloudRow.freeze_armed,
             // Not in device_progress either — same reasoning as bestCombo above.
             everUsedFreeze: local?.everUsedFreeze ?? false,
+            onboardingCompleted: local?.onboardingCompleted ?? true,
             dailyGoalMet: cloudRow.daily_goal_met,
             darkMode: cloudRow.dark_mode,
             dyslexiaMode: cloudRow.dyslexia_mode,
@@ -190,6 +195,7 @@ export async function saveProgress(state: AppState): Promise<void> {
     freezeArmed: state.freezeArmed,
     // Local-only, like bestCombo/view/tab below — device_progress has no matching column yet.
     everUsedFreeze: state.everUsedFreeze,
+    onboardingCompleted: state.onboardingCompleted,
     dailyGoalMet: state.dailyGoalMet,
     darkMode: state.darkMode,
     dyslexiaMode: state.dyslexiaMode,
