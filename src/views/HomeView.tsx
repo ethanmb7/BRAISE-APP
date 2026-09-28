@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { useApp, computeGoalPct, remainingToGoal, resolveChapters } from "@/store";
+import { useApp } from "@/store";
+import { computeGoalPct, remainingToGoal, resolveChapters } from "@/lib/progress";
 import { sfx } from "@/lib/sound";
 import { fireConfetti } from "@/lib/confetti";
 import { LevelSheet } from "@/components/LevelSheet";

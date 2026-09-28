@@ -32,7 +32,11 @@ export default tseslint.config(
           ],
         },
       ],
-      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+      "react-refresh/only-export-components": [
+        "warn",
+        // useApp lives next to AppProvider on purpose: the context and its hook are one unit.
+        { allowConstantExport: true, allowExportNames: ["useApp"] },
+      ],
       "@typescript-eslint/no-unused-vars": "off",
     },
   },

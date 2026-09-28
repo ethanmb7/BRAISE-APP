@@ -1,5 +1,6 @@
 import { Check, Lock, AlertCircle, SkipForward } from "lucide-react";
-import { useApp, resolveChapters } from "@/store";
+import { useApp } from "@/store";
+import { resolveChapters } from "@/lib/progress";
 import { sfx } from "@/lib/sound";
 import { TopBar } from "@/components/TopBar";
 import { BraiseMascot } from "@/components/BraiseMascot";

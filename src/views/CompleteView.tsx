@@ -5,7 +5,7 @@ import { sfx } from "@/lib/sound";
 import { BraiseMascot } from "@/components/BraiseMascot";
 import { getAgeGroup, lessonComplete } from "@/lib/braiseVoice";
 import { SUBJECTS } from "@/data";
-import { remainingToGoal } from "@/store";
+import { remainingToGoal } from "@/lib/progress";
 
 const CONFETTI = ["🎉", "⭐", "🔥", "✨", "🎊", "⭐", "🎉", "✨"];
 

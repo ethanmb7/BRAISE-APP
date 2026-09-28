@@ -3,7 +3,8 @@ import { BookOpen, CheckCircle2 } from "lucide-react";
 import { SubjectDecks, type SubjectDeckItem } from "@/components/SubjectDecks";
 import { SUBJECTS } from "@/data";
 import { sfx } from "@/lib/sound";
-import { resolveChapters, useApp } from "@/store";
+import { useApp } from "@/store";
+import { resolveChapters } from "@/lib/progress";
 
 const stagger = {
   hidden: {},

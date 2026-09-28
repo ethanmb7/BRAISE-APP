@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Settings, ChevronRight, Check, Pencil, X } from "lucide-react";
-import { useApp, computeUnlockedBadges, countDoneChapters } from "@/store";
+import { useApp } from "@/store";
+import { computeUnlockedBadges, countDoneChapters } from "@/lib/progress";
 import { sfx } from "@/lib/sound";
 import { getRankInfo, RANKS } from "@/lib/aura";
 import { useCountUp } from "@/lib/useCountUp";
@@ -10,7 +11,8 @@ import { TopBar } from "@/components/TopBar";
 import { RankIcon } from "@/components/RankIcon";
 import { SubjectIcon } from "@/components/SubjectIcon";
 import { BraiseMascot } from "@/components/BraiseMascot";
-import { AvatarGlyph, getAvatarName } from "@/components/AvatarGlyph";
+import { AvatarGlyph } from "@/components/AvatarGlyph";
+import { getAvatarName } from "@/components/avatarGlyphs";
 import { BADGES, SUBJECTS, AVATARS } from "@/data";
 import type { Personality } from "@/types";
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { computeUnlockedBadges } from "@/store";
+import { computeUnlockedBadges } from "@/lib/progress";
 import { getRankInfo, RANKS, type Rank } from "@/lib/aura";
 import { fireConfetti } from "@/lib/confetti";
 import { sfx } from "@/lib/sound";

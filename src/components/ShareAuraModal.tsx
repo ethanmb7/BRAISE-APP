@@ -3,8 +3,7 @@ import { Share2, X, Zap } from "lucide-react";
 import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
 import type { Rank } from "@/lib/aura";
-import { BRAISE_BODY_PATHS, BRAISE_RANK_COLORS } from "@/components/BraiseCharacter";
-import type { BraiseRankId } from "@/components/BraiseCharacter";
+import { BRAISE_BODY_PATHS, BRAISE_RANK_COLORS, type BraiseRankId } from "@/lib/braiseArt";
 
 // Native Story format (1080x1920) — the canvas is always rasterized at this true resolution
 // for a crisp export; on screen it's scaled down responsively via CSS (width:100%, height:auto

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { ensureSession, resolveRestoredView } from "@/store";
+import { ensureSession, resolveRestoredView } from "@/lib/progress";
 import { DEFAULT_USER } from "@/data";
 import type { AppState } from "@/types";
 
