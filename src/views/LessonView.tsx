@@ -17,6 +17,8 @@ import { BraiseMascot } from "@/components/BraiseMascot";
 import { sendChatMessage } from "@/lib/chat";
 import { getAgeGroup, quizCorrect, quizWrong, lessonOpenerCheckIn } from "@/lib/braiseVoice";
 import { SUBJECTS, STORIES, AUDIO_TRANSCRIPTS, LESSON_INTRO } from "@/data";
+import { DECLIC_SCRIPTS } from "@/lib/declic";
+import { DeclicMode } from "@/components/declic/DeclicMode";
 import type { QuizQuestion, ChatMessage } from "@/types";
 
 type Mode = "vocal" | "echanger";
@@ -36,12 +38,29 @@ export function LessonView() {
 
   const storyData = STORIES[chapter.id];
   const transcript = AUDIO_TRANSCRIPTS[chapter.id];
+  const declicScript = DECLIC_SCRIPTS[chapter.id];
 
   const handleComplete = () => {
     sfx.complete(state.soundOn);
     completeChapter(chapter.id);
     setView("complete");
   };
+
+  // "Le Déclic" (PRODUCT_VISION.md, section 4) replaces Vocal Animé and the end-of-chapter quiz
+  // entirely for any chapter with an authored script — it already covers explanation,
+  // verification and the abstraction step the old quiz used to bolt on separately. Chapters
+  // without a script yet (everything but the one notion built end to end so far) keep the old
+  // vocal/chat modes below; this is an authoring gap, not a design choice — see roadmap.md.
+  if (declicScript) {
+    return (
+      <div>
+        <TopBar title={chapter.title} onBack={goBack} />
+        <div className="view is-active">
+          <DeclicMode script={declicScript} soundOn={state.soundOn} onComplete={handleComplete} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
