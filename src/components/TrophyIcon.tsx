@@ -4,9 +4,9 @@
 // flat fill, #151821 stroke, a light highlight line for shine. The handles are stroke-only
 // (no fill) rather than a closed ring shape — thin loops read cleaner at 18-20px that way than
 // a filled ring would.
-const INK = '#151821';
+const INK = "#151821";
 
-export function TrophyIcon({ color = '#ffd166', size = 18 }: { color?: string; size?: number }) {
+export function TrophyIcon({ color = "#ffd166", size = 18 }: { color?: string; size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
       <path
@@ -37,7 +37,13 @@ export function TrophyIcon({ color = '#ffd166', size = 18 }: { color?: string; s
         strokeWidth="1.7"
         strokeLinejoin="round"
       />
-      <path d="M8.7 5.6 L9.6 9.4" stroke="#fff" strokeWidth="1.1" strokeLinecap="round" opacity="0.55" />
+      <path
+        d="M8.7 5.6 L9.6 9.4"
+        stroke="#fff"
+        strokeWidth="1.1"
+        strokeLinecap="round"
+        opacity="0.55"
+      />
     </svg>
   );
 }

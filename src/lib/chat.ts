@@ -1,9 +1,9 @@
-import type { ChatMessage } from '@/types';
-import { toneSystemPrompt, type VoiceCtx } from '@/lib/braiseVoice';
+import type { ChatMessage } from "@/types";
+import { toneSystemPrompt, type VoiceCtx } from "@/lib/braiseVoice";
 
 const MISTRAL_API_KEY = import.meta.env.VITE_MISTRAL_API_KEY as string | undefined;
-const MISTRAL_MODEL = 'mistral-small-latest';
-const MISTRAL_URL = 'https://api.mistral.ai/v1/chat/completions';
+const MISTRAL_MODEL = "mistral-small-latest";
+const MISTRAL_URL = "https://api.mistral.ai/v1/chat/completions";
 
 // No imposed slang or pop-culture references: forced "jeune" vocabulary dates fast and reads as
 // an adult imitating a teenager — the opposite of a pote. Natural, short, direct speech ages well.
@@ -31,32 +31,32 @@ export async function sendChatMessage(
   _chapterId: string | null,
   subject: string | null,
   voiceCtx?: VoiceCtx,
-  extraContext?: string
+  extraContext?: string,
 ): Promise<{ text: string } | { error: string }> {
   if (!MISTRAL_API_KEY) {
-    return { error: 'Oups, il manque la clé API. Vérifie le fichier .env' };
+    return { error: "Oups, il manque la clé API. Vérifie le fichier .env" };
   }
 
-  const toneLine = voiceCtx ? `\n\n${toneSystemPrompt(voiceCtx)}` : '';
-  const contextLine = extraContext ? `\n\n${extraContext}` : '';
+  const toneLine = voiceCtx ? `\n\n${toneSystemPrompt(voiceCtx)}` : "";
+  const contextLine = extraContext ? `\n\n${extraContext}` : "";
 
   const apiMessages = [
     {
-      role: 'system' as const,
-      content: `${SYSTEM_PROMPT}\n\nContexte : ${subject ? `Matière : ${subject}.` : ''} L'élève pose une question sur un cours ou un piège d'examen.${toneLine}${contextLine}`,
+      role: "system" as const,
+      content: `${SYSTEM_PROMPT}\n\nContexte : ${subject ? `Matière : ${subject}.` : ""} L'élève pose une question sur un cours ou un piège d'examen.${toneLine}${contextLine}`,
     },
     ...messages.map((m) => ({
-      role: m.role === 'model' ? ('assistant' as const) : m.role,
+      role: m.role === "model" ? ("assistant" as const) : m.role,
       content: m.text,
     })),
   ];
 
   try {
     const res = await fetch(MISTRAL_URL, {
-      method: 'POST',
+      method: "POST",
       headers: {
         Authorization: `Bearer ${MISTRAL_API_KEY}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         model: MISTRAL_MODEL,
@@ -73,12 +73,12 @@ export async function sendChatMessage(
     const data = await res.json();
     const text = data?.choices?.[0]?.message?.content;
 
-    if (typeof text !== 'string') {
-      return { error: 'Oups, réponse bizarre de l\'API' };
+    if (typeof text !== "string") {
+      return { error: "Oups, réponse bizarre de l'API" };
     }
 
     return { text: text.trim() };
   } catch {
-    return { error: 'Oups, connexion impossible. Check ton réseau.' };
+    return { error: "Oups, connexion impossible. Check ton réseau." };
   }
 }

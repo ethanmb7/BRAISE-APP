@@ -1,4 +1,4 @@
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft } from "lucide-react";
 
 type Props = {
   title: string;

@@ -3,7 +3,7 @@
 // through the typed, debounced persist.ts pipeline. This is what makes the flashcard "Signaler
 // un problème" button real: before this, tapping it only flipped a local component flag that
 // reset on the next card, so no report ever survived past the moment it was made.
-const REPORTS_KEY = 'sapie_card_reports';
+const REPORTS_KEY = "sapie_card_reports";
 
 export type CardReport = { cardId: string; question: string; at: number };
 

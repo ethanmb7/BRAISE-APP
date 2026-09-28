@@ -26,7 +26,14 @@ export function SnowflakeIcon({ size = 17 }: { size?: number }) {
         <line x1="8.9" y1="16.1" x2="6.7" y2="14.9" stroke="#151821" strokeWidth="1.4" />
       </g>
       <circle cx="12" cy="12" r="2.3" fill="url(#hudSnowGrad)" stroke="#151821" strokeWidth="1.2" />
-      <path d="M13 4.5 15.6 9" stroke="#fff" strokeWidth="1" strokeLinecap="round" fill="none" opacity="0.4" />
+      <path
+        d="M13 4.5 15.6 9"
+        stroke="#fff"
+        strokeWidth="1"
+        strokeLinecap="round"
+        fill="none"
+        opacity="0.4"
+      />
     </svg>
   );
 }

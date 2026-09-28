@@ -6,11 +6,20 @@ import {
   useEffect,
   useRef,
   type ReactNode,
-} from 'react';
-import type { ViewId, TabId, UserProfile, AppState, Confidence, CardReview, Personality, Chapter } from '@/types';
-import { DEFAULT_USER, FLASHCARDS, SUBJECTS } from '@/data';
-import { sfx } from '@/lib/sound';
-import { loadProgress, saveProgress, saveCardReview } from '@/lib/persist';
+} from "react";
+import type {
+  ViewId,
+  TabId,
+  UserProfile,
+  AppState,
+  Confidence,
+  CardReview,
+  Personality,
+  Chapter,
+} from "@/types";
+import { DEFAULT_USER, FLASHCARDS, SUBJECTS } from "@/data";
+import { sfx } from "@/lib/sound";
+import { loadProgress, saveProgress, saveCardReview } from "@/lib/persist";
 
 type Ctx = {
   state: AppState;
@@ -29,12 +38,17 @@ type Ctx = {
   toggleDyslexia: () => void;
   toggleSound: () => void;
   openSubject: (subjectId: string, chapterId?: string) => void;
-  openLesson: (subjectId: string, chapterId: string, mode?: 'vocal' | 'echanger') => void;
+  openLesson: (subjectId: string, chapterId: string, mode?: "vocal" | "echanger") => void;
   completeChapter: (chapterId: string) => void;
   reviewCard: (cardId: string, confidence: Confidence) => void;
   getDueCards: () => string[];
   goBack: () => void;
-  bridgeToChat: (subjectId: string, chapterId: string, bridgeMessage: string, returnTo?: ViewId) => void;
+  bridgeToChat: (
+    subjectId: string,
+    chapterId: string,
+    bridgeMessage: string,
+    returnTo?: ViewId,
+  ) => void;
   clearChatBridge: () => void;
 };
 
@@ -44,11 +58,11 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const GOAL_TARGETS: Record<string, number> = {
   tranquille: 6,
   regulier: 10,
-  'a-fond': 18,
+  "a-fond": 18,
   // Labels saved by the old onboarding, kept so existing students keep the same daily target.
-  '15 min/jour': 6,
-  '30 min/jour': 10,
-  '1 heure/jour': 18,
+  "15 min/jour": 6,
+  "30 min/jour": 10,
+  "1 heure/jour": 18,
 };
 const DEFAULT_GOAL_TARGET = 10;
 
@@ -82,9 +96,9 @@ export function remainingToGoal(s: AppState): number {
 export function resolveChapters(chapters: Chapter[], completedChapters: string[]): Chapter[] {
   const firstOpenIndex = chapters.findIndex((c) => !completedChapters.includes(c.id));
   return chapters.map((c, i) => {
-    if (completedChapters.includes(c.id)) return { ...c, status: 'done', mastery: 100 };
-    if (i === firstOpenIndex) return { ...c, status: 'current', mastery: 0 };
-    return { ...c, status: 'locked', mastery: 0 };
+    if (completedChapters.includes(c.id)) return { ...c, status: "done", mastery: 100 };
+    if (i === firstOpenIndex) return { ...c, status: "current", mastery: 0 };
+    return { ...c, status: "locked", mastery: 0 };
   });
 }
 
@@ -93,8 +107,10 @@ export function resolveChapters(chapters: Chapter[], completedChapters: string[]
  *  it directly here would silently undercount every real user's progress). */
 export function countDoneChapters(completedChapters: string[]): number {
   return SUBJECTS.reduce(
-    (acc, s) => acc + resolveChapters(s.chapters, completedChapters).filter((c) => c.status === 'done').length,
-    0
+    (acc, s) =>
+      acc +
+      resolveChapters(s.chapters, completedChapters).filter((c) => c.status === "done").length,
+    0,
   );
 }
 
@@ -103,7 +119,7 @@ export function countDoneChapters(completedChapters: string[]): number {
  *  duplicated inline in ProfileView with its own `chaptersDone`, which read the static chapter
  *  status directly and could therefore never see a real "done" chapter post-resolveChapters. */
 export function computeUnlockedBadges(
-  s: Pick<AppState, 'streak' | 'xp' | 'everUsedFreeze' | 'completedChapters'>
+  s: Pick<AppState, "streak" | "xp" | "everUsedFreeze" | "completedChapters">,
 ): Record<string, boolean> {
   const chaptersDone = countDoneChapters(s.completedChapters);
   return {
@@ -127,16 +143,24 @@ export function computeUnlockedBadges(
  *  every other resumable view is self-contained and doesn't reference content by id. */
 export function resolveRestoredView(saved: Partial<AppState>): ViewId {
   // A reload mid-onboarding restarts it rather than dropping a half-set-up student on Home.
-  if (saved.onboardingCompleted === false) return 'onboarding';
+  if (saved.onboardingCompleted === false) return "onboarding";
   const view = saved.view;
-  if (view === 'lesson' || view === 'subject') {
+  if (view === "lesson" || view === "subject") {
     const subject = SUBJECTS.find((s) => s.id === saved.currentSubjectId);
-    if (!subject) return 'home';
-    if (view === 'lesson' && !subject.chapters.find((c) => c.id === saved.currentChapterId)) return 'home';
+    if (!subject) return "home";
+    if (view === "lesson" && !subject.chapters.find((c) => c.id === saved.currentChapterId))
+      return "home";
     return view;
   }
-  if (view === 'subjects' || view === 'revisions' || view === 'progres' || view === 'profile' || view === 'settings') return view;
-  return 'home';
+  if (
+    view === "subjects" ||
+    view === "revisions" ||
+    view === "progres" ||
+    view === "profile" ||
+    view === "settings"
+  )
+    return view;
+  return "home";
 }
 
 // `tab` drives the bottom nav highlight independently of `view` (SubjectView/SettingsView both
@@ -144,15 +168,22 @@ export function resolveRestoredView(saved: Partial<AppState>): ViewId {
 // just `view` — otherwise resuming into e.g. Revisions would show the right screen with the wrong
 // tab lit up, and a subsequent "back" from Subject/Settings would return to the wrong place.
 function resolveRestoredTab(view: ViewId, savedTab: TabId | undefined): TabId {
-  if (view === 'home' || view === 'subjects' || view === 'revisions' || view === 'profile') return view;
-  if (savedTab === 'home' || savedTab === 'subjects' || savedTab === 'revisions' || savedTab === 'profile') return savedTab;
+  if (view === "home" || view === "subjects" || view === "revisions" || view === "profile")
+    return view;
+  if (
+    savedTab === "home" ||
+    savedTab === "subjects" ||
+    savedTab === "revisions" ||
+    savedTab === "profile"
+  )
+    return savedTab;
   // `progres` used to be a tab. Old localStorage values now land on Moi, where Aura belongs.
-  return view === 'progres' ? 'profile' : 'home';
+  return view === "progres" ? "profile" : "home";
 }
 
 function sm2(review: CardReview | undefined, confidence: Confidence): CardReview {
   const now = Date.now();
-  const quality = confidence === 'sure' ? 5 : confidence === 'doubt' ? 3 : 1;
+  const quality = confidence === "sure" ? 5 : confidence === "doubt" ? 3 : 1;
 
   let { repetitions, interval, ease } = review
     ? { repetitions: review.repetitions, interval: review.interval, ease: review.ease }
@@ -189,7 +220,12 @@ export function ensureSession(s: AppState): Partial<AppState> {
   const today = new Date().toDateString();
   if (s.sessionDate === today) return {};
 
-  const reset = { sessionDate: today, sessionCardsReviewed: 0, sessionChaptersDone: 0, dailyGoalMet: false };
+  const reset = {
+    sessionDate: today,
+    sessionCardsReviewed: 0,
+    sessionChaptersDone: 0,
+    dailyGoalMet: false,
+  };
 
   // `sessionDate` is a fresh install's own toDateString() (see INITIAL) or a real prior day —
   // never truly unparseable, but a defensive fallback for a corrupted/pre-migration localStorage
@@ -197,7 +233,9 @@ export function ensureSession(s: AppState): Partial<AppState> {
   const lastActive = new Date(s.sessionDate);
   if (Number.isNaN(lastActive.getTime())) return reset;
 
-  const daysSinceLastActive = Math.round((new Date(today).getTime() - lastActive.getTime()) / DAY_MS);
+  const daysSinceLastActive = Math.round(
+    (new Date(today).getTime() - lastActive.getTime()) / DAY_MS,
+  );
 
   // Exactly one calendar day since the last real session: the normal nightly boundary every
   // returning student crosses. Anything wider (2+ days with zero activity) is a real gap a single
@@ -235,8 +273,8 @@ export function ensureSession(s: AppState): Partial<AppState> {
 const INITIAL: AppState = {
   // Only a device with no saved progress at all ever starts from INITIAL — i.e. a genuinely new
   // student. Anyone with a save is routed by resolveRestoredView instead.
-  view: 'onboarding',
-  tab: 'home',
+  view: "onboarding",
+  tab: "home",
   user: DEFAULT_USER,
   streak: 0,
   xp: 0,
@@ -253,7 +291,7 @@ const INITIAL: AppState = {
   currentChapterId: null,
   lastSubjectId: null,
   lastChapterId: null,
-  currentLessonMode: 'vocal' as const,
+  currentLessonMode: "vocal" as const,
   completedChapters: [],
   chatBridgeMessage: null,
   lessonReturnTo: null,
@@ -315,7 +353,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const completeOnboarding = useCallback((u: UserProfile) => {
-    setState((s) => ({ ...s, ...ensureSession(s), user: u, onboardingCompleted: true, view: 'home', tab: 'home' }));
+    setState((s) => ({
+      ...s,
+      ...ensureSession(s),
+      user: u,
+      onboardingCompleted: true,
+      view: "home",
+      tab: "home",
+    }));
   }, []);
 
   const setPersonality = useCallback((p: Personality) => {
@@ -327,7 +372,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const updateBestCombo = useCallback((n: number) => {
-    setState((s) => (n > s.bestCombo ? { ...s, ...ensureSession(s), bestCombo: n } : { ...s, ...ensureSession(s) }));
+    setState((s) =>
+      n > s.bestCombo ? { ...s, ...ensureSession(s), bestCombo: n } : { ...s, ...ensureSession(s) },
+    );
   }, []);
 
   const setFreezes = useCallback((n: number) => {
@@ -370,27 +417,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setState((s) => ({
       ...s,
       ...ensureSession(s),
-      view: 'subject',
+      view: "subject",
       currentSubjectId: subjectId,
       currentChapterId: chapterId ?? null,
     }));
   }, []);
 
   const openLesson = useCallback(
-    (subjectId: string, chapterId: string, mode?: 'vocal' | 'echanger') => {
+    (subjectId: string, chapterId: string, mode?: "vocal" | "echanger") => {
       setState((s) => ({
         ...s,
         ...ensureSession(s),
-        view: 'lesson',
+        view: "lesson",
         currentSubjectId: subjectId,
         currentChapterId: chapterId,
         lastSubjectId: subjectId,
         lastChapterId: chapterId,
-        currentLessonMode: mode ?? 'vocal',
+        currentLessonMode: mode ?? "vocal",
         chatBridgeMessage: null,
       }));
     },
-    []
+    [],
   );
 
   const bridgeToChat = useCallback(
@@ -398,17 +445,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setState((s) => ({
         ...s,
         ...ensureSession(s),
-        view: 'lesson',
+        view: "lesson",
         currentSubjectId: subjectId,
         currentChapterId: chapterId,
-        currentLessonMode: 'echanger',
+        currentLessonMode: "echanger",
         chatBridgeMessage: bridgeMessage,
         // "Revoir la notion" from a Réviser session comes back to the session, not to the
         // subject page it was never on.
         lessonReturnTo: returnTo ?? null,
       }));
     },
-    []
+    [],
   );
 
   // ChatMode used to track "already sent" with its own local useRef, which reset to false on
@@ -428,11 +475,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const session = { ...s, ...ensureSession(s) };
       const already = session.completedChapters.includes(chapterId);
       const xpGained = already ? 0 : 50;
-      const sessionChaptersDone = already ? session.sessionChaptersDone : session.sessionChaptersDone + 1;
+      const sessionChaptersDone = already
+        ? session.sessionChaptersDone
+        : session.sessionChaptersDone + 1;
       const activity = session.sessionCardsReviewed + sessionChaptersDone * 3;
       return {
         ...session,
-        completedChapters: already ? session.completedChapters : [...session.completedChapters, chapterId],
+        completedChapters: already
+          ? session.completedChapters
+          : [...session.completedChapters, chapterId],
         sessionChaptersDone,
         xp: session.xp + xpGained,
         dailyGoalMet: activity >= goalTarget(session),
@@ -457,7 +508,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // never mentioned it, and BraiseRecap's own +XP total only ever summed correct answers.
       // The real account XP (this field) and the celebratory total shown at the end of a
       // session could silently drift apart by 3 XP per mistake with no explanation offered.
-      const xpGain = confidence === 'sure' ? 15 : confidence === 'doubt' ? 8 : 0;
+      const xpGain = confidence === "sure" ? 15 : confidence === "doubt" ? 8 : 0;
       const activity = sessionCardsReviewed + session.sessionChaptersDone * 3;
       void saveCardReview(cardId, updated);
       return {
@@ -483,11 +534,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const goBack = useCallback(() => {
     setState((s) => {
-      if (s.view === 'lesson' && s.lessonReturnTo) {
+      if (s.view === "lesson" && s.lessonReturnTo) {
         return { ...s, view: s.lessonReturnTo, lessonReturnTo: null };
       }
-      if (s.view === 'lesson' || s.view === 'complete') return { ...s, view: 'subject' };
-      if (s.view === 'subject' || s.view === 'settings' || s.view === 'share')
+      if (s.view === "lesson" || s.view === "complete") return { ...s, view: "subject" };
+      if (s.view === "subject" || s.view === "settings" || s.view === "share")
         return { ...s, view: s.tab };
       return s;
     });
@@ -528,6 +579,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
 export function useApp() {
   const ctx = useContext(AppCtx);
-  if (!ctx) throw new Error('useApp must be used within AppProvider');
+  if (!ctx) throw new Error("useApp must be used within AppProvider");
   return ctx;
 }

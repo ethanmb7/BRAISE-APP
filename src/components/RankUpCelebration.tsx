@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import { motion } from 'framer-motion';
-import { BraiseMascot } from './BraiseMascot';
-import { RankIcon } from './RankIcon';
-import { RANKS, type Rank } from '@/lib/aura';
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { motion } from "framer-motion";
+import { BraiseMascot } from "./BraiseMascot";
+import { RankIcon } from "./RankIcon";
+import { RANKS, type Rank } from "@/lib/aura";
 
 interface RankUpCelebrationProps {
   fromRank: Rank;
@@ -11,11 +11,11 @@ interface RankUpCelebrationProps {
   message: string;
   /** "cool" (sunglasses) for the Coach Savage tone, "proud" for Pote Chill — matches whichever
    *  voice tone actually generated `message`, instead of a fixed expression for every tone. */
-  mood?: 'proud' | 'cool';
+  mood?: "proud" | "cool";
   /** Collège gets the full bouncy/sparkly treatment; lycée keeps the same beats (still a real
    *  celebration) but toned down — the copy already splits tone by age ("Le bac recule encore
    *  d'un pas" reads nothing like a collège line), the animation never did. */
-  ageGroup?: 'college' | 'lycee';
+  ageGroup?: "college" | "lycee";
   onDismiss: () => void;
   onShare: () => void;
 }
@@ -35,13 +35,13 @@ export function RankUpCelebration({
   toRank,
   xp,
   message,
-  mood = 'proud',
-  ageGroup = 'college',
+  mood = "proud",
+  ageGroup = "college",
   onDismiss,
   onShare,
 }: RankUpCelebrationProps) {
   const [morphed, setMorphed] = useState(false);
-  const teen = ageGroup === 'lycee';
+  const teen = ageGroup === "lycee";
   const next = RANKS[RANKS.findIndex((r) => r.id === toRank.id) + 1] ?? null;
   // "Passer" used to be tappable from the very first frame — a fast tap could close the screen
   // before the transformation even started, skipping the whole moment this component exists to
@@ -54,11 +54,13 @@ export function RankUpCelebration({
   // must never be pushed off-screen — on a short or budget-Android viewport (360×640 is common,
   // not an edge case), fitting everything without scrolling means the mascot/badge/message block
   // has to shrink first, since it's the only piece here without a real floor.
-  const [viewportH, setViewportH] = useState(() => (typeof window !== 'undefined' ? window.innerHeight : 800));
+  const [viewportH, setViewportH] = useState(() =>
+    typeof window !== "undefined" ? window.innerHeight : 800,
+  );
   useEffect(() => {
     const onResize = () => setViewportH(window.innerHeight);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
   const compact = viewportH < 700;
   const mascotSize = compact ? Math.max(104, Math.round(viewportH * 0.18)) : 164;
@@ -80,10 +82,10 @@ export function RankUpCelebration({
   useEffect(() => {
     continueRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onDismiss();
+      if (e.key === "Escape") onDismiss();
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -125,7 +127,7 @@ export function RankUpCelebration({
           aria-hidden={!canSkip}
           tabIndex={canSkip ? 0 : -1}
           className="rounded-full border-2 border-black bg-white/95 px-3 py-1 text-[0.7rem] font-black text-black shadow-[2px_2px_0px_0px_#000] transition-opacity duration-300"
-          style={{ opacity: canSkip ? 1 : 0, pointerEvents: canSkip ? 'auto' : 'none' }}
+          style={{ opacity: canSkip ? 1 : 0, pointerEvents: canSkip ? "auto" : "none" }}
         >
           Passer ✕
         </button>
@@ -133,30 +135,50 @@ export function RankUpCelebration({
 
       <div className="flex flex-1 flex-col items-center justify-center px-6 py-2">
         <motion.div
-          animate={morphed ? (teen ? { x: [0, -4, 4, -2, 2, 0], y: [0, 3, -3, 1, -1, 0] } : { x: [0, -7, 7, -4, 4, 0], y: [0, 4, -4, 2, -2, 0] }) : {}}
+          animate={
+            morphed
+              ? teen
+                ? { x: [0, -4, 4, -2, 2, 0], y: [0, 3, -3, 1, -1, 0] }
+                : { x: [0, -7, 7, -4, 4, 0], y: [0, 4, -4, 2, -2, 0] }
+              : {}
+          }
           transition={{ duration: 0.4 }}
           className="relative flex flex-col items-center"
         >
           <motion.div
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 260, damping: 18 }}
+            transition={{ type: "spring", stiffness: 260, damping: 18 }}
             className="relative"
           >
             <ImpactBurst show={morphed} />
-            <Sparkles show={morphed} count={teen ? 7 : 12} colorA={toRank.colorFrom} colorB={toRank.colorTo} />
+            <Sparkles
+              show={morphed}
+              count={teen ? 7 : 12}
+              colorA={toRank.colorFrom}
+              colorB={toRank.colorTo}
+            />
 
-            <motion.div animate={{ scale: morphed ? [1, 1.3, 1] : 1 }} transition={{ duration: 0.45 }}>
-              <BraiseMascot size={mascotSize} mood={mood} rankId={morphed ? toRank.id : fromRank.id} />
+            <motion.div
+              animate={{ scale: morphed ? [1, 1.3, 1] : 1 }}
+              transition={{ duration: 0.45 }}
+            >
+              <BraiseMascot
+                size={mascotSize}
+                mood={mood}
+                rankId={morphed ? toRank.id : fromRank.id}
+              />
             </motion.div>
           </motion.div>
 
           <motion.div
             initial={{ y: -24, opacity: 0, scale: 0.7 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 16, delay: 0.62 }}
-            className={`relative z-10 flex items-center gap-1.5 rounded-full border-[2.5px] border-black px-5 py-2 text-base font-black text-black shadow-[3px_3px_0px_0px_#000] ${compact ? 'mt-2' : 'mt-3'}`}
-            style={{ background: `linear-gradient(135deg, ${toRank.colorFrom}, ${toRank.colorTo})` }}
+            transition={{ type: "spring", stiffness: 300, damping: 16, delay: 0.62 }}
+            className={`relative z-10 flex items-center gap-1.5 rounded-full border-[2.5px] border-black px-5 py-2 text-base font-black text-black shadow-[3px_3px_0px_0px_#000] ${compact ? "mt-2" : "mt-3"}`}
+            style={{
+              background: `linear-gradient(135deg, ${toRank.colorFrom}, ${toRank.colorTo})`,
+            }}
           >
             {/* White fill, not the rank's own colour — the pill's background already IS that
                 colour, so a same-colour icon would vanish into it. White reads as an embossed
@@ -169,7 +191,7 @@ export function RankUpCelebration({
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.95, duration: 0.35 }}
-            className={`relative z-10 max-w-[300px] text-center font-display font-black text-white [text-shadow:0_2px_4px_rgba(0,0,0,0.4)] ${compact ? 'mt-2 text-base' : 'mt-3 text-lg'}`}
+            className={`relative z-10 max-w-[300px] text-center font-display font-black text-white [text-shadow:0_2px_4px_rgba(0,0,0,0.4)] ${compact ? "mt-2 text-base" : "mt-3 text-lg"}`}
           >
             {message}
           </motion.p>
@@ -189,7 +211,7 @@ export function RankUpCelebration({
                 <span className="text-white">{next.min - xp} XP</span> jusqu'à {next.name}
               </>
             ) : (
-              'Rang maximum atteint 👑'
+              "Rang maximum atteint 👑"
             )}
           </motion.p>
         </motion.div>
@@ -199,26 +221,36 @@ export function RankUpCelebration({
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.1, duration: 0.4 }}
-        className={`px-6 ${compact ? 'pb-2' : 'pb-4'}`}
+        className={`px-6 ${compact ? "pb-2" : "pb-4"}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className={compact ? '-mb-2' : undefined}>
+        <div className={compact ? "-mb-2" : undefined}>
           <RankJourney currentRankId={toRank.id} accent={toRank.colorFrom} />
         </div>
 
-        <div className={`flex gap-3 ${compact ? 'mt-2' : 'mt-4'}`}>
+        <div className={`flex gap-3 ${compact ? "mt-2" : "mt-4"}`}>
           {/* Sharing was previously absent from the one moment in the whole app with the most
               reason to be shared — a peak-emotion beat is exactly when a student is likeliest to
               post it. Secondary/outlined so it never competes with "Continuer" as the default action. */}
           <button onClick={onShare} className="group relative flex-1">
-            <span aria-hidden="true" className="absolute inset-0 translate-y-[3px] rounded-2xl border-[2.5px] border-black bg-black/60" />
-            <span className={`relative flex items-center justify-center gap-1.5 rounded-2xl border-[2.5px] border-black bg-white/10 px-4 font-display text-base font-black text-white shadow-[3px_3px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[3px] group-active:shadow-none ${compact ? 'py-1.5' : 'py-2.5'}`}>
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 translate-y-[3px] rounded-2xl border-[2.5px] border-black bg-black/60"
+            />
+            <span
+              className={`relative flex items-center justify-center gap-1.5 rounded-2xl border-[2.5px] border-black bg-white/10 px-4 font-display text-base font-black text-white shadow-[3px_3px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[3px] group-active:shadow-none ${compact ? "py-1.5" : "py-2.5"}`}
+            >
               Partager
             </span>
           </button>
           <button ref={continueRef} onClick={onDismiss} className="group relative flex-[1.4]">
-            <span aria-hidden="true" className="absolute inset-0 translate-y-[3px] rounded-2xl border-[2.5px] border-black bg-black/60" />
-            <span className={`relative flex items-center justify-center rounded-2xl border-[2.5px] border-black bg-white px-4 font-display text-base font-black text-black shadow-[3px_3px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[3px] group-active:shadow-none ${compact ? 'py-1.5' : 'py-2.5'}`}>
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 translate-y-[3px] rounded-2xl border-[2.5px] border-black bg-black/60"
+            />
+            <span
+              className={`relative flex items-center justify-center rounded-2xl border-[2.5px] border-black bg-white px-4 font-display text-base font-black text-black shadow-[3px_3px_0px_0px_#000] transition-transform duration-100 group-active:translate-y-[3px] group-active:shadow-none ${compact ? "py-1.5" : "py-2.5"}`}
+            >
               Continuer
             </span>
           </button>
@@ -237,19 +269,30 @@ function RankJourney({ currentRankId, accent }: { currentRankId: string; accent:
     <div className="rank-rail" role="list" aria-label="Les 5 rangs">
       <div className="rank-rail-track">
         <div className="rank-rail-line">
-          <div className="rank-rail-line-fill" style={{ width: `${(currentIdx / (RANKS.length - 1)) * 100}%` }} />
+          <div
+            className="rank-rail-line-fill"
+            style={{ width: `${(currentIdx / (RANKS.length - 1)) * 100}%` }}
+          />
         </div>
         {RANKS.map((r, idx) => {
-          const tier: 'done' | 'current' | 'locked' = idx === currentIdx ? 'current' : idx < currentIdx ? 'done' : 'locked';
+          const tier: "done" | "current" | "locked" =
+            idx === currentIdx ? "current" : idx < currentIdx ? "done" : "locked";
           return (
             <div
               key={r.id}
               className={`rank-rail-node is-${tier}`}
-              style={tier === 'current' ? ({ '--rank-accent': accent } as CSSProperties) : undefined}
+              style={
+                tier === "current" ? ({ "--rank-accent": accent } as CSSProperties) : undefined
+              }
               role="listitem"
-              aria-label={`${r.name}${tier === 'done' ? ', débloqué' : tier === 'locked' ? ', verrouillé' : ', rang actuel'}`}
+              aria-label={`${r.name}${tier === "done" ? ", débloqué" : tier === "locked" ? ", verrouillé" : ", rang actuel"}`}
             >
-              <RankIcon rankId={r.id} color={r.colorFrom} locked={tier === 'locked'} size={tier === 'current' ? 24 : 20} />
+              <RankIcon
+                rankId={r.id}
+                color={r.colorFrom}
+                locked={tier === "locked"}
+                size={tier === "current" ? 24 : 20}
+              />
             </div>
           );
         })}
@@ -264,14 +307,17 @@ function RankJourney({ currentRankId, accent }: { currentRankId: string; accent:
 // filter, so the edges stay crisp like the rest of the app.
 function SunburstRays({ colorFrom, colorTo }: { colorFrom: string; colorTo: string }) {
   const rayCount = 16;
-  const gradId = `rayGrad-${colorFrom.replace('#', '')}`;
+  const gradId = `rayGrad-${colorFrom.replace("#", "")}`;
   return (
     <motion.svg
       viewBox="0 0 400 400"
       className="pointer-events-none absolute left-1/2 top-1/2 h-[460px] w-[460px] -translate-x-1/2 -translate-y-1/2"
       initial={{ opacity: 0, rotate: 0 }}
       animate={{ opacity: 0.9, rotate: 360 }}
-      transition={{ opacity: { duration: 0.4 }, rotate: { duration: 30, repeat: Infinity, ease: 'linear' } }}
+      transition={{
+        opacity: { duration: 0.4 },
+        rotate: { duration: 30, repeat: Infinity, ease: "linear" },
+      }}
     >
       <defs>
         <linearGradient id={gradId} x1="0" y1="1" x2="0" y2="0">
@@ -301,9 +347,14 @@ function ImpactBurst({ show }: { show: boolean }) {
       className="pointer-events-none absolute left-1/2 top-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2"
       initial={{ scale: 0.2, opacity: 0 }}
       animate={{ scale: [0.2, 1.5, 2], opacity: [0, 1, 0] }}
-      transition={{ duration: 0.45, ease: 'easeOut' }}
+      transition={{ duration: 0.45, ease: "easeOut" }}
     >
-      <polygon points={starPoints(200, 200, 8, 190, 85)} fill="#fff" stroke="#151821" strokeWidth="4" />
+      <polygon
+        points={starPoints(200, 200, 8, 190, 85)}
+        fill="#fff"
+        stroke="#151821"
+        strokeWidth="4"
+      />
     </motion.svg>
   );
 }
@@ -311,10 +362,20 @@ function ImpactBurst({ show }: { show: boolean }) {
 // Small flat 5-point star "sparkles" (CSS clip-path, no images) flying outward from Braise and
 // fading — a cheap, GPU-friendly particle effect that reads as "magic" without a single blurred
 // pixel, matching the two colours the mascot is transforming into.
-function Sparkles({ show, count = 12, colorA, colorB }: { show: boolean; count?: number; colorA: string; colorB: string }) {
+function Sparkles({
+  show,
+  count = 12,
+  colorA,
+  colorB,
+}: {
+  show: boolean;
+  count?: number;
+  colorA: string;
+  colorB: string;
+}) {
   if (!show) return null;
   const star5 =
-    'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)';
+    "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)";
   return (
     <>
       {Array.from({ length: count }).map((_, i) => {
@@ -330,7 +391,7 @@ function Sparkles({ show, count = 12, colorA, colorB }: { show: boolean; count?:
             style={{ background: i % 2 === 0 ? colorA : colorB, clipPath: star5 }}
             initial={{ x: 0, y: 0, opacity: 0, scale: 0.3, rotate: 0 }}
             animate={{ x, y, opacity: [0, 1, 0], scale: [0.3, 1, 0.5], rotate: 100 }}
-            transition={{ duration: 0.9, delay: i * 0.02, ease: 'easeOut' }}
+            transition={{ duration: 0.9, delay: i * 0.02, ease: "easeOut" }}
           />
         );
       })}
@@ -338,7 +399,13 @@ function Sparkles({ show, count = 12, colorA, colorB }: { show: boolean; count?:
   );
 }
 
-function starPoints(cx: number, cy: number, spikes: number, outerR: number, innerR: number): string {
+function starPoints(
+  cx: number,
+  cy: number,
+  spikes: number,
+  outerR: number,
+  innerR: number,
+): string {
   const pts: string[] = [];
   const step = Math.PI / spikes;
   let angle = -Math.PI / 2;
@@ -347,5 +414,5 @@ function starPoints(cx: number, cy: number, spikes: number, outerR: number, inne
     pts.push(`${cx + Math.cos(angle) * r},${cy + Math.sin(angle) * r}`);
     angle += step;
   }
-  return pts.join(' ');
+  return pts.join(" ");
 }

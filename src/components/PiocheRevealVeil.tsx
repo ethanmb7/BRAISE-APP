@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import { onPiocheReveal, getPiocheRevealTiming } from '@/lib/piocheTransition';
+import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import { onPiocheReveal, getPiocheRevealTiming } from "@/lib/piocheTransition";
 
 // The one real gap left in the "Je pioche" moment: BraiseChest's own opening ceremony (squash,
 // lid pop, her rise, the eye-flash) is carefully choreographed, but the screen swap right after
@@ -22,7 +22,12 @@ import { onPiocheReveal, getPiocheRevealTiming } from '@/lib/piocheTransition';
 // special-casing is needed the way BraiseChest's own transform-heavy beats would require.
 export function PiocheRevealVeil() {
   const [active, setActive] = useState(false);
-  const [durations, setDurations] = useState({ fadeInMs: 0, holdMs: 0, fadeOutMs: 0, veilTotalMs: 0 });
+  const [durations, setDurations] = useState({
+    fadeInMs: 0,
+    holdMs: 0,
+    fadeOutMs: 0,
+    veilTotalMs: 0,
+  });
   const resetTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
@@ -49,7 +54,11 @@ export function PiocheRevealVeil() {
       animate={active ? { opacity: [0, 1, 1, 0] } : { opacity: 0 }}
       transition={
         active && veilTotalMs > 0
-          ? { duration: veilTotalMs / 1000, times: [0, fadeInMs / veilTotalMs, (fadeInMs + holdMs) / veilTotalMs, 1], ease: 'easeOut' }
+          ? {
+              duration: veilTotalMs / 1000,
+              times: [0, fadeInMs / veilTotalMs, (fadeInMs + holdMs) / veilTotalMs, 1],
+              ease: "easeOut",
+            }
           : { duration: 0.12 }
       }
     />

@@ -1,17 +1,17 @@
-import { memo, useCallback, useMemo, useState, type CSSProperties } from 'react';
-import { motion } from 'framer-motion';
-import { WifiOff, Layers } from 'lucide-react';
-import { useApp } from '@/store';
-import { sfx } from '@/lib/sound';
-import { useOnlineStatus } from '@/lib/useOnlineStatus';
-import { useCountUp } from '@/lib/useCountUp';
-import { BraiseMascot } from '@/components/BraiseMascot';
-import { BraiseCharacter } from '@/components/BraiseCharacter';
-import { ShareAuraModal } from '@/components/ShareAuraModal';
-import { SubjectIcon } from '@/components/SubjectIcon';
-import { RankIcon } from '@/components/RankIcon';
-import { StreakFlameIcon } from '@/components/StreakFlameIcon';
-import { TrophyIcon } from '@/components/TrophyIcon';
+import { memo, useCallback, useMemo, useState, type CSSProperties } from "react";
+import { motion } from "framer-motion";
+import { WifiOff, Layers } from "lucide-react";
+import { useApp } from "@/store";
+import { sfx } from "@/lib/sound";
+import { useOnlineStatus } from "@/lib/useOnlineStatus";
+import { useCountUp } from "@/lib/useCountUp";
+import { BraiseMascot } from "@/components/BraiseMascot";
+import { BraiseCharacter } from "@/components/BraiseCharacter";
+import { ShareAuraModal } from "@/components/ShareAuraModal";
+import { SubjectIcon } from "@/components/SubjectIcon";
+import { RankIcon } from "@/components/RankIcon";
+import { StreakFlameIcon } from "@/components/StreakFlameIcon";
+import { TrophyIcon } from "@/components/TrophyIcon";
 import {
   getRankInfo,
   RANKS,
@@ -23,9 +23,9 @@ import {
   type SubjectMastery,
   type BraiseInsight,
   type NextMilestone,
-} from '@/lib/aura';
-import { getAgeGroup, progressAdvice, strongSubjectLine } from '@/lib/braiseVoice';
-import { FLASHCARDS } from '@/data';
+} from "@/lib/aura";
+import { getAgeGroup, progressAdvice, strongSubjectLine } from "@/lib/braiseVoice";
+import { FLASHCARDS } from "@/data";
 
 // Diameter of the hero ring frame — the single largest element on the page, on purpose.
 const HERO_SIZE = 180;
@@ -44,7 +44,12 @@ const staggerItem = {
 // element meant to land in under half a second actually feels like an arrival, not a fade-up.
 const heroPop = {
   hidden: { opacity: 0, scale: 0.72, y: 8 },
-  show: { opacity: 1, scale: 1, y: 0, transition: { type: 'spring', stiffness: 260, damping: 18 } as const },
+  show: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 260, damping: 18 } as const,
+  },
 };
 export function ProfilAuraView() {
   const { state, loaded, openSubject, setTab, getDueCards } = useApp();
@@ -56,9 +61,12 @@ export function ProfilAuraView() {
   const stats = useMemo(() => {
     const reviewedIds = Object.keys(state.cardReviews);
     const subjectsSeen = new Set(
-      reviewedIds.map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean)
+      reviewedIds.map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean),
     );
-    return { subjectsCount: subjectsSeen.size, masteredCards: countMasteredCards(state.cardReviews) };
+    return {
+      subjectsCount: subjectsSeen.size,
+      masteredCards: countMasteredCards(state.cardReviews),
+    };
   }, [state.cardReviews]);
 
   // Once the rank ladder is maxed, RankRail's own caption has nothing left to say — this keeps
@@ -66,7 +74,7 @@ export function ProfilAuraView() {
   // computeNextMilestone in aura.ts for why streak/mastered-cards never run out the way XP does.
   const milestone = useMemo(
     () => computeNextMilestone(state.streak, stats.masteredCards),
-    [state.streak, stats.masteredCards]
+    [state.streak, stats.masteredCards],
   );
 
   // "Ce que Braise a remarqué" — real observation mined from Réviser's own SM-2 state
@@ -77,12 +85,15 @@ export function ProfilAuraView() {
   const insightLine = useMemo(() => {
     if (!insight) return null;
     const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
-    return insight.kind === 'struggling'
+    return insight.kind === "struggling"
       ? progressAdvice(voiceCtx, insight.subjectName, insight.topic)
       : strongSubjectLine(voiceCtx, insight.subjectName, insight.masteredCount, insight.totalCount);
   }, [insight, state.user.personality, state.user.level]);
 
-  const subjectMastery = useMemo(() => computeSubjectMastery(state.cardReviews), [state.cardReviews]);
+  const subjectMastery = useMemo(
+    () => computeSubjectMastery(state.cardReviews),
+    [state.cardReviews],
+  );
 
   const handleShareOpen = useCallback(() => {
     sfx.tap(state.soundOn);
@@ -98,7 +109,7 @@ export function ProfilAuraView() {
   const handleReviewClick = useCallback(() => {
     sfx.tap(state.soundOn);
     if (navigator.vibrate) navigator.vibrate(10);
-    setTab('revisions');
+    setTab("revisions");
   }, [state.soundOn, setTab]);
 
   // Tapping a subject medallion drops straight into that deck — a weak subject becomes
@@ -110,7 +121,7 @@ export function ProfilAuraView() {
       if (navigator.vibrate) navigator.vibrate(10);
       openSubject(subjectId);
     },
-    [state.soundOn, openSubject]
+    [state.soundOn, openSubject],
   );
 
   if (!loaded) {
@@ -128,7 +139,12 @@ export function ProfilAuraView() {
         </div>
       )}
 
-      <motion.div className="aura-content" variants={staggerContainer} initial="hidden" animate="show">
+      <motion.div
+        className="aura-content"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="show"
+      >
         {/* Pillar 1 — Ancrage émotionnel : identité pure, zéro chiffre de progression. */}
         <motion.div variants={heroPop}>
           <AuraHeroScene rank={current} streak={state.streak} freezes={state.freezes} />
@@ -173,7 +189,9 @@ export function ProfilAuraView() {
             <span className="aura-review-icon" aria-hidden="true">
               <Layers size={18} />
             </span>
-            {dueCount > 0 ? `Réviser maintenant · ${dueCount} carte${dueCount > 1 ? 's' : ''}` : 'Réviser une carte'}
+            {dueCount > 0
+              ? `Réviser maintenant · ${dueCount} carte${dueCount > 1 ? "s" : ""}`
+              : "Réviser une carte"}
           </button>
           <button className="aura-share-cta" onClick={handleShareOpen}>
             <span className="aura-share-icon" aria-hidden="true">
@@ -236,7 +254,7 @@ const AuraHeroScene = memo(function AuraHeroScene({
             {/* Légende used to double up its crown — one floating here, one on the medal badge
                 below. The medal is the single crown now; this spot keeps only the sparkle
                 flourish, still reserved for Or. */}
-            {rank.id === 'or' && (
+            {rank.id === "or" && (
               <>
                 <span className="aura-sparkle s1">✦</span>
                 <span className="aura-sparkle s2">✦</span>
@@ -247,8 +265,8 @@ const AuraHeroScene = memo(function AuraHeroScene({
           </div>
         </div>
         <div
-          className={`aura-streak-badge ${freezeDanger ? 'is-danger' : ''}`}
-          aria-label={`${streak} jour${streak > 1 ? 's' : ''} de suite${freezeDanger ? ' · série à risque' : ''}`}
+          className={`aura-streak-badge ${freezeDanger ? "is-danger" : ""}`}
+          aria-label={`${streak} jour${streak > 1 ? "s" : ""} de suite${freezeDanger ? " · série à risque" : ""}`}
         >
           <span className="aura-streak-flame" aria-hidden="true">
             <StreakFlameIcon size={17} />
@@ -258,7 +276,7 @@ const AuraHeroScene = memo(function AuraHeroScene({
           </span>
           <span className="aura-streak-pips" aria-hidden="true">
             {[0, 1].map((i) => (
-              <span key={i} className={`aura-streak-pip ${i < freezes ? 'is-filled' : ''}`} />
+              <span key={i} className={`aura-streak-pip ${i < freezes ? "is-filled" : ""}`} />
             ))}
           </span>
         </div>
@@ -272,14 +290,18 @@ const AuraHeroScene = memo(function AuraHeroScene({
 });
 
 const EVOLUTION_NAMES: Record<string, string> = {
-  bronze: 'Étincelle',
-  argent: 'Focus',
-  or: 'Impact',
-  platine: 'Maîtrise',
-  legende: 'Libre',
+  bronze: "Étincelle",
+  argent: "Focus",
+  or: "Impact",
+  platine: "Maîtrise",
+  legende: "Libre",
 };
 
-const BraiseEvolutionLine = memo(function BraiseEvolutionLine({ currentRankId }: { currentRankId: string }) {
+const BraiseEvolutionLine = memo(function BraiseEvolutionLine({
+  currentRankId,
+}: {
+  currentRankId: string;
+}) {
   const currentIdx = RANKS.findIndex((rank) => rank.id === currentRankId);
   return (
     <section className="braise-evolution-line" aria-label="Les évolutions de Braise">
@@ -292,8 +314,16 @@ const BraiseEvolutionLine = memo(function BraiseEvolutionLine({ currentRankId }:
           const unlocked = index <= currentIdx;
           const current = index === currentIdx;
           return (
-            <div className={`braise-evolution-stage ${current ? 'is-current' : ''} ${unlocked ? '' : 'is-locked'}`} key={rank.id}>
-              <BraiseCharacter size={current ? 58 : 46} rankId={rank.id} expression={current ? 'proud' : 'happy'} labelled={false} />
+            <div
+              className={`braise-evolution-stage ${current ? "is-current" : ""} ${unlocked ? "" : "is-locked"}`}
+              key={rank.id}
+            >
+              <BraiseCharacter
+                size={current ? 58 : 46}
+                rankId={rank.id}
+                expression={current ? "proud" : "happy"}
+                labelled={false}
+              />
               <span>{current ? EVOLUTION_NAMES[rank.id] : rank.name}</span>
             </div>
           );
@@ -309,13 +339,19 @@ const BraiseEvolutionLine = memo(function BraiseEvolutionLine({ currentRankId }:
 // wears for "not sure yet" moments elsewhere) reads as genuine concern, not a scolding; `proud`
 // for a real strength is the same mood the rank-up celebration uses. Never rendered when there's
 // nothing true yet to say — the caller (ProfilAuraView) only mounts this when insight is non-null.
-const BraiseInsightCard = memo(function BraiseInsightCard({ insight, line }: { insight: BraiseInsight; line: string }) {
+const BraiseInsightCard = memo(function BraiseInsightCard({
+  insight,
+  line,
+}: {
+  insight: BraiseInsight;
+  line: string;
+}) {
   return (
     <div className="braise-insight">
       <span className="braise-insight-tab">Ce que Braise a remarqué</span>
       <div className="braise-insight-body">
         <div className="braise-insight-mascot" aria-hidden="true">
-          <BraiseMascot size={44} mood={insight.kind === 'struggling' ? 'hesitant' : 'proud'} />
+          <BraiseMascot size={44} mood={insight.kind === "struggling" ? "hesitant" : "proud"} />
         </div>
         <p className="braise-insight-line">{line}</p>
       </div>
@@ -337,8 +373,11 @@ const RankProgressCaption = memo(function RankProgressCaption({
   xp: number;
   milestone: NextMilestone;
 }) {
-  const milestoneUnit = milestone.kind === 'streak' ? 'jour' : 'carte';
-  const milestoneGoal = milestone.kind === 'streak' ? `${milestone.target} jours de série` : `${milestone.target} cartes maîtrisées`;
+  const milestoneUnit = milestone.kind === "streak" ? "jour" : "carte";
+  const milestoneGoal =
+    milestone.kind === "streak"
+      ? `${milestone.target} jours de série`
+      : `${milestone.target} cartes maîtrisées`;
   return (
     <div className="rank-rail-caption">
       {next ? (
@@ -352,7 +391,8 @@ const RankProgressCaption = memo(function RankProgressCaption({
         // atteindre" au lieu de s'arrêter net sur "Rang maximum atteint".
         <>
           <span className="rank-rail-caption-amount">
-            {milestone.remaining} {milestoneUnit}{milestone.remaining > 1 ? 's' : ''}
+            {milestone.remaining} {milestoneUnit}
+            {milestone.remaining > 1 ? "s" : ""}
           </span>
           <span className="rank-rail-caption-rest"> jusqu'à {milestoneGoal}</span>
         </>
@@ -362,7 +402,7 @@ const RankProgressCaption = memo(function RankProgressCaption({
 });
 
 // Same subject the Accueil grid uses, kept in one place so both screens shorten it identically.
-const SHORT_SUBJECT_NAME: Record<string, string> = { maths: 'Maths' };
+const SHORT_SUBJECT_NAME: Record<string, string> = { maths: "Maths" };
 
 // Per-subject mastery — the one signal Réviser's own data (SM-2 repetitions per card) could
 // already answer but nothing on the page surfaced: "où est-ce que je suis vraiment solide".
@@ -397,7 +437,7 @@ const SubjectMasteryGrid = memo(function SubjectMasteryGrid({
                 className="mastery-tile"
                 role="listitem"
                 onClick={() => onSelect(s.id)}
-                aria-label={`${s.name} : ${s.masteredCount} carte${s.masteredCount > 1 ? 's' : ''} maîtrisée${s.masteredCount > 1 ? 's' : ''} sur ${s.totalCount} — réviser cette matière`}
+                aria-label={`${s.name} : ${s.masteredCount} carte${s.masteredCount > 1 ? "s" : ""} maîtrisée${s.masteredCount > 1 ? "s" : ""} sur ${s.totalCount} — réviser cette matière`}
               >
                 <span className="mastery-stack">
                   {[0, 1, 2, 3].map((i) => {
@@ -405,11 +445,15 @@ const SubjectMasteryGrid = memo(function SubjectMasteryGrid({
                     return (
                       <span
                         key={i}
-                        className={`mastery-card ${isFilled ? 'is-filled' : 'is-empty'}`}
+                        className={`mastery-card ${isFilled ? "is-filled" : "is-empty"}`}
                         style={isFilled ? ({ background: s.color } as CSSProperties) : undefined}
                       >
                         {i === 3 && (
-                          <SubjectIcon subjectId={s.id} color={isFilled ? '#fff' : 'rgba(21,24,33,0.35)'} size={16} />
+                          <SubjectIcon
+                            subjectId={s.id}
+                            color={isFilled ? "#fff" : "rgba(21,24,33,0.35)"}
+                            size={16}
+                          />
                         )}
                       </span>
                     );
@@ -428,13 +472,29 @@ const SubjectMasteryGrid = memo(function SubjectMasteryGrid({
   );
 });
 
-function Skeleton({ width, height, radius = 8, style }: { width: string | number; height: string | number; radius?: number; style?: CSSProperties }) {
-  return <div className="skeleton-block" style={{ width, height, borderRadius: radius, ...style }} />;
+function Skeleton({
+  width,
+  height,
+  radius = 8,
+  style,
+}: {
+  width: string | number;
+  height: string | number;
+  radius?: number;
+  style?: CSSProperties;
+}) {
+  return (
+    <div className="skeleton-block" style={{ width, height, borderRadius: radius, ...style }} />
+  );
 }
 
 function ProfilAuraSkeleton() {
   return (
-    <div className="view is-active aura-view aura-hud" aria-busy="true" aria-label="Chargement de ton parcours">
+    <div
+      className="view is-active aura-view aura-hud"
+      aria-busy="true"
+      aria-label="Chargement de ton parcours"
+    >
       <h1 className="aura-view-title">Ton parcours</h1>
 
       <div className="aura-hero">
@@ -442,7 +502,7 @@ function ProfilAuraSkeleton() {
         <Skeleton width={110} height={22} radius={999} />
       </div>
 
-      <Skeleton width={180} height={18} radius={999} style={{ margin: '18px auto 12px' }} />
+      <Skeleton width={180} height={18} radius={999} style={{ margin: "18px auto 12px" }} />
       <Skeleton width="100%" height={44} radius={999} style={{ marginBottom: 16 }} />
 
       <Skeleton width="100%" height={54} radius={999} style={{ marginTop: 16 }} />

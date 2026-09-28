@@ -1,8 +1,8 @@
-import type { AppState, UserProfile, CardReview, Confidence, ViewId, TabId } from '@/types';
-import { supabase, supabaseConfigured, getDeviceId, getDeviceSecret } from './supabase';
+import type { AppState, UserProfile, CardReview, Confidence, ViewId, TabId } from "@/types";
+import { supabase, supabaseConfigured, getDeviceId, getDeviceSecret } from "./supabase";
 
-const PROGRESS_KEY = 'sapie_progress';
-const CARDS_KEY = 'sapie_card_reviews';
+const PROGRESS_KEY = "sapie_progress";
+const CARDS_KEY = "sapie_card_reviews";
 
 type StoredProgress = {
   xp: number;
@@ -31,7 +31,7 @@ type StoredProgress = {
   tab: TabId;
   currentSubjectId: string | null;
   currentChapterId: string | null;
-  currentLessonMode: 'vocal' | 'echanger';
+  currentLessonMode: "vocal" | "echanger";
 };
 
 // Mirrors the real `device_progress` columns (supabase/migrations/20260730074908_...). That
@@ -101,19 +101,19 @@ function toAppState(p: StoredProgress, cardReviews: Record<string, CardReview>):
     darkMode: p.darkMode,
     dyslexiaMode: p.dyslexiaMode,
     soundOn: p.soundOn,
-    user: { ...p.user, personality: p.user?.personality ?? 'chill' },
+    user: { ...p.user, personality: p.user?.personality ?? "chill" },
     completedChapters: p.completedChapters ?? [],
     lastSubjectId: p.lastSubjectId ?? null,
     lastChapterId: p.lastChapterId ?? null,
     cardReviews,
-    sessionDate: p.sessionDate ?? '',
+    sessionDate: p.sessionDate ?? "",
     sessionCardsReviewed: p.sessionCardsReviewed ?? 0,
     sessionChaptersDone: p.sessionChaptersDone ?? 0,
-    view: p.view ?? 'home',
-    tab: p.tab ?? 'home',
+    view: p.view ?? "home",
+    tab: p.tab ?? "home",
     currentSubjectId: p.currentSubjectId ?? null,
     currentChapterId: p.currentChapterId ?? null,
-    currentLessonMode: p.currentLessonMode ?? 'vocal',
+    currentLessonMode: p.currentLessonMode ?? "vocal",
   };
 }
 
@@ -127,10 +127,12 @@ export async function loadProgress(): Promise<Partial<AppState> | null> {
   if (supabaseConfigured && supabase) {
     try {
       const deviceId = getDeviceId();
-      const [{ data: row, error: rowErr }, { data: cardRows, error: cardsErr }] = await Promise.all([
-        supabase.from('device_progress').select('*').eq('device_id', deviceId).maybeSingle(),
-        supabase.from('card_reviews').select('*').eq('device_id', deviceId),
-      ]);
+      const [{ data: row, error: rowErr }, { data: cardRows, error: cardsErr }] = await Promise.all(
+        [
+          supabase.from("device_progress").select("*").eq("device_id", deviceId).maybeSingle(),
+          supabase.from("card_reviews").select("*").eq("device_id", deviceId),
+        ],
+      );
 
       if (!rowErr && row) {
         const cardReviews: Record<string, CardReview> = {};
@@ -169,11 +171,11 @@ export async function loadProgress(): Promise<Partial<AppState> | null> {
             sessionCardsReviewed: cloudRow.session_cards_reviewed,
             sessionChaptersDone: cloudRow.session_chapters_done,
             // Not in device_progress either — same reasoning as bestCombo above.
-            view: local?.view ?? 'home',
-            tab: local?.tab ?? 'home',
+            view: local?.view ?? "home",
+            tab: local?.tab ?? "home",
             currentSubjectId: local?.currentSubjectId ?? null,
             currentChapterId: local?.currentChapterId ?? null,
-            currentLessonMode: local?.currentLessonMode ?? 'vocal',
+            currentLessonMode: local?.currentLessonMode ?? "vocal",
           },
           cardReviews,
         );
@@ -238,7 +240,7 @@ export async function saveProgress(state: AppState): Promise<void> {
         session_cards_reviewed: state.sessionCardsReviewed,
         session_chapters_done: state.sessionChaptersDone,
       };
-      await supabase.from('device_progress').upsert(dbRow);
+      await supabase.from("device_progress").upsert(dbRow);
     } catch {
       // Best-effort cloud sync — the localStorage write above already succeeded.
     }
@@ -266,7 +268,7 @@ export async function saveCardReview(cardId: string, review: CardReview): Promis
         next_review_at: review.nextReviewAt,
         last_confidence: review.lastConfidence,
       };
-      await supabase.from('card_reviews').upsert(row, { onConflict: 'device_id,card_id' });
+      await supabase.from("card_reviews").upsert(row, { onConflict: "device_id,card_id" });
     } catch {
       // Best-effort cloud sync — the localStorage write above already succeeded.
     }

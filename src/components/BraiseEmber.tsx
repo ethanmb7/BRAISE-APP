@@ -1,6 +1,6 @@
-import { useApp } from '@/store';
-import { getRankInfo } from '@/lib/aura';
-import { BraiseCharacter } from './BraiseCharacter';
+import { useApp } from "@/store";
+import { getRankInfo } from "@/lib/aura";
+import { BraiseCharacter } from "./BraiseCharacter";
 
 /**
  * Braise, redessinée depuis zéro pour la Pioche du Jour.
@@ -18,7 +18,7 @@ import { BraiseCharacter } from './BraiseCharacter';
  *   proud  — la carte est tirée : yeux en ^^, grand sourire
  *   sleepy — rien à faire aujourd'hui
  */
-export type EmberMood = 'idle' | 'eager' | 'proud' | 'sleepy';
+export type EmberMood = "idle" | "eager" | "proud" | "sleepy";
 
 type Props = {
   size?: number;
@@ -29,14 +29,20 @@ type Props = {
   rankId?: string;
 };
 
-export function BraiseEmber({ size = 72, mood = 'idle', className = '', presenting, rankId }: Props) {
+export function BraiseEmber({
+  size = 72,
+  mood = "idle",
+  className = "",
+  presenting,
+  rankId,
+}: Props) {
   const { state } = useApp();
   const currentRankId = rankId ?? getRankInfo(state.xp).current.id;
   return (
     <BraiseCharacter
       size={size}
       rankId={currentRankId}
-      expression={mood === 'idle' ? 'happy' : mood}
+      expression={mood === "idle" ? "happy" : mood}
       presenting={presenting}
       className={className}
     />

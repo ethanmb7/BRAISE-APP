@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 // Counts a displayed number up to its target over `duration`ms using a single rAF loop — cheap,
 // touches nothing but a text node, cancels cleanly on unmount or if the target changes mid-flight.

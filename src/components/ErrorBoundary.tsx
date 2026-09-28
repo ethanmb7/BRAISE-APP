@@ -1,5 +1,5 @@
-import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { BraiseMascot } from '@/components/BraiseMascot';
+import { Component, type ErrorInfo, type ReactNode } from "react";
+import { BraiseMascot } from "@/components/BraiseMascot";
 
 type Props = {
   children: ReactNode;
@@ -25,7 +25,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error('[ErrorBoundary] caught a render crash:', error, info.componentStack);
+    console.error("[ErrorBoundary] caught a render crash:", error, info.componentStack);
   }
 
   // "Réessayer" — a purely local reset, no navigation: some crashes are transient (a bad piece
@@ -40,9 +40,12 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="flex min-h-[60vh] flex-col items-center justify-center gap-2 bg-[var(--bg)] px-8 text-center">
           <BraiseMascot size={72} mood="hesitant" />
-          <p className="mt-3 font-display text-[1.15rem] font-extrabold text-[var(--neo-ink)]">Oups, un truc a planté</p>
+          <p className="mt-3 font-display text-[1.15rem] font-extrabold text-[var(--neo-ink)]">
+            Oups, un truc a planté
+          </p>
           <p className="max-w-[30ch] text-[0.9rem] leading-relaxed text-[var(--ink-soft)]">
-            C'est de notre côté, pas du tien. Réessaie, ou retourne à l'accueil en attendant qu'on répare.
+            C'est de notre côté, pas du tien. Réessaie, ou retourne à l'accueil en attendant qu'on
+            répare.
           </p>
           <div className="mt-5 flex gap-3">
             <button

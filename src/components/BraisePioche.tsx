@@ -1,5 +1,5 @@
-import { motion, MotionConfig } from 'framer-motion';
-import { BraiseEmber } from '@/components/BraiseEmber';
+import { motion, MotionConfig } from "framer-motion";
+import { BraiseEmber } from "@/components/BraiseEmber";
 
 interface BraisePiocheProps {
   size?: number;
@@ -32,7 +32,7 @@ export function BraisePioche({ size = 64, hyped, diving, quick }: BraisePiochePr
   // Net et rapide : la même chorégraphie, jouée plus serré (≈560ms plein, ≈300ms en relance).
   const t = quick ? 0.34 : 0.62;
   const s = (v: number) => size * v;
-  const lean = { type: 'spring' as const, stiffness: 620, damping: 20, mass: 0.6 };
+  const lean = { type: "spring" as const, stiffness: 620, damping: 20, mass: 0.6 };
 
   // Paquet au repos, écarté seulement au survol/appui. L'index 1 est la carte piochée.
   const fan = [
@@ -45,9 +45,8 @@ export function BraisePioche({ size = 64, hyped, diving, quick }: BraisePiochePr
     width: s(0.34),
     height: s(0.46),
     marginLeft: -s(0.17),
-    transformOrigin: '50% 94%',
+    transformOrigin: "50% 94%",
   } as const;
-
 
   return (
     <MotionConfig reducedMotion="user">
@@ -61,7 +60,11 @@ export function BraisePioche({ size = 64, hyped, diving, quick }: BraisePiochePr
           className="absolute left-1/2 rounded-full bg-[#FFB020]/60 blur-[6px]"
           style={{ width: s(0.7), height: s(0.22), marginLeft: -s(0.35), bottom: -s(0.02) }}
           animate={diving || hyped ? { opacity: [0.5, 0.95, 0.6] } : { opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: diving || hyped ? 0.7 : 2.8, repeat: Infinity, ease: 'easeInOut' }}
+          transition={{
+            duration: diving || hyped ? 0.7 : 2.8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
         />
 
         {/* Braise, derrière le paquet : contenue dans le cadre — buste visible, jamais coupée. */}
@@ -85,12 +88,12 @@ export function BraisePioche({ size = 64, hyped, diving, quick }: BraisePiochePr
               ? { duration: 0.72 * t, times: [0, 0.22, 0.62, 1], ease: [0.16, 1, 0.3, 1] }
               : hyped
                 ? lean
-                : { duration: 2.8, repeat: Infinity, ease: 'easeInOut' }
+                : { duration: 2.8, repeat: Infinity, ease: "easeInOut" }
           }
         >
           <BraiseEmber
             size={s(0.86)}
-            mood={diving ? 'proud' : hyped ? 'eager' : 'idle'}
+            mood={diving ? "proud" : hyped ? "eager" : "idle"}
             presenting={diving}
           />
         </motion.div>
@@ -100,10 +103,13 @@ export function BraisePioche({ size = 64, hyped, diving, quick }: BraisePiochePr
           className="absolute left-1/2 z-10 rounded-full border-[2.5px] border-[#FFD84B]"
           style={{ width: s(0.5), height: s(0.5), marginLeft: -s(0.25), bottom: s(0.42) }}
           initial={false}
-          animate={diving ? { opacity: [0, 0.9, 0], scale: [0.3, 1.9, 2.4] } : { opacity: 0, scale: 0.3 }}
-          transition={diving ? { duration: 0.5 * t, delay: 0.24 * t, ease: 'easeOut' } : { duration: 0.1 }}
+          animate={
+            diving ? { opacity: [0, 0.9, 0], scale: [0.3, 1.9, 2.4] } : { opacity: 0, scale: 0.3 }
+          }
+          transition={
+            diving ? { duration: 0.5 * t, delay: 0.24 * t, ease: "easeOut" } : { duration: 0.1 }
+          }
         />
-
 
         {/* Le paquet. Écrasement à l'appui, resserrement pendant l'anticipation, recul au tirage. */}
         {fan.map((c, i) => (
@@ -130,20 +136,34 @@ export function BraisePioche({ size = 64, hyped, diving, quick }: BraisePiochePr
             }
             transition={
               diving
-                ? { duration: 0.62 * t, times: [0, 0.16, 0.62, 1], ease: [0.16, 1, 0.3, 1], delay: 0.02 * i * t }
+                ? {
+                    duration: 0.62 * t,
+                    times: [0, 0.16, 0.62, 1],
+                    ease: [0.16, 1, 0.3, 1],
+                    delay: 0.02 * i * t,
+                  }
                 : { ...lean, delay: 0.025 * i }
             }
           >
-            <span className="absolute inset-x-[3px] top-[3px] block rounded-[2px] bg-[#FFD84B]" style={{ height: s(0.07) }} />
-            <span className="absolute inset-x-[4px] bottom-[5px] block rounded-[2px] bg-[#151821]/12" style={{ height: s(0.05) }} />
-            <span className="absolute inset-x-[4px] bottom-[11px] block rounded-[2px] bg-[#151821]/12" style={{ height: s(0.04) }} />
+            <span
+              className="absolute inset-x-[3px] top-[3px] block rounded-[2px] bg-[#FFD84B]"
+              style={{ height: s(0.07) }}
+            />
+            <span
+              className="absolute inset-x-[4px] bottom-[5px] block rounded-[2px] bg-[#151821]/12"
+              style={{ height: s(0.05) }}
+            />
+            <span
+              className="absolute inset-x-[4px] bottom-[11px] block rounded-[2px] bg-[#151821]/12"
+              style={{ height: s(0.04) }}
+            />
           </motion.div>
         ))}
 
         {/* La carte tirée : elle jaillit, se retourne face visible, puis fonce vers toi. */}
         <motion.div
           className="absolute bottom-0 left-1/2 z-20"
-          style={{ ...cardBox, transformStyle: 'preserve-3d' }}
+          style={{ ...cardBox, transformStyle: "preserve-3d" }}
           initial={false}
           animate={
             diving
@@ -158,21 +178,29 @@ export function BraisePioche({ size = 64, hyped, diving, quick }: BraisePiochePr
           }
           transition={
             diving
-              ? { duration: 0.74 * t, delay: 0.1 * t, times: [0, 0.17, 0.58, 0.76, 1], ease: [0.16, 1, 0.3, 1] }
+              ? {
+                  duration: 0.74 * t,
+                  delay: 0.1 * t,
+                  times: [0, 0.17, 0.58, 0.76, 1],
+                  ease: [0.16, 1, 0.3, 1],
+                }
               : { duration: 0.1 }
           }
         >
           {/* dos */}
           <span
             className="absolute inset-0 rounded-[6px] border-[2.5px] border-[#151821] bg-[#FFF8EE] shadow-[2px_2px_0px_0px_#151821]"
-            style={{ backfaceVisibility: 'hidden' }}
+            style={{ backfaceVisibility: "hidden" }}
           >
-            <span className="absolute inset-x-[3px] top-[3px] block rounded-[2px] bg-[#FFD84B]" style={{ height: s(0.07) }} />
+            <span
+              className="absolute inset-x-[3px] top-[3px] block rounded-[2px] bg-[#FFD84B]"
+              style={{ height: s(0.07) }}
+            />
           </span>
           {/* face — la mission, révélée : la silhouette de Braise elle-même */}
           <span
             className="absolute inset-0 flex items-center justify-center rounded-[6px] border-[2.5px] border-[#151821] bg-[#FF4500] shadow-[2px_2px_0px_0px_#151821]"
-            style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+            style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
           >
             <svg viewBox="0 0 100 100" width={s(0.26)} height={s(0.26)} fill="none">
               <path
@@ -215,13 +243,12 @@ export function BraisePioche({ size = 64, hyped, diving, quick }: BraisePiochePr
               }
               transition={
                 diving
-                  ? { duration: 0.42 * t, delay: (0.26 + i * 0.012) * t, ease: 'easeOut' }
+                  ? { duration: 0.42 * t, delay: (0.26 + i * 0.012) * t, ease: "easeOut" }
                   : { duration: 0.1 }
               }
             />
           );
         })}
-
       </div>
     </MotionConfig>
   );

@@ -1,5 +1,5 @@
-import { Fragment, useMemo } from 'react';
-import katex from 'katex';
+import { Fragment, useMemo } from "react";
+import katex from "katex";
 
 // Lightweight inline markup for flashcard content, authored directly in data.ts (never user
 // input, so injecting KaTeX's HTML output below is safe):
@@ -17,26 +17,26 @@ type Props = {
   strongClass?: string;
 };
 
-export function RichText({ text, markClass = 'neo-highlight', strongClass }: Props) {
+export function RichText({ text, markClass = "neo-highlight", strongClass }: Props) {
   const parts = useMemo(() => text.split(TOKEN_SPLIT).filter((part) => part.length > 0), [text]);
 
   return (
     <>
       {parts.map((part, i) => {
-        if (part.startsWith('$$') && part.endsWith('$$')) {
+        if (part.startsWith("$$") && part.endsWith("$$")) {
           return <MathSpan key={i} expr={part.slice(2, -2)} display />;
         }
-        if (part.startsWith('$') && part.endsWith('$')) {
+        if (part.startsWith("$") && part.endsWith("$")) {
           return <MathSpan key={i} expr={part.slice(1, -1)} />;
         }
-        if (part.startsWith('**') && part.endsWith('**')) {
+        if (part.startsWith("**") && part.endsWith("**")) {
           return (
             <strong key={i} className={strongClass}>
               {part.slice(2, -2)}
             </strong>
           );
         }
-        if (part.startsWith('==') && part.endsWith('==')) {
+        if (part.startsWith("==") && part.endsWith("==")) {
           return (
             <mark key={i} className={markClass}>
               {part.slice(2, -2)}

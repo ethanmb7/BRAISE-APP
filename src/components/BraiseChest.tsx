@@ -1,5 +1,5 @@
-import { useId } from 'react';
-import { motion } from 'framer-motion';
+import { useId } from "react";
+import { motion } from "framer-motion";
 
 interface BraiseChestProps {
   size?: number;
@@ -14,7 +14,7 @@ interface BraiseChestProps {
   quick: boolean;
 }
 
-type Phase = 'idle' | 'trigger' | 'full' | 'quick';
+type Phase = "idle" | "trigger" | "full" | "quick";
 
 // Braise doesn't stand beside the card anymore — she's inside a small chest that IS the card's
 // mascot slot. Three real design decisions carried over from the mockup review (see the session's
@@ -42,15 +42,21 @@ type Phase = 'idle' | 'trigger' | 'full' | 'quick';
 // - `quick` swaps in a shorter, calmer version of the same beats for a same-day reopen, so the
 //   full ceremony stays special instead of becoming daily wallpaper (see HeroPiocheCard).
 export function BraiseChest({ size = 56, hyped, diving, quick }: BraiseChestProps) {
-  const phase: Phase = diving ? (quick ? 'quick' : 'full') : hyped ? 'trigger' : 'idle';
-  const isAction = phase === 'full' || phase === 'quick';
+  const phase: Phase = diving ? (quick ? "quick" : "full") : hyped ? "trigger" : "idle";
+  const isAction = phase === "full" || phase === "quick";
   // A clipPath id must be unique document-wide, or every instance of this component on the page
   // would resolve to whichever one happens to be first in the DOM.
   const clipId = `chestMouthClip-${useId()}`;
 
   return (
     <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
-      <svg viewBox="0 0 100 100" width={size} height={size} className="overflow-visible" aria-hidden="true">
+      <svg
+        viewBox="0 0 100 100"
+        width={size}
+        height={size}
+        className="overflow-visible"
+        aria-hidden="true"
+      >
         <defs>
           <clipPath id={clipId}>
             <rect x="0" y="0" width="100" height="46" />
@@ -66,16 +72,16 @@ export function BraiseChest({ size = 56, hyped, diving, quick }: BraiseChestProp
           fill="#151821"
           initial={false}
           animate={
-            phase === 'full'
+            phase === "full"
               ? { opacity: [0, 0, 0.34, 0.34, 0] }
-              : phase === 'quick'
+              : phase === "quick"
                 ? { opacity: [0, 0.3, 0] }
                 : { opacity: 0 }
           }
           transition={
-            phase === 'full'
+            phase === "full"
               ? { duration: 0.9, times: [0, 0.33, 0.42, 0.86, 1] }
-              : phase === 'quick'
+              : phase === "quick"
                 ? { duration: 0.42, delay: 0.08, times: [0, 0.55, 1] }
                 : { duration: 0.15 }
           }
@@ -89,17 +95,17 @@ export function BraiseChest({ size = 56, hyped, diving, quick }: BraiseChestProp
           fill="#FFF8EE"
           initial={false}
           animate={
-            phase === 'full'
+            phase === "full"
               ? { opacity: [0, 1, 0], scale: [0.6, 1.8, 0.6] }
-              : phase === 'quick'
+              : phase === "quick"
                 ? { opacity: [0, 1, 0], scale: [0.6, 1.5, 0.6] }
                 : { opacity: 0 }
           }
           transition={
-            phase === 'full'
-              ? { duration: 0.16, delay: 0.2, times: [0, 0.4, 1], ease: 'easeOut' }
-              : phase === 'quick'
-                ? { duration: 0.1, delay: 0.04, times: [0, 0.4, 1], ease: 'easeOut' }
+            phase === "full"
+              ? { duration: 0.16, delay: 0.2, times: [0, 0.4, 1], ease: "easeOut" }
+              : phase === "quick"
+                ? { duration: 0.1, delay: 0.04, times: [0, 0.4, 1], ease: "easeOut" }
                 : { duration: 0.1 }
           }
         />
@@ -108,47 +114,66 @@ export function BraiseChest({ size = 56, hyped, diving, quick }: BraiseChestProp
             plus the anticipation squash right at the start of the full sequence. Quick skips the
             squash entirely: no wind-up, straight to the pop. */}
         <motion.g
-          style={{ transformBox: 'fill-box', transformOrigin: '50% 100%' }}
+          style={{ transformBox: "fill-box", transformOrigin: "50% 100%" }}
           initial={false}
           animate={
-            phase === 'idle'
+            phase === "idle"
               ? { rotate: [0, 0, -1.6, 0, 0], scaleX: 1, scaleY: 1 }
-              : phase === 'full'
+              : phase === "full"
                 ? { rotate: 0, scaleX: [1, 1.06, 0.96, 1.02, 1], scaleY: [1, 0.9, 1.06, 0.98, 1] }
                 : { rotate: 0, scaleX: 1, scaleY: 1 }
           }
           transition={
-            phase === 'idle'
-              ? { duration: 2.6, repeat: Infinity, ease: 'easeInOut', times: [0, 0.48, 0.5, 0.52, 1] }
-              : phase === 'full'
-                ? { duration: 0.12, times: [0, 0.3, 0.6, 0.85, 1], ease: 'easeInOut' }
+            phase === "idle"
+              ? {
+                  duration: 2.6,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  times: [0, 0.48, 0.5, 0.52, 1],
+                }
+              : phase === "full"
+                ? { duration: 0.12, times: [0, 0.3, 0.6, 0.85, 1], ease: "easeInOut" }
                 : { duration: 0.08 }
           }
         >
-          <rect x="14" y="46" width="72" height="38" rx="6" fill="#B9541E" stroke="#151821" strokeWidth="5" />
+          <rect
+            x="14"
+            y="46"
+            width="72"
+            height="38"
+            rx="6"
+            fill="#B9541E"
+            stroke="#151821"
+            strokeWidth="5"
+          />
           <circle cx="26" cy="60" r="2.4" fill="#FFD84B" />
           <circle cx="74" cy="60" r="2.4" fill="#FFD84B" />
           <circle cx="26" cy="74" r="2.4" fill="#FFD84B" />
           <circle cx="74" cy="74" r="2.4" fill="#FFD84B" />
 
           <motion.g
-            style={{ transformBox: 'fill-box', transformOrigin: '50% 100%' }}
+            style={{ transformBox: "fill-box", transformOrigin: "50% 100%" }}
             initial={false}
             animate={
-              phase === 'trigger'
+              phase === "trigger"
                 ? { rotate: -16 }
-                : phase === 'full'
+                : phase === "full"
                   ? { rotate: [-16, -100, -78, -88] }
-                  : phase === 'quick'
+                  : phase === "quick"
                     ? { rotate: [-16, -90, -84] }
                     : { rotate: 0 }
             }
             transition={
-              phase === 'trigger'
-                ? { type: 'spring', stiffness: 500, damping: 22 }
-                : phase === 'full'
-                  ? { duration: 0.14, delay: 0.12, times: [0, 0.7, 0.85, 1], ease: [0.2, 0.8, 0.3, 1] }
-                  : phase === 'quick'
+              phase === "trigger"
+                ? { type: "spring", stiffness: 500, damping: 22 }
+                : phase === "full"
+                  ? {
+                      duration: 0.14,
+                      delay: 0.12,
+                      times: [0, 0.7, 0.85, 1],
+                      ease: [0.2, 0.8, 0.3, 1],
+                    }
+                  : phase === "quick"
                     ? { duration: 0.09, times: [0, 0.75, 1], ease: [0.2, 0.8, 0.3, 1] }
                     : { duration: 0.1 }
             }
@@ -156,14 +181,23 @@ export function BraiseChest({ size = 56, hyped, diving, quick }: BraiseChestProp
             <path d="M14 46 Q50 16 86 46 Z" fill="#D9691F" stroke="#151821" strokeWidth="5" />
           </motion.g>
 
-          <rect x="44" y="43" width="12" height="15" rx="2" fill="#FFD84B" stroke="#151821" strokeWidth="3" />
+          <rect
+            x="44"
+            y="43"
+            width="12"
+            height="15"
+            rx="2"
+            fill="#FFD84B"
+            stroke="#151821"
+            strokeWidth="3"
+          />
           <motion.circle
             cx="46"
             cy="38"
             r="2"
             fill="#151821"
             initial={false}
-            animate={{ opacity: phase === 'trigger' ? 1 : 0 }}
+            animate={{ opacity: phase === "trigger" ? 1 : 0 }}
             transition={{ duration: isAction ? 0.06 : 0.15 }}
           />
           <motion.circle
@@ -172,7 +206,7 @@ export function BraiseChest({ size = 56, hyped, diving, quick }: BraiseChestProp
             r="2"
             fill="#151821"
             initial={false}
-            animate={{ opacity: phase === 'trigger' ? 1 : 0 }}
+            animate={{ opacity: phase === "trigger" ? 1 : 0 }}
             transition={{ duration: isAction ? 0.06 : 0.15 }}
           />
         </motion.g>
@@ -181,19 +215,34 @@ export function BraiseChest({ size = 56, hyped, diving, quick }: BraiseChestProp
             hidden" mechanism, see the file header comment. */}
         <g clipPath={`url(#${clipId})`}>
           <motion.g
-            style={{ transformBox: 'fill-box', transformOrigin: '50% 100%' }}
+            style={{ transformBox: "fill-box", transformOrigin: "50% 100%" }}
             initial={false}
             animate={
-              phase === 'full'
-                ? { opacity: [0, 1, 1, 1, 1], y: [16, 10, -26, -20, -21], x: [0, 1, -3, 1, 0], scale: [0.6, 0.4, 0.85, 0.76, 0.8] }
-                : phase === 'quick'
-                  ? { opacity: [0, 1, 1], y: [10, -16, -17], x: [0, -2, 0], scale: [0.55, 0.7, 0.72] }
+              phase === "full"
+                ? {
+                    opacity: [0, 1, 1, 1, 1],
+                    y: [16, 10, -26, -20, -21],
+                    x: [0, 1, -3, 1, 0],
+                    scale: [0.6, 0.4, 0.85, 0.76, 0.8],
+                  }
+                : phase === "quick"
+                  ? {
+                      opacity: [0, 1, 1],
+                      y: [10, -16, -17],
+                      x: [0, -2, 0],
+                      scale: [0.55, 0.7, 0.72],
+                    }
                   : { opacity: 0, y: 16, x: 0, scale: 0.6 }
             }
             transition={
-              phase === 'full'
-                ? { duration: 0.34, delay: 0.3, times: [0, 0.15, 0.7, 0.85, 1], ease: [0.3, 1.15, 0.4, 1] }
-                : phase === 'quick'
+              phase === "full"
+                ? {
+                    duration: 0.34,
+                    delay: 0.3,
+                    times: [0, 0.15, 0.7, 0.85, 1],
+                    ease: [0.3, 1.15, 0.4, 1],
+                  }
+                : phase === "quick"
                   ? { duration: 0.16, delay: 0.08, times: [0, 0.75, 1], ease: [0.3, 1.1, 0.4, 1] }
                   : { duration: 0.1 }
             }
@@ -210,16 +259,16 @@ export function BraiseChest({ size = 56, hyped, diving, quick }: BraiseChestProp
               d="M50 38 C 54 46, 58 48, 58 58 C 58 64, 54 68, 50 68 C 46 68, 42 64, 42 58 C 42 50, 48 48, 48 42 C 49 40, 49 39, 50 38 Z"
               initial={false}
               animate={
-                phase === 'full'
-                  ? { fill: ['#FFD84B', '#FFFCEF', '#FFD84B'] }
-                  : phase === 'quick'
-                    ? { fill: ['#FFD84B', '#FFFCEF', '#FFD84B'] }
-                    : { fill: '#FFD84B' }
+                phase === "full"
+                  ? { fill: ["#FFD84B", "#FFFCEF", "#FFD84B"] }
+                  : phase === "quick"
+                    ? { fill: ["#FFD84B", "#FFFCEF", "#FFD84B"] }
+                    : { fill: "#FFD84B" }
               }
               transition={
-                phase === 'full'
+                phase === "full"
                   ? { duration: 0.18, delay: 0.58, times: [0, 0.5, 1] }
-                  : phase === 'quick'
+                  : phase === "quick"
                     ? { duration: 0.12, delay: 0.14, times: [0, 0.5, 1] }
                     : { duration: 0.1 }
               }
@@ -228,13 +277,28 @@ export function BraiseChest({ size = 56, hyped, diving, quick }: BraiseChestProp
             <circle cx="43" cy="53" r="1" fill="#fff" />
             <circle cx="58" cy="54" r="3.2" fill="#16213A" />
             <circle cx="59" cy="53" r="1" fill="#fff" />
-            <path d="M44 62 Q 50 67, 56 62" stroke="#16213A" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+            <path
+              d="M44 62 Q 50 67, 56 62"
+              stroke="#16213A"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              fill="none"
+            />
             <circle cx="38" cy="60" r="2.4" fill="#FF6F59" opacity="0.45" />
             <circle cx="62" cy="60" r="2.4" fill="#FF6F59" opacity="0.45" />
 
             {/* The pickaxe — literal tool, pun on "pioche". Rises with her, same group/transform. */}
             <g transform="rotate(-18 70 45)">
-              <rect x="68.5" y="26" width="3" height="34" rx="1.5" fill="#8B5A2B" stroke="#151821" strokeWidth="1.5" />
+              <rect
+                x="68.5"
+                y="26"
+                width="3"
+                height="34"
+                rx="1.5"
+                fill="#8B5A2B"
+                stroke="#151821"
+                strokeWidth="1.5"
+              />
               <path
                 d="M62 24 L70 18 L78 24 L74 28 L70 25 L66 28 Z"
                 fill="#6B7280"

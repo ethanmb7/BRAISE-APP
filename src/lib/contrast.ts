@@ -8,7 +8,7 @@ function srgbToLinear(channel: number): number {
 }
 
 function relativeLuminance(hex: string): number {
-  const n = parseInt(hex.replace('#', ''), 16);
+  const n = parseInt(hex.replace("#", ""), 16);
   const r = (n >> 16) & 255;
   const g = (n >> 8) & 255;
   const b = n & 255;
@@ -26,8 +26,8 @@ export function contrastRatio(hexA: string, hexB: string): number {
 // Mirrors CSS `color-mix(in srgb, hexA pctA%, hexB)`: a plain per-channel lerp in gamma-encoded
 // sRGB space (not linear-light), which is what `in srgb` means.
 export function mixHex(hexA: string, hexB: string, pctA: number): string {
-  const a = parseInt(hexA.replace('#', ''), 16);
-  const b = parseInt(hexB.replace('#', ''), 16);
+  const a = parseInt(hexA.replace("#", ""), 16);
+  const b = parseInt(hexB.replace("#", ""), 16);
   const t = pctA / 100;
   const mix = (shift: number) => {
     const ca = (a >> shift) & 255;
@@ -37,5 +37,5 @@ export function mixHex(hexA: string, hexB: string, pctA: number): string {
   const r = mix(16);
   const g = mix(8);
   const bl = mix(0);
-  return '#' + [r, g, bl].map((x) => x.toString(16).padStart(2, '0')).join('');
+  return "#" + [r, g, bl].map((x) => x.toString(16).padStart(2, "0")).join("");
 }

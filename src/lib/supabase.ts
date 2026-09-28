@@ -1,4 +1,4 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 const url = import.meta.env.VITE_SUPABASE_URL;
 const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -9,8 +9,8 @@ const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 // localStorage, exactly like today, until someone fills in the two env vars.
 export const supabaseConfigured = Boolean(url && anonKey);
 
-const DEVICE_KEY = 'sapie_device_id';
-const DEVICE_SECRET_KEY = 'sapie_device_secret';
+const DEVICE_KEY = "sapie_device_id";
+const DEVICE_SECRET_KEY = "sapie_device_secret";
 
 export function getDeviceId(): string {
   let id = localStorage.getItem(DEVICE_KEY);
@@ -38,6 +38,6 @@ export function getDeviceSecret(): string {
 export const supabase: SupabaseClient | null = supabaseConfigured
   ? createClient(url, anonKey, {
       auth: { persistSession: false },
-      global: { headers: { 'x-device-secret': getDeviceSecret() } },
+      global: { headers: { "x-device-secret": getDeviceSecret() } },
     })
   : null;

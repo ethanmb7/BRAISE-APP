@@ -2,10 +2,10 @@ type Props = {
   checked: boolean;
   onChange: (v: boolean) => void;
   label?: string;
-  'aria-label'?: string;
+  "aria-label"?: string;
 };
 
-export function Switch({ checked, onChange, 'aria-label': ariaLabel }: Props) {
+export function Switch({ checked, onChange, "aria-label": ariaLabel }: Props) {
   return (
     <label className="switch">
       <input

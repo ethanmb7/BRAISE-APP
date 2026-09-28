@@ -1,15 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { X } from 'lucide-react';
-import { BraiseMascot } from '@/components/BraiseMascot';
-import { useApp } from '@/store';
-import { sfx } from '@/lib/sound';
-import { getAgeGroup, recapCardsLine, recapComboLine, recapTrophyLine } from '@/lib/braiseVoice';
+import { useEffect, useMemo, useRef, useState } from "react";
+import { X } from "lucide-react";
+import { BraiseMascot } from "@/components/BraiseMascot";
+import { useApp } from "@/store";
+import { sfx } from "@/lib/sound";
+import { getAgeGroup, recapCardsLine, recapComboLine, recapTrophyLine } from "@/lib/braiseVoice";
 
 type Slide =
-  | { key: 'cards'; bg: 'ink'; title: string; sub: string }
-  | { key: 'combo'; bg: 'orange'; title: string; sub: string }
-  | { key: 'xp'; bg: 'mint'; xpTarget: number }
-  | { key: 'cta'; bg: 'paper' };
+  | { key: "cards"; bg: "ink"; title: string; sub: string }
+  | { key: "combo"; bg: "orange"; title: string; sub: string }
+  | { key: "xp"; bg: "mint"; xpTarget: number }
+  | { key: "cta"; bg: "paper" };
 
 const DURATIONS: Record<string, number> = {
   cards: 2000,
@@ -38,27 +38,29 @@ export function BraiseRecap({
   // in braiseVoice.ts).
   const voiceCtx = useMemo(
     () => ({ personality: state.user.personality, age: getAgeGroup(state.user.level) }),
-    [state.user.personality, state.user.level]
+    [state.user.personality, state.user.level],
   );
   const trophy = useMemo(() => recapTrophyLine(voiceCtx), [voiceCtx]);
 
   const slides: Slide[] = [
     {
-      key: 'cards',
-      bg: 'ink',
-      title: `${reviewed} CARTE${reviewed > 1 ? 'S' : ''}. ${wrongCount === 0 ? '0 ERREUR.' : `${wrongCount} ERREUR${wrongCount > 1 ? 'S' : ''}.`}`,
+      key: "cards",
+      bg: "ink",
+      title: `${reviewed} CARTE${reviewed > 1 ? "S" : ""}. ${wrongCount === 0 ? "0 ERREUR." : `${wrongCount} ERREUR${wrongCount > 1 ? "S" : ""}.`}`,
       sub: recapCardsLine(voiceCtx, wrongCount),
     },
     ...(maxCombo >= 2
-      ? ([{
-          key: 'combo',
-          bg: 'orange',
-          title: `COMBO ×${maxCombo}`,
-          sub: recapComboLine(voiceCtx, maxCombo),
-        }] as Slide[])
+      ? ([
+          {
+            key: "combo",
+            bg: "orange",
+            title: `COMBO ×${maxCombo}`,
+            sub: recapComboLine(voiceCtx, maxCombo),
+          },
+        ] as Slide[])
       : []),
-    { key: 'xp', bg: 'mint', xpTarget: xpEarned },
-    { key: 'cta', bg: 'paper' },
+    { key: "xp", bg: "mint", xpTarget: xpEarned },
+    { key: "cta", bg: "paper" },
   ];
 
   const [i, setI] = useState(0);
@@ -95,10 +97,14 @@ export function BraiseRecap({
     <div className={`recap-overlay bg-${slide.bg}`}>
       <div className="recap-progress">
         {slides.map((s, idx) => (
-          <div key={s.key} className={`recap-seg ${idx < i ? 'done' : idx === i ? 'active' : ''}`}>
+          <div key={s.key} className={`recap-seg ${idx < i ? "done" : idx === i ? "active" : ""}`}>
             <span
               className="fill"
-              style={idx === i && !isLast ? ({ '--dur': `${DURATIONS[s.key] ?? 2000}ms` } as React.CSSProperties) : undefined}
+              style={
+                idx === i && !isLast
+                  ? ({ "--dur": `${DURATIONS[s.key] ?? 2000}ms` } as React.CSSProperties)
+                  : undefined
+              }
             />
           </div>
         ))}
@@ -109,14 +115,14 @@ export function BraiseRecap({
       {!isLast && <div className="recap-tap-hint">Touche l&apos;écran pour passer</div>}
 
       <div className="recap-slide">
-        {slide.key === 'xp' ? <XpCount target={slide.xpTarget} /> : null}
-        {slide.key === 'cards' || slide.key === 'combo' ? (
+        {slide.key === "xp" ? <XpCount target={slide.xpTarget} /> : null}
+        {slide.key === "cards" || slide.key === "combo" ? (
           <>
             <div className="recap-title">{slide.title}</div>
             <div className="recap-sub">{slide.sub}</div>
           </>
         ) : null}
-        {slide.key === 'cta' ? (
+        {slide.key === "cta" ? (
           <div className="recap-trophy-card">
             <button className="recap-close" onClick={onGoHome} aria-label="Retourner à l'accueil">
               <X size={18} />

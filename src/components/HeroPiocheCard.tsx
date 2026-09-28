@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-import { motion, MotionConfig } from 'framer-motion';
-import { Clock3, Play, Sparkles, Trophy } from 'lucide-react';
-import { BraisePioche } from '@/components/BraisePioche';
-import { sfx } from '@/lib/sound';
-import { getLastPiocheOpenDate, setLastPiocheOpenDate } from '@/lib/celebrations';
-import { firePiocheReveal, getPiocheRevealTiming } from '@/lib/piocheTransition';
+import { useEffect, useRef, useState } from "react";
+import { motion, MotionConfig } from "framer-motion";
+import { Clock3, Play, Sparkles, Trophy } from "lucide-react";
+import { BraisePioche } from "@/components/BraisePioche";
+import { sfx } from "@/lib/sound";
+import { getLastPiocheOpenDate, setLastPiocheOpenDate } from "@/lib/celebrations";
+import { firePiocheReveal, getPiocheRevealTiming } from "@/lib/piocheTransition";
 
 interface HeroPiocheCardProps {
   /** Fuller sentence (from `dailyPickLine()`) announced to screen readers only — folds the
@@ -38,17 +38,29 @@ interface HeroPiocheCardProps {
 // written here rather than lifted to HomeView because both the read and the write have to happen
 // at the exact instant of the click, before the animation choice is made; HomeView's onStart prop
 // only fires later, at the delayed navigation.
-export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterTitle, duration, cardCount, soundOn, onStart }: HeroPiocheCardProps) {
+export function HeroPiocheCard({
+  bubbleLine,
+  subjectName,
+  subjectColor,
+  chapterTitle,
+  duration,
+  cardCount,
+  soundOn,
+  onStart,
+}: HeroPiocheCardProps) {
   const [hyped, setHyped] = useState(false);
   const [launching, setLaunching] = useState(false);
   const [quick, setQuick] = useState(false);
   const launchTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const revealTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  useEffect(() => () => {
-    if (launchTimer.current) clearTimeout(launchTimer.current);
-    if (revealTimer.current) clearTimeout(revealTimer.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (launchTimer.current) clearTimeout(launchTimer.current);
+      if (revealTimer.current) clearTimeout(revealTimer.current);
+    },
+    [],
+  );
 
   const unhype = () => setHyped(false);
 
@@ -67,7 +79,10 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
     // Fires PiocheRevealVeil's light burst timed to peak right as the view actually swaps — see
     // piocheTransition.ts for why this and launchTimer share one timing source instead of two
     // separately-guessed numbers.
-    revealTimer.current = setTimeout(() => firePiocheReveal(totalMs), totalMs - getPiocheRevealTiming(totalMs).fadeInMs);
+    revealTimer.current = setTimeout(
+      () => firePiocheReveal(totalMs),
+      totalMs - getPiocheRevealTiming(totalMs).fadeInMs,
+    );
   };
 
   return (
@@ -97,15 +112,21 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
         <motion.div
           aria-hidden="true"
           className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full"
-          style={{ background: 'radial-gradient(circle, #FFE9A8 0%, rgba(255,233,168,0) 70%)' }}
+          style={{ background: "radial-gradient(circle, #FFE9A8 0%, rgba(255,233,168,0) 70%)" }}
           animate={{ opacity: [0.35, 0.85, 0.35], scale: [0.9, 1.15, 0.9] }}
-          transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
         />
-        <div aria-hidden="true" className="pointer-events-none absolute -right-6 -top-6 h-16 w-16 rounded-full bg-[#FDC800]" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-6 -top-6 h-16 w-16 rounded-full bg-[#FDC800]"
+        />
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 rounded-2xl"
-          style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0) 20px)' }}
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0) 20px)",
+          }}
         />
 
         {/* The mission ticket is the one extra reveal beat after the chest pops. It is not a
@@ -118,17 +139,31 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
           initial={false}
           animate={
             launching
-              ? { opacity: [0, 1, 1, 0], y: [24, -10, -16, -26], rotate: [-6, -10, -8, -5], scale: [0.82, 1.02, 1, 1.06] }
+              ? {
+                  opacity: [0, 1, 1, 0],
+                  y: [24, -10, -16, -26],
+                  rotate: [-6, -10, -8, -5],
+                  scale: [0.82, 1.02, 1, 1.06],
+                }
               : { opacity: 0, y: 24, rotate: -6, scale: 0.82 }
           }
           transition={
             launching
-              ? { duration: quick ? 0.38 : 0.72, delay: quick ? 0.05 : 0.17, times: [0, 0.25, 0.68, 1], ease: [0.16, 1, 0.3, 1] }
+              ? {
+                  duration: quick ? 0.38 : 0.72,
+                  delay: quick ? 0.05 : 0.17,
+                  times: [0, 0.25, 0.68, 1],
+                  ease: [0.16, 1, 0.3, 1],
+                }
               : { duration: 0.1 }
           }
         >
-          <span className="font-mono text-[0.48rem] font-black tracking-[0.12em] text-[#7C2D12]">MISSION TROUVÉE</span>
-          <span className="mt-0.5 font-display text-[0.66rem] font-black leading-none text-[#151821]">C’est parti !</span>
+          <span className="font-mono text-[0.48rem] font-black tracking-[0.12em] text-[#7C2D12]">
+            MISSION TROUVÉE
+          </span>
+          <span className="mt-0.5 font-display text-[0.66rem] font-black leading-none text-[#151821]">
+            C’est parti !
+          </span>
         </motion.div>
 
         <div className="relative flex items-center gap-3">
@@ -138,11 +173,18 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
             <motion.span
               aria-hidden="true"
               className="absolute inset-[5px] rounded-full bg-[#FDC800]/40 blur-md"
-              animate={hyped || launching ? { scale: [0.9, 1.22, 0.9], opacity: [0.25, 0.85, 0.25] } : { scale: [0.96, 1.06, 0.96], opacity: [0.22, 0.4, 0.22] }}
-              transition={{ duration: hyped || launching ? 0.58 : 3.2, repeat: Infinity, ease: 'easeInOut' }}
+              animate={
+                hyped || launching
+                  ? { scale: [0.9, 1.22, 0.9], opacity: [0.25, 0.85, 0.25] }
+                  : { scale: [0.96, 1.06, 0.96], opacity: [0.22, 0.4, 0.22] }
+              }
+              transition={{
+                duration: hyped || launching ? 0.58 : 3.2,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
             />
             <BraisePioche size={88} hyped={hyped} diving={launching} quick={quick} />
-
           </div>
           <div className="min-w-0 flex-1">
             {/* Dark ink, not white — #FF6B35 measures 2.84:1 for white text (a hard AA
@@ -150,19 +192,33 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
                 (same as every other small-caps label app-wide), font-display for the title,
                 font-sans for the stats line. */}
             <p className="flex items-center gap-1 font-mono text-[0.67rem] font-black uppercase tracking-wide text-[#151821]">
-              <Sparkles size={12} strokeWidth={3} /> {launching ? 'Mission trouvée !' : 'Pioche du jour'}
+              <Sparkles size={12} strokeWidth={3} />{" "}
+              {launching ? "Mission trouvée !" : "Pioche du jour"}
             </p>
-            <h2 className="line-clamp-2 font-display text-xl font-black leading-tight text-[#151821]">{chapterTitle}</h2>
+            <h2 className="line-clamp-2 font-display text-xl font-black leading-tight text-[#151821]">
+              {chapterTitle}
+            </h2>
           </div>
         </div>
-        <div className="relative mt-4 grid grid-cols-3 gap-2" aria-label="Les repères de ta mission">
+        <div
+          className="relative mt-4 grid grid-cols-3 gap-2"
+          aria-label="Les repères de ta mission"
+        >
           <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
             <Clock3 size={15} strokeWidth={3} aria-hidden="true" />
-            <span className="font-mono text-[0.67rem] font-black text-[#151821]">{duration} MIN</span>
+            <span className="font-mono text-[0.67rem] font-black text-[#151821]">
+              {duration} MIN
+            </span>
           </div>
           <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
-            <span aria-hidden="true" className="h-3 w-3 flex-none rounded-full border-2 border-[#151821]" style={{ background: subjectColor ?? '#FDC800' }} />
-            <span className="truncate font-mono text-[0.67rem] font-black uppercase text-[#151821]">{subjectName ?? 'Mission'}</span>
+            <span
+              aria-hidden="true"
+              className="h-3 w-3 flex-none rounded-full border-2 border-[#151821]"
+              style={{ background: subjectColor ?? "#FDC800" }}
+            />
+            <span className="truncate font-mono text-[0.67rem] font-black uppercase text-[#151821]">
+              {subjectName ?? "Mission"}
+            </span>
           </div>
           <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
             <Trophy size={15} strokeWidth={3} aria-hidden="true" />
@@ -170,16 +226,24 @@ export function HeroPiocheCard({ bubbleLine, subjectName, subjectColor, chapterT
           </div>
         </div>
         <span className="sr-only">
-          {bubbleLine} Cette mission contient {cardCount} carte{cardCount > 1 ? 's' : ''}, dure environ {duration} minutes et rapporte 50 points d'Aura à sa première validation.
+          {bubbleLine} Cette mission contient {cardCount} carte{cardCount > 1 ? "s" : ""}, dure
+          environ {duration} minutes et rapporte 50 points d'Aura à sa première validation.
         </span>
 
-        {launching && <span className="sr-only" role="status">Braise révèle ta mission.</span>}
+        {launching && (
+          <span className="sr-only" role="status">
+            Braise révèle ta mission.
+          </span>
+        )}
 
         {/* Base+face bevel — untouched, the same mechanic SubjectDecks/HeaderHUD use everywhere
             else on Accueil. Pointer events here drive `hyped` on the chest (hover for a mouse,
             pointerdown for a touch — the only reliable "finger's on it" signal on mobile). */}
         <div className="tw-cta-pulse group relative mt-5">
-          <span aria-hidden="true" className="absolute inset-0 translate-y-[3px] rounded-full border-[2.5px] border-black bg-black" />
+          <span
+            aria-hidden="true"
+            className="absolute inset-0 translate-y-[3px] rounded-full border-[2.5px] border-black bg-black"
+          />
           <button
             onPointerEnter={() => setHyped(true)}
             onPointerDown={() => setHyped(true)}

@@ -11,17 +11,28 @@ interface SubjectIconProps {
 }
 
 export function SubjectIcon({ subjectId, color, size = 20 }: SubjectIconProps) {
-  const common = { width: size, height: size, viewBox: '0 0 24 24', 'aria-hidden': true as const };
+  const common = { width: size, height: size, viewBox: "0 0 24 24", "aria-hidden": true as const };
 
   switch (subjectId) {
-    case 'maths':
+    case "maths":
       return (
         <svg {...common}>
-          <path d="M4 18 L4 6 L18 18 Z" fill={color} stroke="#151821" strokeWidth="1.8" strokeLinejoin="round" />
-          <path d="M6 15 L8 15 M6 12 L8 12 M6 9 L8 9" stroke="#151821" strokeWidth="1.1" strokeLinecap="round" />
+          <path
+            d="M4 18 L4 6 L18 18 Z"
+            fill={color}
+            stroke="#151821"
+            strokeWidth="1.8"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M6 15 L8 15 M6 12 L8 12 M6 9 L8 9"
+            stroke="#151821"
+            strokeWidth="1.1"
+            strokeLinecap="round"
+          />
         </svg>
       );
-    case 'francais':
+    case "francais":
       return (
         <svg {...common}>
           <path
@@ -32,29 +43,57 @@ export function SubjectIcon({ subjectId, color, size = 20 }: SubjectIconProps) {
             strokeLinejoin="round"
           />
           <path d="M12 6 L12 18" stroke="#151821" strokeWidth="1.4" />
-          <path d="M6 8.5 L9.5 8" stroke="#fff" strokeWidth="1" strokeLinecap="round" opacity="0.7" />
-          <path d="M14.5 8 L18 8.5" stroke="#fff" strokeWidth="1" strokeLinecap="round" opacity="0.7" />
+          <path
+            d="M6 8.5 L9.5 8"
+            stroke="#fff"
+            strokeWidth="1"
+            strokeLinecap="round"
+            opacity="0.7"
+          />
+          <path
+            d="M14.5 8 L18 8.5"
+            stroke="#fff"
+            strokeWidth="1"
+            strokeLinecap="round"
+            opacity="0.7"
+          />
         </svg>
       );
-    case 'histoire-geo':
+    case "histoire-geo":
       return (
         <svg {...common}>
           <circle cx="12" cy="12" r="8" fill={color} stroke="#151821" strokeWidth="1.8" />
           <ellipse cx="12" cy="12" rx="3.2" ry="8" fill="none" stroke="#151821" strokeWidth="1.1" />
           <path d="M4 12 L20 12" stroke="#151821" strokeWidth="1.1" />
           <path d="M5.2 8 C9 9.5 15 9.5 18.8 8" fill="none" stroke="#151821" strokeWidth="0.9" />
-          <path d="M5.2 16 C9 14.5 15 14.5 18.8 16" fill="none" stroke="#151821" strokeWidth="0.9" />
+          <path
+            d="M5.2 16 C9 14.5 15 14.5 18.8 16"
+            fill="none"
+            stroke="#151821"
+            strokeWidth="0.9"
+          />
         </svg>
       );
-    case 'svt':
+    case "svt":
       return (
         <svg {...common}>
-          <path d="M12 4 C18 6 19 13 12 20 C5 13 6 6 12 4 Z" fill={color} stroke="#151821" strokeWidth="1.8" strokeLinejoin="round" />
+          <path
+            d="M12 4 C18 6 19 13 12 20 C5 13 6 6 12 4 Z"
+            fill={color}
+            stroke="#151821"
+            strokeWidth="1.8"
+            strokeLinejoin="round"
+          />
           <path d="M12 6 L12 18" stroke="#151821" strokeWidth="1.1" />
-          <path d="M12 9 L15 8.5 M12 13 L9 12.5" stroke="#151821" strokeWidth="0.9" strokeLinecap="round" />
+          <path
+            d="M12 9 L15 8.5 M12 13 L9 12.5"
+            stroke="#151821"
+            strokeWidth="0.9"
+            strokeLinecap="round"
+          />
         </svg>
       );
-    case 'physique':
+    case "physique":
       return (
         <svg {...common}>
           <path
@@ -69,7 +108,7 @@ export function SubjectIcon({ subjectId, color, size = 20 }: SubjectIconProps) {
           <circle cx="12" cy="17.5" r="1" fill="#fff" opacity="0.8" />
         </svg>
       );
-    case 'anglais':
+    case "anglais":
       return (
         <svg {...common}>
           <path
@@ -79,7 +118,15 @@ export function SubjectIcon({ subjectId, color, size = 20 }: SubjectIconProps) {
             strokeWidth="1.8"
             strokeLinejoin="round"
           />
-          <text x="12" y="12.5" textAnchor="middle" fontSize="8" fontWeight="800" fill="#151821" fontFamily="sans-serif">
+          <text
+            x="12"
+            y="12.5"
+            textAnchor="middle"
+            fontSize="8"
+            fontWeight="800"
+            fill="#151821"
+            fontFamily="sans-serif"
+          >
             Aa
           </text>
         </svg>

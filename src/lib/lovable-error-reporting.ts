@@ -19,8 +19,7 @@ declare global {
   // server-side during SSR, where `window` doesn't exist but `globalThis` does).
   var __lovableEvents: LovableEvents | undefined;
   var __lovableReportRuntimeError:
-    | ((payload: { message: string; stack?: string; filename?: string }) => void)
-    | undefined;
+    ((payload: { message: string; stack?: string; filename?: string }) => void) | undefined;
 }
 
 export function reportLovableError(error: unknown, context: Record<string, unknown> = {}) {

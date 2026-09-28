@@ -1,6 +1,6 @@
-import confetti from 'canvas-confetti';
+import confetti from "canvas-confetti";
 
-const DOPAMINE_COLORS = ['#F97316', '#FFC24B', '#3B82F6', '#10B981'];
+const DOPAMINE_COLORS = ["#F97316", "#FFC24B", "#3B82F6", "#10B981"];
 
 export function fireConfetti() {
   confetti({

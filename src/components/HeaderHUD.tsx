@@ -1,6 +1,6 @@
-import { getRankInfo } from '@/lib/aura';
-import { RankIcon } from '@/components/RankIcon';
-import { AvatarGlyph } from '@/components/AvatarGlyph';
+import { getRankInfo } from "@/lib/aura";
+import { RankIcon } from "@/components/RankIcon";
+import { AvatarGlyph } from "@/components/AvatarGlyph";
 
 interface HeaderHUDProps {
   name: string;
@@ -24,19 +24,39 @@ export function HeaderHUD({
 
   return (
     <header className="home-header" aria-label="Ton profil et ton rythme">
-      <button type="button" onClick={onAvatarClick} className="home-header-identity" aria-label="Ouvrir ton profil">
+      <button
+        type="button"
+        onClick={onAvatarClick}
+        className="home-header-identity"
+        aria-label="Ouvrir ton profil"
+      >
         <span className="home-header-avatar" aria-hidden="true">
           <AvatarGlyph id={avatar} rankId={rank.id} size={30} />
         </span>
-        <span className="home-header-copy"><small>Bonjour</small><b>{name}</b></span>
+        <span className="home-header-copy">
+          <small>Bonjour</small>
+          <b>{name}</b>
+        </span>
       </button>
 
-      <span className="home-header-streak" aria-label={`${streak} jour${streak > 1 ? 's' : ''} de suite`}>
-        <span aria-hidden="true">🔥</span>{streak}
+      <span
+        className="home-header-streak"
+        aria-label={`${streak} jour${streak > 1 ? "s" : ""} de suite`}
+      >
+        <span aria-hidden="true">🔥</span>
+        {streak}
       </span>
 
-      <button type="button" onClick={onAuraClick} className="home-header-aura" aria-label={`Ouvrir Ton Aura — ${xp} points, rang ${rank.name}`}>
-        <span aria-hidden="true" style={{ background: `linear-gradient(135deg, ${rank.colorFrom}, ${rank.colorTo})` }}>
+      <button
+        type="button"
+        onClick={onAuraClick}
+        className="home-header-aura"
+        aria-label={`Ouvrir Ton Aura — ${xp} points, rang ${rank.name}`}
+      >
+        <span
+          aria-hidden="true"
+          style={{ background: `linear-gradient(135deg, ${rank.colorFrom}, ${rank.colorTo})` }}
+        >
           <RankIcon rankId={rank.id} color="#fff" size={15} />
         </span>
         <b>{xp}</b>

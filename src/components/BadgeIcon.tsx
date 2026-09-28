@@ -1,23 +1,23 @@
-import { StreakFlameIcon } from '@/components/StreakFlameIcon';
+import { StreakFlameIcon } from "@/components/StreakFlameIcon";
 
 // The 6 achievement badges (data.ts) were raw platform emoji (🔥⚡📚🧊🌟🏆) in a page that's now
 // the direct landing spot for Aura's own badge bridge — showing a custom gold medal on one screen
 // and system emoji on the next would have undercut the whole point of this pass. Same flat-fill
 // + #151821-stroke language as SubjectIcon/RankIcon, sized for the badge grid's own ring instead
 // of a gradient HUD bevel (that's a different chrome, HeaderHUD's job, not this one's).
-const INK = '#151821';
+const INK = "#151821";
 
 export function BadgeIcon({ badgeId, size = 26 }: { badgeId: string; size?: number }) {
-  const common = { width: size, height: size, viewBox: '0 0 24 24', 'aria-hidden': true as const };
+  const common = { width: size, height: size, viewBox: "0 0 24 24", "aria-hidden": true as const };
 
   switch (badgeId) {
     // Same streak signal as everywhere else in the app — a 3-day streak and a 7-day streak are
     // the same kind of accomplishment at two sizes, not two different concepts.
-    case 'b1':
-    case 'b5':
+    case "b1":
+    case "b5":
       return <StreakFlameIcon size={size} />;
-    case 'b2':
-    case 'b6':
+    case "b2":
+    case "b6":
       return (
         <svg {...common}>
           <path
@@ -27,16 +27,32 @@ export function BadgeIcon({ badgeId, size = 26 }: { badgeId: string; size?: numb
             strokeWidth="1.7"
             strokeLinejoin="round"
           />
-          <path d="M13.4 3 9.6 10.2l3.4-0.9" stroke={INK} strokeWidth="0.8" opacity="0.5" strokeLinecap="round" />
-          {badgeId === 'b6' && (
+          <path
+            d="M13.4 3 9.6 10.2l3.4-0.9"
+            stroke={INK}
+            strokeWidth="0.8"
+            opacity="0.5"
+            strokeLinecap="round"
+          />
+          {badgeId === "b6" && (
             <>
-              <path d="M4 4 L5.4 5.4 M4 5.4 L5.4 4" stroke="#ffc700" strokeWidth="1.3" strokeLinecap="round" />
-              <path d="M19.5 17.5 L21 19 M19.5 19 L21 17.5" stroke="#ffc700" strokeWidth="1.3" strokeLinecap="round" />
+              <path
+                d="M4 4 L5.4 5.4 M4 5.4 L5.4 4"
+                stroke="#ffc700"
+                strokeWidth="1.3"
+                strokeLinecap="round"
+              />
+              <path
+                d="M19.5 17.5 L21 19 M19.5 19 L21 17.5"
+                stroke="#ffc700"
+                strokeWidth="1.3"
+                strokeLinecap="round"
+              />
             </>
           )}
         </svg>
       );
-    case 'b3':
+    case "b3":
       return (
         <svg {...common}>
           <path
@@ -47,11 +63,23 @@ export function BadgeIcon({ badgeId, size = 26 }: { badgeId: string; size?: numb
             strokeLinejoin="round"
           />
           <path d="M12 6.5 L12 19" stroke={INK} strokeWidth="1.2" />
-          <path d="M6.5 8.3 L9.8 7.8" stroke="#fff" strokeWidth="0.9" opacity="0.7" strokeLinecap="round" />
-          <path d="M14.2 7.8 L17.5 8.3" stroke="#fff" strokeWidth="0.9" opacity="0.7" strokeLinecap="round" />
+          <path
+            d="M6.5 8.3 L9.8 7.8"
+            stroke="#fff"
+            strokeWidth="0.9"
+            opacity="0.7"
+            strokeLinecap="round"
+          />
+          <path
+            d="M14.2 7.8 L17.5 8.3"
+            stroke="#fff"
+            strokeWidth="0.9"
+            opacity="0.7"
+            strokeLinecap="round"
+          />
         </svg>
       );
-    case 'b4':
+    case "b4":
       return (
         <svg {...common}>
           <g strokeLinecap="round">

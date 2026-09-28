@@ -1,16 +1,16 @@
-import { Check, Lock, AlertCircle, SkipForward } from 'lucide-react';
-import { useApp, resolveChapters } from '@/store';
-import { sfx } from '@/lib/sound';
-import { TopBar } from '@/components/TopBar';
-import { BraiseMascot } from '@/components/BraiseMascot';
-import { SUBJECTS, STORIES } from '@/data';
+import { Check, Lock, AlertCircle, SkipForward } from "lucide-react";
+import { useApp, resolveChapters } from "@/store";
+import { sfx } from "@/lib/sound";
+import { TopBar } from "@/components/TopBar";
+import { BraiseMascot } from "@/components/BraiseMascot";
+import { SUBJECTS, STORIES } from "@/data";
 
 const ROW_JUSTIFY: Record<string, string> = {
-  center: 'justify-center',
-  right: 'justify-end pr-[10%]',
-  left: 'justify-start pl-[10%]',
+  center: "justify-center",
+  right: "justify-end pr-[10%]",
+  left: "justify-start pl-[10%]",
 };
-const POSITIONS = ['center', 'right', 'center', 'left'];
+const POSITIONS = ["center", "right", "center", "left"];
 
 // Every tap from Home lands here — this was still the pre-redesign soft/pastel skill path
 // (thin grey border, pale circles) while everything upstream had moved to the neobrutalist
@@ -25,7 +25,7 @@ export function SubjectView() {
   if (!subject) return null;
 
   const chapters = resolveChapters(subject.chapters, state.completedChapters);
-  const doneCount = chapters.filter((c) => c.status === 'done').length;
+  const doneCount = chapters.filter((c) => c.status === "done").length;
   const pct = Math.round((doneCount / chapters.length) * 100);
 
   return (
@@ -49,14 +49,14 @@ export function SubjectView() {
             className="absolute bottom-10 left-1/2 top-8 w-[3px] -translate-x-1/2"
             style={{
               background:
-                'repeating-linear-gradient(to bottom, rgba(22,33,58,0.22) 0 8px, transparent 8px 16px)',
+                "repeating-linear-gradient(to bottom, rgba(22,33,58,0.22) 0 8px, transparent 8px 16px)",
             }}
           />
 
           {chapters.map((c, i) => {
-            const isLocked = c.status === 'locked';
-            const isDone = c.status === 'done';
-            const isCurrent = c.status === 'current';
+            const isLocked = c.status === "locked";
+            const isDone = c.status === "done";
+            const isCurrent = c.status === "current";
             const pos = POSITIONS[i % POSITIONS.length];
 
             const node = (
@@ -64,7 +64,7 @@ export function SubjectView() {
                 className="relative flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border-[2.5px] border-black text-lg font-black transition-transform active:scale-90 disabled:cursor-default"
                 style={{
                   background: isLocked ? undefined : subject.color,
-                  boxShadow: isLocked ? undefined : '3px 3px 0px 0px #000',
+                  boxShadow: isLocked ? undefined : "3px 3px 0px 0px #000",
                 }}
                 disabled={isLocked}
                 onClick={() => {
@@ -74,7 +74,7 @@ export function SubjectView() {
                   // chapter, chat otherwise — previously always forced 'echanger', so even a
                   // chapter with a full scripted story opened straight into open-ended AI chat,
                   // with the actual lesson buried one tap away behind the "Vocal Animé" toggle.
-                  openLesson(subject.id, c.id, STORIES[c.id] ? 'vocal' : 'echanger');
+                  openLesson(subject.id, c.id, STORIES[c.id] ? "vocal" : "echanger");
                 }}
               >
                 {isDone ? (
@@ -99,9 +99,15 @@ export function SubjectView() {
                   )}
 
                   <div className="flex max-w-[9.5rem] flex-col items-center gap-1 text-center">
-                    <b className="block font-display text-sm font-black leading-tight text-[var(--ink)]">{c.title}</b>
+                    <b className="block font-display text-sm font-black leading-tight text-[var(--ink)]">
+                      {c.title}
+                    </b>
                     <span className="block text-xs font-semibold text-[var(--ink-soft)]">
-                      {isDone ? `${c.mastery}% de maîtrise` : isLocked ? `${c.duration} min · verrouillé` : `${c.duration} min`}
+                      {isDone
+                        ? `${c.mastery}% de maîtrise`
+                        : isLocked
+                          ? `${c.duration} min · verrouillé`
+                          : `${c.duration} min`}
                     </span>
                     {c.reinforce && (
                       <span className="inline-flex items-center gap-1 rounded-full border border-black bg-sapie-coral px-2 py-0.5 text-[0.65rem] font-extrabold uppercase text-white">

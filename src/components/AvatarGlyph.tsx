@@ -27,7 +27,7 @@
  * pas un emoji système. Les anciennes clés emoji tombent sur La Flème (défaut).
  */
 
-const INK = '#151821';
+const INK = "#151821";
 
 type Props = {
   /** Identifiant de l'avatar — slug stable ('fleme', 'crane', …). */
@@ -64,14 +64,26 @@ const dotEyes = (
 const GLYPHS: Record<string, Glyph> = {
   // La Flème — yeux endormis, bouche plate. Vibe chill.
   fleme: {
-    name: 'La Flème',
-    color: '#FFD84B',
+    name: "La Flème",
+    color: "#FFD84B",
     body: (c) => (
       <>
         {flame(c)}
         {/* yeux endormis : arcs vers le bas */}
-        <path d="M36 55 Q 41 59, 46 55" stroke={INK} strokeWidth="3.4" strokeLinecap="round" fill="none" />
-        <path d="M54 55 Q 59 59, 64 55" stroke={INK} strokeWidth="3.4" strokeLinecap="round" fill="none" />
+        <path
+          d="M36 55 Q 41 59, 46 55"
+          stroke={INK}
+          strokeWidth="3.4"
+          strokeLinecap="round"
+          fill="none"
+        />
+        <path
+          d="M54 55 Q 59 59, 64 55"
+          stroke={INK}
+          strokeWidth="3.4"
+          strokeLinecap="round"
+          fill="none"
+        />
         <circle cx="41" cy="57" r="1.6" fill={INK} />
         <circle cx="59" cy="57" r="1.6" fill={INK} />
         {/* bouche plate, blasée */}
@@ -81,8 +93,8 @@ const GLYPHS: Record<string, Glyph> = {
   },
   // Le Crâne — face de crâne sur la flamme. Vibe dark.
   crane: {
-    name: 'Le Crâne',
-    color: '#7C5CFF',
+    name: "Le Crâne",
+    color: "#7C5CFF",
     body: (c) => (
       <>
         {flame(c)}
@@ -101,14 +113,19 @@ const GLYPHS: Record<string, Glyph> = {
         <path d="M50 56 L 47 62 L 53 62 Z" fill={INK} />
         {/* dents */}
         <path d="M40 66 H 60" stroke={INK} strokeWidth="2.8" strokeLinecap="round" />
-        <path d="M45 66 V 70 M 50 66 V 70 M 55 66 V 70" stroke={INK} strokeWidth="2.2" strokeLinecap="round" />
+        <path
+          d="M45 66 V 70 M 50 66 V 70 M 55 66 V 70"
+          stroke={INK}
+          strokeWidth="2.2"
+          strokeLinecap="round"
+        />
       </>
     ),
   },
   // La Bûcheuse — lunettes, bouche déterminée. Vibe sérieuse.
   bucheuse: {
-    name: 'La Bûcheuse',
-    color: '#FF4500',
+    name: "La Bûcheuse",
+    color: "#FF4500",
     body: (c) => (
       <>
         {flame(c)}
@@ -117,21 +134,38 @@ const GLYPHS: Record<string, Glyph> = {
         <circle cx="41" cy="55" r="8" fill="none" stroke={INK} strokeWidth="3.4" />
         <circle cx="59" cy="55" r="8" fill="none" stroke={INK} strokeWidth="3.4" />
         <path d="M49 53 H 51" stroke={INK} strokeWidth="3.4" strokeLinecap="round" />
-        <path d="M33 54 L 27 52 M 67 54 L 73 52" stroke={INK} strokeWidth="2.8" strokeLinecap="round" />
+        <path
+          d="M33 54 L 27 52 M 67 54 L 73 52"
+          stroke={INK}
+          strokeWidth="2.8"
+          strokeLinecap="round"
+        />
         {/* bouche déterminée (légère moue) */}
-        <path d="M43 70 Q 50 67, 57 70" stroke={INK} strokeWidth="3.2" strokeLinecap="round" fill="none" />
+        <path
+          d="M43 70 Q 50 67, 57 70"
+          stroke={INK}
+          strokeWidth="3.2"
+          strokeLinecap="round"
+          fill="none"
+        />
       </>
     ),
   },
   // Le Casque — casque audio. Vibe gamer.
   casque: {
-    name: 'Le Casque',
-    color: '#3FBF87',
+    name: "Le Casque",
+    color: "#3FBF87",
     body: (c) => (
       <>
         {flame(c)}
         {/* serre-tête */}
-        <path d="M30 40 Q 50 24, 70 40" stroke={INK} strokeWidth="4.2" strokeLinecap="round" fill="none" />
+        <path
+          d="M30 40 Q 50 24, 70 40"
+          stroke={INK}
+          strokeWidth="4.2"
+          strokeLinecap="round"
+          fill="none"
+        />
         {/* oreillettes */}
         <rect x="21" y="44" width="11" height="19" rx="4" fill={INK} />
         <rect x="68" y="44" width="11" height="19" rx="4" fill={INK} />
@@ -140,14 +174,20 @@ const GLYPHS: Record<string, Glyph> = {
         <circle cx="73.5" cy="53.5" r="2.4" fill="#3FBF87" />
         {dotEyes}
         {/* sourire confiant */}
-        <path d="M44 67 Q 50 72, 56 67" stroke={INK} strokeWidth="3.2" strokeLinecap="round" fill="none" />
+        <path
+          d="M44 67 Q 50 72, 56 67"
+          stroke={INK}
+          strokeWidth="3.2"
+          strokeLinecap="round"
+          fill="none"
+        />
       </>
     ),
   },
   // Le Masque — visière/masque noir. Vibe mystère.
   masque: {
-    name: 'Le Masque',
-    color: '#3373D6',
+    name: "Le Masque",
+    color: "#3373D6",
     body: (c) => (
       <>
         {flame(c)}
@@ -167,7 +207,7 @@ const GLYPHS: Record<string, Glyph> = {
   // L'Éclair — éclair + bouche ouverte. Vibe énergie.
   eclair: {
     name: "L'Éclair",
-    color: '#FFE06B',
+    color: "#FFE06B",
     body: (c) => (
       <>
         {flame(c)}
@@ -191,8 +231,8 @@ const GLYPHS: Record<string, Glyph> = {
   },
   // La Fuse — hublot de fusée, pointe haute. Vibe ambition. (rang Or)
   fuse: {
-    name: 'La Fuse',
-    color: '#FFC400',
+    name: "La Fuse",
+    color: "#FFC400",
     body: (c) => (
       <>
         {/* flame pointue comme une fusée */}
@@ -204,21 +244,39 @@ const GLYPHS: Record<string, Glyph> = {
           strokeLinejoin="round"
         />
         {/* ailerons de base */}
-        <path d="M28 84 L 20 92 L 34 90 Z" fill="#FF4500" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
-        <path d="M72 84 L 80 92 L 66 90 Z" fill="#FF4500" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+        <path
+          d="M28 84 L 20 92 L 34 90 Z"
+          fill="#FF4500"
+          stroke={INK}
+          strokeWidth="3"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M72 84 L 80 92 L 66 90 Z"
+          fill="#FF4500"
+          stroke={INK}
+          strokeWidth="3"
+          strokeLinejoin="round"
+        />
         {/* hublot */}
         <circle cx="50" cy="52" r="11" fill="#FFF0D2" stroke={INK} strokeWidth="3.6" />
         <circle cx="46" cy="48" r="3.6" fill="#8ECFFF" />
         {/* étoiles dans les yeux (ambition) */}
-        <path d="M38 76 L 39.5 79 L 42.5 79 L 40 81 L 41 84 L 38 82 L 35 84 L 36 81 L 33.5 79 L 36.5 79 Z" fill="#FF4500" />
-        <path d="M62 76 L 63.5 79 L 66.5 79 L 64 81 L 65 84 L 62 82 L 59 84 L 60 81 L 57.5 79 L 60.5 79 Z" fill="#FF4500" />
+        <path
+          d="M38 76 L 39.5 79 L 42.5 79 L 40 81 L 41 84 L 38 82 L 35 84 L 36 81 L 33.5 79 L 36.5 79 Z"
+          fill="#FF4500"
+        />
+        <path
+          d="M62 76 L 63.5 79 L 66.5 79 L 64 81 L 65 84 L 62 82 L 59 84 L 60 81 L 57.5 79 L 60.5 79 Z"
+          fill="#FF4500"
+        />
       </>
     ),
   },
   // La Glace — lunettes de soleil, flame froide. Vibe cool. (rang Platine)
   glace: {
-    name: 'La Glace',
-    color: '#8ECFFF',
+    name: "La Glace",
+    color: "#8ECFFF",
     body: (c) => (
       <>
         {flame(c)}
@@ -227,16 +285,27 @@ const GLYPHS: Record<string, Glyph> = {
         <rect x="54" y="49" width="16" height="12" rx="4.5" fill={INK} />
         <path d="M46 54 H 54" stroke={INK} strokeWidth="3.4" strokeLinecap="round" />
         {/* reflets */}
-        <path d="M34 52 H 40 M 58 52 H 64" stroke="#8ECFFF" strokeWidth="2.2" strokeLinecap="round" />
+        <path
+          d="M34 52 H 40 M 58 52 H 64"
+          stroke="#8ECFFF"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+        />
         {/* sourire en coin (smirk) */}
-        <path d="M44 68 Q 50 66, 57 69" stroke={INK} strokeWidth="3.2" strokeLinecap="round" fill="none" />
+        <path
+          d="M44 68 Q 50 66, 57 69"
+          stroke={INK}
+          strokeWidth="3.2"
+          strokeLinecap="round"
+          fill="none"
+        />
       </>
     ),
   },
   // Le Phénix — ailes + or, yeux fiers. Vibe ultime. (rang Légende)
   phenix: {
-    name: 'Le Phénix',
-    color: '#FF4500',
+    name: "Le Phénix",
+    color: "#FF4500",
     body: (c) => (
       <>
         {/* ailes dorées flanquant la flamme */}
@@ -256,12 +325,36 @@ const GLYPHS: Record<string, Glyph> = {
         />
         {flame(c)}
         {/* liseré or à la pointe */}
-        <path d="M50 10 C 56 20, 62 30, 66 42" stroke="#FFD84B" strokeWidth="2.6" strokeLinecap="round" fill="none" />
+        <path
+          d="M50 10 C 56 20, 62 30, 66 42"
+          stroke="#FFD84B"
+          strokeWidth="2.6"
+          strokeLinecap="round"
+          fill="none"
+        />
         {/* yeux fiers (^ ^) */}
-        <path d="M36 54 Q 41 49, 46 54" stroke={INK} strokeWidth="3.4" strokeLinecap="round" fill="none" />
-        <path d="M54 54 Q 59 49, 64 54" stroke={INK} strokeWidth="3.4" strokeLinecap="round" fill="none" />
+        <path
+          d="M36 54 Q 41 49, 46 54"
+          stroke={INK}
+          strokeWidth="3.4"
+          strokeLinecap="round"
+          fill="none"
+        />
+        <path
+          d="M54 54 Q 59 49, 64 54"
+          stroke={INK}
+          strokeWidth="3.4"
+          strokeLinecap="round"
+          fill="none"
+        />
         {/* grand sourire fier */}
-        <path d="M41 65 Q 50 75, 59 65" stroke={INK} strokeWidth="3.4" strokeLinecap="round" fill="#FFD84B" />
+        <path
+          d="M41 65 Q 50 75, 59 65"
+          stroke={INK}
+          strokeWidth="3.4"
+          strokeLinecap="round"
+          fill="#FFD84B"
+        />
       </>
     ),
   },
@@ -269,15 +362,21 @@ const GLYPHS: Record<string, Glyph> = {
 
 /** La marque d'évolution du rang — une seule par palier, jamais empilée. */
 function RankMark({ rankId }: { rankId?: string }) {
-  if (rankId === 'argent') {
+  if (rankId === "argent") {
     return (
       <g>
-        <path d="M30 80 C 38 88, 62 88, 70 80 L74 90 C 62 97, 38 97, 26 90 Z" fill="#8ECFFF" stroke={INK} strokeWidth="3.4" strokeLinejoin="round" />
+        <path
+          d="M30 80 C 38 88, 62 88, 70 80 L74 90 C 62 97, 38 97, 26 90 Z"
+          fill="#8ECFFF"
+          stroke={INK}
+          strokeWidth="3.4"
+          strokeLinejoin="round"
+        />
         <path d="M44 88 L56 88" stroke="#3373D6" strokeWidth="2.4" strokeLinecap="round" />
       </g>
     );
   }
-  if (rankId === 'or') {
+  if (rankId === "or") {
     return (
       <g>
         <path d="M80 56 L80 66" stroke={INK} strokeWidth="2.6" strokeLinecap="round" />
@@ -285,19 +384,43 @@ function RankMark({ rankId }: { rankId?: string }) {
       </g>
     );
   }
-  if (rankId === 'platine') {
+  if (rankId === "platine") {
     return (
       <g>
-        <path d="M14 30 L18 22 L22 30 L18 38 Z" fill="#B9F3EA" stroke={INK} strokeWidth="2.6" strokeLinejoin="round" />
-        <path d="M84 36 L88 28 L92 36 L88 44 Z" fill="#B9F3EA" stroke={INK} strokeWidth="2.6" strokeLinejoin="round" />
-        <path d="M76 12 L79 6 L82 12 L79 18 Z" fill="#7C3AED" stroke={INK} strokeWidth="2.4" strokeLinejoin="round" />
+        <path
+          d="M14 30 L18 22 L22 30 L18 38 Z"
+          fill="#B9F3EA"
+          stroke={INK}
+          strokeWidth="2.6"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M84 36 L88 28 L92 36 L88 44 Z"
+          fill="#B9F3EA"
+          stroke={INK}
+          strokeWidth="2.6"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M76 12 L79 6 L82 12 L79 18 Z"
+          fill="#7C3AED"
+          stroke={INK}
+          strokeWidth="2.4"
+          strokeLinejoin="round"
+        />
       </g>
     );
   }
-  if (rankId === 'legende') {
+  if (rankId === "legende") {
     return (
       <g>
-        <path d="M28 20 L34 2 L50 14 L66 2 L72 20 L68 25 L32 25 Z" fill="#FFD84B" stroke={INK} strokeWidth="3.6" strokeLinejoin="round" />
+        <path
+          d="M28 20 L34 2 L50 14 L66 2 L72 20 L68 25 L32 25 Z"
+          fill="#FFD84B"
+          stroke={INK}
+          strokeWidth="3.6"
+          strokeLinejoin="round"
+        />
         <circle cx="34" cy="2" r="2.6" fill="#FF4500" stroke={INK} strokeWidth="1.6" />
         <circle cx="66" cy="2" r="2.6" fill="#FF4500" stroke={INK} strokeWidth="1.6" />
         <circle cx="50" cy="14" r="2.8" fill="#FF4500" stroke={INK} strokeWidth="1.6" />
@@ -308,11 +431,11 @@ function RankMark({ rankId }: { rankId?: string }) {
 }
 
 export function getAvatarName(id: string) {
-  return GLYPHS[id]?.name ?? 'Flambé';
+  return GLYPHS[id]?.name ?? "Flambé";
 }
 
-export function AvatarGlyph({ id, size = 40, rankId, className = '' }: Props) {
-  const glyph = GLYPHS[id] ?? GLYPHS['fleme'];
+export function AvatarGlyph({ id, size = 40, rankId, className = "" }: Props) {
+  const glyph = GLYPHS[id] ?? GLYPHS["fleme"];
   return (
     <svg
       width={size}

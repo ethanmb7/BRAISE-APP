@@ -2,11 +2,11 @@
 // time it becomes true — same lightweight pattern as getDeviceId()/getDeviceSecret() in
 // supabase.ts, not routed through the full AppState/persist.ts pipeline since this is purely a
 // "have we already shown this?" flag, not real progress data.
-const SEEN_RANK_KEY = 'sapie_seen_rank';
-const SEEN_BADGES_KEY = 'sapie_seen_badges';
-const BADGE_UNLOCKED_AT_KEY = 'sapie_badge_unlocked_at';
-const INTOX_DISMISSED_COUNT_KEY = 'sapie_intox_dismissed_count';
-const LAST_PIOCHE_OPEN_KEY = 'sapie_last_pioche_open';
+const SEEN_RANK_KEY = "sapie_seen_rank";
+const SEEN_BADGES_KEY = "sapie_seen_badges";
+const BADGE_UNLOCKED_AT_KEY = "sapie_badge_unlocked_at";
+const INTOX_DISMISSED_COUNT_KEY = "sapie_intox_dismissed_count";
+const LAST_PIOCHE_OPEN_KEY = "sapie_last_pioche_open";
 
 export function getSeenRank(): string | null {
   try {

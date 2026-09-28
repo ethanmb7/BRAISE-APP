@@ -1,5 +1,5 @@
-import { SUBJECTS, FLASHCARDS } from '@/data';
-import type { CardReview } from '@/types';
+import { SUBJECTS, FLASHCARDS } from "@/data";
+import type { CardReview } from "@/types";
 
 export type Rank = {
   id: string;
@@ -18,25 +18,46 @@ export const RANKS: Rank[] = [
   // most: bronze used to be a pale, desaturated tan (#e8b088) that read as washed-out next to the
   // app's own saturated signature orange everywhere else. A real copper — closer to the actual
   // metal — keeps the "bronze, not orange" read through hue rather than through desaturation.
-  { id: 'bronze', name: 'Bronze', emoji: '🥉', min: 0, colorFrom: '#CD7F32', colorTo: '#8a4a26' },
+  { id: "bronze", name: "Bronze", emoji: "🥉", min: 0, colorFrom: "#CD7F32", colorTo: "#8a4a26" },
   // Argent used to be a near-neutral grey-blue (#dbe4f0/#7c8fa8) — the only one of the 5 ranks
   // without a real saturated hue, which read as flat next to bronze/or/platine/légende and landed
   // worst on exactly the first rank-up most new users ever see. A vivid "chrome blue" keeps the
   // cool/metallic read of silver through hue and shine rather than through desaturation.
-  { id: 'argent', name: 'Argent', emoji: '🥈', min: 500, colorFrom: '#8ecfff', colorTo: '#3373d6' },
-  { id: 'or', name: 'Or', emoji: '🥇', min: 1500, colorFrom: '#ffe08a', colorTo: '#e8a317' },
-  { id: 'platine', name: 'Platine', emoji: '💎', min: 3500, colorFrom: '#b9f3ea', colorTo: '#7c3aed' },
-  { id: 'legende', name: 'Légende', emoji: '👑', min: 7000, colorFrom: '#ffb199', colorTo: '#ff6f59' },
+  { id: "argent", name: "Argent", emoji: "🥈", min: 500, colorFrom: "#8ecfff", colorTo: "#3373d6" },
+  { id: "or", name: "Or", emoji: "🥇", min: 1500, colorFrom: "#ffe08a", colorTo: "#e8a317" },
+  {
+    id: "platine",
+    name: "Platine",
+    emoji: "💎",
+    min: 3500,
+    colorFrom: "#b9f3ea",
+    colorTo: "#7c3aed",
+  },
+  {
+    id: "legende",
+    name: "Légende",
+    emoji: "👑",
+    min: 7000,
+    colorFrom: "#ffb199",
+    colorTo: "#ff6f59",
+  },
 ];
 
-export function getRankInfo(xp: number): { current: Rank; next: Rank | null; idx: number; pct: number } {
+export function getRankInfo(xp: number): {
+  current: Rank;
+  next: Rank | null;
+  idx: number;
+  pct: number;
+} {
   let idx = 0;
   for (let i = 0; i < RANKS.length; i++) {
     if (xp >= RANKS[i].min) idx = i;
   }
   const current = RANKS[idx];
   const next = RANKS[idx + 1] ?? null;
-  const pct = next ? Math.min(100, Math.round(((xp - current.min) / (next.min - current.min)) * 100)) : 100;
+  const pct = next
+    ? Math.min(100, Math.round(((xp - current.min) / (next.min - current.min)) * 100))
+    : 100;
   return { current, next, idx, pct };
 }
 
@@ -65,9 +86,19 @@ export function computeSubjectMastery(cardReviews: Record<string, CardReview>): 
   return SUBJECTS.map((s) => {
     const subjectCardIds = FLASHCARDS.filter((c) => c.subject === s.id).map((c) => c.id);
     const reviewed = subjectCardIds.filter((id) => cardReviews[id]);
-    const mastered = subjectCardIds.filter((id) => cardReviews[id] && cardReviews[id].repetitions >= MASTERED_AT_REPETITIONS);
+    const mastered = subjectCardIds.filter(
+      (id) => cardReviews[id] && cardReviews[id].repetitions >= MASTERED_AT_REPETITIONS,
+    );
     const started = reviewed.length > 0;
-    return { id: s.id, name: s.name, emoji: s.emoji, color: s.color, masteredCount: mastered.length, totalCount: subjectCardIds.length, started };
+    return {
+      id: s.id,
+      name: s.name,
+      emoji: s.emoji,
+      color: s.color,
+      masteredCount: mastered.length,
+      totalCount: subjectCardIds.length,
+      started,
+    };
   });
 }
 
@@ -79,8 +110,14 @@ export function countMasteredCards(cardReviews: Record<string, CardReview>): num
 }
 
 export type BraiseInsight =
-  | { kind: 'struggling'; topic: string; subjectName: string; repetitions: number }
-  | { kind: 'strong-subject'; subjectName: string; subjectEmoji: string; masteredCount: number; totalCount: number };
+  | { kind: "struggling"; topic: string; subjectName: string; repetitions: number }
+  | {
+      kind: "strong-subject";
+      subjectName: string;
+      subjectEmoji: string;
+      masteredCount: number;
+      totalCount: number;
+    };
 
 // "Attempted at least twice and still not confident" — one pass isn't friction, it's just the
 // first time you've seen it. Two-plus real attempts without landing on "sûre" is a genuine
@@ -100,17 +137,24 @@ const STRONG_SUBJECT_MIN_RATIO = 0.5;
 // "reviews better in the evening"-style insight exists here on purpose: AppState has no per-review
 // timestamp history, only cardReviews' current SM-2 snapshot and a single `nextReviewAt`, so a
 // time-of-day claim would have to be invented rather than computed.
-export function computeBraiseInsight(cardReviews: Record<string, CardReview>): BraiseInsight | null {
+export function computeBraiseInsight(
+  cardReviews: Record<string, CardReview>,
+): BraiseInsight | null {
   let worst: { topic: string; subjectName: string; repetitions: number } | null = null;
   for (const card of FLASHCARDS) {
     const review = cardReviews[card.id];
-    if (!review || review.lastConfidence === 'sure' || review.repetitions < STRUGGLE_MIN_REPETITIONS) continue;
+    if (
+      !review ||
+      review.lastConfidence === "sure" ||
+      review.repetitions < STRUGGLE_MIN_REPETITIONS
+    )
+      continue;
     if (!worst || review.repetitions > worst.repetitions) {
       const subjectName = SUBJECTS.find((s) => s.id === card.subject)?.name ?? card.subject;
       worst = { topic: card.topic, subjectName, repetitions: review.repetitions };
     }
   }
-  if (worst) return { kind: 'struggling', ...worst };
+  if (worst) return { kind: "struggling", ...worst };
 
   let best: SubjectMastery | null = null;
   let bestRatio = 0;
@@ -123,7 +167,13 @@ export function computeBraiseInsight(cardReviews: Record<string, CardReview>): B
     }
   }
   if (best) {
-    return { kind: 'strong-subject', subjectName: best.name, subjectEmoji: best.emoji, masteredCount: best.masteredCount, totalCount: best.totalCount };
+    return {
+      kind: "strong-subject",
+      subjectName: best.name,
+      subjectEmoji: best.emoji,
+      masteredCount: best.masteredCount,
+      totalCount: best.totalCount,
+    };
   }
 
   return null;
@@ -142,7 +192,11 @@ const STREAK_MILESTONE_TAIL_STEP = 100;
 const MASTERY_MILESTONES = [10, 25, 50, 100, 200, 350, 500];
 const MASTERY_MILESTONE_TAIL_STEP = 250;
 
-function nextInSequence(value: number, steps: number[], tailStep: number): { prev: number; next: number } {
+function nextInSequence(
+  value: number,
+  steps: number[],
+  tailStep: number,
+): { prev: number; next: number } {
   for (let i = 0; i < steps.length; i++) {
     if (steps[i] > value) return { prev: i === 0 ? 0 : steps[i - 1], next: steps[i] };
   }
@@ -153,7 +207,7 @@ function nextInSequence(value: number, steps: number[], tailStep: number): { pre
 }
 
 export type NextMilestone = {
-  kind: 'streak' | 'mastery';
+  kind: "streak" | "mastery";
   target: number;
   remaining: number;
   pct: number;
@@ -173,7 +227,6 @@ export function computeNextMilestone(streak: number, masteredCards: number): Nex
   const mPct = m.next > m.prev ? ((masteredCards - m.prev) / (m.next - m.prev)) * 100 : 0;
   const streakWins = sPct !== mPct ? sPct > mPct : s.prev >= m.prev;
   return streakWins
-    ? { kind: 'streak', target: s.next, remaining: s.next - streak, pct: sPct }
-    : { kind: 'mastery', target: m.next, remaining: m.next - masteredCards, pct: mPct };
+    ? { kind: "streak", target: s.next, remaining: s.next - streak, pct: sPct }
+    : { kind: "mastery", target: m.next, remaining: m.next - masteredCards, pct: mPct };
 }
-

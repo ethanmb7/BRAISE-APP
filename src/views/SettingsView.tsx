@@ -1,10 +1,10 @@
-import { Moon, Type, Volume2, Globe } from 'lucide-react';
-import { useApp } from '@/store';
-import { sfx } from '@/lib/sound';
-import { TopBar } from '@/components/TopBar';
-import { Switch } from '@/components/Switch';
-import { LEVELS } from '@/data';
-import type { Level } from '@/types';
+import { Moon, Type, Volume2, Globe } from "lucide-react";
+import { useApp } from "@/store";
+import { sfx } from "@/lib/sound";
+import { TopBar } from "@/components/TopBar";
+import { Switch } from "@/components/Switch";
+import { LEVELS } from "@/data";
+import type { Level } from "@/types";
 
 export function SettingsView() {
   const { state, goBack, toggleDark, toggleDyslexia, toggleSound, setUser } = useApp();
@@ -23,17 +23,25 @@ export function SettingsView() {
         <div className="settings-group">
           <div className="settings-row">
             <span className="settings-row-main">
-              <span className="settings-row-icon" aria-hidden="true"><Moon size={18} /></span>
+              <span className="settings-row-icon" aria-hidden="true">
+                <Moon size={18} />
+              </span>
               Mode sombre
             </span>
             <Switch checked={state.darkMode} onChange={toggleDark} aria-label="Mode sombre" />
           </div>
           <div className="settings-row">
             <span className="settings-row-main">
-              <span className="settings-row-icon" aria-hidden="true"><Type size={18} /></span>
+              <span className="settings-row-icon" aria-hidden="true">
+                <Type size={18} />
+              </span>
               Mode dyslexie
             </span>
-            <Switch checked={state.dyslexiaMode} onChange={toggleDyslexia} aria-label="Mode dyslexie" />
+            <Switch
+              checked={state.dyslexiaMode}
+              onChange={toggleDyslexia}
+              aria-label="Mode dyslexie"
+            />
           </div>
         </div>
 
@@ -42,7 +50,9 @@ export function SettingsView() {
         <div className="settings-group">
           <div className="settings-row">
             <span className="settings-row-main">
-              <span className="settings-row-icon" aria-hidden="true"><Volume2 size={18} /></span>
+              <span className="settings-row-icon" aria-hidden="true">
+                <Volume2 size={18} />
+              </span>
               Sons et effets
             </span>
             <Switch checked={state.soundOn} onChange={toggleSound} aria-label="Sons" />
@@ -54,7 +64,9 @@ export function SettingsView() {
         <div className="settings-group">
           <div className="settings-row">
             <span className="settings-row-main">
-              <span className="settings-row-icon" aria-hidden="true"><Globe size={18} /></span>
+              <span className="settings-row-icon" aria-hidden="true">
+                <Globe size={18} />
+              </span>
               Niveau
             </span>
             <select
@@ -74,7 +86,14 @@ export function SettingsView() {
           </div>
         </div>
 
-        <p style={{ textAlign: 'center', color: 'var(--ink-soft)', fontSize: '0.72rem', marginTop: 20 }}>
+        <p
+          style={{
+            textAlign: "center",
+            color: "var(--ink-soft)",
+            fontSize: "0.72rem",
+            marginTop: 20,
+          }}
+        >
           BRAISE v1.0 · Pensée pour apprendre autrement
         </p>
       </div>

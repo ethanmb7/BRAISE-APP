@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import type { Level } from '@/types';
-import { LEVELS } from '@/data';
+import { useEffect, useState } from "react";
+import type { Level } from "@/types";
+import { LEVELS } from "@/data";
 
 type Props = {
   open: boolean;
@@ -26,23 +26,23 @@ export function LevelSheet({ open, current, onSelect, onClose }: Props) {
     <>
       <div
         className="level-sheet-backdrop"
-        style={{ opacity: open ? 1 : 0, transition: 'opacity 0.2s' }}
+        style={{ opacity: open ? 1 : 0, transition: "opacity 0.2s" }}
         onClick={onClose}
       />
       <div
         className="level-sheet"
         style={{
-          transform: open ? 'translateY(0)' : 'translateY(100%)',
-          transition: 'transform 0.25s ease',
+          transform: open ? "translateY(0)" : "translateY(100%)",
+          transition: "transform 0.25s ease",
         }}
       >
         <div className="level-sheet-handle" />
-        <h2 style={{ fontSize: '1.1rem', marginBottom: 14 }}>Choisis ton niveau</h2>
+        <h2 style={{ fontSize: "1.1rem", marginBottom: 14 }}>Choisis ton niveau</h2>
         <div className="level-list" style={{ marginBottom: 12 }}>
           {LEVELS.map((l) => (
             <button
               key={l.id}
-              className={`level-item ${current === l.id ? 'is-selected' : ''}`}
+              className={`level-item ${current === l.id ? "is-selected" : ""}`}
               onClick={() => onSelect(l)}
             >
               {l.label}
