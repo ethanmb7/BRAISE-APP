@@ -2662,6 +2662,230 @@ select {
   animation: fadeUp 0.26s ease;
 }
 
+/* ===== Le Déclic — BRAISE's learning loop (PRODUCT_VISION.md, section 4) =====
+   Its own identity on purpose: a violet stage instead of Réviser's swipe cards or the old
+   lesson chrome's blue, so a Déclic moment is never mistaken for a drill. Same grammar as the
+   rest of the app underneath (thick black borders, hard shadows, Baloo 2 headers). */
+.declic-stage {
+  display: flex;
+  flex-direction: column;
+  min-height: 50vh;
+}
+.declic-step {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.declic-ask {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+.declic-ask > svg,
+.declic-ask > div {
+  flex-shrink: 0;
+}
+.declic-bubble {
+  flex: 1;
+  padding: 14px 16px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 20px 20px 20px 6px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--violet);
+  color: var(--ink);
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.declic-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.declic-choices--row {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.declic-choices--row .declic-tile {
+  flex: 1 1 auto;
+  min-width: 90px;
+}
+.declic-tile {
+  padding: 15px 16px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: var(--ink);
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  text-align: left;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+.declic-tile:not(:disabled):active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--neo-ink);
+}
+.declic-tile:disabled {
+  opacity: 0.65;
+}
+.declic-tile.is-correct {
+  background: #dcfce7;
+  border-color: var(--mint-text);
+  box-shadow: 3px 3px 0 var(--mint-text);
+}
+.declic-tile.is-wrong {
+  background: #ffe1dc;
+  border-color: var(--coral-2);
+  box-shadow: 3px 3px 0 var(--coral-2);
+}
+.declic-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  align-self: flex-start;
+  padding: 13px 20px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 999px;
+  background: var(--neo-orange);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: #fff;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 0.98rem;
+  font-weight: 800;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+}
+.declic-cta:not(:disabled):active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--neo-ink);
+}
+.declic-cta:disabled {
+  opacity: 0.4;
+}
+.declic-textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  resize: vertical;
+}
+.declic-textarea:focus {
+  outline: none;
+  box-shadow: 3px 3px 0 var(--violet);
+}
+.declic-explain {
+  margin: -6px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+
+/* Timeline widget — the history-specific half of an explanation step (see DeclicVisual in
+   lib/declic.ts). Same bevel/border grammar as everything else; a horizontal track with points
+   revealed as Braise's explanation reaches them, instead of the fraction notion's illustrated
+   text beats. */
+.declic-timeline {
+  position: relative;
+  height: 92px;
+  margin: 4px 0 28px;
+  padding: 0 8px;
+}
+.declic-timeline-track {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 8px;
+  height: 5px;
+  border: 2px solid var(--neo-ink);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--violet) 18%, var(--paper));
+}
+.declic-timeline-point {
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 120px;
+  margin-left: -60px;
+  text-align: center;
+}
+.declic-timeline-dot {
+  width: 15px;
+  height: 15px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 50%;
+  background: var(--violet);
+  box-shadow: 2px 2px 0 var(--neo-ink);
+}
+.declic-timeline-year {
+  margin-top: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+.declic-timeline-label {
+  margin-top: 2px;
+  font-size: 0.68rem;
+  line-height: 1.25;
+  color: var(--ink-soft);
+}
+
+/* The Déclic moment itself — a small full-bleed celebration, same theatrical intent as
+   RankUpCelebration but scoped to the lesson content area, not the whole screen. */
+.declic-moment {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 32px 20px;
+  border: 3px solid var(--neo-ink);
+  border-radius: 24px;
+  background: radial-gradient(120% 140% at 50% -10%, #a78bfa, #5a38d6 65%);
+  box-shadow: 5px 5px 0 var(--neo-ink);
+  color: #fff;
+}
+.declic-moment-flame {
+  filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.2));
+}
+.declic-moment-kicker {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #ffd43b;
+}
+.declic-moment-line {
+  max-width: 22ch;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.declic-moment .declic-cta {
+  align-self: center;
+  margin-top: 6px;
+  background: #fff;
+  color: var(--neo-ink);
+}
+@media (prefers-reduced-motion: reduce) {
+  .declic-moment-flame {
+    animation: none !important;
+  }
+}
+
 /* Story / Vocal Animé — the card itself is neutral paper, not a full-bleed subject colour.
    The theme colour (slides[idx].bg, set inline in LessonView) is confined to the circular
    badge behind the emoji instead of flooding the whole stage — same "colour lives in a badge,
