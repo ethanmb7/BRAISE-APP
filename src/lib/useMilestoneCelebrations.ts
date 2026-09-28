@@ -49,7 +49,6 @@ export function useMilestoneCelebrations(
       setQueue((q) => [...q, { type: 'rank', fromRank, toRank }]);
     }
     setSeenRank(toRank.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loaded, state.xp]);
 
   useEffect(() => {
