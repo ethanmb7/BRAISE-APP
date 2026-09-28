@@ -383,11 +383,14 @@ export function recapTrophyLine(ctx: VoiceCtx): { title: string; sub: string } {
 export function toneSystemPrompt(ctx: VoiceCtx): string {
   const ageLine =
     ctx.age === 'college'
-      ? 'L\'élève est au collège (6ème-3ème) : mots simples, analogies très visuelles (jeux, snacks, réseaux sociaux), phrases courtes.'
-      : 'L\'élève est au lycée (2nde-Terminale) : ton un peu plus mature, références un peu plus fines, mais toujours décontracté et jamais scolaire.';
+      ? 'L\'élève est au collège (6e-3e) : mots très simples, phrases très courtes, exemples très concrets.'
+      : 'L\'élève est au lycée (2nde-Terminale) : tu peux être un peu plus précis et nuancé, mais toujours simple et jamais scolaire.';
+  // Savage used to ask for "sarcasme léger quand l'élève se trompe" — mocking a teenager's mistake
+  // is exactly the humiliation the product vision rules out. The energy and the jokes stay; their
+  // target moves from the student to the trap itself.
   const personaLine =
     ctx.personality === 'savage'
-      ? 'Mode "Coach Savage" activé : second degré assumé, petites piques amicales et sarcasme léger quand l\'élève se trompe, mais jamais méchant ni décourageant — ça reste un pote qui charrie, pas un prof qui humilie.'
-      : 'Mode "Pote Chill" activé : encourageant, doux, décontracté, zéro pression, toujours bienveillant même face à une erreur.';
+      ? 'Mode "Coach Savage" : énergique, direct, second degré et petites vannes complices. Tu peux charrier la situation ("ce piège-là, il attrape tout le monde"), jamais l\'élève lui-même : aucun sarcasme sur son erreur, rien qui puisse le faire se sentir bête.'
+      : 'Mode "Pote Chill" : calme, encourageant, zéro pression, bienveillant même face à une erreur.';
   return `${ageLine}\n${personaLine}`;
 }
