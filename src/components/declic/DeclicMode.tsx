@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { BraiseMascot } from "@/components/BraiseMascot";
@@ -8,6 +8,14 @@ import { recordDeclicMemory, type DeclicScript } from "@/lib/declic";
 import { DeclicTimeline } from "@/components/declic/DeclicTimeline";
 
 const SPRING = { type: "spring", stiffness: 380, damping: 32 } as const;
+// A little bouncier than SPRING and paired with a bigger exit throw — cards should feel like
+// they're being popped in and tossed away, not just cross-fading.
+const CARD_SPRING = { type: "spring", stiffness: 420, damping: 26 } as const;
+// How long the "Braise réfléchit…" beat holds before a choice's reaction appears — long enough
+// to read as a real pause, short enough to never feel like waiting on the app.
+const THINK_MS = 550;
+
+type Mood = "happy" | "eager" | "hesitant" | "cool" | "proud";
 
 // "Le Déclic" — BRAISE's learning loop (PRODUCT_VISION.md, section 4): situation → choix →
 // réaction → déclic. A notion is a chain of small cards — never more than one tap or one short
@@ -26,9 +34,26 @@ export function DeclicMode({
   const reducedMotion = useReducedMotion();
   const [index, setIndex] = useState(0);
   const [pickedId, setPickedId] = useState<string | null>(null);
+  const [thinking, setThinking] = useState(false);
   const [reformulation, setReformulation] = useState("");
 
   const card = script.cards[index];
+
+  // Physical, not just a fade: a card pops in with a little overshoot and gets tossed up and
+  // away on the way out, rather than cross-fading into the next one.
+  const cardMotion = reducedMotion
+    ? {
+        initial: { opacity: 0 },
+        animate: { opacity: 1 },
+        exit: { opacity: 0 },
+        transition: { duration: 0.15 },
+      }
+    : {
+        initial: { opacity: 0, y: 26, scale: 0.97 },
+        animate: { opacity: 1, y: 0, scale: 1 },
+        exit: { opacity: 0, y: -38, rotate: -2, scale: 0.95 },
+        transition: CARD_SPRING,
+      };
 
   const advance = () => {
     sfx.tap(soundOn);
@@ -40,6 +65,11 @@ export function DeclicMode({
     if (pickedId) return;
     sfx[correct ? "correct" : "wrong"](soundOn);
     setPickedId(optionId);
+    // The tile itself colours in immediately (that's the tap's own feedback) — only Braise's
+    // reply waits a beat, like an actual reply would.
+    if (reducedMotion) return;
+    setThinking(true);
+    setTimeout(() => setThinking(false), THINK_MS);
   };
 
   const submitReformulation = () => {
@@ -53,14 +83,7 @@ export function DeclicMode({
     <div className="declic-stage">
       <AnimatePresence mode="wait">
         {card.kind === "situation" && (
-          <motion.div
-            key={index}
-            className="declic-step"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={SPRING}
-          >
+          <motion.div key={index} className="declic-step" {...cardMotion}>
             <DeclicAsk mood="happy">{card.text}</DeclicAsk>
             {card.visual?.kind === "timeline" && <DeclicTimeline visual={card.visual} />}
             <button type="button" className="declic-cta" onClick={advance}>
@@ -70,60 +93,72 @@ export function DeclicMode({
         )}
 
         {card.kind === "choice" && (
-          <motion.div
-            key={index}
-            className="declic-step"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={SPRING}
-          >
-            <DeclicAsk mood="eager">{card.prompt}</DeclicAsk>
+          <motion.div key={index} className="declic-step" {...cardMotion}>
+            <DeclicAsk
+              mood={
+                !pickedId
+                  ? "eager"
+                  : card.options.find((o) => o.id === pickedId)?.correct
+                    ? "proud"
+                    : "hesitant"
+              }
+              bump={
+                !pickedId
+                  ? undefined
+                  : card.options.find((o) => o.id === pickedId)?.correct
+                    ? "correct"
+                    : "wrong"
+              }
+            >
+              {card.prompt}
+            </DeclicAsk>
             {card.visual?.kind === "timeline" && <DeclicTimeline visual={card.visual} />}
-            {!pickedId ? (
-              <div className="declic-choices">
-                {card.options.map((o) => (
-                  <DeclicTile
-                    key={o.id}
-                    label={o.label}
-                    state="idle"
-                    onClick={() => pick(o.id, o.correct)}
-                  />
-                ))}
-              </div>
-            ) : (
+            <div className="declic-choices">
+              {card.options.map((o) => (
+                <DeclicTile
+                  key={o.id}
+                  label={o.label}
+                  state={
+                    !pickedId
+                      ? "idle"
+                      : o.id === pickedId
+                        ? o.correct
+                          ? "correct"
+                          : "wrong"
+                        : "idle"
+                  }
+                  onClick={() => pick(o.id, o.correct)}
+                  disabled={!!pickedId}
+                />
+              ))}
+            </div>
+            {pickedId && (
               <>
-                <div className="declic-choices">
-                  {card.options.map((o) => (
-                    <DeclicTile
-                      key={o.id}
-                      label={o.label}
-                      state={o.id === pickedId ? (o.correct ? "correct" : "wrong") : "idle"}
-                      onClick={() => {}}
-                      disabled
-                    />
-                  ))}
-                </div>
-                <p className="declic-bubble declic-bubble--reaction">
-                  {card.options.find((o) => o.id === pickedId)?.reaction}
-                </p>
-                <button type="button" className="declic-cta" onClick={advance}>
-                  Suite <ArrowRight size={18} />
-                </button>
+                {thinking ? (
+                  <p className="declic-bubble declic-bubble--reaction" aria-live="polite">
+                    <span className="typing-dots">
+                      <span />
+                      <span />
+                      <span />
+                    </span>
+                  </p>
+                ) : (
+                  <>
+                    <p className="declic-bubble declic-bubble--reaction">
+                      {card.options.find((o) => o.id === pickedId)?.reaction}
+                    </p>
+                    <button type="button" className="declic-cta" onClick={advance}>
+                      Suite <ArrowRight size={18} />
+                    </button>
+                  </>
+                )}
               </>
             )}
           </motion.div>
         )}
 
         {card.kind === "reveal" && (
-          <motion.div
-            key={index}
-            className="declic-step"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={SPRING}
-          >
+          <motion.div key={index} className="declic-step" {...cardMotion}>
             <span className="declic-reveal-kicker">{card.kicker}</span>
             <DeclicAsk mood="proud">{card.text}</DeclicAsk>
             {card.visual?.kind === "timeline" && <DeclicTimeline visual={card.visual} />}
@@ -134,14 +169,7 @@ export function DeclicMode({
         )}
 
         {card.kind === "reformulation" && (
-          <motion.div
-            key={index}
-            className="declic-step"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={SPRING}
-          >
+          <motion.div key={index} className="declic-step" {...cardMotion}>
             <DeclicAsk mood="eager">{card.prompt}</DeclicAsk>
             <textarea
               className="declic-textarea"
@@ -202,14 +230,30 @@ export function DeclicMode({
 
 function DeclicAsk({
   mood,
+  bump,
   children,
 }: {
-  mood: "happy" | "eager" | "hesitant" | "cool" | "proud";
-  children: string;
+  mood: Mood;
+  /** A one-shot physical reaction — a headshake on a miss, a little nod on a hit — played once
+   *  when this prop first appears (see the `key`: it forces a fresh mount, which is what makes
+   *  an `initial` → `animate` transition actually run instead of snapping straight to rest). */
+  bump?: "correct" | "wrong";
+  children: ReactNode;
 }) {
   return (
     <div className="declic-ask">
-      <BraiseMascot size={64} mood={mood} />
+      {bump ? (
+        <motion.div
+          key={bump}
+          initial={{ rotate: 0, y: 0 }}
+          animate={bump === "wrong" ? { rotate: [0, -10, 9, -6, 4, 0] } : { y: [0, -10, 0] }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+        >
+          <BraiseMascot size={64} mood={mood} />
+        </motion.div>
+      ) : (
+        <BraiseMascot size={64} mood={mood} />
+      )}
       <h2 className="declic-bubble">{children}</h2>
     </div>
   );
