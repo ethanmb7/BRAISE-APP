@@ -14,7 +14,11 @@ export type Rank = {
 // reachable within a handful of real sessions on purpose, so the very first rank-up lands
 // fast; the curve stretches out after that so Légende stays a genuine long-term target.
 export const RANKS: Rank[] = [
-  { id: 'bronze', name: 'Bronze', emoji: '🥉', min: 0, colorFrom: '#e8b088', colorTo: '#8a4a26' },
+  // Same fix as Argent below, applied to the rank every single new user starts on and sees the
+  // most: bronze used to be a pale, desaturated tan (#e8b088) that read as washed-out next to the
+  // app's own saturated signature orange everywhere else. A real copper — closer to the actual
+  // metal — keeps the "bronze, not orange" read through hue rather than through desaturation.
+  { id: 'bronze', name: 'Bronze', emoji: '🥉', min: 0, colorFrom: '#CD7F32', colorTo: '#8a4a26' },
   // Argent used to be a near-neutral grey-blue (#dbe4f0/#7c8fa8) — the only one of the 5 ranks
   // without a real saturated hue, which read as flat next to bronze/or/platine/légende and landed
   // worst on exactly the first rank-up most new users ever see. A vivid "chrome blue" keeps the

@@ -1030,9 +1030,14 @@ select {
 .braise-evolution-stage.is-current {
   border-color: var(--neo-orange);
 }
+/* Dimmed, not erased: grayscale(1) + 0.28 opacity used to flatten all 4 locked stages into the
+   same indistinguishable pale blob, even though BraiseCharacter draws each rank with its own
+   silhouette and accessories (see BraiseCharacter.tsx) — killing the one thing "Ta Braise" is
+   supposed to make a player curious about. Partial desaturation keeps that shape and a hint of
+   each rank's own hue readable, while staying clearly duller than the current stage. */
 .braise-evolution-stage.is-locked {
-  filter: grayscale(1);
-  opacity: 0.28;
+  filter: grayscale(0.45);
+  opacity: 0.6;
 }
 .braise-mascot .braise-outfit {
   transform-origin: 54px 76px;
