@@ -2,8 +2,10 @@ import { LEVELS } from '@/data';
 import type { AgeGroup, Personality } from '@/types';
 
 export function getAgeGroup(levelId: string | null | undefined): AgeGroup {
+  // Lycée-only app: an unknown or legacy collège level (e.g. '3e' from an old save) must not
+  // flip Braise into its younger collège voice.
   const lvl = LEVELS.find((l) => l.id === levelId);
-  return lvl?.group === 'Lycée' ? 'lycee' : 'college';
+  return lvl?.group === 'Collège' ? 'college' : 'lycee';
 }
 
 export type VoiceCtx = { personality: Personality; age: AgeGroup };

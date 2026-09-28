@@ -540,26 +540,11 @@ select {
 }
 
 /* Tiles — shared by every choice screen */
-.onb-group {
-  margin-bottom: 18px;
-}
-.onb-group-label {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--ink-soft);
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
 .onb-grid {
   display: grid;
   gap: 10px;
 }
 .onb-grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.onb-grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.onb-grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .onb-stack {
   display: flex;
   flex-direction: column;

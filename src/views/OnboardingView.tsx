@@ -168,27 +168,22 @@ export function OnboardingView() {
             {step === 2 && (
               <>
                 <BraiseAsks mood="happy">Enchanté, {trimmedName} ! T'es en quelle classe ?</BraiseAsks>
-                {(['Collège', 'Lycée'] as const).map((group) => (
-                  <div key={group} className="onb-group" role="group" aria-label={group}>
-                    <span className="onb-group-label">{group}</span>
-                    <div className={`onb-grid ${group === 'Collège' ? 'cols-4' : 'cols-3'}`}>
-                      {LEVELS.filter((l) => l.group === group).map((l) => (
-                        <button
-                          key={l.id}
-                          type="button"
-                          className={`onb-tile onb-tile--level ${level?.id === l.id ? 'is-selected' : ''}`}
-                          aria-pressed={level?.id === l.id}
-                          onClick={() => {
-                            tap();
-                            setLevel(l);
-                          }}
-                        >
-                          {l.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                <div className="onb-stack">
+                  {LEVELS.map((l) => (
+                    <button
+                      key={l.id}
+                      type="button"
+                      className={`onb-tile onb-tile--level ${level?.id === l.id ? 'is-selected' : ''}`}
+                      aria-pressed={level?.id === l.id}
+                      onClick={() => {
+                        tap();
+                        setLevel(l);
+                      }}
+                    >
+                      {l.label}
+                    </button>
+                  ))}
+                </div>
               </>
             )}
 
