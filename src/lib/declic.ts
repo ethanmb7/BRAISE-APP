@@ -1,202 +1,212 @@
-// "Le Déclic" — BRAISE's real learning method (see PRODUCT_VISION.md, section 4). Each script
-// below is a fully authored, validated conversation for one notion: the AI is not asked to
-// improvise the diagnostic, the explanations or the verification questions — see the vision
-// doc's own "reste à trancher" note on why that stays a human-authored decision for now.
+// "Le Déclic" — BRAISE's learning method (PRODUCT_VISION.md, section 4): "Situation → Choix →
+// Réaction → Déclic". A notion is a chain of tiny cards, never a page of course text — the
+// question comes before the explanation, not after it, and each card asks for one tap (or, for
+// the closing reformulation, one short sentence) before the next beat appears. Content is fully
+// authored and validated ahead of time, same reasoning as before: an AI improvising the situations
+// live risks a wrong or misleading one reaching a student with nobody checking it first.
 
-export type DeclicChoice = { id: string; label: string };
-
-// A subject-appropriate widget for the explanation step — the actual place a notion's own
-// discipline should shape the interface (see PRODUCT_VISION.md discussion on per-subject
-// design): a shared conversational shell, but the explanation itself can be a timeline, a
-// diagram, a number line... whatever the notion needs, added here as new variants.
 export type DeclicVisual = {
   kind: "timeline";
-  /** `revealAtStep` is the 0-based index into the explanation's `steps` at which this event
-   *  becomes visible — the timeline builds up in sync with what Braise is saying. */
-  events: { year: number; label: string; revealAtStep: number }[];
+  events: { year: number; label: string }[];
 };
 
-export type DeclicExplanation = {
-  /** What the explanation is framed as reacting to — shown nowhere, just for authors. */
-  title: string;
-  /** Each string is one beat, revealed one at a time. */
-  steps: string[];
-  /** The check-in after the explanation ("ça te parle ?"). */
-  checkIn: string;
-  /** Optional subject-specific widget shown alongside the text beats. */
-  visual?: DeclicVisual;
+export type DeclicChoiceOption = {
+  id: string;
+  label: string;
+  correct?: boolean;
+  /** What Braise says back the instant this option is tapped — never a bare "faux". */
+  reaction: string;
 };
+
+export type DeclicCard =
+  /** Braise sets the scene. One line, then "Suite". */
+  | { kind: "situation"; text: string; visual?: DeclicVisual }
+  /** The student takes a position before anything is explained — the question opens the notion,
+   *  it doesn't close it. */
+  | { kind: "choice"; prompt: string; options: DeclicChoiceOption[]; visual?: DeclicVisual }
+  /** The name/definition/rule, shown only once the student has already built the idea. */
+  | { kind: "reveal"; kicker: string; text: string; visual?: DeclicVisual }
+  /** Explaining it back, in the student's own words — the one part of the old method kept
+   *  deliberately: retrieval in your own words is real evidence of understanding, a tap isn't. */
+  | { kind: "reformulation"; prompt: string }
+  /** The payoff. Full-bleed, same theatrical weight regardless of which notion led here. */
+  | { kind: "declic"; line: string };
 
 export type DeclicScript = {
   chapterId: string;
-  essayer: { question: string; choices: DeclicChoice[]; correctId: string };
-  diagnostic: { prompt: string; reasons: { id: string; label: string; explanationId: string }[] };
-  /** Keyed by explanationId — `diagnostic.reasons` points into this map. */
-  explanations: Record<string, DeclicExplanation>;
-  declicLine: string;
-  reformulationPrompt: string;
-  verification: { question: string; choices: DeclicChoice[]; correctId: string };
-  abstraction: {
-    question: string;
-    choices: DeclicChoice[];
-    correctId: string;
-    explain: string;
-  };
+  cards: DeclicCard[];
 };
 
-// The vision doc's own worked example, word for word: 1/2 = 2/4, the pizza, the reformulation,
-// the 3/6 check, the 4/10 simplification. First (and only) notion built end to end on purpose —
-// PRODUCT_VISION.md section 10 asks for one real notion validated before generalising, not a
-// method half-built across the whole curriculum.
 export const DECLIC_SCRIPTS: Record<string, DeclicScript> = {
   m1: {
     chapterId: "m1",
-    essayer: {
-      question: "1/2 et 2/4, c'est la même quantité ?",
-      choices: [
-        { id: "oui", label: "Oui, c'est pareil" },
-        { id: "non", label: "Non, c'est différent" },
-      ],
-      correctId: "oui",
-    },
-    diagnostic: {
-      prompt: "Pourquoi tu penses que c'est différent ?",
-      reasons: [
-        {
-          id: "taille",
-          label: "Parce que 2 et 4 sont plus grands que 1 et 2",
-          explanationId: "pizza-taille",
-        },
-        { id: "sais-pas", label: "Je sais pas trop", explanationId: "pizza-defaut" },
-      ],
-    },
-    explanations: {
-      "pizza-taille": {
-        title: "confusion taille des nombres / taille de la quantité",
-        steps: [
-          "OK, je vois le truc. Imagine deux pizzas identiques.",
-          "La première, tu la coupes en 2 parts égales, et t'en manges 1.",
-          "La deuxième, tu la coupes en 4 parts égales, et t'en manges 2.",
-          "Dans laquelle t'as mangé le plus ?",
+    cards: [
+      { kind: "situation", text: "Imagine une pizza coupée en 2 parts égales. Tu manges 1 part." },
+      {
+        kind: "choice",
+        prompt:
+          "Une deuxième pizza identique est coupée en 4 parts égales. Combien de parts tu dois manger pour avoir mangé exactement pareil que la première fois ?",
+        options: [
+          {
+            id: "1",
+            label: "1 part",
+            reaction: "Pas tout à fait : sur 4 parts, 1 seule c'est moins que sur 2.",
+          },
+          {
+            id: "2",
+            label: "2 parts",
+            correct: true,
+            reaction: "Exactement ! 2 parts sur 4, c'est la même quantité qu'1 part sur 2.",
+          },
+          {
+            id: "3",
+            label: "3 parts",
+            reaction: "Ça ferait plus que la première fois — regarde encore les parts.",
+          },
         ],
-        checkIn: "Alors, ça te parle ?",
       },
-      "pizza-defaut": {
-        title: "premier passage, pas de diagnostic précis",
-        steps: [
-          "Pas de souci, on regarde ça ensemble. Imagine deux pizzas identiques.",
-          "La première, tu la coupes en 2 parts égales, et t'en manges 1.",
-          "La deuxième, tu la coupes en 4 parts égales, et t'en manges 2.",
-          "Dans laquelle t'as mangé le plus ?",
+      {
+        kind: "situation",
+        text: "Autrement dit : 1/2 et 2/4, c'est la même quantité — juste coupée différemment.",
+      },
+      {
+        kind: "choice",
+        prompt: "Et 3/6, tu penses que c'est aussi la même quantité que 1/2 ?",
+        options: [
+          {
+            id: "oui",
+            label: "Oui, pareil",
+            correct: true,
+            reaction: "Exact ! 6 parts, tu en manges 3 — toujours la moitié.",
+          },
+          {
+            id: "non",
+            label: "Non, différent",
+            reaction: "Recompte : sur 6 parts égales, la moitié, c'est 3.",
+          },
         ],
-        checkIn: "Ça te parle plus comme ça ?",
       },
-    },
-    declicLine: "Voilà. Maintenant t'as capté.",
-    reformulationPrompt: "Vas-y, explique-moi maintenant pourquoi 1/2 = 2/4, avec tes mots.",
-    verification: {
-      question: "Et maintenant : 3/6 et 1/2, même quantité ou pas ?",
-      choices: [
-        { id: "oui", label: "Oui, même quantité" },
-        { id: "non", label: "Non, différent" },
-      ],
-      correctId: "oui",
-    },
-    abstraction: {
-      question: "Simplifie 4/10 le plus possible.",
-      choices: [
-        { id: "2-5", label: "2/5" },
-        { id: "2-10", label: "2/10" },
-        { id: "1-5", label: "1/5" },
-      ],
-      correctId: "2-5",
-      explain: "4/10 : tu divises le haut ET le bas par 2 → 2/5. On ne peut plus simplifier.",
-    },
+      {
+        kind: "reveal",
+        kicker: "🔥 Fractions équivalentes",
+        text: "1/2, 2/4, 3/6… ce sont des fractions équivalentes : la même quantité, écrite avec des nombres différents.",
+      },
+      {
+        kind: "choice",
+        prompt: "À ton tour : simplifie 4/10 le plus possible.",
+        options: [
+          {
+            id: "2-5",
+            label: "2/5",
+            correct: true,
+            reaction: "Voilà. Tu divises le haut ET le bas par 2 — on ne peut plus simplifier.",
+          },
+          {
+            id: "2-10",
+            label: "2/10",
+            reaction: "Tu n'as divisé que le haut — fais pareil en bas.",
+          },
+          { id: "1-5", label: "1/5", reaction: "Presque : tu as divisé par 4, pas par 2." },
+        ],
+      },
+      { kind: "reformulation", prompt: "Explique à un pote, avec tes mots, pourquoi 1/2 = 2/4." },
+      { kind: "declic", line: "Voilà. Maintenant t'as capté les fractions équivalentes." },
+    ],
   },
 
-  // Second notion, deliberately in a very different subject, to test whether the Déclic shell
-  // needs to change per matière or just the explanation widget does — here, a timeline instead
-  // of an illustrated reveal. Built from the misconception already documented in this chapter's
-  // own AUDIO_TRANSCRIPTS/STORIES content (confusing 1789 and 1793), not invented from scratch.
+  // Second notion, deliberately in a very different subject — same card chain, no bespoke
+  // screen: only this one card's visual (a timeline instead of nothing) changes per subject.
   h1: {
     chapterId: "h1",
-    essayer: {
-      question: "La prise de la Bastille et l'exécution de Louis XVI, c'est la même année ?",
-      choices: [
-        { id: "oui", label: "Oui, la même année" },
-        { id: "non", label: "Non, des années différentes" },
-      ],
-      correctId: "non",
-    },
-    diagnostic: {
-      prompt: "Pourquoi tu penses que c'est la même année ?",
-      reasons: [
-        {
-          id: "meme-evenement",
-          label: "Pour moi la Révolution, c'est un seul grand moment",
-          explanationId: "timeline-meme-evenement",
-        },
-        { id: "sais-pas", label: "Je sais pas trop", explanationId: "timeline-defaut" },
-      ],
-    },
-    explanations: {
-      "timeline-meme-evenement": {
-        title: "confusion : la Révolution vécue comme un instant unique",
-        steps: [
-          "Je vois l'idée : « la Révolution », ça sonne comme un seul grand moment.",
-          "Mais remontons les deux dates ensemble, sur une ligne du temps.",
-          "Le 14 juillet 1789, le peuple de Paris prend la Bastille : premier point.",
-          "Louis XVI, lui, est exécuté bien plus tard : en 1793. Regarde l'écart.",
+    cards: [
+      {
+        kind: "situation",
+        text: "14 juillet 1789 : le peuple de Paris prend la Bastille. C'est le début de la Révolution.",
+      },
+      {
+        kind: "choice",
+        prompt: "À ton avis, le roi Louis XVI est exécuté…",
+        options: [
+          {
+            id: "meme-annee",
+            label: "La même année, en 1789",
+            reaction:
+              "Pas si vite : entre la prise de la Bastille et l'exécution du roi, il se passe bien plus de temps que ça.",
+          },
+          {
+            id: "plus-tard",
+            label: "Plusieurs années plus tard",
+            correct: true,
+            reaction: "Exact ! Quatre ans plus tard, en 1793.",
+          },
         ],
-        checkIn: "Ça te parle, l'écart entre les deux ?",
+      },
+      {
+        kind: "situation",
+        text: "Entre les deux, beaucoup de choses changent : dès août 1789, la Déclaration des droits de l'homme proclame liberté et égalité.",
+      },
+      {
+        kind: "choice",
+        prompt: "La Déclaration des droits de l'homme arrive…",
+        options: [
+          {
+            id: "avant",
+            label: "Avant la Bastille",
+            reaction: "Non — la Bastille tombe en premier, en juillet.",
+          },
+          {
+            id: "meme-annee",
+            label: "Juste après la Bastille, la même année",
+            correct: true,
+            reaction: "Exact ! Un mois plus tard, toujours en 1789.",
+          },
+          {
+            id: "apres-execution",
+            label: "Après l'exécution du roi",
+            reaction: "Non, c'est même le contraire : elle arrive bien avant, dès 1789.",
+          },
+        ],
+      },
+      {
+        kind: "reveal",
+        kicker: "🔥 1789 ≠ 1793",
+        text: "La prise de la Bastille (1789) et l'exécution de Louis XVI (1793) sont deux événements bien distincts, séparés de 4 ans.",
         visual: {
           kind: "timeline",
           events: [
-            { year: 1789, label: "Prise de la Bastille", revealAtStep: 2 },
-            { year: 1793, label: "Exécution de Louis XVI", revealAtStep: 3 },
+            { year: 1789, label: "Prise de la Bastille" },
+            { year: 1793, label: "Exécution de Louis XVI" },
           ],
         },
       },
-      "timeline-defaut": {
-        title: "premier passage, pas de diagnostic précis",
-        steps: [
-          "Pas de souci, on pose les deux dates ensemble sur une ligne du temps.",
-          "Le 14 juillet 1789, le peuple de Paris prend la Bastille : premier point.",
-          "Louis XVI, lui, est exécuté bien plus tard : en 1793. Regarde l'écart.",
+      {
+        kind: "choice",
+        prompt: "Parmi ces trois événements, lequel arrive en dernier ?",
+        options: [
+          {
+            id: "bastille",
+            label: "Prise de la Bastille",
+            reaction: "Non, celui-là ouvre la liste, en 1789.",
+          },
+          {
+            id: "declaration",
+            label: "Déclaration des droits de l'homme",
+            reaction: "Non, elle arrive dès 1789, juste après la Bastille.",
+          },
+          {
+            id: "execution",
+            label: "Exécution de Louis XVI",
+            correct: true,
+            reaction: "Exact. 1793 — le dernier des trois, et de loin.",
+          },
         ],
-        checkIn: "Ça te parle mieux comme ça ?",
-        visual: {
-          kind: "timeline",
-          events: [
-            { year: 1789, label: "Prise de la Bastille", revealAtStep: 1 },
-            { year: 1793, label: "Exécution de Louis XVI", revealAtStep: 2 },
-          ],
-        },
       },
-    },
-    declicLine: "Voilà. Quatre ans séparent ces deux moments.",
-    reformulationPrompt:
-      "Explique-moi avec tes mots pourquoi ces deux dates ne sont pas la même année.",
-    verification: {
-      question:
-        "La Déclaration des droits de l'homme (août 1789) : avant ou après la prise de la Bastille ?",
-      choices: [
-        { id: "apres", label: "Après" },
-        { id: "avant", label: "Avant" },
-      ],
-      correctId: "apres",
-    },
-    abstraction: {
-      question: "Parmi ces trois événements, lequel arrive en dernier ?",
-      choices: [
-        { id: "bastille", label: "Prise de la Bastille" },
-        { id: "declaration", label: "Déclaration des droits de l'homme" },
-        { id: "execution", label: "Exécution de Louis XVI" },
-      ],
-      correctId: "execution",
-      explain:
-        "La Bastille (juillet 1789) et la Déclaration (août 1789) sont la même année. L'exécution de Louis XVI arrive 4 ans plus tard, en 1793.",
-    },
+      {
+        kind: "reformulation",
+        prompt: "Explique avec tes mots pourquoi on ne doit pas confondre ces deux dates.",
+      },
+      { kind: "declic", line: "Voilà. Maintenant tu as la vraie chronologie en tête." },
+    ],
   },
 };
 
@@ -212,7 +222,6 @@ export function hasDeclicScript(chapterId: string): boolean {
 const DECLIC_MEMORY_KEY = "sapie_declic_memory";
 
 export type DeclicMemoryEntry = {
-  explanationId: string;
   reformulation: string;
   at: number;
 };

@@ -2703,14 +2703,6 @@ select {
   flex-direction: column;
   gap: 10px;
 }
-.declic-choices--row {
-  flex-direction: row;
-  flex-wrap: wrap;
-}
-.declic-choices--row .declic-tile {
-  flex: 1 1 auto;
-  min-width: 90px;
-}
 .declic-tile {
   padding: 15px 16px;
   border: 2.5px solid var(--neo-ink);
@@ -2782,16 +2774,26 @@ select {
   outline: none;
   box-shadow: 3px 3px 0 var(--violet);
 }
-.declic-explain {
-  margin: -6px 0 0;
-  color: var(--ink-soft);
-  font-size: 0.86rem;
-  line-height: 1.4;
+/* The reaction bubble after a choice card — same shell as the ask bubble, just not paired with
+   a fresh mascot render since Braise is already on screen. */
+.declic-bubble--reaction {
+  border-radius: 20px 20px 20px 6px;
+  font-size: 1rem;
+}
+.declic-reveal-kicker {
+  display: block;
+  margin-bottom: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--violet);
 }
 
-/* Timeline widget — the history-specific half of an explanation step (see DeclicVisual in
-   lib/declic.ts). Same bevel/border grammar as everything else; a horizontal track with points
-   revealed as Braise's explanation reaches them, instead of the fraction notion's illustrated
+/* Timeline widget — the subject-specific half of a card (see DeclicVisual in lib/declic.ts).
+   Same bevel/border grammar as everything else; a horizontal track with points popping in
+   together when the card appears, instead of the fraction notion's plain choice cards.
    text beats. */
 .declic-timeline {
   position: relative;
