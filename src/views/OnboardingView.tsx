@@ -16,10 +16,10 @@ type StepId = (typeof STEPS)[number];
 // Steps that show the progress bar: every question, not the two "hero" moments around them.
 const QUESTION_COUNT = STEPS.length - 1;
 
-const LEVEL_INFO: Record<string, { tag: string; reaction: string }> = {
-  '2nde': { tag: 'Nouveau lycée', reaction: 'La 2nde, nouveau rythme. On pose de bonnes bases ensemble.' },
-  '1ere': { tag: 'Bac de français', reaction: 'La 1ère, avec le bac de français au bout. On va s’organiser.' },
-  term: { tag: 'Année du bac', reaction: 'Terminale, l’année du bac. On va gérer ça ensemble.' },
+const LEVEL_INFO: Record<string, { tag: string; icon: string; reaction: string }> = {
+  '2nde': { tag: 'Nouveau lycée', icon: '🌱', reaction: 'La 2nde, nouveau rythme. On pose de bonnes bases ensemble.' },
+  '1ere': { tag: 'Bac de français', icon: '✍️', reaction: 'La 1ère, avec le bac de français au bout. On va s’organiser.' },
+  term: { tag: 'Année du bac', icon: '🎓', reaction: 'Terminale, l’année du bac. On va gérer ça ensemble.' },
 };
 
 const TONES: { id: Personality; title: string; desc: string; sample: string; mood: Mood }[] = [
@@ -169,12 +169,12 @@ export function OnboardingView() {
             </header>
           )}
 
-          <div className={`onb-scene ${hero ? 'is-hero' : ''}`}>
+          <div className={`onb-scene ${hero ? 'is-hero' : ''} ${stepId === 'name' ? 'is-column' : ''}`}>
             {/* One persistent element across every screen: `layout` animates it between the big
                 welcome stage and the small speaker seat instead of unmounting and redrawing. */}
             <motion.div layout transition={SPRING} className="onb-avatar">
               <motion.div layout transition={SPRING} className="onb-avatar-inner">
-                <BraiseMascot size={hero ? 132 : 50} mood={line.mood} />
+                <BraiseMascot size={hero ? 132 : stepId === 'name' ? 92 : 60} mood={line.mood} />
               </motion.div>
             </motion.div>
 
@@ -188,7 +188,7 @@ export function OnboardingView() {
           <AnimatePresence mode="wait" initial={false} custom={direction}>
             <motion.section
               key={step}
-              className="onb-body"
+              className={`onb-body onb-body--${stepId}`}
               initial={{ opacity: 0, x: 32 * direction }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -32 * direction }}
@@ -212,7 +212,7 @@ export function OnboardingView() {
               )}
 
               {stepId === 'level' && (
-                <div className="onb-stack">
+                <div className="onb-stack onb-stack--fill">
                   {LEVELS.map((l) => (
                     <Tile
                       key={l.id}
@@ -224,15 +224,21 @@ export function OnboardingView() {
                         setReaction({ text: LEVEL_INFO[l.id]?.reaction ?? 'Noté !', mood: 'proud' });
                       }}
                     >
-                      <b>{l.label}</b>
-                      <small>{LEVEL_INFO[l.id]?.tag}</small>
+                      <span>
+                        <b>{l.label}</b>
+                        <small>{LEVEL_INFO[l.id]?.tag}</small>
+                      </span>
+                      <span className="onb-tile-icon" aria-hidden="true">
+                        {LEVEL_INFO[l.id]?.icon}
+                      </span>
                     </Tile>
                   ))}
                 </div>
               )}
 
               {stepId === 'tone' && (
-                <div className="onb-stack">
+                <>
+                <div className="onb-stack onb-stack--fill">
                   {TONES.map((t) => (
                     <Tile
                       key={t.id}
@@ -253,12 +259,13 @@ export function OnboardingView() {
                       </span>
                     </Tile>
                   ))}
-                  <p className="onb-hint">Tu pourras changer ça quand tu veux, dans Moi.</p>
                 </div>
+                <p className="onb-hint">Tu pourras changer ça quand tu veux, dans Moi.</p>
+                </>
               )}
 
               {stepId === 'rhythm' && (
-                <div className="onb-stack">
+                <div className="onb-stack onb-stack--fill">
                   {RHYTHMS.map((r) => (
                     <Tile
                       key={r.id}

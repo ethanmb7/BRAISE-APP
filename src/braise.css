@@ -451,8 +451,8 @@ select {
 }
 .onb-avatar {
   flex-shrink: 0;
-  width: 64px;
-  height: 64px;
+  width: 76px;
+  height: 76px;
   display: grid;
   place-items: center;
   border: 2.5px solid #151821;
@@ -465,6 +465,24 @@ select {
   height: 200px;
   border-width: 3px;
   box-shadow: 6px 6px 0 #151821;
+}
+/* The name screen is the first real exchange and has a single field: Braise gets a bigger seat
+   above its question, which also gives that screen some weight instead of a lone input. */
+.onb-scene.is-column {
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.is-column .onb-avatar {
+  width: 128px;
+  height: 128px;
+  border-width: 3px;
+  box-shadow: 5px 5px 0 #151821;
+}
+.is-column .onb-bubble {
+  align-self: stretch;
+  border-radius: 20px;
+  text-align: center;
 }
 /* On the mascot itself, not on the layout-animated wrappers: a CSS transform animation there
    would fight framer's own transforms mid-morph. */
@@ -515,8 +533,24 @@ select {
   display: flex;
   flex-direction: column;
 }
+/* Screens with a single block (the name field, the data notice): Braise's question and the
+   answer stay together as one group, centred in the page, instead of hugging the top and leaving
+   a hole above the button — the free space is split between the auto margins above and below. */
+.onb--name .onb-scene,
+.onb--consent .onb-scene {
+  margin-top: auto;
+}
+.onb-body--name,
+.onb-body--consent {
+  flex: 0 0 auto;
+  margin-bottom: auto;
+}
+.onb--name .onb-footer,
+.onb--consent .onb-footer {
+  margin-top: 0;
+}
 .onb-hint {
-  margin: 4px 0 0;
+  margin: 12px 0 0;
   color: var(--ink-soft);
   font-size: 0.84rem;
   text-align: center;
@@ -549,6 +583,38 @@ select {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+/* Choice screens: the tiles share all the height down to the button — big, thumb-sized blocks
+   rather than a short list floating at the top. Capped so they don't turn absurd on tall screens,
+   where the leftover space is split evenly above and below. */
+.onb-stack--fill {
+  flex: 1;
+  justify-content: center;
+  gap: 14px;
+}
+.onb-stack--fill > .onb-tile {
+  flex: 1 1 0;
+  min-height: 76px;
+  max-height: 180px;
+}
+.onb-stack--fill .onb-tile--row {
+  padding: 14px 18px;
+}
+.onb-stack--fill .onb-tile--row b {
+  font-size: 1.5rem;
+}
+.onb-stack--fill .onb-tile--row small {
+  margin-top: 4px;
+  font-size: 0.9rem;
+}
+.onb-stack--fill .onb-tile-icon,
+.onb-stack--fill .onb-tone-face {
+  width: 68px;
+  height: 68px;
+}
+.onb-stack--fill .onb-flames svg {
+  width: 24px;
+  height: 24px;
 }
 .onb-tile {
   position: relative;
@@ -592,6 +658,7 @@ select {
 .onb-tile--tone {
   justify-content: flex-start;
 }
+.onb-tile-icon,
 .onb-tone-face {
   width: 54px;
   height: 54px;
@@ -601,6 +668,9 @@ select {
   border: 2px solid #151821;
   border-radius: 50%;
   background: #fffdf8;
+}
+.onb-tile-icon {
+  font-size: 1.7rem;
 }
 .onb-flames {
   display: flex;
@@ -620,8 +690,8 @@ select {
 .onb-info {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 16px;
+  gap: 18px;
+  padding: 18px;
   border: 2.5px solid var(--neo-ink);
   border-radius: 16px;
   background: var(--paper);
@@ -631,8 +701,8 @@ select {
   align-items: flex-start;
   gap: 12px;
   color: var(--ink);
-  font-size: 0.9rem;
-  line-height: 1.4;
+  font-size: 1rem;
+  line-height: 1.45;
 }
 .onb-info svg {
   flex-shrink: 0;
