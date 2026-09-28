@@ -50,7 +50,7 @@ export function ProfilAuraView() {
   const { state, loaded, openSubject, setTab, getDueCards } = useApp();
   const isOnline = useOnlineStatus();
   const [shareOpen, setShareOpen] = useState(false);
-  const { current, next, pct } = getRankInfo(state.xp);
+  const { current, next } = getRankInfo(state.xp);
   const dueCount = getDueCards().length;
 
   const stats = useMemo(() => {
@@ -138,12 +138,12 @@ export function ProfilAuraView() {
           <BraiseEvolutionLine currentRankId={current.id} />
         </motion.div>
 
-        {/* Pillar 2 — Contrat de rétention : tout le calcul de progression vit ici, et
-            uniquement les métriques qui nourrissent la fierté ou l'envie de revenir. Le "X XP
-            jusqu'à Y" vit maintenant comme légende du rail lui-même — même histoire de
-            progression, un seul bloc au lieu de deux qui se répétaient. */}
+        {/* Pillar 2 — Contrat de rétention : le chiffre de progression qui nourrit la fierté ou
+            l'envie de revenir. Portait autrefois aussi un rail des 5 rangs sous ce chiffre, mais
+            "Ta Braise" juste au-dessus montre déjà les 5 mêmes paliers — deux rangées de pastilles
+            identiques l'une sous l'autre ne racontaient rien de plus qu'une seule. */}
         <motion.div variants={staggerItem}>
-          <RankRail currentRankId={current.id} rank={current} pct={pct} next={next} xp={state.xp} milestone={milestone} />
+          <RankProgressCaption next={next} xp={state.xp} milestone={milestone} />
         </motion.div>
 
         {/* "Ce que Braise a remarqué" juste avant la grille qu'elle commente (jamais avant le rail
@@ -323,68 +323,40 @@ const BraiseInsightCard = memo(function BraiseInsightCard({ insight, line }: { i
   );
 });
 
-// Every rank visible at once on a single always-on progress rail, season-pass style. Nothing
-// is hidden behind a tap, a swipe, or an expand — the entire ladder is legible in one glance.
-// Carries its own caption now (used to be a standalone NextRankCallout block above it) — "1 556
-// XP jusqu'à Légende" and the rail are the same story, so they're one component, not two.
-const RankRail = memo(function RankRail({
-  currentRankId,
-  rank,
-  pct,
+// The numeric half of what used to be RankRail — "X XP jusqu'à Y" — kept on its own now that
+// the row of 5 rank icons beneath it is gone (see its removal note at the call site): that row
+// showed the exact same 5 ranks "Ta Braise" already shows right above it on this page, just as
+// icons instead of characters. This caption is the one part of the old rail that wasn't a
+// duplicate — a concrete number is real information "Ta Braise" doesn't carry on its own.
+const RankProgressCaption = memo(function RankProgressCaption({
   next,
   xp,
   milestone,
 }: {
-  currentRankId: string;
-  rank: Rank;
-  pct: number;
   next: Rank | null;
   xp: number;
   milestone: NextMilestone;
 }) {
-  const currentIdx = RANKS.findIndex((r) => r.id === currentRankId);
-  const overallPct = ((currentIdx + pct / 100) / (RANKS.length - 1)) * 100;
   const milestoneUnit = milestone.kind === 'streak' ? 'jour' : 'carte';
   const milestoneGoal = milestone.kind === 'streak' ? `${milestone.target} jours de série` : `${milestone.target} cartes maîtrisées`;
   return (
-    <div className="rank-rail" role="list" aria-label="Les 5 rangs">
-      <div className="rank-rail-caption">
-        {next ? (
-          <>
-            <span className="rank-rail-caption-amount">{next.min - xp} XP</span>
-            <span className="rank-rail-caption-rest"> jusqu'à {next.name}</span>
-          </>
-        ) : (
-          // Le ladder de rangs est fini par design (5 paliers), mais série et cartes maîtrisées
-          // continuent de grandir bien après — la légende reste "toujours quelque chose à
-          // atteindre" au lieu de s'arrêter net sur "Rang maximum atteint".
-          <>
-            <span className="rank-rail-caption-amount">
-              {milestone.remaining} {milestoneUnit}{milestone.remaining > 1 ? 's' : ''}
-            </span>
-            <span className="rank-rail-caption-rest"> jusqu'à {milestoneGoal}</span>
-          </>
-        )}
-      </div>
-      <div className="rank-rail-track">
-        <div className="rank-rail-line">
-          <div className="rank-rail-line-fill" style={{ width: `${overallPct}%` }} />
-        </div>
-        {RANKS.map((r, idx) => {
-          const tier: 'done' | 'current' | 'locked' = idx === currentIdx ? 'current' : idx < currentIdx ? 'done' : 'locked';
-          return (
-            <div
-              key={r.id}
-              className={`rank-rail-node is-${tier}`}
-              style={tier === 'current' ? ({ '--rank-accent': rank.colorFrom } as CSSProperties) : undefined}
-              role="listitem"
-              aria-label={`${r.name}, ${r.min} XP${tier === 'done' ? ', débloqué' : tier === 'locked' ? ', verrouillé' : ', rang actuel'}`}
-            >
-              <RankIcon rankId={r.id} color={r.colorFrom} locked={tier === 'locked'} size={tier === 'current' ? 24 : 20} />
-            </div>
-          );
-        })}
-      </div>
+    <div className="rank-rail-caption">
+      {next ? (
+        <>
+          <span className="rank-rail-caption-amount">{next.min - xp} XP</span>
+          <span className="rank-rail-caption-rest"> jusqu'à {next.name}</span>
+        </>
+      ) : (
+        // Le ladder de rangs est fini par design (5 paliers), mais série et cartes maîtrisées
+        // continuent de grandir bien après — la légende reste "toujours quelque chose à
+        // atteindre" au lieu de s'arrêter net sur "Rang maximum atteint".
+        <>
+          <span className="rank-rail-caption-amount">
+            {milestone.remaining} {milestoneUnit}{milestone.remaining > 1 ? 's' : ''}
+          </span>
+          <span className="rank-rail-caption-rest"> jusqu'à {milestoneGoal}</span>
+        </>
+      )}
     </div>
   );
 });
