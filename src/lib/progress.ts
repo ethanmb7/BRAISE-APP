@@ -118,18 +118,15 @@ export function resolveRestoredView(saved: Partial<AppState>): ViewId {
 // use it to know which tab "back" returns to — see goBack below), so it needs restoring too, not
 // just `view` — otherwise resuming into e.g. Revisions would show the right screen with the wrong
 // tab lit up, and a subsequent "back" from Subject/Settings would return to the wrong place.
+const TAB_IDS: readonly TabId[] = ["home", "subjects", "revisions", "progres", "profile"];
+const isTab = (v: string | undefined): v is TabId => TAB_IDS.includes(v as TabId);
+
+// Aura ('progres') is its own tab again — it used to be folded into Moi, and this used to send
+// it there, lighting up the wrong tab after a reload on Aura.
 export function resolveRestoredTab(view: ViewId, savedTab: TabId | undefined): TabId {
-  if (view === "home" || view === "subjects" || view === "revisions" || view === "profile")
-    return view;
-  if (
-    savedTab === "home" ||
-    savedTab === "subjects" ||
-    savedTab === "revisions" ||
-    savedTab === "profile"
-  )
-    return savedTab;
-  // `progres` used to be a tab. Old localStorage values now land on Moi, where Aura belongs.
-  return view === "progres" ? "profile" : "home";
+  if (isTab(view)) return view;
+  if (isTab(savedTab)) return savedTab;
+  return "home";
 }
 
 export function sm2(review: CardReview | undefined, confidence: Confidence): CardReview {

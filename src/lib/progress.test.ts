@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { ensureSession, resolveRestoredView } from "@/lib/progress";
+import { ensureSession, resolveRestoredTab, resolveRestoredView } from "@/lib/progress";
 import { DEFAULT_USER } from "@/data";
 import type { AppState } from "@/types";
 
@@ -136,5 +136,17 @@ describe("resolveRestoredView", () => {
   it("never sends a student who finished onboarding back through it", () => {
     expect(resolveRestoredView({ onboardingCompleted: true, view: "onboarding" })).toBe("home");
     expect(resolveRestoredView({ onboardingCompleted: true, view: "revisions" })).toBe("revisions");
+  });
+});
+
+describe("resolveRestoredTab", () => {
+  it("keeps Aura's own tab lit after a reload on Aura", () => {
+    expect(resolveRestoredTab("progres", undefined)).toBe("progres");
+  });
+
+  it("falls back to the saved tab for views that aren't tabs themselves", () => {
+    expect(resolveRestoredTab("settings", "progres")).toBe("progres");
+    expect(resolveRestoredTab("lesson", "revisions")).toBe("revisions");
+    expect(resolveRestoredTab("lesson", undefined)).toBe("home");
   });
 });
