@@ -1,4 +1,4 @@
-import { SUBJECTS, FLASHCARDS, BADGES } from '@/data';
+import { SUBJECTS, FLASHCARDS } from '@/data';
 import type { CardReview } from '@/types';
 
 export type Rank = {
@@ -156,7 +156,7 @@ export type NextMilestone = {
 };
 
 // Picks whichever axis (série ou cartes maîtrisées) is proportionally closer to its own next
-// step — the same fairness rule nextBadgeHint already uses to compare streak-days against XP:
+// step — comparable as "% of the way there" even though their units differ (days vs. cards), so
 // the one that's honestly nearest is the one worth naming. A tie in that percentage (most often
 // both axes sitting at their very first rung, 0%) falls back to whichever axis has already
 // cleared more ground overall (`prev`, its last passed milestone) — a fresh streak of 0 and 500
@@ -173,52 +173,3 @@ export function computeNextMilestone(streak: number, masteredCards: number): Nex
     : { kind: 'mastery', target: m.next, remaining: m.next - masteredCards, pct: mPct };
 }
 
-export type BadgeHint = { badgeId: string; label: string };
-
-// The 4 numeric badges' real thresholds, in the order nextBadgeHint has always checked them —
-// shared by nextBadgeHint (which badge to feature) and badgeRemainingLabel (what to print on any
-// one locked badge's own tile), so the two can never quote different numbers for the same badge.
-const BADGE_THRESHOLDS: Record<string, { kind: 'streak' | 'xp'; value: number }> = {
-  b1: { kind: 'streak', value: 3 },
-  b5: { kind: 'streak', value: 7 },
-  b2: { kind: 'xp', value: 100 },
-  b6: { kind: 'xp', value: 1000 },
-};
-const NUMERIC_BADGE_IDS = ['b1', 'b5', 'b2', 'b6'];
-
-// "Encore 4 jours" / "Encore 850 XP" for one specific numeric badge — null for b3/b4, which have
-// no partial progress to report honestly. Used on each locked badge tile in Profil, not just the
-// single closest one nextBadgeHint picks for the Aura bridge.
-export function badgeRemainingLabel(badgeId: string, s: { streak: number; xp: number }): string | null {
-  const t = BADGE_THRESHOLDS[badgeId];
-  if (!t) return null;
-  const current = t.kind === 'streak' ? s.streak : s.xp;
-  const remaining = Math.max(1, t.value - current);
-  return t.kind === 'streak' ? `Encore ${remaining} jour${remaining > 1 ? 's' : ''}` : `Encore ${remaining} XP`;
-}
-
-// Picks the single locked badge that's honestly closest to unlocking, so the badge bridge gives
-// a reason to act now instead of just a static count. Streak/XP thresholds are comparable as "%
-// of the way there" even though their units differ (days vs. XP), which lets a 2-day gap and a
-// 300 XP gap be ranked fairly against each other. b3 ("finis un chapitre") and b4 ("utilise un
-// gel") have no partial progress to report — surfaced only once no numeric badge is left locked,
-// and never with a fabricated remaining amount.
-export function nextBadgeHint(
-  s: { streak: number; xp: number },
-  unlocked: Record<string, boolean>
-): BadgeHint | null {
-  const cond = (id: string) => BADGES.find((b) => b.id === id)?.cond ?? '';
-  const numeric = NUMERIC_BADGE_IDS.filter((id) => !unlocked[id]).map((id) => {
-    const t = BADGE_THRESHOLDS[id];
-    const current = t.kind === 'streak' ? s.streak : s.xp;
-    const remaining = Math.max(1, t.value - current);
-    return { badgeId: id, frac: remaining / t.value, label: `${badgeRemainingLabel(id, s)} → ${cond(id)}` };
-  });
-  if (numeric.length > 0) {
-    numeric.sort((a, b) => a.frac - b.frac);
-    return { badgeId: numeric[0].badgeId, label: numeric[0].label };
-  }
-  if (!unlocked.b3) return { badgeId: 'b3', label: cond('b3') };
-  if (!unlocked.b4) return { badgeId: 'b4', label: cond('b4') };
-  return null;
-}

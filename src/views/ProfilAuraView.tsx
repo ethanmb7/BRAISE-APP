@@ -8,7 +8,6 @@ import { useCountUp } from '@/lib/useCountUp';
 import { BraiseMascot } from '@/components/BraiseMascot';
 import { BraiseCharacter } from '@/components/BraiseCharacter';
 import { ShareAuraModal } from '@/components/ShareAuraModal';
-import { BadgeShelf } from '@/components/BadgeShelf';
 import { SubjectIcon } from '@/components/SubjectIcon';
 import { RankIcon } from '@/components/RankIcon';
 import { StreakFlameIcon } from '@/components/StreakFlameIcon';
@@ -164,13 +163,6 @@ export function ProfilAuraView() {
           <SubjectMasteryGrid subjects={subjectMastery} onSelect={handleSubjectSelect} />
         </motion.div>
 
-        {/* Parcours — le journal des badges débloqués (vraies dates, jamais inventées — voir
-            BadgeShelf), déplacé ici depuis Profil : c'est un historique d'accomplissement, pas
-            une question d'identité. Remplace l'ancien BadgeBridge (un simple pont vers Profil) —
-            il n'y a plus besoin de pont, le contenu réel vit directement ici maintenant. */}
-        <motion.div variants={staggerItem}>
-          <BadgeShelf state={state} />
-        </motion.div>
         {/* Réviser était absent de la page dont le but entier est de donner envie de revenir —
             seul "Partager" avait une présence. C'est maintenant l'action principale (pleine,
             bruyante) ; "Partager" reste réel mais passe en secondaire (contour) — les deux
@@ -463,10 +455,6 @@ const SubjectMasteryGrid = memo(function SubjectMasteryGrid({
     </div>
   );
 });
-
-// BadgeBridge (a teaser + a link over to Profil's own badge grid) used to live here — removed
-// now that Profil no longer holds any badge content to bridge to; see BadgeShelf.tsx for the
-// real thing that replaced it, rendered directly on this page.
 
 function Skeleton({ width, height, radius = 8, style }: { width: string | number; height: string | number; radius?: number; style?: CSSProperties }) {
   return <div className="skeleton-block" style={{ width, height, borderRadius: radius, ...style }} />;

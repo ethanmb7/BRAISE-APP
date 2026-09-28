@@ -56,7 +56,7 @@ export function setSeenBadgeIds(ids: string[]): void {
 // already earned before this existed stays dateless rather than getting a fabricated "unlocked
 // today". Written once, at the same moment a badge is first detected as newly unlocked
 // (useMilestoneCelebrations), never backdated or guessed.
-export function getBadgeUnlockedAtMap(): Record<string, number> {
+function getBadgeUnlockedAtMap(): Record<string, number> {
   try {
     const raw = localStorage.getItem(BADGE_UNLOCKED_AT_KEY);
     return raw ? (JSON.parse(raw) as Record<string, number>) : {};

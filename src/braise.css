@@ -1172,16 +1172,6 @@ select {
   letter-spacing: 0.04em;
   box-shadow: 2px 2px 0 #000;
 }
-/* BadgeShelf's own real count line, under its .mastery-tab eyebrow — same treatment as
-   .mastery-count (small IBM Plex Mono, muted), a new class because the two say different things
-   ("3/6 cartes" vs "4 badges débloqués"), not because the styling itself differs. */
-.parcours-sub {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.6rem;
-  font-weight: 600;
-  color: var(--ink-soft);
-  margin: 0 0 10px;
-}
 .mastery-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -3186,63 +3176,6 @@ select {
 .rank-progress-fill {
   height: 100%;
   border-radius: 999px;
-}
-
-/* Parcours — the single record of "what happened" (real getBadgeUnlockedAtMap dates), ending
-   in a dashed ghost node for what's next (real nextBadgeHint data, never fabricated). Replaces
-   the old badges-count dot row, which said the same "x/6" the timeline already shows. */
-.timeline-row {
-  display: flex;
-  padding: 2px;
-  width: 100%;
-}
-.timeline-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-  position: relative;
-}
-.timeline-line {
-  position: absolute;
-  top: 14px;
-  left: 50%;
-  width: 100%;
-  height: 2px;
-  background: rgba(21, 24, 33, 0.2);
-  z-index: 0;
-}
-.app-shell.dark .timeline-line {
-  background: rgba(240, 238, 230, 0.16);
-}
-.timeline-dot {
-  position: relative;
-  z-index: 1;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 2px solid #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-}
-.timeline-dot.ghost {
-  background: transparent;
-  border-style: dashed;
-  opacity: 0.55;
-  filter: grayscale(1);
-}
-.timeline-date {
-  font-size: 0.52rem;
-  color: var(--ink-soft);
-  font-family: 'IBM Plex Mono', monospace;
-  text-align: center;
-  line-height: 1.3;
-}
-.timeline-date.ghost {
-  font-weight: 700;
 }
 
 /* Ton Braise — a segmented control instead of two full bordered+shadowed cards: choosing a
