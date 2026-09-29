@@ -25,8 +25,23 @@ Le texte qui donne enfin le nom de la notion — seulement après que l'élève 
 REFORMULATION
 La consigne pour que l'élève réexplique avec ses propres mots.
 
+SITUATION
+À toi maintenant : une situation NOUVELLE, différente de celle du début, pour vérifier que
+l'élève sait réutiliser l'idée — pas juste répéter la définition.
+
+CHOIX
+La question sur cette nouvelle situation.
+- Une mauvaise réponse => Réaction de Braise.
+- [correct] La bonne réponse => Réaction de Braise.
+
 DECLIC
 La phrase finale de Braise, au moment de la récompense.
+
+FICHE: Le nom de la notion
+RETENIR
+Ce qu'il faut savoir pour le contrôle ou le bac, en une ou deux phrases.
+PIEGE
+Une confusion fréquente à éviter (facultatif — enlevez tout le bloc PIEGE si aucun piège net).
 ```
 
 ## Règles
@@ -39,8 +54,14 @@ La phrase finale de Braise, au moment de la récompense.
 - **`CHOIX`** : toujours au moins 2 options, et **exactement une** marquée `[correct]`. Chaque
   option doit avoir une réaction après `=>` — jamais un simple "faux".
 - **`REVELATION:`** : le titre court se met sur la même ligne, après les deux points.
-- Le fichier doit toujours se terminer par une carte **`DECLIC`**, et contenir au moins une
-  carte **`REFORMULATION`** avant elle.
+- Après la **`REFORMULATION`**, ajoutez toujours une nouvelle paire **`SITUATION` / `CHOIX`** —
+  le "à toi" : une situation différente de celle du début, pour vérifier que l'élève sait
+  réutiliser l'idée ailleurs, pas seulement redire la définition qu'on vient de lui donner.
+- Le fichier doit toujours se terminer par une carte **`FICHE:`**, et contenir au moins une
+  carte **`DECLIC`** et une carte **`REFORMULATION`** avant elle.
+- **`FICHE: <titre>`** est le pont vers le bac — la carte que l'élève pourrait garder pour
+  réviser. Elle est toujours suivie de **`RETENIR`** (obligatoire) puis, en option, de
+  **`PIEGE`** (une confusion fréquente ; omettez tout le bloc s'il n'y en a pas de nette).
 - Une **`VISUEL: timeline`** optionnelle peut précéder une carte SITUATION/CHOIX/REVELATION pour
   y attacher une frise chronologique :
   ```
@@ -60,4 +81,4 @@ npm run declic:check
 
 Ce script relit tous les fichiers de ce dossier et signale, ligne par ligne, tout ce qui ne
 respecte pas le format (une carte CHOIX sans bonne réponse marquée, un fichier qui ne termine
-pas par DECLIC, etc.).
+pas par FICHE, etc.).

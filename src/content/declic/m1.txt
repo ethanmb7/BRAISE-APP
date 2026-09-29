@@ -30,5 +30,19 @@ CHOIX
 REFORMULATION
 Explique à un pote, avec tes mots, pourquoi 1/2 = 2/4.
 
+SITUATION
+On te donne 5/10 cette fois.
+
+CHOIX
+Est-ce que 5/10, c'est la même quantité que 1/2 ?
+- Non, c'est différent => Recompte : divise 5 et 10 par 5, et regarde ce qu'il reste.
+- [correct] Oui, c'est pareil => Exact ! 5/10 = 1/2 — même quantité, juste écrite avec des nombres 10 fois plus grands.
+
 DECLIC
 Voilà. Maintenant t'as capté les fractions équivalentes.
+
+FICHE: Fractions équivalentes
+RETENIR
+Deux fractions sont équivalentes quand elles représentent la même quantité, même si les nombres sont différents (ex : 1/2 = 2/4 = 3/6). On les obtient en multipliant OU en divisant le haut ET le bas par le même nombre.
+PIEGE
+Multiplier ou diviser seulement le haut, ou seulement le bas, change la quantité — il faut toujours faire pareil des deux côtés.

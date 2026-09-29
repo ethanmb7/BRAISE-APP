@@ -28,5 +28,19 @@ CHOIX
 REFORMULATION
 Explique avec tes mots quand il faut ajouter un S au verbe.
 
+SITUATION
+Cette fois, le sujet est « the teacher » (le professeur).
+
+CHOIX
+« The teacher ___ every day. » (arrive)
+- arrive => Presque ! « The teacher » se remplace par « he/she » — il manque le S.
+- [correct] arrives => Exact ! « The teacher » = « he/she/it » → le S est obligatoire.
+
 DECLIC
 Voilà. T'as le réflexe du S, maintenant.
+
+FICHE: Le S de la 3e personne au present simple
+RETENIR
+Au present simple, on ajoute un S au verbe seulement à la 3e personne du singulier (he/she/it). Pas de S pour I/you/we/they.
+PIEGE
+Oublier le S avec « he/she/it », ou au contraire en ajouter un avec « they » — l'erreur classique va dans les deux sens.

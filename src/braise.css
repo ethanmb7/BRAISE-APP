@@ -2903,6 +2903,74 @@ select {
   }
 }
 
+/* The closing fiche — "ce que ton prof attend de toi". Deliberately plain paper, not the violet
+   full-bleed of .declic-moment: that card is the emotional payoff, this one is the practical
+   takeaway a student would screenshot before a contrôle. Retenir/piège reuse the same
+   correct/wrong tint pair as .declic-tile instead of inventing new colours. */
+.declic-fiche {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px 20px;
+  border: 3px solid var(--neo-ink);
+  border-radius: 22px;
+  background: var(--paper);
+  box-shadow: 5px 5px 0 var(--neo-ink);
+}
+.declic-fiche-kicker {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.declic-fiche-title {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--ink);
+}
+.declic-fiche-section {
+  padding: 12px 14px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 14px;
+}
+.declic-fiche-section.is-retenir {
+  background: #dcfce7;
+  border-color: var(--mint-text);
+}
+.declic-fiche-section.is-piege {
+  background: #ffe1dc;
+  border-color: var(--coral-2);
+}
+.declic-fiche-label {
+  display: block;
+  margin-bottom: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.declic-fiche-section.is-retenir .declic-fiche-label {
+  color: var(--mint-text);
+}
+.declic-fiche-section.is-piege .declic-fiche-label {
+  color: var(--coral-2);
+}
+.declic-fiche-text {
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  color: var(--ink);
+}
+.declic-fiche .declic-cta {
+  align-self: center;
+  margin-top: 4px;
+}
+
 /* Story / Vocal Animé — the card itself is neutral paper, not a full-bleed subject colour.
    The theme colour (slides[idx].bg, set inline in LessonView) is confined to the circular
    badge behind the emoji instead of flooding the whole stage — same "colour lives in a badge,

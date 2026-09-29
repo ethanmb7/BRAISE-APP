@@ -28,5 +28,19 @@ Plus tu bouges, plus tes muscles ont besoin d'O₂. Donc plus tu cours vite, plu
 REFORMULATION
 Explique avec tes mots pourquoi respirer et digérer, ce n'est pas la même chose.
 
+SITUATION
+En apnée sous l'eau, tu ne peux plus respirer pendant une minute.
+
+CHOIX
+Que se passe-t-il dans ton corps pendant ce temps ?
+- Rien de spécial, le corps arrête tout échange => Non — tes cellules continuent à produire du CO₂, mais il ne peut plus être évacué.
+- [correct] Le CO₂ s'accumule car l'échange de gaz est coupé => Exact ! Sans respiration, l'échange O₂/CO₂ s'arrête — d'où l'envie irrépressible de respirer.
+
 DECLIC
 Voilà. Tu ne confonds plus respiration et digestion.
+
+FICHE: Respirer = échanger des gaz
+RETENIR
+La respiration est l'échange de gaz (O₂ entrant, CO₂ sortant) entre l'air et le sang, au niveau des alvéoles pulmonaires. Elle n'a rien à voir avec la digestion.
+PIEGE
+Ne pas confondre « respirer » (échange de gaz) et « digérer » (transformer les aliments en énergie) — deux fonctions du corps totalement différentes.

@@ -34,5 +34,20 @@ Parmi ces trois événements, lequel arrive en dernier ?
 REFORMULATION
 Explique avec tes mots pourquoi on ne doit pas confondre ces deux dates.
 
+SITUATION
+Un texte d'histoire évoque « la Terreur, qui suit l'exécution du roi ».
+
+CHOIX
+Cette Terreur se situe donc…
+- Avant 1789 => Impossible : l'exécution du roi a lieu en 1793, bien après 1789.
+- Entre 1789 et 1793 => Presque : mais elle suit l'exécution du roi, donc après 1793.
+- [correct] Après 1793 => Exact ! Après l'exécution du roi, donc après 1793.
+
 DECLIC
 Voilà. Maintenant tu as la vraie chronologie en tête.
+
+FICHE: 1789 et 1793, deux repères à ne pas confondre
+RETENIR
+1789 : prise de la Bastille, début de la Révolution. 1793 : exécution de Louis XVI, quatre ans plus tard. Deux repères distincts de la chronologie révolutionnaire.
+PIEGE
+Beaucoup d'élèves collent les deux événements à la même année — retiens l'écart de 4 ans entre eux.

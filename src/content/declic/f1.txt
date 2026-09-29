@@ -28,5 +28,19 @@ Tu binges une série et tu devines déjà la suite. Ça veut dire que tu as capt
 REFORMULATION
 Explique avec tes mots pourquoi l'auteur n'est presque jamais le narrateur.
 
+SITUATION
+Tu lis maintenant un roman fantastique raconté par un vampire : « Je n'ai pas vieilli depuis 300 ans… »
+
+CHOIX
+Ça veut dire que l'auteur ou l'autrice du livre est un vampire ?
+- Oui, forcément => Non ! C'est exactement le piège du narrateur pris pour l'auteur.
+- [correct] Non, c'est juste le narrateur inventé => Exact ! Même un vampire-narrateur ne dit rien sur qui a écrit le livre.
+
 DECLIC
 Voilà. Tu ne confondras plus narrateur et auteur.
+
+FICHE: Narrateur ≠ auteur
+RETENIR
+Le narrateur est une voix fictive créée par l'auteur pour raconter l'histoire ; l'auteur est la personne réelle qui a écrit le livre. Il ne faut jamais confondre ce qu'un narrateur dit ou fait avec les opinions ou la vie de l'auteur.
+PIEGE
+Écrire dans une copie « l'auteur pense que… » en parlant en fait du narrateur est une confusion fréquente et sanctionnée.

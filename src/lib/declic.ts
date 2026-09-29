@@ -36,7 +36,11 @@ export type DeclicCard =
    *  deliberately: retrieval in your own words is real evidence of understanding, a tap isn't. */
   | { kind: "reformulation"; prompt: string }
   /** The payoff. Full-bleed, same theatrical weight regardless of which notion led here. */
-  | { kind: "declic"; line: string };
+  | { kind: "declic"; line: string }
+  /** "Ce que ton prof attend de toi" — the bridge from "j'ai compris" to "je sais l'écrire au
+   *  contrôle". Always the last card: BRAISE stays serious about the bac even while the way there
+   *  is anti-scolaire. */
+  | { kind: "fiche"; title: string; retenir: string; piege?: string };
 
 export type DeclicScript = {
   chapterId: string;

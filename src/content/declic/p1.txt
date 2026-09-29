@@ -29,5 +29,19 @@ Si un atome faisait la taille d'un stade de foot, où serait le noyau ?
 REFORMULATION
 Explique avec tes mots pourquoi un atome n'est pas « plein ».
 
+SITUATION
+Une table entière est faite de milliards d'atomes collés les uns aux autres.
+
+CHOIX
+Donc une table, c'est surtout…
+- De la matière pleine, sans aucun vide => Non — si chaque atome est surtout du vide, la table aussi, à cette échelle.
+- [correct] Du vide, à l'échelle atomique => Exact ! Même si elle te paraît solide, une table est faite d'atomes eux-mêmes surtout vides.
+
 DECLIC
 Voilà. Tu vois l'atome autrement, maintenant.
+
+FICHE: L'atome est surtout du vide
+RETENIR
+Un atome est composé d'un noyau minuscule (protons + neutrons) entouré d'un immense espace vide où circulent les électrons. Il est électriquement neutre : autant de charges positives que de charges négatives.
+PIEGE
+Ne pas imaginer l'atome comme une bille pleine — le noyau occupe une part infime du volume total de l'atome.

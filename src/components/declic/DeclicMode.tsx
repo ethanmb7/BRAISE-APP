@@ -82,7 +82,7 @@ export function DeclicMode({
 
   return (
     <div className="declic-stage">
-      {card.kind !== "declic" && (
+      {card.kind !== "declic" && card.kind !== "fiche" && (
         <div
           className="declic-progress"
           role="progressbar"
@@ -228,6 +228,26 @@ export function DeclicMode({
             </motion.div>
             <span className="declic-moment-kicker">🔥 déclic</span>
             <p className="declic-moment-line">{card.line}</p>
+            <button type="button" className="declic-cta" onClick={advance}>
+              Suite <ArrowRight size={18} />
+            </button>
+          </motion.div>
+        )}
+
+        {card.kind === "fiche" && (
+          <motion.div key={index} className="declic-fiche" {...cardMotion}>
+            <span className="declic-fiche-kicker">🔥 ce que ton prof attend de toi</span>
+            <h2 className="declic-fiche-title">{card.title}</h2>
+            <div className="declic-fiche-section is-retenir">
+              <span className="declic-fiche-label">À retenir</span>
+              <p className="declic-fiche-text">{card.retenir}</p>
+            </div>
+            {card.piege && (
+              <div className="declic-fiche-section is-piege">
+                <span className="declic-fiche-label">Piège</span>
+                <p className="declic-fiche-text">{card.piege}</p>
+              </div>
+            )}
             <button
               type="button"
               className="declic-cta"

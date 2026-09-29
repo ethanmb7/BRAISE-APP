@@ -62,7 +62,7 @@ export function parseDeclicScript(rawText: string, source: string): DeclicScript
   };
 
   const KEYWORD_RE =
-    /^(NOTION|CARTE_REVISION|VISUEL|SITUATION|CHOIX|REVELATION|REFORMULATION|DECLIC)\b/;
+    /^(NOTION|CARTE_REVISION|VISUEL|SITUATION|CHOIX|REVELATION|REFORMULATION|DECLIC|FICHE|RETENIR|PIEGE)\b/;
 
   skipBlank();
   const notionLine = peek();
@@ -149,9 +149,24 @@ export function parseDeclicScript(rawText: string, source: string): DeclicScript
       i++;
       const declicLine = readText();
       cards.push({ kind: "declic", line: declicLine });
+    } else if (/^FICHE:/.test(line)) {
+      const title = line.slice(line.indexOf(":") + 1).trim();
+      if (!title) err('"FICHE:" doit être suivi d\'un titre sur la même ligne');
+      i++;
+      skipBlank();
+      if (peek() !== "RETENIR") err('une carte "FICHE:" doit être suivie de "RETENIR"');
+      i++;
+      const retenir = readText();
+      skipBlank();
+      let piege: string | undefined;
+      if (peek() === "PIEGE") {
+        i++;
+        piege = readText();
+      }
+      cards.push({ kind: "fiche", title, retenir, ...(piege ? { piege } : {}) });
     } else {
       err(
-        `mot-clé inconnu : "${line.trim()}" (attendu SITUATION, CHOIX, REVELATION:, REFORMULATION, DECLIC ou VISUEL: timeline)`,
+        `mot-clé inconnu : "${line.trim()}" (attendu SITUATION, CHOIX, REVELATION:, REFORMULATION, DECLIC, FICHE: ou VISUEL: timeline)`,
       );
     }
 
@@ -160,7 +175,11 @@ export function parseDeclicScript(rawText: string, source: string): DeclicScript
 
   if (cards.length === 0) err("le fichier ne contient aucune carte");
   const last = cards[cards.length - 1];
-  if (last.kind !== "declic") err('le fichier doit se terminer par une carte "DECLIC"');
+  if (last.kind !== "fiche")
+    err(
+      'le fichier doit se terminer par une carte "FICHE:" — le pont entre "j\'ai compris" et "je sais l\'écrire au contrôle"',
+    );
+  if (!cards.some((c) => c.kind === "declic")) err('le fichier doit contenir une carte "DECLIC"');
   if (!cards.some((c) => c.kind === "reformulation"))
     err(
       'le fichier doit contenir une carte "REFORMULATION" — c\'est la seule vraie preuve de compréhension de toute la boucle',
