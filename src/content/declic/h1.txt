@@ -1,0 +1,38 @@
+NOTION: h1
+CARTE_REVISION: fc5
+
+SITUATION
+14 juillet 1789 : le peuple de Paris prend la Bastille. C'est le début de la Révolution.
+
+CHOIX
+À ton avis, le roi Louis XVI est exécuté…
+- La même année, en 1789 => Pas si vite : entre la prise de la Bastille et l'exécution du roi, il se passe bien plus de temps que ça.
+- [correct] Plusieurs années plus tard => Exact ! Quatre ans plus tard, en 1793.
+
+SITUATION
+Entre les deux, beaucoup de choses changent : dès août 1789, la Déclaration des droits de l'homme proclame liberté et égalité.
+
+CHOIX
+La Déclaration des droits de l'homme arrive…
+- Avant la Bastille => Non — la Bastille tombe en premier, en juillet.
+- [correct] Juste après la Bastille, la même année => Exact ! Un mois plus tard, toujours en 1789.
+- Après l'exécution du roi => Non, c'est même le contraire : elle arrive bien avant, dès 1789.
+
+VISUEL: timeline
+- 1789: Prise de la Bastille
+- 1793: Exécution de Louis XVI
+
+REVELATION: 🔥 1789 ≠ 1793
+La prise de la Bastille (1789) et l'exécution de Louis XVI (1793) sont deux événements bien distincts, séparés de 4 ans.
+
+CHOIX
+Parmi ces trois événements, lequel arrive en dernier ?
+- Prise de la Bastille => Non, celui-là ouvre la liste, en 1789.
+- Déclaration des droits de l'homme => Non, elle arrive dès 1789, juste après la Bastille.
+- [correct] Exécution de Louis XVI => Exact. 1793 — le dernier des trois, et de loin.
+
+REFORMULATION
+Explique avec tes mots pourquoi on ne doit pas confondre ces deux dates.
+
+DECLIC
+Voilà. Maintenant tu as la vraie chronologie en tête.

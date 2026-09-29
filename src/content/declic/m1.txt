@@ -1,0 +1,34 @@
+NOTION: m1
+CARTE_REVISION: fc2
+
+SITUATION
+Imagine une pizza coupée en 2 parts égales. Tu manges 1 part.
+
+CHOIX
+Une deuxième pizza identique est coupée en 4 parts égales. Combien de parts tu dois manger pour avoir mangé exactement pareil que la première fois ?
+- 1 part => Pas tout à fait : sur 4 parts, 1 seule c'est moins que sur 2.
+- [correct] 2 parts => Exactement ! 2 parts sur 4, c'est la même quantité qu'1 part sur 2.
+- 3 parts => Ça ferait plus que la première fois — regarde encore les parts.
+
+SITUATION
+Autrement dit : 1/2 et 2/4, c'est la même quantité — juste coupée différemment.
+
+CHOIX
+Et 3/6, tu penses que c'est aussi la même quantité que 1/2 ?
+- [correct] Oui, pareil => Exact ! 6 parts, tu en manges 3 — toujours la moitié.
+- Non, différent => Recompte : sur 6 parts égales, la moitié, c'est 3.
+
+REVELATION: 🔥 Fractions équivalentes
+1/2, 2/4, 3/6… ce sont des fractions équivalentes : la même quantité, écrite avec des nombres différents.
+
+CHOIX
+À ton tour : simplifie 4/10 le plus possible.
+- [correct] 2/5 => Voilà. Tu divises le haut ET le bas par 2 — on ne peut plus simplifier.
+- 2/10 => Tu n'as divisé que le haut — fais pareil en bas.
+- 1/5 => Presque : tu as divisé par 4, pas par 2.
+
+REFORMULATION
+Explique à un pote, avec tes mots, pourquoi 1/2 = 2/4.
+
+DECLIC
+Voilà. Maintenant t'as capté les fractions équivalentes.

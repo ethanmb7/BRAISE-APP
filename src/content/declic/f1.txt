@@ -1,0 +1,32 @@
+NOTION: f1
+CARTE_REVISION: fc12
+
+SITUATION
+Tu lis un roman écrit à la première personne : « Je marchais dans la rue… »
+
+CHOIX
+À ton avis, qui parle ? L'auteur du livre, ou quelqu'un d'autre ?
+- L'auteur lui-même => C'est le piège classique ! Regarde ce qui se passe si le narrateur est un tueur en série…
+- [correct] Un personnage inventé, le narrateur => Exactement ! Le narrateur est une voix créée par l'auteur, presque jamais l'auteur en personne.
+
+SITUATION
+Un exemple concret : dans un roman policier, le narrateur peut être un meurtrier. L'auteur, lui, n'en est pas un.
+
+CHOIX
+Donc l'auteur et le narrateur, c'est…
+- Toujours la même personne => Presque jamais, en fait — ce sont deux rôles différents.
+- [correct] Presque toujours deux personnes différentes => Voilà. Le narrateur, c'est un costume que l'auteur enfile pour raconter.
+
+REVELATION: 🔥 Narrateur ≠ Auteur
+Le narrateur est la voix qui raconte l'histoire ; l'auteur est la personne réelle qui a écrit le livre. Ce sont presque toujours deux personnes différentes.
+
+CHOIX
+Tu binges une série et tu devines déjà la suite. Ça veut dire que tu as capté…
+- [correct] Le réflexe du roman : anticiper l'intrigue => Exact ! Suivre les personnages et deviner la suite, c'est déjà lire comme un pro.
+- Rien de spécial => Si ! C'est même tout l'art du récit.
+
+REFORMULATION
+Explique avec tes mots pourquoi l'auteur n'est presque jamais le narrateur.
+
+DECLIC
+Voilà. Tu ne confondras plus narrateur et auteur.

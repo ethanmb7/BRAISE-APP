@@ -1,0 +1,33 @@
+NOTION: p1
+CARTE_REVISION: fc7
+
+SITUATION
+Ton téléphone, la table, l'air que tu respires… tout est fait des mêmes briques minuscules : les atomes.
+
+CHOIX
+Tu imagines un atome comment ?
+- Plein, comme une bille => C'est l'intuition la plus courante — mais regarde ce qu'il y a vraiment dedans…
+- [correct] Surtout du vide, avec un petit noyau au centre => Exact ! Le noyau est minuscule comparé à l'espace immense autour de lui.
+
+SITUATION
+Autour du noyau (protons + neutrons), des électrons gravitent, loin, dans cet immense vide.
+
+CHOIX
+Un atome a-t-il une charge électrique, globalement ?
+- Oui, positive => Presque : il y a des charges positives, mais elles sont compensées.
+- Oui, négative => Presque : il y a des charges négatives, mais elles sont compensées.
+- [correct] Non, il est neutre => Exact ! Autant de charges positives (protons) que négatives (électrons).
+
+REVELATION: 🔥 L'atome est surtout du vide
+Un atome, c'est un tout petit noyau entouré d'un immense espace vide où circulent les électrons — pas une bille pleine.
+
+CHOIX
+Si un atome faisait la taille d'un stade de foot, où serait le noyau ?
+- [correct] Une balle de tennis posée au milieu du terrain => Exact ! C'est à peu près cette proportion-là entre le noyau et l'atome entier.
+- Il remplirait tout le stade => Non — c'est justement l'inverse : minuscule comparé au reste.
+
+REFORMULATION
+Explique avec tes mots pourquoi un atome n'est pas « plein ».
+
+DECLIC
+Voilà. Tu vois l'atome autrement, maintenant.

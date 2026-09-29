@@ -1,0 +1,32 @@
+NOTION: a1
+CARTE_REVISION: fc25
+
+SITUATION
+En anglais, pour parler d'une habitude : « I play football every day. »
+
+CHOIX
+Et pour dire la même chose avec « she » ?
+- She play football every day => Presque ! Il manque un petit détail à la 3e personne du singulier…
+- [correct] She plays football every day => Exact ! À la 3e personne du singulier (he/she/it), le verbe prend un S.
+
+SITUATION
+Ce S est obligatoire : « he like », ça n'existe pas en anglais correct.
+
+CHOIX
+Donc pour « they » (ils/elles), on dit…
+- They likes music => Non — le S n'est que pour he/she/it, pas pour they.
+- [correct] They like music => Exact ! Pas de S pour I/you/we/they.
+
+REVELATION: 🔥 Le S de la 3e personne
+I/you/we/they + verbe de base. He/she/it + verbe + S. C'est LE réflexe à avoir au present simple.
+
+CHOIX
+« My brother ___ music every night. » (listen)
+- listen => Presque ! « Brother » se remplace par « he » — il manque le S.
+- [correct] listens => Exact ! « My brother » = « he » → le S est obligatoire.
+
+REFORMULATION
+Explique avec tes mots quand il faut ajouter un S au verbe.
+
+DECLIC
+Voilà. T'as le réflexe du S, maintenant.

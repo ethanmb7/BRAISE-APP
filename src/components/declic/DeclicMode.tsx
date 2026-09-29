@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { BraiseMascot } from "@/components/BraiseMascot";
+import { StreakFlameIcon } from "@/components/StreakFlameIcon";
 import { sfx } from "@/lib/sound";
 import { fireConfetti } from "@/lib/confetti";
 import { recordDeclicMemory, type DeclicScript } from "@/lib/declic";
@@ -81,6 +82,22 @@ export function DeclicMode({
 
   return (
     <div className="declic-stage">
+      {card.kind !== "declic" && (
+        <div
+          className="declic-progress"
+          role="progressbar"
+          aria-label="Progression de la notion"
+          aria-valuemin={1}
+          aria-valuemax={script.cards.length}
+          aria-valuenow={index + 1}
+        >
+          {script.cards.map((c, i) => (
+            <span key={i} className={i <= index ? "is-lit" : ""}>
+              <StreakFlameIcon size={14} />
+            </span>
+          ))}
+        </div>
+      )}
       <AnimatePresence mode="wait">
         {card.kind === "situation" && (
           <motion.div key={index} className="declic-step" {...cardMotion}>

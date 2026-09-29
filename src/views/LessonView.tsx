@@ -24,7 +24,7 @@ import type { QuizQuestion, ChatMessage } from "@/types";
 type Mode = "vocal" | "echanger";
 
 export function LessonView() {
-  const { state, goBack, completeChapter, setView, bridgeToChat } = useApp();
+  const { state, goBack, completeChapter, setView, bridgeToChat, reviewCard } = useApp();
   const [mode, setMode] = useState<Mode>(state.currentLessonMode);
   const subject = SUBJECTS.find((s) => s.id === state.currentSubjectId);
   const chapter = subject?.chapters.find((c) => c.id === state.currentChapterId);
@@ -49,14 +49,26 @@ export function LessonView() {
   // "Le Déclic" (PRODUCT_VISION.md, section 4) replaces Vocal Animé and the end-of-chapter quiz
   // entirely for any chapter with an authored script — it already covers explanation,
   // verification and the abstraction step the old quiz used to bolt on separately. Chapters
-  // without a script yet (everything but the one notion built end to end so far) keep the old
+  // without a script yet (everything but the notions built end to end so far) keep the old
   // vocal/chat modes below; this is an authoring gap, not a design choice — see roadmap.md.
   if (declicScript) {
+    const handleDeclicComplete = () => {
+      // Real consolidation, not just a completed chapter: seeding a first "sure" review is what
+      // schedules this exact notion to come back due in Réviser tomorrow, via the same SM-2
+      // engine as every other card — see PRODUCT_VISION.md's "consolidation différée, sur le
+      // même moteur que Réviser". Chapters authored before CARTE_REVISION existed skip this.
+      if (declicScript.reviewCardId) reviewCard(declicScript.reviewCardId, "sure");
+      handleComplete();
+    };
     return (
       <div>
         <TopBar title={chapter.title} onBack={goBack} />
         <div className="view is-active">
-          <DeclicMode script={declicScript} soundOn={state.soundOn} onComplete={handleComplete} />
+          <DeclicMode
+            script={declicScript}
+            soundOn={state.soundOn}
+            onComplete={handleDeclicComplete}
+          />
         </div>
       </div>
     );
