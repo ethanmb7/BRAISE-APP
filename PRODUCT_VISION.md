@@ -113,12 +113,16 @@ local, `sapie_declic_memory`) — un compagnon qui se souvient, pas un historiqu
 **Non construit** : s'appuyer sur cette mémoire pour personnaliser une notion qui redevient floue
 plus tard (« tu te rappelles notre histoire avec les pizzas ? »).
 
-### Si l'explication ne suffit pas (non construit)
+### Si l'explication ne suffit pas
 
-Dire « j'ai pas capté » devrait être aussi simple que répondre à la question elle-même, avec une
-vraie explication alternative plutôt que le même texte redit plus lentement. Aujourd'hui, chaque
-option d'une carte Choix n'a qu'une seule réaction fixe : rouvrir cette piste suppose d'abord
-qu'un vrai chapitre ait été testé avec de vrais élèves pour savoir où ça bloque réellement.
+Construit : une option de carte Choix peut porter une explication alternative (`altExplanation`,
+`~ <texte>` dans le format `.txt`), jamais surfacée automatiquement. Un lien discret « J'ai
+toujours pas compris » apparaît à côté de « Suite » seulement quand l'option choisie en a une ;
+il disparaît une fois utilisé, pour éviter d'enchaîner les tentatives à l'infini. Volontairement
+limité : pas de nouvelle carte, pas de deuxième tentative sur la bonne réponse, et seulement là
+où un auteur a écrit une explication vraiment différente — jamais un filler générique. Encore
+non construit : une vraie relance après cette deuxième explication si elle non plus ne suffit
+pas ; à réévaluer une fois qu'un vrai chapitre aura tourné avec de vrais élèves.
 
 ### Pistes futures pour approfondir le format (non construites)
 
