@@ -5,6 +5,7 @@ import { sfx } from "@/lib/sound";
 import { TopBar } from "@/components/TopBar";
 import { BraiseMascot } from "@/components/BraiseMascot";
 import { SUBJECTS, STORIES } from "@/data";
+import { DECLIC_SCRIPTS } from "@/lib/declic";
 
 const ROW_JUSTIFY: Record<string, string> = {
   center: "justify-center",
@@ -59,6 +60,10 @@ export function SubjectView() {
             const isDone = c.status === "done";
             const isCurrent = c.status === "current";
             const pos = POSITIONS[i % POSITIONS.length];
+            // The non-scolaire hook ("Pourquoi ton argent perd de la valeur ?") takes the
+            // primary label's place when a chapter has one — the real name moves to a small
+            // caption underneath instead of disappearing, so the two stay connected.
+            const hook = DECLIC_SCRIPTS[c.id]?.hook;
 
             const node = (
               <button
@@ -101,8 +106,13 @@ export function SubjectView() {
 
                   <div className="flex max-w-[9.5rem] flex-col items-center gap-1 text-center">
                     <b className="block font-display text-sm font-black leading-tight text-[var(--ink)]">
-                      {c.title}
+                      {hook ?? c.title}
                     </b>
+                    {hook && (
+                      <span className="block font-mono text-[0.65rem] font-bold uppercase tracking-wide text-[var(--ink-soft)]">
+                        {c.title}
+                      </span>
+                    )}
                     <span className="block text-xs font-semibold text-[var(--ink-soft)]">
                       {isDone
                         ? `${c.mastery}% de maîtrise`

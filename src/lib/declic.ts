@@ -53,6 +53,12 @@ export type DeclicScript = {
    *  moteur que Réviser". Optional only because content authored before this existed doesn't
    *  have one yet; every ".declic" file should set CARTE_REVISION. */
   reviewCardId?: string;
+  /** The non-scolaire hook shown on the chapter path instead of the chapter's real name (e.g.
+   *  "Pourquoi ton argent perd de la valeur ?" instead of "Inflation") — SubjectView shows this
+   *  in place of the chapter title for any chapter that has a Déclic script, real name kept as a
+   *  small caption underneath. Optional for the same reason as reviewCardId: older content
+   *  written before this existed doesn't have one yet. */
+  hook?: string;
 };
 
 // Eagerly loaded as raw text at build time — every ".txt" file here becomes one entry, keyed by

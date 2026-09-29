@@ -71,7 +71,7 @@ export function parseDeclicScript(rawText: string, source: string): DeclicScript
   };
 
   const KEYWORD_RE =
-    /^(NOTION|CARTE_REVISION|VISUEL|SITUATION|CHOIX|REVELATION|REFORMULATION|DECLIC|FICHE|RETENIR|PIEGE)\b/;
+    /^(NOTION|CARTE_REVISION|ACCROCHE|VISUEL|SITUATION|CHOIX|REVELATION|REFORMULATION|DECLIC|FICHE|RETENIR|PIEGE)\b/;
 
   skipBlank();
   const notionLine = peek();
@@ -85,6 +85,15 @@ export function parseDeclicScript(rawText: string, source: string): DeclicScript
   const reviewMatch = peek().match(/^CARTE_REVISION:\s*(\S+)/);
   if (reviewMatch) {
     reviewCardId = reviewMatch[1];
+    i++;
+  }
+
+  let hook: string | undefined;
+  skipBlank();
+  const hookMatch = peek().match(/^ACCROCHE:\s*(.+)/);
+  if (hookMatch) {
+    hook = hookMatch[1].trim();
+    if (!hook) err('"ACCROCHE:" doit être suivi d\'une question sur la même ligne');
     i++;
   }
 
@@ -207,5 +216,5 @@ export function parseDeclicScript(rawText: string, source: string): DeclicScript
       'le fichier doit contenir une carte "REFORMULATION" — c\'est la seule vraie preuve de compréhension de toute la boucle',
     );
 
-  return { chapterId, cards, ...(reviewCardId ? { reviewCardId } : {}) };
+  return { chapterId, cards, ...(reviewCardId ? { reviewCardId } : {}), ...(hook ? { hook } : {}) };
 }

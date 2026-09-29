@@ -3,11 +3,35 @@
 Un fichier `.txt` par notion, dans ce dossier. Pas besoin de savoir coder — juste respecter la
 structure ci-dessous. Une ligne vide sépare chaque carte.
 
+## Le format d'une notion, en bref
+
+- **8 à 12 cartes**, jamais plus. Chaque carte tient sur un écran, un seul tap (ou une phrase
+  courte pour la reformulation) suffit pour avancer.
+- **1 à 3 minutes** pour tout le parcours. Si en l'écrivant vous dépassez ça, la notion est trop
+  grosse — découpez-la en deux fichiers plutôt que d'allonger celui-ci.
+- **Une idée par carte.** Jamais un pavé de texte, jamais deux questions sur le même écran.
+- Le nom scolaire, la définition ou la formule n'apparaissent **qu'après** que l'élève a déjà
+  compris le principe à travers une situation et un choix — jamais avant.
+
+## Avant d'écrire, répondez à ces questions
+
+Ça évite d'écrire une carte CHOIX qui ressemble à un quiz déguisé plutôt qu'à une vraie
+progression.
+
+- **Objectif** — qu'est-ce que l'élève doit réellement comprendre à la fin, en une phrase ?
+- **Erreur fréquente** — quelle confusion classique font les lycéens sur cette notion ? C'est
+  l'option fausse de votre carte CHOIX, pas une distraction inventée au hasard.
+- **Situation d'entrée** — quel exemple concret fait naître la question naturellement, sans dire
+  le nom de la notion ? C'est votre première carte SITUATION.
+- **Validation** — quelle situation NOUVELLE (différente de la première) prouve que l'élève sait
+  réutiliser l'idée, pas juste répéter la définition qu'on vient de lui donner ? C'est le "à toi".
+
 ## Squelette
 
 ```
 NOTION: m1
 CARTE_REVISION: fc2
+ACCROCHE: Deux pizzas coupées différemment… et pourtant t'as mangé pareil ?
 
 SITUATION
 Braise plante le décor en une phrase.
@@ -52,6 +76,11 @@ Une confusion fréquente à éviter (facultatif — enlevez tout le bloc PIEGE s
 - **`CARTE_REVISION: <id>`** est optionnel mais fortement recommandé : c'est l'identifiant d'une
   carte déjà existante dans `src/data.ts` qui teste la même notion. Sans lui, le Déclic
   n'alimente jamais la révision espacée de l'élève plus tard.
+- **`ACCROCHE: <question>`** est optionnel mais fortement recommandé : une question courte,
+  non-scolaire, affichée à la place du nom du chapitre quand l'élève parcourt la matière (le vrai
+  nom reste affiché juste en dessous, en plus petit). Pas « Chapitre 2 — Fonctions affines » mais
+  « Comment prévoir ce que tu vas payer ? ». Gardez-la courte : elle s'affiche sous un petit rond,
+  pas sur une pleine largeur.
 - **`CHOIX`** : toujours au moins 2 options, et **exactement une** marquée `[correct]`. Chaque
   option doit avoir une réaction après `=>` — jamais un simple "faux".
 - Une ligne **`~ <explication>`** juste après une option ajoute une deuxième explication,
@@ -77,6 +106,21 @@ Une confusion fréquente à éviter (facultatif — enlevez tout le bloc PIEGE s
   REVELATION: 🔥 1789 ≠ 1793
   ...
   ```
+
+## Avant de considérer une notion terminée
+
+- **Pédagogie** — l'erreur ciblée dans CHOIX est-elle une vraie confusion, pas une distraction
+  inventée ? Le contenu est-il exact ?
+- **Rythme** — chaque carte tient-elle sur un écran, sans pavé de texte ni double question ?
+- **Ton** — Braise ne dit jamais "faux" sec, ni ne force un ton "jeune" à chaque phrase. Relisez à
+  voix haute : ça doit sonner comme un pote qui explique, pas comme un prof ni comme quelqu'un qui
+  essaie trop.
+- **Accroche** — les 5 premières secondes (la première carte SITUATION) donnent-elles vraiment
+  envie de savoir la suite, sans citer le nom de la notion ?
+- **Validation** — le "à toi" utilise-t-il une situation vraiment différente de la première, ou
+  juste les mêmes mots reformulés ?
+
+Si un point de cette liste échoue, la notion n'est pas terminée.
 
 ## Vérifier son fichier
 

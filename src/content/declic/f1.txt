@@ -1,5 +1,6 @@
 NOTION: f1
 CARTE_REVISION: fc12
+ACCROCHE: Un narrateur tueur en série… l'auteur aussi, alors ?
 
 SITUATION
 Tu lis un roman écrit à la première personne : « Je marchais dans la rue… »

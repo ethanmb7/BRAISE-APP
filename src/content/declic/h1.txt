@@ -1,5 +1,6 @@
 NOTION: h1
 CARTE_REVISION: fc5
+ACCROCHE: 1789, 1793… deux dates qu'on confond tout le temps
 
 SITUATION
 14 juillet 1789 : le peuple de Paris prend la Bastille. C'est le début de la Révolution.

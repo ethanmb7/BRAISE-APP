@@ -1,5 +1,6 @@
 NOTION: s1
 CARTE_REVISION: fc20
+ACCROCHE: Pourquoi t'es à bout de souffle après un sprint ?
 
 SITUATION
 Tu sprintes 100 mètres. Juste après, t'es à bout de souffle.

@@ -1,5 +1,6 @@
 NOTION: a1
 CARTE_REVISION: fc25
+ACCROCHE: Un seul S peut tout changer
 
 SITUATION
 En anglais, pour parler d'une habitude : « I play football every day. »

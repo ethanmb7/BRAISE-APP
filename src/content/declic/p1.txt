@@ -1,5 +1,6 @@
 NOTION: p1
 CARTE_REVISION: fc7
+ACCROCHE: Et si ta table était presque entièrement vide ?
 
 SITUATION
 Ton téléphone, la table, l'air que tu respires… tout est fait des mêmes briques minuscules : les atomes.

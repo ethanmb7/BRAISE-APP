@@ -1,5 +1,6 @@
 NOTION: m1
 CARTE_REVISION: fc2
+ACCROCHE: Deux pizzas coupées différemment… et pourtant t'as mangé pareil ?
 
 SITUATION
 Imagine une pizza coupée en 2 parts égales. Tu manges 1 part.
