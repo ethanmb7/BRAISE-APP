@@ -7,8 +7,10 @@ Imagine une pizza coupée en 2 parts égales. Tu manges 1 part.
 CHOIX
 Une deuxième pizza identique est coupée en 4 parts égales. Combien de parts tu dois manger pour avoir mangé exactement pareil que la première fois ?
 - 1 part => Pas tout à fait : sur 4 parts, 1 seule c'est moins que sur 2.
+~ Imagine les deux pizzas côte à côte, même taille. Coupée en 4, chaque part est deux fois plus petite que coupée en 2. Il t'en faut donc deux fois plus pour retrouver la même quantité dans ton assiette.
 - [correct] 2 parts => Exactement ! 2 parts sur 4, c'est la même quantité qu'1 part sur 2.
 - 3 parts => Ça ferait plus que la première fois — regarde encore les parts.
+~ Chaque part de la pizza coupée en 4 est plus petite que celle coupée en 2 — mais 3 parts sur 4, c'est déjà plus que la moitié de la pizza. Plus que ce que tu avais mangé la première fois.
 
 SITUATION
 Autrement dit : 1/2 et 2/4, c'est la même quantité — juste coupée différemment.
@@ -17,6 +19,7 @@ CHOIX
 Et 3/6, tu penses que c'est aussi la même quantité que 1/2 ?
 - [correct] Oui, pareil => Exact ! 6 parts, tu en manges 3 — toujours la moitié.
 - Non, différent => Recompte : sur 6 parts égales, la moitié, c'est 3.
+~ Fais le calcul dans l'autre sens : 6 ÷ 2 = 3. Si tu coupes la même pizza en 6 au lieu de 2, chaque part est 3 fois plus petite — il t'en faut donc 3 fois plus pour retrouver la même quantité. 3 parts sur 6, c'est exactement ça.
 
 REVELATION: 🔥 Fractions équivalentes
 1/2, 2/4, 3/6… ce sont des fractions équivalentes : la même quantité, écrite avec des nombres différents.
@@ -25,7 +28,9 @@ CHOIX
 À ton tour : simplifie 4/10 le plus possible.
 - [correct] 2/5 => Voilà. Tu divises le haut ET le bas par 2 — on ne peut plus simplifier.
 - 2/10 => Tu n'as divisé que le haut — fais pareil en bas.
+~ Simplifier, c'est comme recouper la même pizza en plus gros morceaux : la quantité totale ne change pas. Si tu ne divises que le haut, tu changes la quantité elle-même — pas juste son écriture.
 - 1/5 => Presque : tu as divisé par 4, pas par 2.
+~ 4 et 10 ont un point commun : ils sont tous les deux divisibles par 2, et c'est le plus grand nombre qui marche pour les deux à la fois. 4 ÷ 2 = 2 et 10 ÷ 2 = 5 → 2/5. Diviser par un nombre trop grand donne un résultat faux.
 
 REFORMULATION
 Explique à un pote, avec tes mots, pourquoi 1/2 = 2/4.
@@ -36,6 +41,7 @@ On te donne 5/10 cette fois.
 CHOIX
 Est-ce que 5/10, c'est la même quantité que 1/2 ?
 - Non, c'est différent => Recompte : divise 5 et 10 par 5, et regarde ce qu'il reste.
+~ Pose la question autrement : est-ce que 5 c'est la moitié de 10 ? Oui. Donc 5/10 représente la moitié d'un tout coupé en 10 parts — exactement comme 1/2 représente la moitié d'un tout coupé en 2. Même moitié, juste avec plus de parts.
 - [correct] Oui, c'est pareil => Exact ! 5/10 = 1/2 — même quantité, juste écrite avec des nombres 10 fois plus grands.
 
 DECLIC

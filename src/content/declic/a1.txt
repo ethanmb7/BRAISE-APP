@@ -7,6 +7,7 @@ En anglais, pour parler d'une habitude : « I play football every day. »
 CHOIX
 Et pour dire la même chose avec « she » ?
 - She play football every day => Presque ! Il manque un petit détail à la 3e personne du singulier…
+~ Remplace le sujet par « he », « she » ou « it » dans ta tête : si ça marche, le verbe prend TOUJOURS un S au présent simple. « She » fait partie de ce trio.
 - [correct] She plays football every day => Exact ! À la 3e personne du singulier (he/she/it), le verbe prend un S.
 
 SITUATION
@@ -15,6 +16,7 @@ Ce S est obligatoire : « he like », ça n'existe pas en anglais correct.
 CHOIX
 Donc pour « they » (ils/elles), on dit…
 - They likes music => Non — le S n'est que pour he/she/it, pas pour they.
+~ Le S n'existe que pour trois sujets : he, she, it — une seule personne ou chose. « They » désigne plusieurs personnes : dès que le sujet est I/you/we/they, le verbe garde sa forme de base, sans S.
 - [correct] They like music => Exact ! Pas de S pour I/you/we/they.
 
 REVELATION: 🔥 Le S de la 3e personne
@@ -23,6 +25,7 @@ I/you/we/they + verbe de base. He/she/it + verbe + S. C'est LE réflexe à avoir
 CHOIX
 « My brother ___ music every night. » (listen)
 - listen => Presque ! « Brother » se remplace par « he » — il manque le S.
+~ Remplace « my brother » par un seul mot : ça donne « he ». Et « he » fait toujours partie du trio he/she/it qui prend un S au présent simple — donc « listens », jamais « listen ».
 - [correct] listens => Exact ! « My brother » = « he » → le S est obligatoire.
 
 REFORMULATION
@@ -34,6 +37,7 @@ Cette fois, le sujet est « the teacher » (le professeur).
 CHOIX
 « The teacher ___ every day. » (arrive)
 - arrive => Presque ! « The teacher » se remplace par « he/she » — il manque le S.
+~ « The teacher » désigne une seule personne — on peut le remplacer par « he » ou « she ». C'est le test à faire à chaque fois : si le remplacement marche, le verbe prend un S.
 - [correct] arrives => Exact ! « The teacher » = « he/she/it » → le S est obligatoire.
 
 DECLIC

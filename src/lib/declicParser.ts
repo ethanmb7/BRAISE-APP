@@ -33,6 +33,9 @@ function slugify(label: string): string {
 // after the last option/event without it being a formatting error).
 const OPTION_RE = /^-\s*(\[correct\]\s*)?(.+?)\s*=>\s*(.+)$/;
 const VISUAL_ITEM_RE = /^-\s*(\d{3,4})\s*:\s*(.+)$/;
+// A second, different explanation for a wrong option — shown only if the student says the first
+// reaction didn't land ("j'ai toujours pas compris"), never surfaced automatically.
+const ALT_EXPLANATION_RE = /^~\s*(.+)$/;
 
 export function parseDeclicScript(rawText: string, source: string): DeclicScript {
   const lines = rawText.replace(/\r\n/g, "\n").split("\n");
@@ -52,7 +55,13 @@ export function parseDeclicScript(rawText: string, source: string): DeclicScript
     const parts: string[] = [];
     while (i < lines.length) {
       const l = peek();
-      if (l.trim() === "" || KEYWORD_RE.test(l) || OPTION_RE.test(l) || VISUAL_ITEM_RE.test(l))
+      if (
+        l.trim() === "" ||
+        KEYWORD_RE.test(l) ||
+        OPTION_RE.test(l) ||
+        VISUAL_ITEM_RE.test(l) ||
+        ALT_EXPLANATION_RE.test(l)
+      )
         break;
       parts.push(l.trim());
       i++;
@@ -119,12 +128,25 @@ export function parseDeclicScript(rawText: string, source: string): DeclicScript
         const reaction = m[3].trim();
         if (!label) err("une option ne peut pas avoir un intitulé vide");
         if (!reaction) err(`l'option "${label}" n'a pas de réaction après "=>"`);
+        i++;
+        let altExplanation: string | undefined;
+        const altMatch = peek().match(ALT_EXPLANATION_RE);
+        if (altMatch) {
+          altExplanation = altMatch[1].trim();
+          if (!altExplanation) err('"~" doit être suivi d\'une explication');
+          i++;
+        }
         let id = slugify(label);
         while (seenIds.has(id)) id += "-2";
         seenIds.add(id);
         if (correct) correctCount++;
-        options.push({ id, label, reaction, ...(correct ? { correct: true } : {}) });
-        i++;
+        options.push({
+          id,
+          label,
+          reaction,
+          ...(correct ? { correct: true } : {}),
+          ...(altExplanation ? { altExplanation } : {}),
+        });
       }
       if (options.length < 2)
         err('une carte CHOIX doit avoir au moins 2 options ("- Label => Réaction")');

@@ -2817,6 +2817,39 @@ select {
   border-radius: 20px 20px 20px 6px;
   font-size: 1rem;
 }
+/* The second, genuinely different explanation — shown only after "J'ai toujours pas compris".
+   Dashed violet border instead of the reaction bubble's solid one, so it visibly reads as a
+   second attempt rather than more of the same reply. */
+.declic-bubble--alt {
+  border-radius: 20px 20px 20px 6px;
+  border-style: dashed;
+  border-color: var(--violet);
+  background: color-mix(in srgb, var(--violet) 12%, var(--paper));
+  box-shadow: 3px 3px 0 var(--violet);
+  font-size: 1rem;
+}
+.declic-step-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+/* Deliberately quiet — a text link, not a second CTA competing with "Suite". Getting it wrong
+   and moving on is the default path; asking for a different explanation is the exception. */
+.declic-link {
+  padding: 2px;
+  border: none;
+  background: none;
+  color: var(--ink-soft);
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.declic-link:active {
+  opacity: 0.6;
+}
 .declic-reveal-kicker {
   display: block;
   margin-bottom: 6px;

@@ -22,6 +22,9 @@ export type DeclicChoiceOption = {
   correct?: boolean;
   /** What Braise says back the instant this option is tapped — never a bare "faux". */
   reaction: string;
+  /** A genuinely different angle on the same idea, offered only if the student taps "j'ai
+   *  toujours pas compris" after this reaction — never the same explanation said more slowly. */
+  altExplanation?: string;
 };
 
 export type DeclicCard =

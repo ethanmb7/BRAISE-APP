@@ -36,9 +36,12 @@ export function DeclicMode({
   const [index, setIndex] = useState(0);
   const [pickedId, setPickedId] = useState<string | null>(null);
   const [thinking, setThinking] = useState(false);
+  const [showAlt, setShowAlt] = useState(false);
   const [reformulation, setReformulation] = useState("");
 
   const card = script.cards[index];
+  const pickedOption =
+    card.kind === "choice" ? card.options.find((o) => o.id === pickedId) : undefined;
 
   // Physical, not just a fade: a card pops in with a little overshoot and gets tossed up and
   // away on the way out, rather than cross-fading into the next one.
@@ -59,6 +62,7 @@ export function DeclicMode({
   const advance = () => {
     sfx.tap(soundOn);
     setPickedId(null);
+    setShowAlt(false);
     setIndex((i) => i + 1);
   };
 
@@ -71,6 +75,11 @@ export function DeclicMode({
     if (reducedMotion) return;
     setThinking(true);
     setTimeout(() => setThinking(false), THINK_MS);
+  };
+
+  const explainDifferently = () => {
+    sfx.tap(soundOn);
+    setShowAlt(true);
   };
 
   const submitReformulation = () => {
@@ -132,20 +141,8 @@ export function DeclicMode({
             {...cardMotion}
           >
             <DeclicAsk
-              mood={
-                !pickedId
-                  ? "eager"
-                  : card.options.find((o) => o.id === pickedId)?.correct
-                    ? "proud"
-                    : "hesitant"
-              }
-              bump={
-                !pickedId
-                  ? undefined
-                  : card.options.find((o) => o.id === pickedId)?.correct
-                    ? "correct"
-                    : "wrong"
-              }
+              mood={!pickedOption ? "eager" : pickedOption.correct ? "proud" : "hesitant"}
+              bump={!pickedOption ? undefined : pickedOption.correct ? "correct" : "wrong"}
             >
               {card.prompt}
             </DeclicAsk>
@@ -169,7 +166,7 @@ export function DeclicMode({
                 />
               ))}
             </div>
-            {pickedId && (
+            {pickedOption && (
               <>
                 {thinking ? (
                   <p className="declic-bubble declic-bubble--reaction" aria-live="polite">
@@ -182,11 +179,23 @@ export function DeclicMode({
                 ) : (
                   <>
                     <p className="declic-bubble declic-bubble--reaction" aria-live="polite">
-                      {card.options.find((o) => o.id === pickedId)?.reaction}
+                      {pickedOption.reaction}
                     </p>
-                    <button type="button" className="declic-cta" onClick={advance}>
-                      Suite <ArrowRight size={18} />
-                    </button>
+                    {showAlt && pickedOption.altExplanation && (
+                      <p className="declic-bubble declic-bubble--alt" aria-live="polite">
+                        {pickedOption.altExplanation}
+                      </p>
+                    )}
+                    <div className="declic-step-actions">
+                      {!showAlt && !pickedOption.correct && pickedOption.altExplanation && (
+                        <button type="button" className="declic-link" onClick={explainDifferently}>
+                          J'ai toujours pas compris
+                        </button>
+                      )}
+                      <button type="button" className="declic-cta" onClick={advance}>
+                        Suite <ArrowRight size={18} />
+                      </button>
+                    </div>
                   </>
                 )}
               </>

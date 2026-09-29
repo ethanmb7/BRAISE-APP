@@ -15,6 +15,7 @@ Braise plante le décor en une phrase.
 CHOIX
 La question posée à l'élève, avant toute explication.
 - Une mauvaise réponse => Ce que Braise répond, sans jamais dire juste "faux".
+~ Une explication vraiment différente, montrée seulement si l'élève dit ne pas avoir compris.
 - [correct] La bonne réponse => Ce que Braise répond quand c'est juste.
 - Une autre mauvaise réponse => Une autre réaction.
 
@@ -53,6 +54,10 @@ Une confusion fréquente à éviter (facultatif — enlevez tout le bloc PIEGE s
   n'alimente jamais la révision espacée de l'élève plus tard.
 - **`CHOIX`** : toujours au moins 2 options, et **exactement une** marquée `[correct]`. Chaque
   option doit avoir une réaction après `=>` — jamais un simple "faux".
+- Une ligne **`~ <explication>`** juste après une option ajoute une deuxième explication,
+  vraiment différente de la première (pas juste redite plus lentement). Elle n'apparaît que si
+  l'élève tape "J'ai toujours pas compris" après avoir vu la réaction — ajoutez-la sur les
+  options fausses les plus fréquentes, ce n'est pas obligatoire sur chacune.
 - **`REVELATION:`** : le titre court se met sur la même ligne, après les deux points.
 - Après la **`REFORMULATION`**, ajoutez toujours une nouvelle paire **`SITUATION` / `CHOIX`** —
   le "à toi" : une situation différente de celle du début, pour vérifier que l'élève sait

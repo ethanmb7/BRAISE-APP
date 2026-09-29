@@ -7,6 +7,7 @@ Ton téléphone, la table, l'air que tu respires… tout est fait des mêmes bri
 CHOIX
 Tu imagines un atome comment ?
 - Plein, comme une bille => C'est l'intuition la plus courante — mais regarde ce qu'il y a vraiment dedans…
+~ Si un atome était vraiment plein comme une bille, rien ne pourrait jamais le traverser. Mais certaines particules invisibles passent à travers la matière presque sans la toucher — un signe que l'intérieur d'un atome est presque entièrement vide.
 - [correct] Surtout du vide, avec un petit noyau au centre => Exact ! Le noyau est minuscule comparé à l'espace immense autour de lui.
 
 SITUATION
@@ -15,7 +16,9 @@ Autour du noyau (protons + neutrons), des électrons gravitent, loin, dans cet i
 CHOIX
 Un atome a-t-il une charge électrique, globalement ?
 - Oui, positive => Presque : il y a des charges positives, mais elles sont compensées.
+~ Le noyau a bien des charges positives (les protons), mais l'atome complet a aussi des électrons autour, chargés négativement — exactement autant des deux côtés. Les deux charges s'annulent, comme +1 et -1 qui font 0.
 - Oui, négative => Presque : il y a des charges négatives, mais elles sont compensées.
+~ Les électrons apportent bien des charges négatives, mais le noyau au centre a exactement le même nombre de charges positives (les protons). Les deux se compensent parfaitement — le total est zéro.
 - [correct] Non, il est neutre => Exact ! Autant de charges positives (protons) que négatives (électrons).
 
 REVELATION: 🔥 L'atome est surtout du vide
@@ -25,6 +28,7 @@ CHOIX
 Si un atome faisait la taille d'un stade de foot, où serait le noyau ?
 - [correct] Une balle de tennis posée au milieu du terrain => Exact ! C'est à peu près cette proportion-là entre le noyau et l'atome entier.
 - Il remplirait tout le stade => Non — c'est justement l'inverse : minuscule comparé au reste.
+~ C'est l'inverse de la réalité : le noyau, déjà minuscule dans un vrai atome, reste minuscule même agrandi à la taille d'un stade — une petite balle posée au milieu d'un terrain presque entièrement vide.
 
 REFORMULATION
 Explique avec tes mots pourquoi un atome n'est pas « plein ».
@@ -35,6 +39,7 @@ Une table entière est faite de milliards d'atomes collés les uns aux autres.
 CHOIX
 Donc une table, c'est surtout…
 - De la matière pleine, sans aucun vide => Non — si chaque atome est surtout du vide, la table aussi, à cette échelle.
+~ Une table est faite de milliards d'atomes empilés, et chacun de ces atomes est surtout du vide. Empiler des milliards de choses presque vides ne fabrique pas soudainement quelque chose de plein.
 - [correct] Du vide, à l'échelle atomique => Exact ! Même si elle te paraît solide, une table est faite d'atomes eux-mêmes surtout vides.
 
 DECLIC
