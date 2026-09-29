@@ -80,6 +80,14 @@ export function DeclicMode({
     setIndex((i) => i + 1);
   };
 
+  // A screen-reader or keyboard user needs focus to actually move to each new card — without
+  // this, focus stays on the "Suite" button that just unmounted (or falls back to <body>), so
+  // every beat after the first goes unannounced and Tab has to be walked from the top of the
+  // page again. tabIndex={-1} makes the card itself a valid, non-tab-stoppable focus target; the
+  // reformulation card skips this and keeps its textarea's own autoFocus instead, so focus lands
+  // on the actual input rather than fighting it for the container.
+  const focusStep = (el: HTMLElement | null) => el?.focus();
+
   return (
     <div className="declic-stage">
       {card.kind !== "declic" && card.kind !== "fiche" && (
@@ -100,7 +108,13 @@ export function DeclicMode({
       )}
       <AnimatePresence mode="wait">
         {card.kind === "situation" && (
-          <motion.div key={index} className="declic-step" {...cardMotion}>
+          <motion.div
+            key={index}
+            className="declic-step"
+            ref={focusStep}
+            tabIndex={-1}
+            {...cardMotion}
+          >
             <DeclicAsk mood="happy">{card.text}</DeclicAsk>
             {card.visual?.kind === "timeline" && <DeclicTimeline visual={card.visual} />}
             <button type="button" className="declic-cta" onClick={advance}>
@@ -110,7 +124,13 @@ export function DeclicMode({
         )}
 
         {card.kind === "choice" && (
-          <motion.div key={index} className="declic-step" {...cardMotion}>
+          <motion.div
+            key={index}
+            className="declic-step"
+            ref={focusStep}
+            tabIndex={-1}
+            {...cardMotion}
+          >
             <DeclicAsk
               mood={
                 !pickedId
@@ -161,7 +181,7 @@ export function DeclicMode({
                   </p>
                 ) : (
                   <>
-                    <p className="declic-bubble declic-bubble--reaction">
+                    <p className="declic-bubble declic-bubble--reaction" aria-live="polite">
                       {card.options.find((o) => o.id === pickedId)?.reaction}
                     </p>
                     <button type="button" className="declic-cta" onClick={advance}>
@@ -175,7 +195,13 @@ export function DeclicMode({
         )}
 
         {card.kind === "reveal" && (
-          <motion.div key={index} className="declic-step" {...cardMotion}>
+          <motion.div
+            key={index}
+            className="declic-step"
+            ref={focusStep}
+            tabIndex={-1}
+            {...cardMotion}
+          >
             <span className="declic-reveal-kicker">{card.kicker}</span>
             <DeclicAsk mood="proud">{card.text}</DeclicAsk>
             {card.visual?.kind === "timeline" && <DeclicTimeline visual={card.visual} />}
@@ -193,6 +219,7 @@ export function DeclicMode({
               value={reformulation}
               onChange={(e) => setReformulation(e.target.value)}
               placeholder="Avec tes mots…"
+              aria-label={card.prompt}
               rows={3}
               autoFocus
             />
@@ -211,6 +238,8 @@ export function DeclicMode({
           <motion.div
             key={index}
             className="declic-moment"
+            ref={focusStep}
+            tabIndex={-1}
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={SPRING}
@@ -235,7 +264,13 @@ export function DeclicMode({
         )}
 
         {card.kind === "fiche" && (
-          <motion.div key={index} className="declic-fiche" {...cardMotion}>
+          <motion.div
+            key={index}
+            className="declic-fiche"
+            ref={focusStep}
+            tabIndex={-1}
+            {...cardMotion}
+          >
             <span className="declic-fiche-kicker">🔥 ce que ton prof attend de toi</span>
             <h2 className="declic-fiche-title">{card.title}</h2>
             <div className="declic-fiche-section is-retenir">

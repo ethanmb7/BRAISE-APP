@@ -53,6 +53,19 @@
      dark mode by never changing at all. */
   --rev-paper: #faf8f3;
   --rev-ink-soft: rgba(22, 33, 58, 0.72);
+
+  /* Correct/wrong tinted surfaces (Déclic tiles, the fiche's à-retenir/piège blocks). A fixed
+     light tint with var(--ink) text reads fine here in light mode, but --ink flips to near-white
+     under .dark, leaving near-white text on a near-white tint — under 1.1:1 contrast, effectively
+     invisible (confirmed by computing WCAG contrast, not just eyeballing it). Own token pair per
+     state, redefined under .dark, so both the background AND its text stay a real pair instead of
+     mixing a fixed surface with a theme-adaptive text colour. */
+  --feedback-correct-bg: #dcfce7;
+  --feedback-correct-text: #065f46;
+  --feedback-correct-label: var(--mint-text);
+  --feedback-wrong-bg: #ffe1dc;
+  --feedback-wrong-text: #7f1d1d;
+  --feedback-wrong-label: var(--coral-2);
 }
 
 .dark {
@@ -62,6 +75,13 @@
   --ink-soft: rgba(234, 241, 255, 0.72);
   --line: rgba(234, 241, 255, 0.12);
   --bg: #0f1830;
+
+  --feedback-correct-bg: #123524;
+  --feedback-correct-text: #86efac;
+  --feedback-correct-label: #34d399;
+  --feedback-wrong-bg: #3a1512;
+  --feedback-wrong-text: #fecaca;
+  --feedback-wrong-label: #f87171;
 }
 
 .dyslexia-mode,
@@ -2739,14 +2759,16 @@ select {
   opacity: 0.65;
 }
 .declic-tile.is-correct {
-  background: #dcfce7;
+  background: var(--feedback-correct-bg);
   border-color: var(--mint-text);
   box-shadow: 3px 3px 0 var(--mint-text);
+  color: var(--feedback-correct-text);
 }
 .declic-tile.is-wrong {
-  background: #ffe1dc;
+  background: var(--feedback-wrong-bg);
   border-color: var(--coral-2);
   box-shadow: 3px 3px 0 var(--coral-2);
+  color: var(--feedback-wrong-text);
 }
 .declic-cta {
   display: flex;
@@ -2937,11 +2959,11 @@ select {
   border-radius: 14px;
 }
 .declic-fiche-section.is-retenir {
-  background: #dcfce7;
+  background: var(--feedback-correct-bg);
   border-color: var(--mint-text);
 }
 .declic-fiche-section.is-piege {
-  background: #ffe1dc;
+  background: var(--feedback-wrong-bg);
   border-color: var(--coral-2);
 }
 .declic-fiche-label {
@@ -2954,10 +2976,16 @@ select {
   text-transform: uppercase;
 }
 .declic-fiche-section.is-retenir .declic-fiche-label {
-  color: var(--mint-text);
+  color: var(--feedback-correct-label);
 }
 .declic-fiche-section.is-piege .declic-fiche-label {
-  color: var(--coral-2);
+  color: var(--feedback-wrong-label);
+}
+.declic-fiche-section.is-retenir .declic-fiche-text {
+  color: var(--feedback-correct-text);
+}
+.declic-fiche-section.is-piege .declic-fiche-text {
+  color: var(--feedback-wrong-text);
 }
 .declic-fiche-text {
   font-family: 'Baloo 2', sans-serif;
