@@ -64,71 +64,77 @@ pas consultation de la progression — Aura reste l'endroit où on va pour voir 
 
 Le trou identifié dans le parcours actuel (le « moment Eureka ») n'est plus une piste ouverte :
 c'est la boucle **Le Déclic**, détaillée section 4, validée comme méthode d'apprentissage
-principale de BRAISE. Ce qui reste à trancher est uniquement son emplacement dans
-l'interface — une fonctionnalité à l'intérieur d'un espace existant (probablement Réviser), pas
-un cinquième onglet, et pas un remplacement d'Aura ou de la navigation validée ci-dessus.
+principale de BRAISE. Construite et déployée sur les 6 matières : elle vit à l'intérieur du
+parcours de leçon existant (`LessonView`), en remplacement de l'ancien Vocal Animé pour les
+chapitres qui ont un script Déclic — pas un cinquième onglet, pas un remplacement d'Aura.
 
 ## 4. Boucle centrale « Le Déclic »
 
 Le principe fondamental : BRAISE ne cherche pas seulement à savoir si une réponse est juste. Elle
-cherche comment cet élève précis va réussir à comprendre — puis elle s'en souvient. Se tromper ou
-hésiter n'est jamais un échec : c'est l'information qui indique où se situe le blocage.
+cherche à faire comprendre — jamais en donnant la règle avant que l'élève ait dû se positionner
+dessus. Une notion est une chaîne de petites cartes plein écran, jamais une page de cours suivie
+d'un quiz : un seul tap, ou une courte phrase, entre deux battements. Elle dure 1 à 3 minutes.
 
-Une session dure de 90 secondes à 5 minutes.
+1. **Situation** — Braise plante un décor concret, en une phrase.
+2. **Choix** — avant toute explication, l'élève doit se positionner (2-3 options en tap). Braise
+   réagit réellement à son choix, jamais un simple « faux ». Ce cycle situation/choix peut se
+   répéter une ou deux fois pour complexifier le cas avant la révélation.
+3. **Révélation** — le nom ou la règle n'apparaît qu'une fois l'idée déjà construite par les
+   cartes précédentes.
+4. **Reformulation** — l'élève réexplique avec ses propres mots. La seule étape conservée de
+   l'ancienne méthode (diagnostic/explication/vérification) : c'est une vraie preuve de
+   compréhension, un tap n'en est pas une. La phrase est conservée (« la mémoire du Déclic »,
+   ci-dessous).
+5. **À toi** — une situation nouvelle, différente de la première, vérifie que l'élève sait
+   réutiliser l'idée ailleurs, pas seulement redire la définition qu'on vient de lui donner.
+6. **Le Déclic** 🔥 — le moment où l'élève passe de « je ne comprends pas » à « ah oui, j'ai
+   capté ». Carte plein écran, même poids théâtral quelle que soit la notion. C'est la récompense
+   principale de BRAISE ; XP et badges peuvent l'accompagner, jamais la remplacer.
+7. **Fiche** — « Ce que ton prof attend de toi » : titre, à retenir, piège éventuel. Le pont entre
+   « j'ai compris » et « je sais l'écrire au contrôle » — toujours la dernière carte.
 
-1. **Essayer** — Braise pose une question, une situation ou un petit problème sur une seule
-   notion. L'élève doit essayer, même sans être sûr — répondre, hésiter ou dire « je sais pas »
-   sont trois réponses également valables.
-2. **Diagnostic** — sur une réponse fausse ou hésitante, Braise ne corrige pas tout de suite. Elle
-   demande pourquoi (« pourquoi tu penses ça ? ») pour identifier la représentation erronée, pas
-   seulement la mauvaise réponse. Exemple : « 2/4 est plus grand que 1/2 » n'est pas une erreur
-   de calcul mais un signe que l'élève lit la taille des nombres comme la taille de la quantité.
-3. **Explication autrement** — Braise choisit, parmi plusieurs formes validées pour cette notion
-   (image, analogie, exemple concret, mini-histoire, schéma, manipulation guidée), celle qui
-   répond au blocage identifié — jamais la même formulation répétée à l'identique.
-4. **Le Déclic** 🔥 — le moment où l'élève passe de « je ne comprends pas » à « ah oui, j'ai
-   capté ». C'est la récompense principale de BRAISE ; XP et badges peuvent l'accompagner, jamais
-   la remplacer.
-5. **Reformulation** — l'élève explique la notion avec ses propres mots, oralement ou par écrit.
-   Cette phrase est conservée : c'est la preuve du Déclic, dans le langage de cet élève.
-6. **Réutilisation vérifiée** — jamais « t'as compris ? ». Braise propose une situation nouvelle
-   sur la même notion, pour vérifier que la compréhension tient et pas seulement qu'elle a été
-   entendue. Un échec à cette étape rouvre le diagnostic (étape 2) plutôt que de répéter
-   l'explication précédente.
-7. **Retrait progressif de l'aide** — la même notion revient ensuite sans l'analogie de départ,
-   puis sous forme abstraite, puis dans un problème réel. Le but n'est jamais que l'élève ait
-   durablement besoin de l'image de départ pour raisonner.
-8. **Consolidation différée** — la notion revient le lendemain, puis à quelques jours d'écart,
-   puis dans des contextes différents, sur le même moteur de répétition espacée que Réviser (pas
-   un second système parallèle), jusqu'à ce que l'élève sache la reconnaître, la retrouver sans
-   aide et l'utiliser.
+Terminer un Déclic déclenche ensuite une première révision « sûr » sur la carte de révision
+associée à la notion : la consolidation se fait sur le même moteur de répétition espacée que
+Réviser (SM-2), jamais un second système parallèle.
 
-### Si l'explication ne suffit pas
+### Contenu : écrit à l'avance, jamais improvisé
 
-Dire « j'ai pas capté » ou « explique autrement » doit être aussi simple et normal que répondre à
-la question elle-même. Braise change alors réellement de forme d'explication — jamais le même
-texte redit plus lentement. Rien dans l'interface ne doit laisser croire à l'élève que redemander
-est un échec.
+Chaque notion est un fichier texte dans `src/content/declic/` (voir son README), écrit et validé
+à l'avance — jamais généré à la volée par l'IA, pour la même raison que la génération non validée
+est exclue en section 9 : une situation ou une explication fausse ne doit jamais atteindre un
+élève sans relecture humaine. `npm run declic:check` valide la structure de chaque fichier avant
+qu'il n'atteigne la production. C'est la décision qui, plus tôt, restait « à trancher » sur
+l'origine des explications alternatives — tranchée dans ce sens.
 
 ### La mémoire du Déclic
 
-Pour chaque notion et chaque élève, BRAISE conserve ce qui a réellement fonctionné : l'erreur
-initiale, le blocage identifié, l'explication qui a mené au Déclic et la reformulation de
-l'élève. Si la notion redevient floue plus tard, Braise peut s'appuyer sur ce qui a déjà marché
-pour cet élève précis (« tu te rappelles notre histoire avec les pizzas ? ») plutôt que de
-repartir de zéro. C'est un compagnon qui se souvient, pas un historique affiché tel quel, et cette
-mémoire reste soumise à la même collecte minimale que le reste de l'application (section 7).
+Pour chaque notion et chaque élève, BRAISE conserve la dernière reformulation donnée (stockage
+local, `sapie_declic_memory`) — un compagnon qui se souvient, pas un historique affiché tel quel.
+**Non construit** : s'appuyer sur cette mémoire pour personnaliser une notion qui redevient floue
+plus tard (« tu te rappelles notre histoire avec les pizzas ? »).
 
-### Ce qui reste à trancher avant construction
+### Si l'explication ne suffit pas (non construit)
 
-- **L'origine des explications alternatives.** Si l'IA les improvise entièrement à la volée, une
-  analogie fausse peut atteindre un élève sans validation préalable — contraire à la génération
-  non validée déjà exclue en section 9. Direction retenue par défaut : chaque notion porte
-  plusieurs explications rédigées et validées à l'avance par l'équipe pédagogique (objectif,
-  confusions fréquentes, exemples, contre-exemple, formulations de reformulation acceptables) ;
-  l'IA choisit, adapte le ton et personnalise, elle n'invente pas le fond pédagogique.
-- **Le format de stockage de la mémoire du Déclic** (par élève et par notion) doit être défini
-  avant toute implémentation, avec la même exigence de collecte minimale que le reste de l'app.
+Dire « j'ai pas capté » devrait être aussi simple que répondre à la question elle-même, avec une
+vraie explication alternative plutôt que le même texte redit plus lentement. Aujourd'hui, chaque
+option d'une carte Choix n'a qu'une seule réaction fixe : rouvrir cette piste suppose d'abord
+qu'un vrai chapitre ait été testé avec de vrais élèves pour savoir où ça bloque réellement.
+
+### Pistes futures pour approfondir le format (non construites)
+
+Une refonte plus ambitieuse a été étudiée : transformer chaque notion en « épisode » de 4-8
+minutes avec un déroulé enrichi (accroche → prise de position → réaction → découverte → déclic →
+nom du cours → à toi → conclusion), plusieurs épisodes par chapitre se terminant par un « Boss »
+qui mélange les notions, des écrans centraux plus riches (graphique, formule, animation) plutôt
+que uniquement des bulles de texte, et le swipe comme geste secondaire au tap.
+
+Décision : ne pas construire maintenant. Le format actuel vient tout juste d'être étendu aux 6
+matières et n'a encore été testé par aucun vrai élève sur un chapitre complet — multiplier le
+contenu par 4-5 avant cette validation serait prématuré. Enrichir les visuels par écran contredit
+aussi une discipline déjà validée par les tests m1/h1 : une coquille partagée + un widget
+optionnel (comme la frise chronologique) suffit ; inventer une interface par notion recrée le
+problème déjà écarté plus tôt. À réévaluer une fois qu'un chapitre complet aura tourné avec de
+vrais élèves.
 
 ## 5. Carte complète des écrans
 
