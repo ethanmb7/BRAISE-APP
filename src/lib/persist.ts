@@ -31,7 +31,6 @@ type StoredProgress = {
   tab: TabId;
   currentSubjectId: string | null;
   currentChapterId: string | null;
-  currentLessonMode: "vocal" | "echanger";
 };
 
 // Mirrors the real `device_progress` columns (supabase/migrations/20260730074908_...). That
@@ -113,7 +112,6 @@ function toAppState(p: StoredProgress, cardReviews: Record<string, CardReview>):
     tab: p.tab ?? "home",
     currentSubjectId: p.currentSubjectId ?? null,
     currentChapterId: p.currentChapterId ?? null,
-    currentLessonMode: p.currentLessonMode ?? "vocal",
   };
 }
 
@@ -175,7 +173,6 @@ export async function loadProgress(): Promise<Partial<AppState> | null> {
             tab: local?.tab ?? "home",
             currentSubjectId: local?.currentSubjectId ?? null,
             currentChapterId: local?.currentChapterId ?? null,
-            currentLessonMode: local?.currentLessonMode ?? "vocal",
           },
           cardReviews,
         );
@@ -213,7 +210,6 @@ export async function saveProgress(state: AppState): Promise<void> {
     tab: state.tab,
     currentSubjectId: state.currentSubjectId,
     currentChapterId: state.currentChapterId,
-    currentLessonMode: state.currentLessonMode,
   };
   try {
     localStorage.setItem(PROGRESS_KEY, JSON.stringify(row));

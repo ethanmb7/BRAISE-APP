@@ -2638,42 +2638,6 @@ select {
   border-radius: 999px;
   transition: width 0.4s ease;
 }
-.lesson-modes {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 18px;
-  background: var(--bg);
-  border: 2px solid #000;
-  border-radius: 999px;
-  padding: 5px;
-}
-.lesson-mode-btn {
-  flex: 1;
-  text-align: center;
-  padding: 9px 4px;
-  border: 2px solid transparent;
-  border-radius: 999px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  color: var(--ink-soft);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-}
-.lesson-mode-btn:not(.is-on) {
-  background: rgba(255, 255, 255, 0.6);
-  border-color: rgba(21, 24, 33, 0.16);
-}
-.lesson-mode-btn.is-on {
-  background: var(--neo-ink);
-  color: #fff;
-  border-color: #000;
-}
 .lesson-panel {
   display: none;
 }
@@ -3299,87 +3263,6 @@ select {
   flex-shrink: 0;
 }
 
-/* Échanger / Chat */
-.peer-chat {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-.peer-msg {
-  display: flex;
-  gap: 8px;
-  align-items: flex-end;
-  animation: msgIn 0.3s ease;
-}
-@keyframes msgIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: none; }
-}
-.peer-avatar {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--paper);
-  flex-shrink: 0;
-  overflow: hidden;
-}
-.peer-bubble {
-  background: var(--paper);
-  border-radius: 14px;
-  border-bottom-left-radius: 4px;
-  padding: 9px 13px;
-  font-size: 0.84rem;
-  max-width: 75%;
-  line-height: 1.45;
-}
-.peer-msg.me {
-  flex-direction: row-reverse;
-}
-.peer-msg.me .peer-bubble {
-  background: var(--blue);
-  color: var(--paper);
-  border-bottom-left-radius: 14px;
-  border-bottom-right-radius: 4px;
-}
-.peer-input-row {
-  display: flex;
-  gap: 8px;
-  position: sticky;
-  bottom: 0;
-  background: var(--bg);
-  padding: 8px 0;
-}
-.peer-input-row input {
-  flex: 1;
-  background: var(--paper);
-  border: none;
-  border-radius: 999px;
-  padding: 11px 16px;
-  font-size: 0.85rem;
-  color: var(--ink);
-}
-.peer-input-row input:focus {
-  outline: none;
-}
-.peer-send {
-  background: var(--blue);
-  color: var(--paper);
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.15s ease;
-}
-.peer-send:active {
-  transform: scale(0.92);
-}
 .typing-dots {
   display: inline-flex;
   gap: 3px;
@@ -3594,27 +3477,6 @@ select {
   font-size: 0.84rem;
   color: var(--ink-soft);
   line-height: 1.45;
-}
-.quiz-bridge-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  background: var(--coral);
-  color: #fff;
-  border: 2px solid #000;
-  border-radius: 999px;
-  padding: 13px;
-  font-weight: 700;
-  font-size: 0.86rem;
-  margin-top: 14px;
-  box-shadow: 3px 3px 0 #000;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
-}
-.quiz-bridge-btn:active {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 #000;
 }
 .quiz-summary2 {
   text-align: center;
@@ -4643,66 +4505,6 @@ select {
   50% { transform: scaleY(0.3); }
 }
 
-/* ===== Braise explain drawer ===== */
-.explain-drawer {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 0;
-  width: 100%;
-  max-width: 428px;
-  background: var(--bg);
-  border-radius: 24px 24px 0 0;
-  padding: 10px 20px calc(14px + env(safe-area-inset-bottom, 0px));
-  z-index: 91;
-  height: 70vh;
-  display: flex;
-  flex-direction: column;
-}
-.explain-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 0 12px;
-}
-.explain-head-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.explain-head-info b {
-  display: block;
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 0.92rem;
-}
-.explain-head-info span {
-  font-size: 0.72rem;
-  color: var(--ink-soft);
-}
-.explain-scroll {
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-.explain-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  background: var(--paper);
-  color: var(--ink);
-  border: 1.5px solid rgba(21, 24, 33, 0.35);
-  border-radius: 999px;
-  padding: 11px;
-  font-weight: 700;
-  font-size: 0.82rem;
-  margin-top: 14px;
-  transition: transform 0.15s ease;
-}
-.explain-btn:active {
-  transform: scale(0.97);
-}
 .listen-btn {
   display: inline-flex;
   align-items: center;

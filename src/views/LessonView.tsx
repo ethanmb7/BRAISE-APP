@@ -1,38 +1,19 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import {
-  Play,
-  Pause,
-  Headphones,
-  MessageCircle,
-  Send,
-  Check,
-  X,
-  Flame,
-  MessageSquare,
-} from "lucide-react";
+import { Play, Pause, Check, X, Flame } from "lucide-react";
 import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
 import { TopBar } from "@/components/TopBar";
 import { BraiseMascot } from "@/components/BraiseMascot";
-import { sendChatMessage } from "@/lib/chat";
-import { getAgeGroup, quizCorrect, quizWrong, lessonOpenerCheckIn } from "@/lib/braiseVoice";
-import { SUBJECTS, STORIES, AUDIO_TRANSCRIPTS, LESSON_INTRO } from "@/data";
+import { getAgeGroup, quizCorrect, quizWrong } from "@/lib/braiseVoice";
+import { SUBJECTS, STORIES, AUDIO_TRANSCRIPTS } from "@/data";
 import { DECLIC_SCRIPTS } from "@/lib/declic";
 import { DeclicMode } from "@/components/declic/DeclicMode";
-import type { QuizQuestion, ChatMessage } from "@/types";
-
-type Mode = "vocal" | "echanger";
+import type { QuizQuestion } from "@/types";
 
 export function LessonView() {
-  const { state, goBack, completeChapter, setView, bridgeToChat, reviewCard } = useApp();
-  const [mode, setMode] = useState<Mode>(state.currentLessonMode);
+  const { state, goBack, completeChapter, setView, reviewCard } = useApp();
   const subject = SUBJECTS.find((s) => s.id === state.currentSubjectId);
   const chapter = subject?.chapters.find((c) => c.id === state.currentChapterId);
-
-  // Sync mode when store changes (e.g. quiz bridge)
-  useEffect(() => {
-    setMode(state.currentLessonMode);
-  }, [state.currentLessonMode]);
 
   if (!subject || !chapter) return null;
 
@@ -79,31 +60,6 @@ export function LessonView() {
       <TopBar title={chapter.title} onBack={goBack} />
       <div className="view is-active">
         {storyData && (
-          <div className="lesson-modes">
-            <button
-              className={`lesson-mode-btn ${mode === "vocal" ? "is-on" : ""}`}
-              onClick={() => {
-                sfx.tap(state.soundOn);
-                setMode("vocal");
-              }}
-            >
-              <Headphones size={13} />
-              Vocal Animé
-            </button>
-            <button
-              className={`lesson-mode-btn ${mode === "echanger" ? "is-on" : ""}`}
-              onClick={() => {
-                sfx.tap(state.soundOn);
-                setMode("echanger");
-              }}
-            >
-              <MessageCircle size={13} />
-              Échanger
-            </button>
-          </div>
-        )}
-
-        {mode === "vocal" && storyData && (
           <div className="lesson-panel is-on">
             <VocalMode
               slides={storyData.slides}
@@ -114,33 +70,10 @@ export function LessonView() {
           </div>
         )}
 
-        {(mode === "echanger" || !storyData) && (
-          <div className="lesson-panel is-on">
-            <ChatMode
-              chapterId={chapter.id}
-              subjectId={subject.id}
-              soundOn={state.soundOn}
-              bridgeMessage={state.chatBridgeMessage}
-              onComplete={handleComplete}
-            />
-          </div>
-        )}
-
-        {storyData && mode === "vocal" && (
+        {storyData && (
           <div style={{ marginTop: 24 }}>
             <div className="section-title">Vérifie tes acquis</div>
-            <Quiz
-              questions={storyData.quiz}
-              soundOn={state.soundOn}
-              onComplete={handleComplete}
-              onBridge={(question: string, userAnswer: string) =>
-                bridgeToChat(
-                  subject.id,
-                  chapter.id,
-                  `J'ai répondu "${userAnswer}" à cette question mais j'ai faux : ${question}. Tu peux m'expliquer le piège ?`,
-                )
-              }
-            />
+            <Quiz questions={storyData.quiz} soundOn={state.soundOn} onComplete={handleComplete} />
           </div>
         )}
       </div>
@@ -366,213 +299,15 @@ function VocalMode({
   );
 }
 
-/* ===== Échanger — Chat with Braise (Gemini RAG) ===== */
-type Msg = { from: "braise" | "me"; text: string };
-
-function ChatMode({
-  chapterId,
-  subjectId,
-  soundOn,
-  bridgeMessage,
-  onComplete,
-}: {
-  chapterId: string;
-  subjectId: string;
-  soundOn: boolean;
-  bridgeMessage: string | null;
-  onComplete: () => void;
-}) {
-  const { state, clearChatBridge } = useApp();
-  const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
-  const [messages, setMessages] = useState<Msg[]>([]);
-  const [input, setInput] = useState("");
-  const [typing, setTyping] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const bridgeHandled = useRef(false);
-  const openerStarted = useRef(false);
-
-  useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, typing]);
-
-  // Braise takes the lead: she narrates the chapter first instead of waiting for a question.
-  useEffect(() => {
-    if (openerStarted.current || bridgeMessage) return;
-    const intro = LESSON_INTRO[chapterId];
-    if (!intro) return;
-    openerStarted.current = true;
-
-    const lines = [intro.hook, intro.cheatCode, intro.piege, lessonOpenerCheckIn(voiceCtx)];
-    let cumulative = 300;
-    lines.forEach((line) => {
-      const typingTime = 500 + Math.min(line.length * 12, 1100);
-      setTimeout(() => setTyping(true), cumulative);
-      cumulative += typingTime;
-      setTimeout(() => {
-        setTyping(false);
-        setMessages((m) => [...m, { from: "braise", text: line }]);
-      }, cumulative);
-      cumulative += 250;
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chapterId, bridgeMessage]);
-
-  // Handle quiz→chat bridge: auto-send the bridge message. Clearing it in the store (not just
-  // the local `bridgeHandled` ref below) is what actually prevents a resend: toggling to "Vocal
-  // Animé" and back unmounts/remounts this whole component, which would reset a local-only ref
-  // to false again, but state.chatBridgeMessage stays null across that remount — see
-  // clearChatBridge's own comment in store.tsx.
-  useEffect(() => {
-    if (bridgeMessage && !bridgeHandled.current) {
-      bridgeHandled.current = true;
-      openerStarted.current = true;
-      clearChatBridge();
-      setMessages((m) => [...m, { from: "me", text: bridgeMessage }]);
-      setInput("");
-      setTyping(true);
-      setError(null);
-
-      sendChatMessage(
-        [{ role: "user" as const, text: bridgeMessage }],
-        chapterId,
-        subjectId,
-        voiceCtx,
-      ).then((res) => {
-        setTyping(false);
-        if ("text" in res) {
-          sfx.correct(soundOn);
-          setMessages((m) => [...m, { from: "braise", text: res.text }]);
-        } else {
-          setError(res.error);
-          setMessages((m) => [
-            ...m,
-            { from: "braise", text: "Oups, j'ai eu un petit bug. Tu peux reformuler ?" },
-          ]);
-        }
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bridgeMessage, chapterId, subjectId, soundOn]);
-
-  const send = async () => {
-    const text = input.trim();
-    if (!text || typing) return;
-    sfx.tap(soundOn);
-    setError(null);
-    const nextMessages: Msg[] = [...messages, { from: "me", text }];
-    setMessages(nextMessages);
-    setInput("");
-    setTyping(true);
-
-    const apiMessages: ChatMessage[] = nextMessages.map((m) => ({
-      role: (m.from === "me" ? "user" : "model") as "user" | "model",
-      text: m.text,
-    }));
-
-    const res = await sendChatMessage(apiMessages, chapterId, subjectId, voiceCtx);
-    setTyping(false);
-    if ("text" in res) {
-      sfx.correct(soundOn);
-      setMessages((m) => [...m, { from: "braise", text: res.text }]);
-    } else {
-      setError(res.error);
-      setMessages((m) => [
-        ...m,
-        { from: "braise", text: "Oups, j'ai eu un petit bug. Tu peux reformuler ?" },
-      ]);
-    }
-  };
-
-  return (
-    <div>
-      <div
-        ref={scrollRef}
-        style={{ maxHeight: "calc(100vh - 320px)", overflowY: "auto", marginBottom: 12 }}
-      >
-        <div className="peer-chat">
-          {messages.map((m, i) => (
-            <div key={i} className={`peer-msg ${m.from === "me" ? "me" : ""}`}>
-              {m.from === "braise" && (
-                <div className="peer-avatar" style={{ background: "var(--coral)" }}>
-                  <BraiseMascot size={20} mood="happy" />
-                </div>
-              )}
-              <div className="peer-bubble">{m.text}</div>
-            </div>
-          ))}
-          {typing && (
-            <div className="peer-msg">
-              <div className="peer-avatar" style={{ background: "var(--coral)" }}>
-                <BraiseMascot size={20} />
-              </div>
-              <div className="peer-bubble">
-                <span style={{ fontSize: "0.82rem", color: "var(--ink-soft)" }}>
-                  Braise réfléchit... 🔥
-                </span>
-                <div className="typing-dots" style={{ marginTop: 4 }}>
-                  <span />
-                  <span />
-                  <span />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-        {error && (
-          <p
-            style={{
-              fontSize: "0.76rem",
-              color: "var(--coral-2)",
-              textAlign: "center",
-              marginTop: 8,
-            }}
-          >
-            {error}
-          </p>
-        )}
-      </div>
-      {messages.length > 0 && !typing && (
-        <button
-          className="explain-btn"
-          style={{ marginBottom: 10 }}
-          onClick={() => {
-            sfx.complete(soundOn);
-            onComplete();
-          }}
-        >
-          <Check size={15} />
-          Terminer le chapitre
-        </button>
-      )}
-      <div className="peer-input-row">
-        <input
-          type="text"
-          placeholder="Pose ta question à Braise..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && send()}
-          disabled={typing}
-        />
-        <button className="peer-send" onClick={send} disabled={typing || !input.trim()}>
-          <Send size={16} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/* ===== Quiz with quiz→chat bridge ===== */
+/* ===== Quiz ===== */
 function Quiz({
   questions,
   soundOn,
   onComplete,
-  onBridge,
 }: {
   questions: QuizQuestion[];
   soundOn: boolean;
   onComplete: () => void;
-  onBridge: (question: string, userAnswer: string) => void;
 }) {
   const [idx, setIdx] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -651,13 +386,6 @@ function Quiz({
     );
   }
 
-  const userAnswerText =
-    q.type === "mcq" && q.options
-      ? (q.options[selected ?? -1] ?? "")
-      : selected === 1
-        ? "Vrai"
-        : "Faux";
-
   return (
     <div className="quiz-card" style={{ position: "relative" }}>
       {xpPop && (
@@ -732,12 +460,6 @@ function Quiz({
         <div>
           <div className="bx-title">Braise t'explique</div>
           <div className="bx-text">{q.explain}</div>
-          {selected !== null && selected !== q.answer && (
-            <button className="quiz-bridge-btn" onClick={() => onBridge(q.q, userAnswerText)}>
-              <MessageSquare size={15} />
-              Comprendre ce piège avec Braise
-            </button>
-          )}
         </div>
       </div>
 

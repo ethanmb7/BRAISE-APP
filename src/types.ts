@@ -46,12 +46,6 @@ export type StorySlide = {
   duration: number;
 };
 
-export type LessonIntro = {
-  hook: string;
-  cheatCode: string;
-  piege: string;
-};
-
 export type QuizQuestion = {
   type: "mcq" | "vf";
   q: string;
@@ -78,8 +72,6 @@ export type Badge = {
   name: string;
   cond: string;
 };
-
-export type ChatMessage = { role: "user" | "model"; text: string };
 
 export type Confidence = "not-sure" | "doubt" | "sure";
 
@@ -141,9 +133,7 @@ export type AppState = {
   currentChapterId: string | null;
   lastSubjectId: string | null;
   lastChapterId: string | null;
-  currentLessonMode: "vocal" | "echanger";
   completedChapters: string[];
-  chatBridgeMessage: string | null;
   /** Where "back" from a lesson should land when it wasn't reached through a subject (e.g.
    *  "Revoir la notion" mid-session on Réviser). In-memory only, never persisted. */
   lessonReturnTo: ViewId | null;

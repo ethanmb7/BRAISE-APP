@@ -349,46 +349,6 @@ export function duelResult(ctx: VoiceCtx, won: boolean): string {
   });
 }
 
-/** Closing check-in line after Braise proactively opens a lesson conversation. */
-export function lessonOpenerCheckIn(ctx: VoiceCtx): string {
-  return byCombo(ctx, {
-    "chill-college": [
-      "Ça te parle ou tu veux que je réexplique un bout ?",
-      "Dis-moi si un truc est flou, on reprend ensemble.",
-    ],
-    "chill-lycee": [
-      "Ça va, t'as suivi ? Dis-moi si un point mérite d'être creusé.",
-      "Tout est clair ou il y a un passage à revoir ?",
-    ],
-    "savage-college": [
-      "Bon, t'as suivi ou je parle dans le vide ?",
-      "Alors, ça capte ou faut un dessin ?",
-    ],
-    "savage-lycee": [
-      "T'as capté ou faut que je répète comme si t'avais 6 ans ?",
-      "Bon spoiler : c'est pas si dur. T'en es où ?",
-    ],
-  });
-}
-
-/** Invitation for the student to explain a concept back to Braise in their own words (Feynman technique). */
-export function feynmanInvite(ctx: VoiceCtx, topic: string): string {
-  return byCombo(ctx, {
-    "chill-college": [
-      `Fais comme si j'avais 10 ans et que je connaissais rien à "${topic}" — tu m'expliques ?`,
-    ],
-    "chill-lycee": [
-      `Explique-moi "${topic}" comme si je découvrais complètement le sujet, vas-y je t'écoute.`,
-    ],
-    "savage-college": [
-      `Allez, prouve-moi que t'as pas juste zappé le cours. Explique-moi "${topic}" façon débutant total.`,
-    ],
-    "savage-lycee": [
-      `Vas-y, convaincs-moi que t'as vraiment compris "${topic}" — explique comme si j'avais zéro base.`,
-    ],
-  });
-}
-
 /** Braise's take on the Profil page — real rank/streak/badge facts, never a generic filler line.
  *  Branches on streak (active or not) so the reaction actually changes with what's true right
  *  now, giving a real reason to check back instead of a static caption. */
@@ -568,20 +528,4 @@ export function recapTrophyLine(ctx: VoiceCtx): { title: string; sub: string } {
       "savage-lycee": ["Demain, sans excuse.", "Reviens demain — ta série te surveille."],
     }),
   };
-}
-
-/** Extra instructions appended to the Mistral system prompt so free-text chat matches the chosen tone. */
-export function toneSystemPrompt(ctx: VoiceCtx): string {
-  const ageLine =
-    ctx.age === "college"
-      ? "L'élève est au collège (6e-3e) : mots très simples, phrases très courtes, exemples très concrets."
-      : "L'élève est au lycée (2nde-Terminale) : tu peux être un peu plus précis et nuancé, mais toujours simple et jamais scolaire.";
-  // Savage used to ask for "sarcasme léger quand l'élève se trompe" — mocking a teenager's mistake
-  // is exactly the humiliation the product vision rules out. The energy and the jokes stay; their
-  // target moves from the student to the trap itself.
-  const personaLine =
-    ctx.personality === "savage"
-      ? 'Mode "Coach Savage" : énergique, direct, second degré et petites vannes complices. Tu peux charrier la situation ("ce piège-là, il attrape tout le monde"), jamais l\'élève lui-même : aucun sarcasme sur son erreur, rien qui puisse le faire se sentir bête.'
-      : 'Mode "Pote Chill" : calme, encourageant, zéro pression, bienveillant même face à une erreur.';
-  return `${ageLine}\n${personaLine}`;
 }

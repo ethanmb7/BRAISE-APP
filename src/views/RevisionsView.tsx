@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, type ReactNode } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   motion,
   AnimatePresence,
@@ -6,9 +6,6 @@ import {
   useMotionValue,
   useReducedMotion,
   useTransform,
-  animate,
-  type PanInfo,
-  type MotionValue,
 } from "framer-motion";
 import { Flag, Check, X, Zap, BookOpen, ArrowRight } from "lucide-react";
 import { useApp } from "@/store";
@@ -29,6 +26,9 @@ import {
 import { reportCard } from "@/lib/reports";
 import { FLASHCARDS, SUBJECTS } from "@/data";
 import type { Flashcard, Confidence } from "@/types";
+import { readSnapshot, writeSnapshot, type SessionSnapshot } from "@/lib/revisionSession";
+import { BevelButton } from "@/components/revisions/BevelButton";
+import { SwipeCard, type FlyDir, type Verdict } from "@/components/revisions/SwipeCard";
 
 // Plain direct localStorage key, deliberately outside the app's main progress-sync system
 // (src/lib/persist.ts) — that store is a typed, debounced model of account progress (XP,
@@ -41,43 +41,6 @@ const JOKER_SEEN_KEY = "sapie_joker_seen";
 // A daily session is a sprint, not the whole library: ~15 cards, mixed. The deck used to
 // serve every due card (26 on a fresh install) with no cap at all.
 const SESSION_SIZE = 15;
-
-// In-progress session snapshot so "Revoir la notion" (which leaves for the chapter's chat)
-// comes back to the NEXT card with the streak, joker charge and totals intact, instead of
-// remounting a brand-new deck at 1/15. sessionStorage, not localStorage: a session is a
-// single sitting, it has no business surviving the tab.
-const SESSION_SNAPSHOT_KEY = "sapie_rev_session";
-const SESSION_SNAPSHOT_TTL = 30 * 60 * 1000;
-type SessionSnapshot = {
-  cardIds: string[];
-  index: number;
-  combo: number;
-  maxCombo: number;
-  xpEarned: number;
-  reviewed: number;
-  wrongCount: number;
-  jokerCharge: number;
-  at: number;
-};
-function readSnapshot(): SessionSnapshot | null {
-  try {
-    const raw = sessionStorage.getItem(SESSION_SNAPSHOT_KEY);
-    if (!raw) return null;
-    const snap = JSON.parse(raw) as SessionSnapshot;
-    if (Date.now() - snap.at > SESSION_SNAPSHOT_TTL) return null;
-    return snap;
-  } catch {
-    return null;
-  }
-}
-function writeSnapshot(snap: SessionSnapshot | null) {
-  try {
-    if (snap) sessionStorage.setItem(SESSION_SNAPSHOT_KEY, JSON.stringify(snap));
-    else sessionStorage.removeItem(SESSION_SNAPSHOT_KEY);
-  } catch {
-    // ignore quota/availability errors, same defensive pattern as lib/persist.ts
-  }
-}
 
 // The joker (×2) has to be earned, not free: available on every card at no cost it strictly
 // dominated CARRÉ (a rational player never pressed CARRÉ again). It charges with the combo —
@@ -169,9 +132,6 @@ export function RevisionsView() {
   );
 }
 
-type Verdict = "accept" | "reject";
-type FlyDir = "left" | "right" | "up";
-
 function SwipeDeck({
   cards,
   resume,
@@ -185,7 +145,7 @@ function SwipeDeck({
   onReview: (id: string, c: Confidence) => void;
   onRestartSession: () => void;
 }) {
-  const { state, addXp, updateBestCombo, setTab, bridgeToChat } = useApp();
+  const { state, addXp, updateBestCombo, setTab, openLesson } = useApp();
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
   // Confetti isn't a transform MotionConfig can neuter (it's a canvas particle burst, not a
   // framer animation) — gated explicitly. The verdict is still fully communicated without it
@@ -560,11 +520,11 @@ function SwipeDeck({
     advance("right");
   };
 
-  // "Revoir la notion": drops the student into the chapter's chat with Braise, first person,
-  // same voice as the lesson's own "explique-moi le piège" bridge — not a link to a syllabus.
+  // "Revoir la notion": drops the student back into the chapter's real lesson (Déclic if it has
+  // one, Vocal Animé otherwise) — not a link to a syllabus.
   const reviewNotion = () => {
     sfx.tap(soundOn);
-    // This card is done — the snapshot points at the NEXT one, so coming back from the chat
+    // This card is done — the snapshot points at the NEXT one, so coming back from the lesson
     // lands on a fresh card with everything else (streak, joker, totals) exactly as left.
     writeSnapshot({
       cardIds: cards.map((c) => c.id),
@@ -577,10 +537,7 @@ function SwipeDeck({
       jokerCharge,
       at: Date.now(),
     });
-    const ask = wasCorrect
-      ? `Tu peux m'en dire un peu plus sur ${card.topic} ? Je veux être sûr de bien capter.`
-      : `Je viens de me planter sur « ${card.q} ». Tu peux me réexpliquer ${card.topic}, vite fait ?`;
-    bridgeToChat(card.subject, card.chapterId, ask, "revisions");
+    openLesson(card.subject, card.chapterId, "revisions");
   };
 
   const progressPct = ((index + (judged ? 1 : 0.5)) / cards.length) * 100;
@@ -904,212 +861,5 @@ function SwipeDeck({
         </div>
       </div>
     </>
-  );
-}
-
-// The app's own tactile button (see HeaderHUD's BeveledButton and Home's "Je pioche !"):
-// a darker base underneath, a face with the 2.5px border and hard shadow that presses down
-// 3px onto it. `round` makes the joker's circle; `compact` is the lighter post-verdict pill.
-function BevelButton({
-  children,
-  onClick,
-  label,
-  base,
-  face,
-  badge,
-  badgeTone = "hot",
-  round = false,
-  compact = false,
-  pressed,
-  className = "",
-}: {
-  children: ReactNode;
-  onClick: () => void;
-  label: string;
-  base: string;
-  face: string;
-  badge?: string;
-  badgeTone?: "hot" | "muted";
-  round?: boolean;
-  compact?: boolean;
-  pressed?: boolean;
-  className?: string;
-}) {
-  const radius = round ? "rounded-full" : "rounded-[22px]";
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={label}
-      aria-pressed={pressed}
-      className={`group relative block min-w-0 ${className}`}
-    >
-      <span
-        aria-hidden="true"
-        className={`absolute inset-0 translate-y-[4px] ${radius} border-[2.5px] border-black ${base}`}
-      />
-      <span
-        // Mouse-only lift (the `[@media(hover:hover)]` guard is what keeps this from sticking
-        // after a tap on touch devices, where Tailwind's plain `hover:` would otherwise latch
-        // on until the next unrelated tap) — this is also a web app, reached from a laptop via
-        // the keyboard shortcuts, and until now nothing told a mouse it was over a button
-        // before the click landed. Rises toward the cursor, the mirror of the press-down.
-        className={`relative flex h-[58px] items-center justify-center gap-2 ${radius} border-[2.5px] border-black px-3 font-display font-black uppercase tracking-wide shadow-[4px_4px_0_#000,inset_0_1.5px_0_rgba(255,255,255,0.5)] transition-transform duration-100 [@media(hover:hover)]:group-hover:-translate-y-0.5 [@media(hover:hover)]:group-hover:shadow-[5px_5px_0_#000,inset_0_1.5px_0_rgba(255,255,255,0.5)] group-active:translate-y-[4px] group-active:scale-[0.97] group-active:shadow-none ${
-          compact ? "text-[0.82rem] normal-case tracking-normal" : "text-[1.02rem]"
-        } ${face}`}
-      >
-        {children}
-      </span>
-      {badge && (
-        <span
-          aria-hidden="true"
-          className={`absolute -top-2.5 right-2 rounded-md border-2 border-black px-1.5 py-0.5 font-display text-[0.62rem] font-black shadow-[2px_2px_0_#000] ${
-            badgeTone === "hot" ? "bg-[var(--sun)] text-black" : "bg-white text-black/60"
-          }`}
-        >
-          {badge}
-        </span>
-      )}
-    </button>
-  );
-}
-
-function SwipeCard({
-  x,
-  y,
-  judged,
-  judgedMode,
-  typing,
-  flying,
-  flyDir,
-  onDragJudge,
-  onDragArm,
-  onDragNext,
-  onFlyComplete,
-  onDragStart,
-  onTap,
-  children,
-}: {
-  x: MotionValue<number>;
-  y: MotionValue<number>;
-  judged: boolean;
-  judgedMode: Verdict | null;
-  typing: boolean;
-  flying: boolean;
-  flyDir: FlyDir;
-  onDragJudge: (mode: Verdict) => void;
-  onDragArm: () => void;
-  onDragNext: (dir: FlyDir) => void;
-  onFlyComplete: () => void;
-  onDragStart?: () => void;
-  onTap?: () => void;
-  children: React.ReactNode;
-}) {
-  // Tilt is a pure function of the current horizontal drag offset, nothing else — rotate is
-  // fully derived from x, so whenever x is animated back to 0 rotate follows it to exactly 0
-  // automatically, with nothing separate left to reset or go stale.
-  const rotate = useTransform(x, [-200, 200], [-16, 16]);
-
-  // Border tints green/red as the drag leans toward accept/reject, fully saturated well
-  // before the 90px release threshold so the color itself previews the outcome.
-  const borderColor = useTransform(x, [-140, 0, 140], ["#E8564B", "#000000", "#0F9E6E"]);
-  // Full-card color wash layered on top of the content (see .fc-swipe-wash) — the border tint
-  // alone reads as a thin accent; this makes the whole stage visibly lean red/green as you
-  // drag. Together with the dock button lifting (SwipeDeck), that's the whole drag preview:
-  // nothing is written over the cards while the student is moving them.
-  const washColor = useTransform(
-    x,
-    [-140, 0, 140],
-    ["rgba(232, 86, 75, 0.28)", "rgba(0, 0, 0, 0)", "rgba(15, 158, 110, 0.28)"],
-  );
-
-  const springBack = () => {
-    // Released without crossing a threshold. With dragMomentum off and no dragConstraints,
-    // framer freezes x/y wherever the finger lifted — forcing the spring back explicitly is
-    // what keeps an aborted swipe from leaving the card stuck off-center and tilted.
-    animate(x, 0, { type: "spring", stiffness: 420, damping: 32 });
-    animate(y, 0, { type: "spring", stiffness: 420, damping: 32 });
-  };
-
-  const handleDragEnd = (_e: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const { offset } = info;
-    // Release threshold: 90px covers a comfortable thumb flick without being so short that
-    // a small readjustment mid-read accidentally commits a verdict.
-    const vertical = offset.y < -90 && Math.abs(offset.y) > Math.abs(offset.x);
-    if (judged) {
-      // After the verdict the swipe never blocks: any direction past the threshold moves on,
-      // flying the card out the way it was thrown.
-      if (vertical) onDragNext("up");
-      else if (offset.x > 90) onDragNext("right");
-      else if (offset.x < -90) onDragNext("left");
-      else springBack();
-      return;
-    }
-    if (vertical) {
-      // Up = arm the joker for this card (a declaration, not a verdict), then settle back.
-      onDragArm();
-      springBack();
-    } else if (offset.x > 90) {
-      onDragJudge("accept");
-    } else if (offset.x < -90) {
-      onDragJudge("reject");
-    } else {
-      springBack();
-    }
-  };
-
-  // Verdict lock: once a direction is committed, the card animates to a fixed off-screen
-  // target rather than continuing on drag momentum — the outcome (and its color) needs to
-  // be deterministic, not dependent on exactly how hard the release throw was.
-  const verdictColor =
-    judgedMode === "accept" ? "#0F9E6E" : judgedMode === "reject" ? "#E8564B" : "#000000";
-  const target = !flying
-    ? { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1, borderColor: "#000000" }
-    : flyDir === "up"
-      ? { x: 0, y: -700, rotate: 0, scale: 1, opacity: 0, borderColor: verdictColor }
-      : flyDir === "left"
-        ? { x: -480, y: -30, rotate: -22, scale: 1, opacity: 0, borderColor: verdictColor }
-        : { x: 480, y: -30, rotate: 22, scale: 1, opacity: 0, borderColor: verdictColor };
-
-  return (
-    <motion.div
-      className={`flashcard ${judged ? "is-judged" : ""}`}
-      style={{ x, y, rotate, borderColor }}
-      // Draggable before AND after the verdict — post-verdict drags advance instead of judging
-      // (see handleDragEnd). Only the typing beat is off-limits.
-      drag={!typing && !flying}
-      // Commits to whichever axis the gesture starts on and holds it for the rest of that
-      // drag, instead of letting x and y drift together — a swipe that starts slightly
-      // diagonal used to blend the verdict tilt/colour-wash (driven by x) with the up-swipe
-      // check (driven by y), reading as "mushy" rather than a clean, single-direction swipe.
-      // It also means handleDragEnd's own vertical/horizontal branches see a cleaner signal:
-      // whichever axis is locked stays near 0 on the other, so the two checks can't both
-      // nearly-fire on the same ambiguous diagonal release.
-      dragDirectionLock
-      // 0.55 = the physical "resistance": at 1 the card would track the finger 1:1 with no
-      // give, at 0 it wouldn't move past the origin at all.
-      dragElastic={0.55}
-      // Momentum is off deliberately — release-throw physics are replaced by the fixed
-      // `target` animation above once a verdict is locked.
-      dragMomentum={false}
-      onDragStart={onDragStart}
-      onDragEnd={handleDragEnd}
-      // Each new card mounts fresh (key={card.id}), so this initial state is what makes it
-      // arrive with a soft pop rather than snapping straight to rest.
-      initial={{ scale: 0.92, opacity: 0 }}
-      animate={target}
-      transition={
-        flying
-          ? { duration: 0.4, ease: [0.5, 0, 0.85, 0.35] }
-          : { type: "spring", stiffness: 420, damping: 32 }
-      }
-      onAnimationComplete={() => {
-        if (flying) onFlyComplete();
-      }}
-      onClick={onTap}
-    >
-      <motion.div className="fc-swipe-wash" style={{ background: washColor }} aria-hidden="true" />
-      {children}
-    </motion.div>
   );
 }

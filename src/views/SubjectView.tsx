@@ -4,7 +4,7 @@ import { resolveChapters } from "@/lib/progress";
 import { sfx } from "@/lib/sound";
 import { TopBar } from "@/components/TopBar";
 import { BraiseMascot } from "@/components/BraiseMascot";
-import { SUBJECTS, STORIES } from "@/data";
+import { SUBJECTS } from "@/data";
 import { DECLIC_SCRIPTS } from "@/lib/declic";
 
 const ROW_JUSTIFY: Record<string, string> = {
@@ -80,7 +80,7 @@ export function SubjectView() {
                   // chapter, chat otherwise — previously always forced 'echanger', so even a
                   // chapter with a full scripted story opened straight into open-ended AI chat,
                   // with the actual lesson buried one tap away behind the "Vocal Animé" toggle.
-                  openLesson(subject.id, c.id, STORIES[c.id] ? "vocal" : "echanger");
+                  openLesson(subject.id, c.id);
                 }}
               >
                 {isDone ? (

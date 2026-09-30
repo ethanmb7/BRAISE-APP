@@ -36,18 +36,11 @@ type Ctx = {
   toggleDyslexia: () => void;
   toggleSound: () => void;
   openSubject: (subjectId: string, chapterId?: string) => void;
-  openLesson: (subjectId: string, chapterId: string, mode?: "vocal" | "echanger") => void;
+  openLesson: (subjectId: string, chapterId: string, returnTo?: ViewId) => void;
   completeChapter: (chapterId: string) => void;
   reviewCard: (cardId: string, confidence: Confidence) => void;
   getDueCards: () => string[];
   goBack: () => void;
-  bridgeToChat: (
-    subjectId: string,
-    chapterId: string,
-    bridgeMessage: string,
-    returnTo?: ViewId,
-  ) => void;
-  clearChatBridge: () => void;
 };
 
 const AppCtx = createContext<Ctx | null>(null);
@@ -79,9 +72,7 @@ const INITIAL: AppState = {
   currentChapterId: null,
   lastSubjectId: null,
   lastChapterId: null,
-  currentLessonMode: "vocal" as const,
   completedChapters: [],
-  chatBridgeMessage: null,
   lessonReturnTo: null,
   lastCompletion: null,
   cardReviews: {},
@@ -211,49 +202,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
-  const openLesson = useCallback(
-    (subjectId: string, chapterId: string, mode?: "vocal" | "echanger") => {
-      setState((s) => ({
-        ...s,
-        ...ensureSession(s),
-        view: "lesson",
-        currentSubjectId: subjectId,
-        currentChapterId: chapterId,
-        lastSubjectId: subjectId,
-        lastChapterId: chapterId,
-        currentLessonMode: mode ?? "vocal",
-        chatBridgeMessage: null,
-      }));
-    },
-    [],
-  );
-
-  const bridgeToChat = useCallback(
-    (subjectId: string, chapterId: string, bridgeMessage: string, returnTo?: ViewId) => {
-      setState((s) => ({
-        ...s,
-        ...ensureSession(s),
-        view: "lesson",
-        currentSubjectId: subjectId,
-        currentChapterId: chapterId,
-        currentLessonMode: "echanger",
-        chatBridgeMessage: bridgeMessage,
-        // "Revoir la notion" from a Réviser session comes back to the session, not to the
-        // subject page it was never on.
-        lessonReturnTo: returnTo ?? null,
-      }));
-    },
-    [],
-  );
-
-  // ChatMode used to track "already sent" with its own local useRef, which reset to false on
-  // every remount — toggling to "Vocal Animé" and back to "Échanger" unmounts/remounts ChatMode,
-  // and state.chatBridgeMessage itself was only ever cleared by openLesson (a fresh lesson entry),
-  // so the same bridged question got auto-sent and duplicated in the transcript on every toggle.
-  // Clearing it in the store, right when ChatMode actually consumes it, means the message is gone
-  // for good the moment it's been sent once — no local ref needed to survive a remount.
-  const clearChatBridge = useCallback(() => {
-    setState((s) => ({ ...s, ...ensureSession(s), chatBridgeMessage: null }));
+  const openLesson = useCallback((subjectId: string, chapterId: string, returnTo?: ViewId) => {
+    setState((s) => ({
+      ...s,
+      ...ensureSession(s),
+      view: "lesson",
+      currentSubjectId: subjectId,
+      currentChapterId: chapterId,
+      lastSubjectId: subjectId,
+      lastChapterId: chapterId,
+      // "Revoir la notion" from a Réviser session comes back to the session, not to the
+      // subject page it was never on.
+      lessonReturnTo: returnTo ?? null,
+    }));
   }, []);
 
   const completeChapter = useCallback((chapterId: string) => {
@@ -352,8 +313,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
         toggleSound,
         openSubject,
         openLesson,
-        bridgeToChat,
-        clearChatBridge,
         completeChapter,
         reviewCard,
         getDueCards,
