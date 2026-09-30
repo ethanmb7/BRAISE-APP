@@ -1,0 +1,48 @@
+NOTION: h2
+CARTE_REVISION: fc15
+ACCROCHE: Un général devient empereur juste après une révolution anti-rois… logique ?
+
+SITUATION
+1799 : la Révolution française a aboli la royauté depuis 10 ans. Un général, Napoléon Bonaparte, prend le pouvoir.
+
+CHOIX
+En 1804, Napoléon se proclame…
+- Président => Non — ce mot n'a même pas ce sens-là à l'époque, et surtout ce n'est pas ce qu'il choisit.
+- [correct] Empereur => Exact ! Napoléon Ier, empereur des Français, en 1804.
+
+SITUATION
+Un empereur, comme un roi, a tout le pouvoir. Après une révolution qui a guillotiné un roi, ça surprend.
+
+CHOIX
+Est-ce que ça veut dire que Napoléon annule tout ce qu'a fait la Révolution ?
+- Oui, il remet tout comme avant 1789 => Non — plusieurs acquis de la Révolution restent en place sous son pouvoir.
+~ Napoléon garde le pouvoir personnel d'un roi, mais il conserve aussi de vraies avancées de la Révolution : l'égalité devant la loi, par exemple, reste écrite dans ses propres textes.
+- [correct] Non, il garde certaines idées de la Révolution => Exact ! Il verrouille le pouvoir, mais garde des acquis comme l'égalité devant la loi.
+
+REVELATION: 🔥 Le Code civil (1804)
+En 1804, Napoléon fait rédiger le Code civil, qui organise le droit des personnes et des biens — et qui reste, encore aujourd'hui, en partie la base du droit français.
+
+CHOIX
+Le Code civil et la Déclaration des droits de l'homme, c'est…
+- La même chose, écrite à deux moments différents => Non, ce sont deux textes différents, avec 15 ans d'écart et un objectif différent.
+- [correct] Deux textes différents, à 15 ans d'écart => Exact ! Déclaration des droits de l'homme = 1789. Code civil = 1804, sous Napoléon.
+
+REFORMULATION
+Explique avec tes mots pourquoi Napoléon n'a pas juste « annulé » la Révolution.
+
+SITUATION
+On te donne un texte de 1804 qui organise le mariage, l'héritage et la propriété en France.
+
+CHOIX
+Ce texte, c'est probablement…
+- La Déclaration des droits de l'homme => Non — elle date de 1789, et parle de libertés politiques, pas d'héritage ou de mariage.
+- [correct] Le Code civil => Exact ! Ces sujets (mariage, héritage, propriété) sont typiquement ceux du Code civil.
+
+DECLIC
+Voilà. Tu ne confonds plus la Révolution et l'Empire de Napoléon.
+
+FICHE: Napoléon et le Code civil
+RETENIR
+Napoléon devient empereur en 1804, verrouillant le pouvoir personnel — mais il garde certains acquis de la Révolution (égalité devant la loi) et crée le Code civil, encore en partie utilisé aujourd'hui.
+PIEGE
+Ne pas confondre le Code civil (1804, droit des personnes et des biens) avec la Déclaration des droits de l'homme (1789, libertés politiques) — deux textes différents, à 15 ans d'écart.

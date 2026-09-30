@@ -1,0 +1,49 @@
+NOTION: f2
+CARTE_REVISION: fc4
+ACCROCHE: 3 points gratuits au contrôle si tu sais compter jusqu'à 12
+
+SITUATION
+Un poème a des lignes qui reviennent toujours à la même longueur, comme une musique.
+
+CHOIX
+Une de ces lignes, en poésie, ça s'appelle comment ?
+- Une strophe => Presque : une strophe, c'est un GROUPE de plusieurs lignes, pas une seule.
+~ Pense à un texte comme à un livre : la strophe est le paragraphe (plusieurs lignes ensemble), le vers est la phrase, une seule ligne à l'intérieur de ce paragraphe.
+- [correct] Un vers => Exact ! Un vers, c'est une seule ligne du poème.
+
+SITUATION
+Chaque vers a un nombre précis de syllabes — et ce nombre a même un nom.
+
+CHOIX
+Un vers de 12 syllabes s'appelle…
+- Un décasyllabe => Non — "déca" veut dire 10, pas 12.
+- [correct] Un alexandrin => Exact ! Alexandrin = 12 syllabes.
+
+REVELATION: 🔥 Alexandrin et décasyllabe
+Un alexandrin a 12 syllabes, un décasyllabe en a 10. Pour vérifier, on compte les SYLLABES du vers, jamais les mots.
+
+CHOIX
+Un vers de 9 mots a-t-il forcément 12 syllabes ?
+- Oui, ça se voit au nombre de mots => Non — le nombre de mots ne donne jamais le nombre de syllabes : un mot peut avoir 1, 2, 3 syllabes ou plus.
+- [correct] Non, il faut compter les syllabes une par une => Exact ! Le compte de mots ne dit rien sur le compte de syllabes.
+
+REFORMULATION
+Explique avec tes mots la différence entre un alexandrin et un décasyllabe.
+
+SITUATION
+Le "e" final d'un mot, en fin de vers, peut disparaître à l'oral… ou pas, selon ce qui suit.
+
+CHOIX
+Dans "une petite fille", suivi d'une consonne, le "e" de "petite" compte-t-il comme une syllabe ?
+- Non, le e final ne compte jamais => Non — c'est vrai seulement s'il est suivi d'une voyelle, ou tout en fin de vers. Là, il est suivi d'une consonne (le "f" de "fille").
+~ Le "e" muet, c'est comme un interrupteur : il s'éteint (disparaît) devant une voyelle ou en fin de vers, mais il s'allume (compte comme une syllabe) devant une consonne. Ici, "fille" commence par une consonne — donc le e s'allume.
+- [correct] Oui, il compte comme une syllabe => Exact ! Devant une consonne, le e muet se prononce et compte dans le total.
+
+DECLIC
+Voilà. Tu sais compter un vers comme un vrai pro, e muet compris.
+
+FICHE: Alexandrin et décasyllabe
+RETENIR
+Un alexandrin = 12 syllabes, un décasyllabe = 10. On compte les syllabes du vers, pas les mots.
+PIEGE
+Le "e" muet en fin de mot compte comme une syllabe s'il est suivi d'une consonne — il ne disparaît que devant une voyelle ou en toute fin de vers.

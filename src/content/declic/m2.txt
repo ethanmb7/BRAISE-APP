@@ -1,0 +1,49 @@
+NOTION: m2
+CARTE_REVISION: fc1
+ACCROCHE: Mesurer une distance sans un mètre assez long ? Fais confiance à un triangle.
+
+SITUATION
+Tu veux savoir si un mur fait un angle bien droit, mais tu n'as pas d'équerre géante.
+
+CHOIX
+Un triangle a deux côtés de 3 et 4. Le troisième (le plus long) fait…
+- 7 => Presque logique, mais un triangle ne marche pas comme une addition simple.
+~ Si tu pouvais juste additionner les côtés, un triangle serait toujours "plat", aligné en ligne droite. Un vrai triangle rectangle a une forme, une hauteur : le calcul doit en tenir compte.
+- [correct] 5 => Exact ! (Le fameux triangle 3-4-5, le plus connu de tous.)
+
+SITUATION
+Ce triangle 3-4-5 n'est pas un hasard : il vérifie une règle précise entre ses trois côtés.
+
+CHOIX
+Cette règle relie les côtés comment, à ton avis ?
+- [correct] En mettant chaque côté au carré => Exact ! 3² + 4² = 9 + 16 = 25, et 5² = 25. Ça correspond.
+- En les multipliant tous ensemble => Non — 3 × 4 × 5 = 60, ça n'a aucun rapport avec les trois nombres pris seuls.
+
+REVELATION: 🔥 Le théorème de Pythagore
+Dans un triangle RECTANGLE, le carré de l'hypoténuse (le côté le plus long, face à l'angle droit) est égal à la somme des carrés des deux autres côtés : a² + b² = c².
+
+CHOIX
+Un triangle a des côtés 6, 8 et 10. Est-ce qu'il est rectangle ?
+- Non, il faut le mesurer avec une équerre => Pas besoin d'équerre : le calcul suffit à le prouver ou le contredire.
+- [correct] Oui, car 6² + 8² = 10² => Exact ! 36 + 64 = 100 = 10². Le théorème est vérifié, donc le triangle est rectangle.
+
+REFORMULATION
+Explique avec tes mots ce que dit le théorème de Pythagore.
+
+SITUATION
+Un triangle a des côtés 5, 6 et 8 — mais personne ne t'a dit s'il est rectangle.
+
+CHOIX
+Comment savoir si CE triangle est vraiment rectangle ?
+- Il l'est forcément, tous les triangles marchent avec Pythagore => Non — le théorème ne marche QUE sur un triangle déjà rectangle, sinon le calcul ne tombe pas juste.
+~ Pythagore n'est pas une formule magique pour tous les triangles — c'est un test réservé aux triangles rectangles. Sur un triangle quelconque, a² + b² ne fait pas forcément c² : ça ne veut rien dire du tout.
+- [correct] Je vérifie si 5² + 6² = 8² => Exact ! 25 + 36 = 61, alors que 8² = 64. Ce n'est pas égal : ce triangle n'est PAS rectangle.
+
+DECLIC
+Voilà. Tu sais maintenant reconnaître — et utiliser — un triangle rectangle rien qu'avec des calculs.
+
+FICHE: Le théorème de Pythagore
+RETENIR
+Dans un triangle RECTANGLE seulement : a² + b² = c², où c est l'hypoténuse (le côté le plus long, face à l'angle droit).
+PIEGE
+Appliquer la formule à un triangle qui n'est pas rectangle — vérifie toujours l'angle droit (ou fais le calcul dans les deux sens) avant.
