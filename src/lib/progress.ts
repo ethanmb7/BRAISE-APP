@@ -6,32 +6,34 @@ import { SUBJECTS } from "@/data";
 // and tests can exercise them directly.
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+// In real XP — the same unit as the header badge, Aura and everything else, not a separately
+// invented "card-equivalent" scale. Same relative spacing as before (6:10:18), just multiplied
+// by XP_REWARDS.REVIEW_LEARNING so "tranquille" still means roughly a handful of cards and
+// "a-fond" still means substantially more, but the number a student sees here is now the exact
+// same number that shows up on the header a moment later — no mental conversion between two
+// systems that used to weight a finished chapter differently (3x a card here, 5x a card in XP).
 const GOAL_TARGETS: Record<string, number> = {
-  tranquille: 6,
-  regulier: 10,
-  "a-fond": 18,
+  tranquille: 60,
+  regulier: 100,
+  "a-fond": 180,
   // Labels saved by the old onboarding, kept so existing students keep the same daily target.
-  "15 min/jour": 6,
-  "30 min/jour": 10,
-  "1 heure/jour": 18,
+  "15 min/jour": 60,
+  "30 min/jour": 100,
+  "1 heure/jour": 180,
 };
-const DEFAULT_GOAL_TARGET = 10;
+const DEFAULT_GOAL_TARGET = 100;
 
 export function goalTarget(s: AppState): number {
   return GOAL_TARGETS[s.user.goal] ?? DEFAULT_GOAL_TARGET;
 }
 
 export function computeGoalPct(s: AppState): number {
-  const activity = s.sessionCardsReviewed + s.sessionChaptersDone * 3;
-  return Math.min(100, Math.round((activity / goalTarget(s)) * 100));
+  return Math.min(100, Math.round((s.sessionXpEarned / goalTarget(s)) * 100));
 }
 
-/** Remaining "card-equivalent" units to hit today's goal (cards count 1, chapters count 3 —
- *  same weighting as computeGoalPct) — real, derived from the same activity formula, never a
- *  separate guess. 0 once the goal is already met. */
+/** Real XP remaining to hit today's goal — 0 once it's already met. */
 export function remainingToGoal(s: AppState): number {
-  const activity = s.sessionCardsReviewed + s.sessionChaptersDone * 3;
-  return Math.max(0, goalTarget(s) - activity);
+  return Math.max(0, goalTarget(s) - s.sessionXpEarned);
 }
 
 /** Real chapter progression, derived from `completedChapters` — the one dynamic signal the app
@@ -188,8 +190,7 @@ export function ensureSession(s: AppState): Partial<AppState> {
 
   const reset = {
     sessionDate: today,
-    sessionCardsReviewed: 0,
-    sessionChaptersDone: 0,
+    sessionXpEarned: 0,
     dailyGoalMet: false,
   };
 

@@ -30,8 +30,7 @@ function baseState(overrides: Partial<AppState>): AppState {
     lastCompletion: null,
     cardReviews: {},
     sessionDate: new Date().toDateString(),
-    sessionCardsReviewed: 3,
-    sessionChaptersDone: 1,
+    sessionXpEarned: 30,
     ...overrides,
   };
 }
@@ -48,8 +47,7 @@ describe("ensureSession", () => {
     const s = baseState({ sessionDate: daysAgo(1), dailyGoalMet: true, streak: 4 });
     const result = ensureSession(s);
     expect(result.streak).toBe(5);
-    expect(result.sessionCardsReviewed).toBe(0);
-    expect(result.sessionChaptersDone).toBe(0);
+    expect(result.sessionXpEarned).toBe(0);
     expect(result.dailyGoalMet).toBe(false);
   });
 
@@ -122,7 +120,7 @@ describe("ensureSession", () => {
     const s = baseState({ sessionDate: "not-a-real-date", streak: 3 });
     const result = ensureSession(s);
     expect(Number.isNaN(result.streak)).toBe(false);
-    expect(result.sessionCardsReviewed).toBe(0);
+    expect(result.sessionXpEarned).toBe(0);
   });
 });
 

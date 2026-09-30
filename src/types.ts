@@ -141,6 +141,10 @@ export type AppState = {
   lastCompletion: ChapterCompletion | null;
   cardReviews: Record<string, CardReview>;
   sessionDate: string;
-  sessionCardsReviewed: number;
-  sessionChaptersDone: number;
+  /** Real XP earned today (resets at the day boundary, same as everything else prefixed
+   *  `session`) — the one number the daily goal is measured in, same unit the header/Aura/every
+   *  other reward number already shows. Replaced separate sessionCardsReviewed/
+   *  sessionChaptersDone counters that weighted a chapter as "worth 3 cards" for the goal while
+   *  XP itself weighted it at 5x — two numbers for the same day's effort that didn't agree. */
+  sessionXpEarned: number;
 };

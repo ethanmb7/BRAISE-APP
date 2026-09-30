@@ -79,8 +79,7 @@ const INITIAL: AppState = {
   lastCompletion: null,
   cardReviews: {},
   sessionDate: new Date().toDateString(),
-  sessionCardsReviewed: 0,
-  sessionChaptersDone: 0,
+  sessionXpEarned: 0,
 };
 
 export function AppProvider({ children }: { children: ReactNode }) {
@@ -226,18 +225,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const session = { ...s, ...ensureSession(s) };
       const already = session.completedChapters.includes(chapterId);
       const xpGained = already ? 0 : XP_REWARDS.CHAPTER_COMPLETE;
-      const sessionChaptersDone = already
-        ? session.sessionChaptersDone
-        : session.sessionChaptersDone + 1;
-      const activity = session.sessionCardsReviewed + sessionChaptersDone * 3;
+      const sessionXpEarned = session.sessionXpEarned + xpGained;
       return {
         ...session,
         completedChapters: already
           ? session.completedChapters
           : [...session.completedChapters, chapterId],
-        sessionChaptersDone,
+        sessionXpEarned,
         xp: session.xp + xpGained,
-        dailyGoalMet: activity >= goalTarget(session),
+        dailyGoalMet: sessionXpEarned >= goalTarget(session),
         lastCompletion: { chapterId, wasNewCompletion: !already, xpGained },
       };
     });
@@ -253,7 +249,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const session = { ...s, ...ensureSession(s) };
       const prev = session.cardReviews[cardId];
       const updated = sm2(prev, confidence);
-      const sessionCardsReviewed = session.sessionCardsReviewed + 1;
       // A wrong swipe-judgment (RevisionsView's only caller for 'not-sure') used to still grant
       // XP here — invisible everywhere a student could see it: the "GRILLÉ" feedback line never
       // mentioned it, and BraiseRecap's own +XP total only ever summed correct answers. The real
@@ -271,14 +266,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
             ? XP_REWARDS.REVIEW_MASTERED
             : XP_REWARDS.REVIEW_LEARNING
           : 0;
-      const activity = sessionCardsReviewed + session.sessionChaptersDone * 3;
+      const sessionXpEarned = session.sessionXpEarned + xpGain;
       void saveCardReview(cardId, updated);
       return {
         ...session,
         cardReviews: { ...session.cardReviews, [cardId]: updated },
-        sessionCardsReviewed,
+        sessionXpEarned,
         xp: session.xp + xpGain,
-        dailyGoalMet: activity >= goalTarget(session),
+        dailyGoalMet: sessionXpEarned >= goalTarget(session),
       };
     });
   }, []);
