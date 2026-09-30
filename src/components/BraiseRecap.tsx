@@ -4,6 +4,7 @@ import { BraiseMascot } from "@/components/BraiseMascot";
 import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
 import { getAgeGroup, recapCardsLine, recapComboLine, recapTrophyLine } from "@/lib/braiseVoice";
+import { useCountUp } from "@/lib/useCountUp";
 
 type Slide =
   | { key: "cards"; bg: "ink"; title: string; sub: string }
@@ -158,23 +159,10 @@ export function BraiseRecap({
 }
 
 function XpCount({ target }: { target: number }) {
-  const [n, setN] = useState(0);
-  useEffect(() => {
-    setN(0);
-    if (target <= 0) return;
-    const step = Math.max(1, Math.ceil(target / 24));
-    const id = setInterval(() => {
-      setN((v) => {
-        const next = v + step;
-        if (next >= target) {
-          clearInterval(id);
-          return target;
-        }
-        return next;
-      });
-    }, 28);
-    return () => clearInterval(id);
-  }, [target]);
+  // Same rAF-based counter every other reward number in the app uses (Aura, Profil, the header
+  // XP badge) — this used to be its own separate setInterval implementation, functionally
+  // similar but a second copy of logic that already existed once.
+  const n = useCountUp(target, 700);
   return (
     <>
       <div className="recap-xp">+{n}</div>
