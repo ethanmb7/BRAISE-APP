@@ -24,6 +24,7 @@ import {
   verdictTag,
 } from "@/lib/braiseVoice";
 import { reportCard } from "@/lib/reports";
+import { MASTERED_AT_REPETITIONS, XP_REWARDS } from "@/lib/progress";
 import { FLASHCARDS, SUBJECTS } from "@/data";
 import type { Flashcard, Confidence } from "@/types";
 import { readSnapshot, writeSnapshot, type SessionSnapshot } from "@/lib/revisionSession";
@@ -422,6 +423,16 @@ function SwipeDeck({
   const card = cards[index];
   const subject = SUBJECTS.find((s) => s.id === card.subject);
   const shownAnswer = isTrueAnswer ? card.a : card.wrongA;
+  // What INTOX/CARRÉ actually pay for this exact card, shown on the buttons themselves before
+  // the student answers — never a static number that could promise more than judge() below
+  // actually grants once it checks this same card's own mastery.
+  const currentCardMastered =
+    !!state.cardReviews[card.id] &&
+    state.cardReviews[card.id].repetitions >= MASTERED_AT_REPETITIONS;
+  const expectedReward = currentCardMastered
+    ? XP_REWARDS.REVIEW_MASTERED
+    : XP_REWARDS.REVIEW_LEARNING;
+  const rewardBadge = `+${armed ? expectedReward * 2 : expectedReward}`;
 
   const toggleArm = () => {
     if (judged || typing || !jokerReady) return;
@@ -444,10 +455,13 @@ function SwipeDeck({
     setArmed(false);
     if (correctJudgment) {
       sfx.correct(soundOn);
-      const base = 15;
-      // Doubling, not a flat top-up: reviewCard() below already grants the base amount for a
-      // 'sure' review, so adding that same base again here as a bonus makes the total exactly
-      // 2x rather than base+5.
+      const prevReview = state.cardReviews[card.id];
+      const wasMastered = !!prevReview && prevReview.repetitions >= MASTERED_AT_REPETITIONS;
+      const base = wasMastered ? XP_REWARDS.REVIEW_MASTERED : XP_REWARDS.REVIEW_LEARNING;
+      // Doubling, not a flat top-up: reviewCard() below already grants this exact base amount
+      // for a 'sure' review (same mastered/learning check, same constants), so adding it again
+      // here as a bonus makes the total exactly 2x — never a separately-tuned number that could
+      // drift out of sync with what reviewCard actually grants.
       const bonus = useSuper ? base : 0;
       if (bonus > 0) addXp(bonus);
       const total = base + bonus;
@@ -741,7 +755,7 @@ function SwipeDeck({
                       face="bg-[var(--coral)] text-white"
                       onClick={() => judge("reject")}
                       label="Intox — c'est faux"
-                      badge={armed ? "+30" : "+15"}
+                      badge={rewardBadge}
                     >
                       <X size={20} strokeWidth={3.2} />
                       <span>Intox</span>
@@ -802,7 +816,7 @@ function SwipeDeck({
                       face="bg-[var(--mint)] text-black"
                       onClick={() => judge("accept")}
                       label="Carré — c'est vrai"
-                      badge={armed ? "+30" : "+15"}
+                      badge={rewardBadge}
                     >
                       <Check size={20} strokeWidth={3.2} />
                       <span>Carré</span>

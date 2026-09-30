@@ -3326,22 +3326,6 @@ select {
   transition: opacity 0.5s ease;
 }
 .quiz-streak-badge.show { opacity: 1; }
-.xp-pop {
-  position: absolute;
-  transform: translateX(-50%);
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 800;
-  color: var(--orange);
-  font-size: 1.15rem;
-  animation: xpFloat 0.9s ease forwards;
-  pointer-events: none;
-  z-index: 5;
-}
-@keyframes xpFloat {
-  0% { opacity: 0; transform: translateX(-50%) translateY(0); }
-  30% { opacity: 1; }
-  100% { opacity: 0; transform: translateX(-50%) translateY(-30px); }
-}
 .quiz-tag2 {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.68rem;

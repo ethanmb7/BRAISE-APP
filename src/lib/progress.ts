@@ -129,9 +129,27 @@ export function resolveRestoredTab(view: ViewId, savedTab: TabId | undefined): T
   return "home";
 }
 
+// A card counts as mastered once it's cleared the SM-2 learning phase (recalled correctly at
+// least twice in a row) — the one signal the whole XP economy and Aura's mastery display both
+// key off, so a review's real value and its "acquise" badge always agree with each other.
+export const MASTERED_AT_REPETITIONS = 2;
+
+// The one place every XP amount in the app is defined — everywhere else imports these instead
+// of writing its own number, so there is exactly one number to change if the economy is ever
+// retuned, and no risk of two call sites silently drifting apart (see git history: the "Super
+// Braise" bonus in RevisionsView used to hardcode its own copy of the base reward). Reviewing a
+// card you're still learning pays full price; reviewing one you've already mastered pays half —
+// real, but not worth restarting a session over, so replaying known cards for repeated full XP
+// stops being profitable without a hard cap or cooldown getting in a genuine study session's way.
+export const XP_REWARDS = {
+  REVIEW_LEARNING: 10,
+  REVIEW_MASTERED: 5,
+  CHAPTER_COMPLETE: 50,
+} as const;
+
 export function sm2(review: CardReview | undefined, confidence: Confidence): CardReview {
   const now = Date.now();
-  const quality = confidence === "sure" ? 5 : confidence === "doubt" ? 3 : 1;
+  const quality = confidence === "sure" ? 5 : 1;
 
   let { repetitions, interval, ease } = review
     ? { repetitions: review.repetitions, interval: review.interval, ease: review.ease }

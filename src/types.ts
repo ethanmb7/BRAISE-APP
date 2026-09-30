@@ -73,7 +73,7 @@ export type Badge = {
   cond: string;
 };
 
-export type Confidence = "not-sure" | "doubt" | "sure";
+export type Confidence = "not-sure" | "sure";
 
 export type CardReview = {
   repetitions: number;

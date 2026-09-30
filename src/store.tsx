@@ -14,9 +14,11 @@ import { loadProgress, saveProgress, saveCardReview } from "@/lib/persist";
 import {
   ensureSession,
   goalTarget,
+  MASTERED_AT_REPETITIONS,
   resolveRestoredTab,
   resolveRestoredView,
   sm2,
+  XP_REWARDS,
 } from "@/lib/progress";
 
 type Ctx = {
@@ -223,7 +225,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // happens after midnight while a previous session is still in local storage.
       const session = { ...s, ...ensureSession(s) };
       const already = session.completedChapters.includes(chapterId);
-      const xpGained = already ? 0 : 50;
+      const xpGained = already ? 0 : XP_REWARDS.CHAPTER_COMPLETE;
       const sessionChaptersDone = already
         ? session.sessionChaptersDone
         : session.sessionChaptersDone + 1;
@@ -253,11 +255,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const updated = sm2(prev, confidence);
       const sessionCardsReviewed = session.sessionCardsReviewed + 1;
       // A wrong swipe-judgment (RevisionsView's only caller for 'not-sure') used to still grant
-      // +3 XP here — invisible everywhere a student could see it: the "GRILLÉ" feedback line
-      // never mentioned it, and BraiseRecap's own +XP total only ever summed correct answers.
-      // The real account XP (this field) and the celebratory total shown at the end of a
-      // session could silently drift apart by 3 XP per mistake with no explanation offered.
-      const xpGain = confidence === "sure" ? 15 : confidence === "doubt" ? 8 : 0;
+      // XP here — invisible everywhere a student could see it: the "GRILLÉ" feedback line never
+      // mentioned it, and BraiseRecap's own +XP total only ever summed correct answers. The real
+      // account XP (this field) and the celebratory total shown at the end of a session could
+      // silently drift apart with no explanation offered.
+      //
+      // A correct review of a card already mastered before this attempt pays half price — see
+      // XP_REWARDS' own comment for why: reviewing something you already know is real
+      // consolidation and still worth something, but paying it full price is what let a student
+      // farm XP by restarting a Réviser session and re-answering cards they'd long since learned.
+      const wasMastered = !!prev && prev.repetitions >= MASTERED_AT_REPETITIONS;
+      const xpGain =
+        confidence === "sure"
+          ? wasMastered
+            ? XP_REWARDS.REVIEW_MASTERED
+            : XP_REWARDS.REVIEW_LEARNING
+          : 0;
       const activity = sessionCardsReviewed + session.sessionChaptersDone * 3;
       void saveCardReview(cardId, updated);
       return {

@@ -316,14 +316,17 @@ function Quiz({
   const [streak, setStreak] = useState(0);
   const [showStreak, setShowStreak] = useState(false);
   const [done, setDone] = useState(false);
-  const [xpPop, setXpPop] = useState<{ x: number; y: number } | null>(null);
   const [feedbackLine, setFeedbackLine] = useState("");
   const { state } = useApp();
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
 
   const q = questions[idx];
 
-  const handleAnswer = (optIdx: number, event: React.MouseEvent) => {
+  // No per-question XP here, on purpose: a quiz answer used to pop up "+10 XP" without ever
+  // actually calling addXp — a real number the student never received. The one honest reward for
+  // this chapter is completeChapter's flat amount at the end (see LessonView's handleComplete),
+  // same as Le Déclic, which never gamified individual taps either.
+  const handleAnswer = (optIdx: number) => {
     if (selected !== null) return;
     setSelected(optIdx);
     const correct = optIdx === q.answer;
@@ -340,15 +343,6 @@ function Quiz({
         }
         return ns;
       });
-      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-      const parentRect = (
-        event.currentTarget as HTMLElement
-      ).parentElement?.getBoundingClientRect();
-      setXpPop({
-        x: rect.left - (parentRect?.left ?? 0) + rect.width / 2,
-        y: rect.top - (parentRect?.top ?? 0),
-      });
-      setTimeout(() => setXpPop(null), 900);
     } else {
       sfx.wrong(soundOn);
       setFeedbackLine(quizWrong(voiceCtx));
@@ -388,11 +382,6 @@ function Quiz({
 
   return (
     <div className="quiz-card" style={{ position: "relative" }}>
-      {xpPop && (
-        <div className="xp-pop" style={{ left: xpPop.x, top: xpPop.y }}>
-          +10 XP
-        </div>
-      )}
       <div className="quiz-head">
         <div className="quiz-dots">
           {questions.map((_, i) => (
@@ -414,7 +403,7 @@ function Quiz({
               className={`quiz-opt2 ${
                 selected !== null && i === q.answer ? "correct" : selected === i ? "wrong" : ""
               }`}
-              onClick={(e) => handleAnswer(i, e)}
+              onClick={() => handleAnswer(i)}
               disabled={selected !== null}
             >
               {opt}
@@ -429,7 +418,7 @@ function Quiz({
             className={
               selected !== null && q.answer === 1 ? "correct" : selected === 1 ? "wrong" : ""
             }
-            onClick={(e) => handleAnswer(1, e)}
+            onClick={() => handleAnswer(1)}
             disabled={selected !== null}
           >
             <Check size={16} />
@@ -439,7 +428,7 @@ function Quiz({
             className={
               selected !== null && q.answer === 0 ? "correct" : selected === 0 ? "wrong" : ""
             }
-            onClick={(e) => handleAnswer(0, e)}
+            onClick={() => handleAnswer(0)}
             disabled={selected !== null}
           >
             <X size={16} />
