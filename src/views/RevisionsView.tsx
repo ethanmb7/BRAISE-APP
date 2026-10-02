@@ -701,6 +701,7 @@ function SwipeDeck({
                   color={subject?.color ?? "var(--sun)"}
                   subjectLabel={SUBJECT_SHORT[card.subject] ?? subject?.name ?? ""}
                   topic={card.topic}
+                  alreadyMastered={currentCardMastered}
                 />
                 <AnimatePresence mode="wait" initial={false}>
                   <AnswerCard

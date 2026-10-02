@@ -44,6 +44,7 @@ export function QuestionCard({
   color,
   subjectLabel,
   topic,
+  alreadyMastered,
 }: {
   question: string;
   emoji: string;
@@ -51,6 +52,10 @@ export function QuestionCard({
   /** Folded into this card's own header — no separate pill floating above it anymore. */
   subjectLabel: string;
   topic: string;
+  /** Whether this exact card already cleared the SM-2 learning phase — shown as a quiet chip so
+   *  a correct answer paying half XP (see XP_REWARDS.REVIEW_MASTERED) has a visible reason
+   *  instead of just being a smaller number with no explanation the moment it's judged. */
+  alreadyMastered?: boolean;
 }) {
   return (
     <motion.div
@@ -71,6 +76,11 @@ export function QuestionCard({
         <span className="font-display text-[0.92rem] font-extrabold leading-tight text-black">
           {subjectLabel} <span className="text-black/40">·</span> {topic}
         </span>
+        {alreadyMastered && (
+          <span className="ml-auto flex-shrink-0 rounded-full border-[1.5px] border-black/20 bg-black/[0.05] px-2 py-0.5 font-mono text-[0.6rem] font-bold uppercase tracking-wide text-black/45">
+            Connue
+          </span>
+        )}
       </div>
       <p className="mt-3 font-sans text-[1.2rem] font-bold leading-snug text-black">
         <RichText text={question} markClass={HIGHLIGHT} strongClass={STRONG} />
