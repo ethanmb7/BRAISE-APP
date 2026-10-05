@@ -15,6 +15,10 @@ export type Rank = {
 // purpose (see XP_REWARDS in lib/progress.ts for the per-action amounts they're pacing
 // against), so the very first rank-up lands fast; the curve stretches out after that so
 // Légende stays a genuine long-term target.
+// Thresholds sized to the pace and to the amount of content: at a "régulier" ~80 XP a day, Argent
+// comes after about a week, Or after two, Platine after a month and a half, Légende only with
+// sustained review. A first pass over all the content is worth ~2,300 XP, so Or is reachable
+// within it and everything above needs the reviews that spaced repetition keeps asking for.
 export const RANKS: Rank[] = [
   // Same fix as Argent below, applied to the rank every single new user starts on and sees the
   // most: bronze used to be a pale, desaturated tan (#e8b088) that read as washed-out next to the
@@ -25,13 +29,13 @@ export const RANKS: Rank[] = [
   // without a real saturated hue, which read as flat next to bronze/or/platine/légende and landed
   // worst on exactly the first rank-up most new users ever see. A vivid "chrome blue" keeps the
   // cool/metallic read of silver through hue and shine rather than through desaturation.
-  { id: "argent", name: "Argent", emoji: "🥈", min: 500, colorFrom: "#8ecfff", colorTo: "#3373d6" },
-  { id: "or", name: "Or", emoji: "🥇", min: 1500, colorFrom: "#ffe08a", colorTo: "#e8a317" },
+  { id: "argent", name: "Argent", emoji: "🥈", min: 400, colorFrom: "#8ecfff", colorTo: "#3373d6" },
+  { id: "or", name: "Or", emoji: "🥇", min: 1200, colorFrom: "#ffe08a", colorTo: "#e8a317" },
   {
     id: "platine",
     name: "Platine",
     emoji: "💎",
-    min: 3500,
+    min: 2800,
     colorFrom: "#b9f3ea",
     colorTo: "#7c3aed",
   },
@@ -39,7 +43,7 @@ export const RANKS: Rank[] = [
     id: "legende",
     name: "Légende",
     emoji: "👑",
-    min: 7000,
+    min: 5500,
     colorFrom: "#ffb199",
     colorTo: "#ff6f59",
   },

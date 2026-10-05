@@ -27,14 +27,14 @@ describe("getRankInfo", () => {
   });
 
   it("computes progress toward the next rank as a percentage of the gap", () => {
-    // Bronze spans 0-500; halfway there is 250.
-    const info = getRankInfo(250);
+    // Bronze spans 0-400; halfway there is 200.
+    const info = getRankInfo(200);
     expect(info.current.id).toBe("bronze");
     expect(info.pct).toBe(50);
   });
 
   it("lands exactly on a rank boundary as that rank, not the one before it", () => {
-    const info = getRankInfo(500);
+    const info = getRankInfo(400);
     expect(info.current.id).toBe("argent");
     expect(info.pct).toBe(0);
   });

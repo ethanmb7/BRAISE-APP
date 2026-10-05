@@ -38,7 +38,9 @@ export function LessonView() {
       // schedules this exact notion to come back due in Réviser tomorrow, via the same SM-2
       // engine as every other card — see PRODUCT_VISION.md's "consolidation différée, sur le
       // même moteur que Réviser". Chapters authored before CARTE_REVISION existed skip this.
-      if (declicScript.reviewCardId) reviewCard(declicScript.reviewCardId, "sure");
+      // payXp false: the chapter's own 50 XP is the reward for this moment, and the Pioche card
+      // promises exactly that — a hidden +10 for a card the student never saw would not match it.
+      if (declicScript.reviewCardId) reviewCard(declicScript.reviewCardId, "sure", false);
       handleComplete();
     };
     return (

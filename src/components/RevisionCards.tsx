@@ -53,7 +53,7 @@ export function QuestionCard({
   subjectLabel: string;
   topic: string;
   /** Whether this exact card already cleared the SM-2 learning phase — shown as a quiet chip so
-   *  a correct answer paying half XP (see XP_REWARDS.REVIEW_MASTERED) has a visible reason
+   *  a card that is already known has a visible reason
    *  instead of just being a smaller number with no explanation the moment it's judged. */
   alreadyMastered?: boolean;
 }) {
@@ -96,6 +96,9 @@ export type ResultProps = {
   tag: string;
   text: string;
   xp: number;
+  /** Why this card paid what it paid ("Retrouvée !", "Revanche !"…), named on the verdict so the
+   *  number is never a mystery. Absent on a miss. */
+  reason?: string;
   speaking: boolean;
   onListen: () => void;
 };
@@ -357,7 +360,7 @@ function DareBadge({ prompt, color }: { prompt: string; color: string }) {
 /** The verdict as a row of chips at the top of the card, in its own slot. Each chip is the
  *  app's sticker (border + hard shadow + a glossy inner edge); they pop in one after another
  *  with spring overshoot, like a real reward landing rather than a UI element fading in. */
-function VerdictBar({ verdict, tag, xp }: ResultProps) {
+function VerdictBar({ verdict, tag, xp, reason }: ResultProps) {
   const win = verdict === "win";
   const chip =
     "rounded-xl border-2 border-black px-2.5 py-1 font-display text-[0.72rem] font-black uppercase tracking-wide shadow-[2px_2px_0_#000,inset_0_1px_0_rgba(255,255,255,0.55)]";
@@ -380,6 +383,11 @@ function VerdictBar({ verdict, tag, xp }: ResultProps) {
       >
         {tag}
       </motion.span>
+      {reason && (
+        <motion.span className={`${chip} bg-white text-black`} {...pop(0.15)}>
+          {reason}
+        </motion.span>
+      )}
       {xp > 0 && <XpChip xp={xp} chip={chip} />}
     </div>
   );

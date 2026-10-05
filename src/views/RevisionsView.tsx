@@ -24,7 +24,7 @@ import {
   verdictTag,
 } from "@/lib/braiseVoice";
 import { reportCard } from "@/lib/reports";
-import { MASTERED_AT_REPETITIONS, reviewReward } from "@/lib/progress";
+import { MASTERED_AT_REPETITIONS, reviewReward, type RewardKind } from "@/lib/progress";
 import { FLASHCARDS, SUBJECTS, SUBJECT_SHORT_NAMES } from "@/data";
 import type { Flashcard, Confidence } from "@/types";
 import { readSnapshot, writeSnapshot, type SessionSnapshot } from "@/lib/revisionSession";
@@ -51,6 +51,15 @@ const JOKER_CHARGE_NEEDED = 2;
 
 // Compact subject tag in the header pill ("⚗️ PHYSIQUE · ÉNERGIE"), not the full display name
 // — the pill has to stay one line next to the report/quit buttons.
+
+// Named on the verdict chip, so the number of XP always comes with its reason. "Retrouvée" is the
+// moment BRAISE exists for: the card came back after a gap and the student still had it.
+const REWARD_REASON: Record<RewardKind, string> = {
+  new: "Nouvelle",
+  retrieved: "Retrouvée !",
+  revenge: "Revanche !",
+  practice: "Revue rapide",
+};
 
 export function RevisionsView() {
   const { state, reviewCard, getDueCards } = useApp();
@@ -155,7 +164,12 @@ function SwipeDeck({
   const [flyDir, setFlyDir] = useState<FlyDir>("right");
   // Verdict feedback: emoji tag, Braise's line, and the XP won (0 on a miss) — rendered
   // inside the answer card (verdict bar on top, Braise's line as footer).
-  const [feedback, setFeedback] = useState<{ tag: string; text: string; xp: number } | null>(null);
+  const [feedback, setFeedback] = useState<{
+    tag: string;
+    text: string;
+    xp: number;
+    reason?: string;
+  } | null>(null);
   // Picked once per card (in the index effect), not in render — byCombo() draws at random,
   // so reading it during render would reshuffle the wording on every re-render mid-card.
   const [prompt, setPrompt] = useState("");
@@ -422,7 +436,7 @@ function SwipeDeck({
   // merely pays half price because it was answered again before it was due.
   const currentCardMastered =
     (state.cardReviews[card.id]?.repetitions ?? 0) >= MASTERED_AT_REPETITIONS;
-  const expectedReward = reviewReward(state.cardReviews[card.id]);
+  const expectedReward = reviewReward(state.cardReviews[card.id]).xp;
   const rewardBadge = `+${armed ? expectedReward * 2 : expectedReward}`;
 
   const toggleArm = () => {
@@ -446,7 +460,8 @@ function SwipeDeck({
     setArmed(false);
     if (correctJudgment) {
       sfx.correct(soundOn);
-      const base = reviewReward(state.cardReviews[card.id]);
+      const reward = reviewReward(state.cardReviews[card.id]);
+      const base = reward.xp;
       // Doubling, not a flat top-up: reviewCard() below already grants this exact base amount
       // for a 'sure' review (same mastered/learning check, same constants), so adding it again
       // here as a bonus makes the total exactly 2x — never a separately-tuned number that could
@@ -459,6 +474,7 @@ function SwipeDeck({
         tag: verdictTag(voiceCtx, useSuper ? "super" : "carre"),
         text: quizCorrect(voiceCtx),
         xp: total,
+        reason: REWARD_REASON[reward.kind],
       });
       // Immediate, physical: a small burst fires from the side of the dock that was pressed
       // (INTOX left / CARRÉ right), the whole stack shivers, the result strip pops in.
@@ -711,6 +727,7 @@ function SwipeDeck({
                             tag: feedback.tag,
                             text: feedback.text,
                             xp: feedback.xp,
+                            reason: feedback.reason,
                             speaking,
                             onListen: () => handleListen(card.a),
                           }

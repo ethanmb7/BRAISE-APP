@@ -6,22 +6,19 @@ import { FLASHCARDS, SUBJECTS } from "@/data";
 // and tests can exercise them directly.
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-// In real XP — the same unit as the header badge, Aura and everything else, not a separately
-// invented "card-equivalent" scale. Same relative spacing as before (6:10:18), just multiplied
-// by XP_REWARDS.REVIEW_LEARNING so "tranquille" still means roughly a handful of cards and
-// "a-fond" still means substantially more, but the number a student sees here is now the exact
-// same number that shows up on the header a moment later — no mental conversion between two
-// systems that used to weight a finished chapter differently (3x a card here, 5x a card in XP).
+// In real XP — the same unit as the header badge, Aura and everything else. Sized to what a
+// student actually does in a sitting, so the goal is reachable without grinding: one Déclic (50)
+// is nearly a "tranquille" day by itself, a Déclic and a few new cards is a "régulier" one.
 const GOAL_TARGETS: Record<string, number> = {
-  tranquille: 60,
-  regulier: 100,
-  "a-fond": 180,
-  // Labels saved by the old onboarding, kept so existing students keep the same daily target.
-  "15 min/jour": 60,
-  "30 min/jour": 100,
-  "1 heure/jour": 180,
+  tranquille: 40,
+  regulier: 80,
+  "a-fond": 150,
+  // Labels saved by the old onboarding, kept so existing students keep a matching daily target.
+  "15 min/jour": 40,
+  "30 min/jour": 80,
+  "1 heure/jour": 150,
 };
-const DEFAULT_GOAL_TARGET = 100;
+const DEFAULT_GOAL_TARGET = 80;
 
 export function goalTarget(s: AppState): number {
   return GOAL_TARGETS[s.user.goal] ?? DEFAULT_GOAL_TARGET;
@@ -169,17 +166,20 @@ export function resolveRestoredTab(view: ViewId, savedTab: TabId | undefined): T
 // key off, so a review's real value and its "acquise" badge always agree with each other.
 export const MASTERED_AT_REPETITIONS = 2;
 
-// The one place every XP amount in the app is defined — everywhere else imports these instead
-// of writing its own number, so there is exactly one number to change if the economy is ever
-// retuned, and no risk of two call sites silently drifting apart (see git history: the "Super
-// Braise" bonus in RevisionsView used to hardcode its own copy of the base reward). Reviewing a
-// card you're still learning pays full price; reviewing one you've already mastered pays half —
-// real, but not worth restarting a session over, so replaying known cards for repeated full XP
-// stops being profitable without a hard cap or cooldown getting in a genuine study session's way.
+// The one place every XP amount in the app is defined — everywhere else imports these instead of
+// writing its own number. The principle: pay the behaviour that makes a student remember, not the
+// time spent. Seeing a card for the first time is worth 10; getting it right AFTER the gap
+// spaced repetition asked for — remembering it, which is the whole point — is worth 15, and
+// 20 when it is a card missed last time (a comeback is rewarded, never punished). Answering a
+// card again before it is due is practice, nearly free, so replaying a deck is not a farm.
 export const XP_REWARDS = {
-  REVIEW_LEARNING: 10,
-  REVIEW_MASTERED: 5,
+  NEW_CARD: 10,
+  RETRIEVED_CARD: 15,
+  REVENGE_BONUS: 5,
+  PRACTICE_CARD: 3,
   CHAPTER_COMPLETE: 50,
+  /** Once a day, the moment the daily goal is reached. */
+  DAILY_CHEST: 20,
 } as const;
 
 /** A review that comes before the card is due. Spaced repetition only works if the gaps are
@@ -189,14 +189,34 @@ export function isEarlyReview(review: CardReview | undefined, now = Date.now()):
   return !!review && now < review.nextReviewAt;
 }
 
-/** What a correct answer pays for this exact card — one rule shared by the store (what is
- *  granted) and Réviser (what the buttons promise). Full price only for a card that is new or
- *  due; half price for one already mastered, or answered again before it was due. */
-export function reviewReward(review: CardReview | undefined, now = Date.now()): number {
-  const mastered = !!review && review.repetitions >= MASTERED_AT_REPETITIONS;
-  return mastered || isEarlyReview(review, now)
-    ? XP_REWARDS.REVIEW_MASTERED
-    : XP_REWARDS.REVIEW_LEARNING;
+export type RewardKind = "new" | "retrieved" | "revenge" | "practice";
+
+/** What a correct answer pays for this exact card, and why — one rule shared by the store (what is
+ *  granted) and Réviser (what the buttons promise and the chip that names the reason). */
+export function reviewReward(
+  review: CardReview | undefined,
+  now = Date.now(),
+): { xp: number; kind: RewardKind } {
+  if (!review) return { xp: XP_REWARDS.NEW_CARD, kind: "new" };
+  if (isEarlyReview(review, now)) return { xp: XP_REWARDS.PRACTICE_CARD, kind: "practice" };
+  if (review.lastConfidence === "not-sure") {
+    return { xp: XP_REWARDS.RETRIEVED_CARD + XP_REWARDS.REVENGE_BONUS, kind: "revenge" };
+  }
+  return { xp: XP_REWARDS.RETRIEVED_CARD, kind: "retrieved" };
+}
+
+/** Adds XP to today's tally and, the first time the day's goal is reached, the daily chest. The one
+ *  place that touches xp, sessionXpEarned and dailyGoalMet together, so the header, the goal bar
+ *  and the chest can never disagree (the Joker's doubling used to add to xp only, so the goal
+ *  bar ignored it). The chest counts toward xp, not toward the goal it just completed. */
+export function grantXp(
+  s: AppState,
+  gain: number,
+): Pick<AppState, "xp" | "sessionXpEarned" | "dailyGoalMet"> {
+  const sessionXpEarned = s.sessionXpEarned + gain;
+  const goalReached = sessionXpEarned >= goalTarget(s);
+  const chest = goalReached && !s.dailyGoalMet ? XP_REWARDS.DAILY_CHEST : 0;
+  return { xp: s.xp + gain + chest, sessionXpEarned, dailyGoalMet: goalReached };
 }
 
 export function sm2(

@@ -253,6 +253,32 @@ Les métriques secondaires mesurent la réussite après reformulation, les aides
 confiance, les retours après absence et le sentiment « j'ai compris ». Le temps passé et les XP ne
 sont pas des preuves d'apprentissage.
 
+## 8 bis. Économie de points (version 1)
+
+Principe : **on paye le comportement qui fait retenir, pas le temps passé.** Jamais de perte de
+points ni de ton culpabilisant ; rien à farmer ; chaque gain a une raison visible.
+
+| Action | XP | Condition |
+| --- | --- | --- |
+| Chapitre Déclic terminé | 50 | première fois seulement |
+| Carte nouvelle | 10 | première fois qu'on la voit |
+| **Carte retrouvée** | 15 | juste, une fois le délai de la répétition espacée écoulé |
+| Revanche | +5 (20 au total) | juste, sur une carte ratée la fois d'avant |
+| Revue rapide | 3 | carte revue avant son échéance : de l'entraînement, pas une preuve |
+| Joker ×2 | double le gain | après 2 bonnes réponses d'affilée |
+| Coffre du jour | +20 | une fois par jour, au moment où l'objectif est atteint |
+
+- **Objectif du jour** : Tranquille 40, Régulier 80, À fond 150 XP — de quoi faire un Déclic et
+  quelques cartes. Le gain de Réviser affiche sa raison sur la carte (« Retrouvée ! », « Revanche ! »).
+- **Une carte n'est « acquise »** que si elle est réussie un autre jour (pas deux fois dans la
+  même séance).
+- **Rangs** : Bronze 0, Argent 400, Or 1 200, Platine 2 800, Légende 5 500. Une première passe sur
+  tout le contenu vaut environ 2 300 XP, donc Or se mérite dans cette passe et la suite demande les
+  révisions que la répétition espacée réclame.
+- **Ce que les rangs débloquent aujourd'hui** : les formes de Braise (une par rang) et trois avatars
+  (Or, Platine, Légende). Rien d'utile n'est caché derrière un score.
+- Tout passe par `XP_REWARDS`, `reviewReward` et `grantXp` (`src/lib/progress.ts`), testés.
+
 ## 9. Ce que nous ne construisons pas maintenant
 
 - classement mondial ;

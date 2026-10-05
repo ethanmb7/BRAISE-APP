@@ -4,6 +4,7 @@ import {
   computeGoalPct,
   ensureSession,
   goalTarget,
+  grantXp,
   MASTERED_AT_REPETITIONS,
   remainingToGoal,
   resolveChapters,
@@ -236,20 +237,61 @@ describe("reviewReward", () => {
   const DAY = 24 * 60 * 60 * 1000;
   const t0 = 1_000_000_000_000;
 
-  it("pays full price for a new card and for one that is due", () => {
-    expect(reviewReward(undefined, t0)).toBe(XP_REWARDS.REVIEW_LEARNING);
-    const first = sm2(undefined, "sure", t0);
-    expect(reviewReward(first, t0 + DAY)).toBe(XP_REWARDS.REVIEW_LEARNING);
+  it("pays the new-card price for a card seen for the first time", () => {
+    expect(reviewReward(undefined, t0)).toEqual({ xp: XP_REWARDS.NEW_CARD, kind: "new" });
   });
 
-  it("pays half price for a card answered again before it is due", () => {
+  it("pays the most for a card remembered after the gap it was given", () => {
     const first = sm2(undefined, "sure", t0);
-    expect(reviewReward(first, t0 + 1000)).toBe(XP_REWARDS.REVIEW_MASTERED);
+    expect(reviewReward(first, t0 + DAY)).toEqual({
+      xp: XP_REWARDS.RETRIEVED_CARD,
+      kind: "retrieved",
+    });
+    expect(XP_REWARDS.RETRIEVED_CARD).toBeGreaterThan(XP_REWARDS.NEW_CARD);
   });
 
-  it("pays half price for a card already mastered, even when due", () => {
+  it("adds a revenge bonus when the card was missed the time before", () => {
+    const missed = sm2(sm2(undefined, "sure", t0), "not-sure", t0 + DAY);
+    expect(reviewReward(missed, t0 + 2 * DAY)).toEqual({
+      xp: XP_REWARDS.RETRIEVED_CARD + XP_REWARDS.REVENGE_BONUS,
+      kind: "revenge",
+    });
+  });
+
+  it("pays almost nothing for a card answered again before it is due, so replaying is no farm", () => {
+    const first = sm2(undefined, "sure", t0);
+    expect(reviewReward(first, t0 + 1000)).toEqual({
+      xp: XP_REWARDS.PRACTICE_CARD,
+      kind: "practice",
+    });
+    expect(XP_REWARDS.PRACTICE_CARD).toBeLessThan(XP_REWARDS.NEW_CARD / 2);
+  });
+
+  it("keeps paying full price for a card that comes due again, however well it is known", () => {
     const mastered = sm2(sm2(undefined, "sure", t0), "sure", t0 + DAY);
-    expect(reviewReward(mastered, t0 + 10 * DAY)).toBe(XP_REWARDS.REVIEW_MASTERED);
+    expect(reviewReward(mastered, t0 + 10 * DAY).kind).toBe("retrieved");
+  });
+});
+
+describe("grantXp (daily chest)", () => {
+  const user = { ...DEFAULT_USER, goal: "regulier" }; // 80 XP a day
+
+  it("adds the XP to the account and to today's tally", () => {
+    const r = grantXp(baseState({ user, xp: 500, sessionXpEarned: 10 }), 15);
+    expect(r).toEqual({ xp: 515, sessionXpEarned: 25, dailyGoalMet: false });
+  });
+
+  it("opens the daily chest the moment the goal is reached, on top of the XP", () => {
+    const r = grantXp(baseState({ user, xp: 500, sessionXpEarned: 70 }), 15);
+    expect(r.dailyGoalMet).toBe(true);
+    expect(r.xp).toBe(500 + 15 + XP_REWARDS.DAILY_CHEST);
+    // The chest is a bonus, not part of what it was a reward for.
+    expect(r.sessionXpEarned).toBe(85);
+  });
+
+  it("opens it only once a day", () => {
+    const r = grantXp(baseState({ user, xp: 600, sessionXpEarned: 90, dailyGoalMet: true }), 15);
+    expect(r.xp).toBe(615);
   });
 });
 
@@ -284,9 +326,9 @@ describe("daily goal (measured in real XP)", () => {
 
   it("reads its target in XP and reports progress against it", () => {
     const s = baseState({ user, sessionXpEarned: 45 });
-    expect(goalTarget(s)).toBe(100);
-    expect(computeGoalPct(s)).toBe(45);
-    expect(remainingToGoal(s)).toBe(55);
+    expect(goalTarget(s)).toBe(80);
+    expect(computeGoalPct(s)).toBe(56);
+    expect(remainingToGoal(s)).toBe(35);
   });
 
   it("caps at 100% and never reports a negative remainder", () => {

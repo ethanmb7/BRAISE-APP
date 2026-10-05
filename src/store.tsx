@@ -21,7 +21,7 @@ import { sfx } from "@/lib/sound";
 import { loadProgress, saveProgress, saveCardReview } from "@/lib/persist";
 import {
   ensureSession,
-  goalTarget,
+  grantXp,
   resolveRestoredTab,
   resolveRestoredView,
   sm2,
@@ -49,7 +49,9 @@ type Ctx = {
   openSubject: (subjectId: string, chapterId?: string) => void;
   openLesson: (subjectId: string, chapterId: string, returnTo?: ViewId) => void;
   completeChapter: (chapterId: string) => void;
-  reviewCard: (cardId: string, confidence: Confidence) => void;
+  /** `payXp: false` schedules the card without paying for it (see LessonView: finishing a Déclic
+   *  seeds its review card, and the chapter's own 50 XP is the whole reward for that moment). */
+  reviewCard: (cardId: string, confidence: Confidence, payXp?: boolean) => void;
   getDueCards: () => string[];
   goBack: () => void;
 };
@@ -158,7 +160,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const addXp = useCallback((n: number) => {
-    setState((s) => ({ ...s, ...ensureSession(s), xp: s.xp + n }));
+    setState((s) => {
+      const session = { ...s, ...ensureSession(s) };
+      return { ...session, ...grantXp(session, n) };
+    });
   }, []);
 
   const updateBestCombo = useCallback((n: number) => {
@@ -239,21 +244,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const session = { ...s, ...ensureSession(s) };
       const already = session.completedChapters.includes(chapterId);
       const xpGained = already ? 0 : XP_REWARDS.CHAPTER_COMPLETE;
-      const sessionXpEarned = session.sessionXpEarned + xpGained;
       return {
         ...session,
         completedChapters: already
           ? session.completedChapters
           : [...session.completedChapters, chapterId],
-        sessionXpEarned,
-        xp: session.xp + xpGained,
-        dailyGoalMet: sessionXpEarned >= goalTarget(session),
+        ...grantXp(session, xpGained),
         lastCompletion: { chapterId, wasNewCompletion: !already, xpGained },
       };
     });
   }, []);
 
-  const reviewCard = useCallback((cardId: string, confidence: Confidence) => {
+  const reviewCard = useCallback((cardId: string, confidence: Confidence, payXp = true) => {
     setState((s) => {
       // `ensureSession` is intentionally first, just as it is in `completeChapter`. A card
       // reviewed just after midnight must be card 1 of *today*, never yesterday's total plus
@@ -269,19 +271,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // account XP (this field) and the celebratory total shown at the end of a session could
       // silently drift apart with no explanation offered.
       //
-      // A correct review of a card already mastered before this attempt pays half price — see
-      // XP_REWARDS' own comment for why: reviewing something you already know is real
-      // consolidation and still worth something, but paying it full price is what let a student
-      // farm XP by restarting a Réviser session and re-answering cards they'd long since learned.
-      const xpGain = confidence === "sure" ? reviewReward(prev) : 0;
-      const sessionXpEarned = session.sessionXpEarned + xpGain;
+      // What a correct answer pays depends on timing (new, due, early) — see reviewReward.
+      const xpGain = confidence === "sure" && payXp ? reviewReward(prev).xp : 0;
       void saveCardReview(cardId, updated);
       return {
         ...session,
         cardReviews: { ...session.cardReviews, [cardId]: updated },
-        sessionXpEarned,
-        xp: session.xp + xpGain,
-        dailyGoalMet: sessionXpEarned >= goalTarget(session),
+        ...grantXp(session, xpGain),
       };
     });
   }, []);

@@ -8,6 +8,7 @@
 //  - Savage: direct and punchy, second degree, a friendly jab at most. Never insults the student
 //    or their mistakes; the joke is always on the situation, with Braise on their side.
 import type { Lines } from "@/lib/tone";
+import { XP_REWARDS } from "@/lib/progress";
 
 const L = (chill: string, savage: string): Lines => ({ chill, savage });
 const plural = (n: number) => (n > 1 ? "s" : "");
@@ -16,12 +17,12 @@ export const COPY = {
   home: {
     /** Daily-goal strip: the goal is met and the streak is alive. */
     rhythmMetWithStreak: L(
-      "Belle régularité : ta série continue.",
-      "Série intacte. Tu deviens fréquentable.",
+      `Belle régularité : ta série continue. +${XP_REWARDS.DAILY_CHEST} XP de bonus.`,
+      `Série intacte, +${XP_REWARDS.DAILY_CHEST} XP de bonus. Tu deviens fréquentable.`,
     ),
     rhythmMet: L(
-      "Ton objectif du jour est validé.",
-      "Objectif du jour validé. Je m'incline (un peu).",
+      `Objectif du jour validé : +${XP_REWARDS.DAILY_CHEST} XP de bonus.`,
+      `Objectif validé, +${XP_REWARDS.DAILY_CHEST} XP de bonus. Je m'incline (un peu).`,
     ),
     rhythmRemaining: (xp: number) =>
       L(`Encore ${xp} XP pour boucler ta journée.`, `Encore ${xp} XP. C'est pas la mer à boire.`),
