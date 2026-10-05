@@ -1,4 +1,4 @@
-import { Check, Lock, AlertCircle } from "lucide-react";
+import { Check, AlertCircle } from "lucide-react";
 import { useApp } from "@/store";
 import { chapterMastery, resolveChapters } from "@/lib/progress";
 import { sfx } from "@/lib/sound";
@@ -56,8 +56,8 @@ export function SubjectView() {
           />
 
           {chapters.map((c, i) => {
-            const isLocked = c.status === "locked";
             const isDone = c.status === "done";
+            const isOpen = c.status === "open";
             const isCurrent = c.status === "current";
             const pos = POSITIONS[i % POSITIONS.length];
             // The non-scolaire hook ("Pourquoi ton argent perd de la valeur ?") takes the
@@ -69,13 +69,14 @@ export function SubjectView() {
             const node = (
               <button
                 className="relative flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border-[2.5px] border-black text-lg font-black transition-transform active:scale-90 disabled:cursor-default"
+                // The suggested chapter and finished ones are filled with the subject's colour;
+                // the other open chapters keep a paper fill, so the path still says "start here"
+                // without ever saying "you can't".
                 style={{
-                  background: isLocked ? undefined : subject.color,
-                  boxShadow: isLocked ? undefined : "3px 3px 0px 0px #000",
+                  background: isOpen ? "var(--paper)" : subject.color,
+                  boxShadow: "3px 3px 0px 0px #000",
                 }}
-                disabled={isLocked}
                 onClick={() => {
-                  if (isLocked) return;
                   sfx.tap(state.soundOn);
                   // Open the real narrated lesson (slides + quiz) when one exists for this
                   // chapter, chat otherwise — previously always forced 'echanger', so even a
@@ -86,8 +87,6 @@ export function SubjectView() {
               >
                 {isDone ? (
                   <Check size={24} className="text-black" strokeWidth={3} />
-                ) : isLocked ? (
-                  <Lock size={18} className="text-black/35" />
                 ) : (
                   <span className="text-black">{i + 1}</span>
                 )}
@@ -119,9 +118,7 @@ export function SubjectView() {
                         ? mastery.total > 0
                           ? `Terminé · ${mastery.mastered}/${mastery.total} acquises`
                           : "Terminé"
-                        : isLocked
-                          ? `${c.duration} min · verrouillé`
-                          : `${c.duration} min`}
+                        : `${c.duration} min`}
                     </span>
                     {isDone && mastery.weak > 0 && (
                       <span className="inline-flex items-center gap-1 rounded-full border border-black bg-sapie-coral px-2 py-0.5 text-[0.65rem] font-extrabold uppercase text-white">

@@ -37,20 +37,26 @@ export function remainingToGoal(s: AppState): number {
 }
 
 /** Real chapter progression, derived from `completedChapters` — the one dynamic signal the app
- *  actually tracks. `data.ts` only ships a fresh-install baseline (chapter 0 of each subject
- *  open, the rest locked); this recomputes status/mastery from real completion every render, so
- *  finishing a chapter anywhere actually unlocks the next one everywhere. Without this, `status`
- *  in data.ts never changes and every subject stays stuck on its first chapter forever — the
- *  same "static field never reflects real progress" bug the streak/XP fix addressed, just one
- *  level deeper. Completion is the only thing this decides — how well a chapter is actually
- *  known is `chapterMastery`'s job, from real card-review history, never a number stored here.
+ *  actually tracks. `data.ts` only ships a fresh-install baseline; this recomputes status from
+ *  real completion every render, so finishing a chapter moves the "suggested next" marker
+ *  everywhere. Without this, `status` in data.ts never changes and every subject stays pointed
+ *  at its first chapter forever — the same "static field never reflects real progress" bug the
+ *  streak/XP fix addressed, just one level deeper.
+ *
+ *  Nothing is ever locked: the first unfinished chapter is "current" (the suggestion), every
+ *  other unfinished one is "open". A student revising for tomorrow's contrôle on Pythagore, or a
+ *  Terminale student who already knows fractions, must not have to grind through the chapters in
+ *  front of it — and the Matières tab promises "choisis ce que tu veux comprendre".
+ *
+ *  Completion is the only thing this decides — how well a chapter is actually known is
+ *  `chapterMastery`'s job, from real card-review history, never a number stored here.
  */
 export function resolveChapters(chapters: Chapter[], completedChapters: string[]): Chapter[] {
   const firstOpenIndex = chapters.findIndex((c) => !completedChapters.includes(c.id));
   return chapters.map((c, i) => {
     if (completedChapters.includes(c.id)) return { ...c, status: "done" };
     if (i === firstOpenIndex) return { ...c, status: "current" };
-    return { ...c, status: "locked" };
+    return { ...c, status: "open" };
   });
 }
 
@@ -176,9 +182,37 @@ export const XP_REWARDS = {
   CHAPTER_COMPLETE: 50,
 } as const;
 
-export function sm2(review: CardReview | undefined, confidence: Confidence): CardReview {
-  const now = Date.now();
+/** A review that comes before the card is due. Spaced repetition only works if the gaps are
+ *  respected: answering the same card again an hour later says nothing about whether it will be
+ *  remembered next week, so it is practice, not evidence. */
+export function isEarlyReview(review: CardReview | undefined, now = Date.now()): boolean {
+  return !!review && now < review.nextReviewAt;
+}
+
+/** What a correct answer pays for this exact card — one rule shared by the store (what is
+ *  granted) and Réviser (what the buttons promise). Full price only for a card that is new or
+ *  due; half price for one already mastered, or answered again before it was due. */
+export function reviewReward(review: CardReview | undefined, now = Date.now()): number {
+  const mastered = !!review && review.repetitions >= MASTERED_AT_REPETITIONS;
+  return mastered || isEarlyReview(review, now)
+    ? XP_REWARDS.REVIEW_MASTERED
+    : XP_REWARDS.REVIEW_LEARNING;
+}
+
+export function sm2(
+  review: CardReview | undefined,
+  confidence: Confidence,
+  now = Date.now(),
+): CardReview {
   const quality = confidence === "sure" ? 5 : 1;
+
+  // A correct answer before the card is due earns no repetition credit and leaves the schedule
+  // alone. Without this, answering a card correctly twice in the same sitting made it "acquise"
+  // — a status that is supposed to mean "remembered on a later day". A wrong answer still
+  // resets the card, early or not: forgetting is information whenever it shows up.
+  if (quality >= 3 && review && isEarlyReview(review, now)) {
+    return { ...review, lastConfidence: confidence };
+  }
 
   let { repetitions, interval, ease } = review
     ? { repetitions: review.repetitions, interval: review.interval, ease: review.ease }

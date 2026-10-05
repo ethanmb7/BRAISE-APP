@@ -24,7 +24,7 @@ import {
   verdictTag,
 } from "@/lib/braiseVoice";
 import { reportCard } from "@/lib/reports";
-import { MASTERED_AT_REPETITIONS, XP_REWARDS } from "@/lib/progress";
+import { MASTERED_AT_REPETITIONS, reviewReward } from "@/lib/progress";
 import { FLASHCARDS, SUBJECTS } from "@/data";
 import type { Flashcard, Confidence } from "@/types";
 import { readSnapshot, writeSnapshot, type SessionSnapshot } from "@/lib/revisionSession";
@@ -426,12 +426,11 @@ function SwipeDeck({
   // What INTOX/CARRÉ actually pay for this exact card, shown on the buttons themselves before
   // the student answers — never a static number that could promise more than judge() below
   // actually grants once it checks this same card's own mastery.
+  // Drives the "Connue" chip on the question card: only a card actually mastered, not one that
+  // merely pays half price because it was answered again before it was due.
   const currentCardMastered =
-    !!state.cardReviews[card.id] &&
-    state.cardReviews[card.id].repetitions >= MASTERED_AT_REPETITIONS;
-  const expectedReward = currentCardMastered
-    ? XP_REWARDS.REVIEW_MASTERED
-    : XP_REWARDS.REVIEW_LEARNING;
+    (state.cardReviews[card.id]?.repetitions ?? 0) >= MASTERED_AT_REPETITIONS;
+  const expectedReward = reviewReward(state.cardReviews[card.id]);
   const rewardBadge = `+${armed ? expectedReward * 2 : expectedReward}`;
 
   const toggleArm = () => {
@@ -455,9 +454,7 @@ function SwipeDeck({
     setArmed(false);
     if (correctJudgment) {
       sfx.correct(soundOn);
-      const prevReview = state.cardReviews[card.id];
-      const wasMastered = !!prevReview && prevReview.repetitions >= MASTERED_AT_REPETITIONS;
-      const base = wasMastered ? XP_REWARDS.REVIEW_MASTERED : XP_REWARDS.REVIEW_LEARNING;
+      const base = reviewReward(state.cardReviews[card.id]);
       // Doubling, not a flat top-up: reviewCard() below already grants this exact base amount
       // for a 'sure' review (same mastered/learning check, same constants), so adding it again
       // here as a bonus makes the total exactly 2x — never a separately-tuned number that could

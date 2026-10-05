@@ -22,11 +22,11 @@ import { loadProgress, saveProgress, saveCardReview } from "@/lib/persist";
 import {
   ensureSession,
   goalTarget,
-  MASTERED_AT_REPETITIONS,
   resolveRestoredTab,
   resolveRestoredView,
   sm2,
   XP_REWARDS,
+  reviewReward,
 } from "@/lib/progress";
 
 type Ctx = {
@@ -273,13 +273,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // XP_REWARDS' own comment for why: reviewing something you already know is real
       // consolidation and still worth something, but paying it full price is what let a student
       // farm XP by restarting a Réviser session and re-answering cards they'd long since learned.
-      const wasMastered = !!prev && prev.repetitions >= MASTERED_AT_REPETITIONS;
-      const xpGain =
-        confidence === "sure"
-          ? wasMastered
-            ? XP_REWARDS.REVIEW_MASTERED
-            : XP_REWARDS.REVIEW_LEARNING
-          : 0;
+      const xpGain = confidence === "sure" ? reviewReward(prev) : 0;
       const sessionXpEarned = session.sessionXpEarned + xpGain;
       void saveCardReview(cardId, updated);
       return {

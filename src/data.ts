@@ -1,8 +1,9 @@
 import type { Level, Subject, Flashcard, Badge, UserProfile } from "./types";
 
-// Chapter `status` below is only the fresh-install baseline (chapter 0 of each subject open, the
-// rest locked) — same logic as `INITIAL.streak/xp = 0` in store.tsx: a real new user hasn't done
-// anything yet, so nothing here claims otherwise. Real progression is computed at render time by
+// Chapter `status` below is only the fresh-install baseline (chapter 0 of each subject is the
+// suggested one, the rest are open — nothing is ever locked) — same logic as
+// `INITIAL.streak/xp = 0` in store.tsx: a real new user hasn't done anything yet, so nothing here
+// claims otherwise. Real progression is computed at render time by
 // `resolveChapters()` in lib/progress.ts from the device's actual `completedChapters`, and real
 // mastery by `chapterMastery()` from its card-review history — which is what both HomeView and
 // SubjectView read.
@@ -29,15 +30,15 @@ export const SUBJECTS: Subject[] = [
     bg: "#EFF6FF",
     chapters: [
       { id: "m1", title: "Les fractions", status: "current", duration: 3 },
-      { id: "m2", title: "Théorème de Pythagore", status: "locked", duration: 4 },
+      { id: "m2", title: "Théorème de Pythagore", status: "open", duration: 4 },
       {
         id: "m3",
         title: "Les équations",
-        status: "locked",
+        status: "open",
         duration: 3,
       },
-      { id: "m4", title: "Fonctions affines", status: "locked", duration: 5 },
-      { id: "m5", title: "Statistiques", status: "locked", duration: 4 },
+      { id: "m4", title: "Fonctions affines", status: "open", duration: 5 },
+      { id: "m5", title: "Statistiques", status: "open", duration: 4 },
     ],
   },
   {
@@ -48,9 +49,9 @@ export const SUBJECTS: Subject[] = [
     bg: "#F5F3FF",
     chapters: [
       { id: "f1", title: "Le roman et le récit", status: "current", duration: 5 },
-      { id: "f2", title: "La poésie", status: "locked", duration: 3 },
-      { id: "f3", title: "Le théâtre", status: "locked", duration: 4 },
-      { id: "f4", title: "L'argumentation", status: "locked", duration: 5 },
+      { id: "f2", title: "La poésie", status: "open", duration: 3 },
+      { id: "f3", title: "Le théâtre", status: "open", duration: 4 },
+      { id: "f4", title: "L'argumentation", status: "open", duration: 5 },
     ],
   },
   {
@@ -61,9 +62,9 @@ export const SUBJECTS: Subject[] = [
     bg: "#FFFBEB",
     chapters: [
       { id: "h1", title: "La Révolution française", status: "current", duration: 4 },
-      { id: "h2", title: "L'Empire et Napoléon", status: "locked", duration: 5 },
-      { id: "h3", title: "Les régimes politiques", status: "locked", duration: 3 },
-      { id: "h4", title: "La mondialisation", status: "locked", duration: 4 },
+      { id: "h2", title: "L'Empire et Napoléon", status: "open", duration: 5 },
+      { id: "h3", title: "Les régimes politiques", status: "open", duration: 3 },
+      { id: "h4", title: "La mondialisation", status: "open", duration: 4 },
     ],
   },
   {
@@ -74,9 +75,9 @@ export const SUBJECTS: Subject[] = [
     bg: "#ECFDF5",
     chapters: [
       { id: "s1", title: "La respiration", status: "current", duration: 3 },
-      { id: "s2", title: "La digestion", status: "locked", duration: 4 },
-      { id: "s3", title: "La génétique", status: "locked", duration: 5 },
-      { id: "s4", title: "L'écosystème", status: "locked", duration: 3 },
+      { id: "s2", title: "La digestion", status: "open", duration: 4 },
+      { id: "s3", title: "La génétique", status: "open", duration: 5 },
+      { id: "s4", title: "L'écosystème", status: "open", duration: 3 },
     ],
   },
   {
@@ -90,11 +91,11 @@ export const SUBJECTS: Subject[] = [
       {
         id: "p2",
         title: "Les réactions chimiques",
-        status: "locked",
+        status: "open",
         duration: 5,
       },
-      { id: "p3", title: "L'électricité", status: "locked", duration: 3 },
-      { id: "p4", title: "L'énergie", status: "locked", duration: 4 },
+      { id: "p3", title: "L'électricité", status: "open", duration: 3 },
+      { id: "p4", title: "L'énergie", status: "open", duration: 4 },
     ],
   },
   {
@@ -109,9 +110,9 @@ export const SUBJECTS: Subject[] = [
       // was 3 with only 1 real card behind it (Pioche du jour showed "3 min · 1 carte", a mismatch
       // between the two numbers). Recalculate this if fc25/fc27-30 below ever change.
       { id: "a1", title: "Present simple", status: "current", duration: 4 },
-      { id: "a2", title: "Past simple", status: "locked", duration: 3 },
-      { id: "a3", title: "Present perfect", status: "locked", duration: 4 },
-      { id: "a4", title: "Modals & advice", status: "locked", duration: 4 },
+      { id: "a2", title: "Past simple", status: "open", duration: 3 },
+      { id: "a3", title: "Present perfect", status: "open", duration: 4 },
+      { id: "a4", title: "Modals & advice", status: "open", duration: 4 },
     ],
   },
 ];

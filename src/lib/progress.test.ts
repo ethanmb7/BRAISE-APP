@@ -7,11 +7,16 @@ import {
   MASTERED_AT_REPETITIONS,
   remainingToGoal,
   resolveChapters,
+  reviewReward,
+  sm2,
+  XP_REWARDS,
   resolveRestoredTab,
   resolveRestoredView,
 } from "@/lib/progress";
 import { DEFAULT_USER, FLASHCARDS, SUBJECTS } from "@/data";
 import type { AppState, CardReview } from "@/types";
+
+const isMastered = (r: CardReview) => r.repetitions >= MASTERED_AT_REPETITIONS;
 
 const review = (repetitions: number, lastConfidence: CardReview["lastConfidence"]): CardReview => ({
   repetitions,
@@ -169,20 +174,82 @@ describe("resolveRestoredTab", () => {
 describe("resolveChapters", () => {
   const maths = SUBJECTS[0].chapters;
 
-  it("opens only the first unfinished chapter and locks the rest", () => {
+  it("suggests the first unfinished chapter and leaves the rest open", () => {
     const resolved = resolveChapters(maths, []);
-    expect(resolved.map((c) => c.status)).toEqual([
-      "current",
-      "locked",
-      "locked",
-      "locked",
-      "locked",
-    ]);
+    expect(resolved.map((c) => c.status)).toEqual(["current", "open", "open", "open", "open"]);
   });
 
-  it("marks finished chapters done and moves 'current' to the next one", () => {
+  it("marks finished chapters done and moves the suggestion to the next one", () => {
     const resolved = resolveChapters(maths, [maths[0].id, maths[1].id]);
-    expect(resolved.map((c) => c.status)).toEqual(["done", "done", "current", "locked", "locked"]);
+    expect(resolved.map((c) => c.status)).toEqual(["done", "done", "current", "open", "open"]);
+  });
+
+  it("never locks a chapter, even when finished out of order", () => {
+    const resolved = resolveChapters(maths, [maths[3].id]);
+    expect(resolved.map((c) => c.status)).toEqual(["current", "open", "open", "done", "open"]);
+  });
+});
+
+describe("sm2 spacing", () => {
+  const DAY = 24 * 60 * 60 * 1000;
+  const t0 = 1_000_000_000_000;
+
+  it("starts a new card at one repetition, due the next day", () => {
+    const r = sm2(undefined, "sure", t0);
+    expect(r.repetitions).toBe(1);
+    expect(r.interval).toBe(1);
+    expect(r.nextReviewAt).toBe(t0 + DAY);
+  });
+
+  it("gives no repetition credit for a correct answer before the card is due", () => {
+    const first = sm2(undefined, "sure", t0);
+    const sameDay = sm2(first, "sure", t0 + 60 * 60 * 1000);
+    expect(sameDay.repetitions).toBe(1);
+    expect(sameDay.nextReviewAt).toBe(first.nextReviewAt);
+    expect(isMastered(sameDay)).toBe(false);
+  });
+
+  it("advances once the card is due, and only then reaches mastery", () => {
+    const first = sm2(undefined, "sure", t0);
+    const nextDay = sm2(first, "sure", t0 + DAY);
+    expect(nextDay.repetitions).toBe(2);
+    expect(nextDay.interval).toBe(3);
+    expect(isMastered(nextDay)).toBe(true);
+  });
+
+  it("still resets a card answered wrong before it was due", () => {
+    const second = sm2(sm2(undefined, "sure", t0), "sure", t0 + DAY);
+    const forgotten = sm2(second, "not-sure", t0 + DAY + 1000);
+    expect(forgotten.repetitions).toBe(0);
+    expect(forgotten.interval).toBe(1);
+  });
+
+  it("answering the same card many times in one sitting never masters it", () => {
+    let r = sm2(undefined, "sure", t0);
+    for (let i = 1; i <= 10; i++) r = sm2(r, "sure", t0 + i * 60 * 1000);
+    expect(r.repetitions).toBe(1);
+    expect(isMastered(r)).toBe(false);
+  });
+});
+
+describe("reviewReward", () => {
+  const DAY = 24 * 60 * 60 * 1000;
+  const t0 = 1_000_000_000_000;
+
+  it("pays full price for a new card and for one that is due", () => {
+    expect(reviewReward(undefined, t0)).toBe(XP_REWARDS.REVIEW_LEARNING);
+    const first = sm2(undefined, "sure", t0);
+    expect(reviewReward(first, t0 + DAY)).toBe(XP_REWARDS.REVIEW_LEARNING);
+  });
+
+  it("pays half price for a card answered again before it is due", () => {
+    const first = sm2(undefined, "sure", t0);
+    expect(reviewReward(first, t0 + 1000)).toBe(XP_REWARDS.REVIEW_MASTERED);
+  });
+
+  it("pays half price for a card already mastered, even when due", () => {
+    const mastered = sm2(sm2(undefined, "sure", t0), "sure", t0 + DAY);
+    expect(reviewReward(mastered, t0 + 10 * DAY)).toBe(XP_REWARDS.REVIEW_MASTERED);
   });
 });
 
