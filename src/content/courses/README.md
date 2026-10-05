@@ -21,6 +21,9 @@ données (JSON), jamais de code. Le moteur, la validation et l'écran les lisent
 Ce qui est construit aujourd'hui : l'architecture, le Déclic `M2-ARI-D01` et son deck de 6 cartes.
 Le bilan de chapitre, les decks de 30 cartes et l'entraînement par paliers restent à faire.
 
+Pour **livrer** un nouveau cours (le format à remplir, le prompt à donner à une IA), voir
+`BRIEF_TEMPLATE.md`.
+
 ## Les fichiers
 
 ```
