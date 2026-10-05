@@ -1,7 +1,7 @@
-import { BRAISE_BODY_PATHS, BRAISE_RANK_COLORS, type BraiseRankId } from "@/lib/braiseArt";
-
+export type BraiseRankId = "bronze" | "argent" | "or" | "platine" | "legende";
 export type BraiseExpression =
-  "happy" | "hesitant" | "proud" | "sleepy" | "cool" | "frozen" | "eager";
+  "happy" | "hesitant" | "proud" | "sleepy" | "cool" | "frozen" | "eager" | "charging";
+export type BraisePose = "idle" | "focus" | "charge" | "transform" | "land" | "victory";
 
 type Props = {
   size?: number;
@@ -10,10 +10,32 @@ type Props = {
   className?: string;
   presenting?: boolean;
   labelled?: boolean;
+  pose?: BraisePose;
 };
 
 const INK = "#151821";
 const FACE = "#FFF2D8";
+
+export const BRAISE_RANK_COLORS: Record<BraiseRankId, [string, string, string]> = {
+  bronze: ["#F04418", "#FF7A1A", "#FFD84B"],
+  argent: ["#1859A9", "#3B91E8", "#BDEBFF"],
+  or: ["#A63D11", "#F08A16", "#FFE06B"],
+  platine: ["#482080", "#7655D8", "#52E2DD"],
+  legende: ["#861C42", "#F04418", "#FFD84B"],
+};
+
+// The two asymmetric tips are Braise's fixed signature. Width, stance and edge language mature.
+export const BRAISE_BODY_PATHS: Record<BraiseRankId, string> = {
+  bronze:
+    "M25 79 C20 65 25 53 36 44 C33 35 37 29 43 34 L49 40 C50 28 58 16 66 9 C71 5 74 10 71 17 C68 27 71 34 79 43 C88 53 91 67 86 81 C81 96 69 103 53 103 C38 103 29 95 25 79 Z",
+  argent:
+    "M24 81 C19 64 26 51 36 41 L35 27 L47 36 C49 24 56 11 64 5 C69 1 74 5 71 14 C69 25 72 33 80 41 C90 52 92 67 87 82 C82 98 68 106 52 106 C36 106 27 96 24 81 Z",
+  or: "M17 82 C14 64 24 49 36 41 L31 27 L45 35 C47 22 56 10 65 5 C71 2 76 7 72 16 C70 25 75 33 84 42 C95 53 98 68 92 84 C86 101 70 108 52 108 C33 108 20 99 17 82 Z",
+  platine:
+    "M15 84 L20 60 L34 44 L31 27 L45 35 L51 15 L59 31 L74 9 L70 38 L87 48 L95 70 L89 89 L70 108 L43 109 L23 98 Z",
+  legende:
+    "M10 87 C8 66 20 49 34 40 L30 22 L44 32 L51 7 L59 29 L75 14 L70 39 C90 45 101 64 97 86 C93 106 74 114 52 113 C29 113 13 105 10 87 Z",
+};
 
 const CORE_PATHS: Record<BraiseRankId, string> = {
   bronze: "M53 76 L58 82 L53 90 L48 82 Z",
@@ -134,7 +156,7 @@ function Face({ expression, mature }: { expression: BraiseExpression; mature: bo
       </g>
     );
   }
-  const closed = expression === "sleepy" || expression === "proud";
+  const closed = expression === "sleepy" || expression === "proud" || expression === "charging";
   const eyeY = mature ? 59 : 60;
   return (
     <g>
@@ -150,7 +172,13 @@ function Face({ expression, mature }: { expression: BraiseExpression; mature: bo
         {closed ? (
           <>
             <path
-              d={expression === "proud" ? "M36 62 L43 57 L50 62" : "M36 59 Q43 64 50 59"}
+              d={
+                expression === "proud"
+                  ? "M36 62 L43 57 L50 62"
+                  : expression === "charging"
+                    ? "M36 60 L43 63 L50 59"
+                    : "M36 59 Q43 64 50 59"
+              }
               stroke={INK}
               strokeWidth="3.5"
               strokeLinecap="round"
@@ -158,7 +186,13 @@ function Face({ expression, mature }: { expression: BraiseExpression; mature: bo
               fill="none"
             />
             <path
-              d={expression === "proud" ? "M57 62 L64 57 L71 62" : "M57 59 Q64 64 71 59"}
+              d={
+                expression === "proud"
+                  ? "M57 62 L64 57 L71 62"
+                  : expression === "charging"
+                    ? "M57 59 L64 63 L71 60"
+                    : "M57 59 Q64 64 71 59"
+              }
               stroke={INK}
               strokeWidth="3.5"
               strokeLinecap="round"
@@ -195,6 +229,8 @@ function Face({ expression, mature }: { expression: BraiseExpression; mature: bo
           strokeLinecap="round"
           fill="none"
         />
+      ) : expression === "charging" ? (
+        <path d="M46 73 L61 73" stroke={INK} strokeWidth="3.4" strokeLinecap="round" />
       ) : expression === "eager" ? (
         <ellipse cx="54" cy="73" rx="5.5" ry="4.5" fill={INK} />
       ) : expression === "sleepy" ? (
@@ -233,6 +269,7 @@ export function BraiseCharacter({
   className = "",
   presenting = false,
   labelled = true,
+  pose = "idle",
 }: Props) {
   const rank = (rankId in BRAISE_RANK_COLORS ? rankId : "bronze") as BraiseRankId;
   const [outer, middle, inner] = BRAISE_RANK_COLORS[rank];
@@ -260,71 +297,79 @@ export function BraiseCharacter({
       height={size}
       viewBox="0 0 108 116"
       fill="none"
-      className={`braise-mascot braise-form-${rank} mood-${expression === "cool" ? "proud" : expression} ${expression === "frozen" ? "mood-frozen-tint mood-frozen" : ""} ${className}`}
+      className={`braise-mascot braise-form-${rank} mood-${expression === "cool" ? "proud" : expression} pose-${pose} ${expression === "frozen" ? "mood-frozen-tint mood-frozen" : ""} ${className}`}
       role={labelled ? "img" : undefined}
       aria-label={labelled ? `Braise, évolution ${rank}` : undefined}
       aria-hidden={labelled ? undefined : true}
     >
       <ellipse cx="54" cy="109" rx={27 + rankIndex * 2} ry="5" fill={INK} opacity="0.18" />
-      <path d={leftArm} stroke={INK} strokeWidth={armWidth} strokeLinecap="round" />
-      <path d={rightArm} stroke={INK} strokeWidth={armWidth} strokeLinecap="round" />
-      <circle
-        cx={armUp ? 93 : rank === "bronze" ? 17 : 16}
-        cy={armUp ? 39 : rank === "bronze" ? 53 : 87}
-        r="4"
-        fill={middle}
-        stroke={INK}
-        strokeWidth="2.4"
-      />
-      <circle
-        cx={armUp ? 16 : 92}
-        cy={armUp ? 46 : 88}
-        r="4"
-        fill={middle}
-        stroke={INK}
-        strokeWidth="2.4"
-      />
-
-      <path
-        className="flame-outer"
-        d={BRAISE_BODY_PATHS[rank]}
-        fill={outer}
-        stroke={INK}
-        strokeWidth="4.5"
-        strokeLinejoin="round"
-      />
-      <path
-        className="flame-middle"
-        d={
-          mature
-            ? "M26 82 C25 59 39 43 53 42 C71 41 86 58 83 82 C81 98 68 105 53 105 C37 105 28 98 26 82 Z"
-            : "M30 80 C29 61 40 47 53 46 C69 46 80 60 79 80 C78 94 67 101 53 101 C39 101 31 94 30 80 Z"
-        }
-        fill={middle}
-      />
-      <RankLanguage rankId={rank} inner={inner} />
-
-      <path
-        d={
-          mature
-            ? "M30 67 C30 52 40 45 53 45 C68 45 78 53 78 68 C78 82 67 89 53 89 C39 89 30 81 30 67 Z"
-            : "M31 67 C31 53 41 46 53 46 C67 46 77 54 77 68 C77 82 67 89 53 89 C40 89 31 81 31 67 Z"
-        }
-        fill={FACE}
-        stroke={INK}
-        strokeWidth="3.2"
-        strokeLinejoin="round"
-      />
-      <Face expression={expression} mature={mature} />
-      {rank === "bronze" && (
-        <path
-          d="M34 69 l4 -1"
-          stroke="#FF6F59"
-          strokeWidth="3"
-          strokeLinecap="round"
-          opacity="0.65"
+      <g className="braise-arm braise-arm-left">
+        <path d={leftArm} stroke={INK} strokeWidth={armWidth} strokeLinecap="round" />
+        <circle
+          cx={armUp ? 16 : rank === "bronze" ? 17 : 16}
+          cy={armUp ? 46 : rank === "bronze" ? 53 : 87}
+          r="4"
+          fill={middle}
+          stroke={INK}
+          strokeWidth="2.4"
         />
-      )}
+      </g>
+      <g className="braise-arm braise-arm-right">
+        <path d={rightArm} stroke={INK} strokeWidth={armWidth} strokeLinecap="round" />
+        <circle
+          cx={armUp ? 93 : 92}
+          cy={armUp ? 39 : 88}
+          r="4"
+          fill={middle}
+          stroke={INK}
+          strokeWidth="2.4"
+        />
+      </g>
+
+      <g className="braise-body">
+        <path
+          className="flame-outer"
+          d={BRAISE_BODY_PATHS[rank]}
+          fill={outer}
+          stroke={INK}
+          strokeWidth="4.5"
+          strokeLinejoin="round"
+        />
+        <path
+          className="flame-middle"
+          d={
+            mature
+              ? "M26 82 C25 59 39 43 53 42 C71 41 86 58 83 82 C81 98 68 105 53 105 C37 105 28 98 26 82 Z"
+              : "M30 80 C29 61 40 47 53 46 C69 46 80 60 79 80 C78 94 67 101 53 101 C39 101 31 94 30 80 Z"
+          }
+          fill={middle}
+        />
+        <RankLanguage rankId={rank} inner={inner} />
+      </g>
+
+      <g className="braise-face">
+        <path
+          d={
+            mature
+              ? "M30 67 C30 52 40 45 53 45 C68 45 78 53 78 68 C78 82 67 89 53 89 C39 89 30 81 30 67 Z"
+              : "M31 67 C31 53 41 46 53 46 C67 46 77 54 77 68 C77 82 67 89 53 89 C40 89 31 81 31 67 Z"
+          }
+          fill={FACE}
+          stroke={INK}
+          strokeWidth="3.2"
+          strokeLinejoin="round"
+        />
+        <Face expression={expression} mature={mature} />
+        {rank === "bronze" && (
+          <path
+            d="M34 69 l4 -1"
+            stroke="#FF6F59"
+            strokeWidth="3"
+            strokeLinecap="round"
+            opacity="0.65"
+          />
+        )}
+      </g>
 
       <path
         className="braise-core"
@@ -342,28 +387,32 @@ export function BraiseCharacter({
         opacity="0.8"
       />
 
-      <rect
-        x={footLeft}
-        y="98"
-        width={rankIndex < 2 ? 17 : 19}
-        height="10"
-        rx="4.5"
-        fill={outer}
-        stroke={INK}
-        strokeWidth="3.5"
-        transform={rank === "bronze" ? "rotate(5 33 98)" : undefined}
-      />
-      <rect
-        x={footRight}
-        y="98"
-        width={rankIndex < 2 ? 17 : 19}
-        height="10"
-        rx="4.5"
-        fill={outer}
-        stroke={INK}
-        strokeWidth="3.5"
-        transform={rank === "bronze" ? "rotate(-5 58 98)" : undefined}
-      />
+      <g className="braise-foot braise-foot-left">
+        <rect
+          x={footLeft}
+          y="98"
+          width={rankIndex < 2 ? 17 : 19}
+          height="10"
+          rx="4.5"
+          fill={outer}
+          stroke={INK}
+          strokeWidth="3.5"
+          transform={rank === "bronze" ? "rotate(5 33 98)" : undefined}
+        />
+      </g>
+      <g className="braise-foot braise-foot-right">
+        <rect
+          x={footRight}
+          y="98"
+          width={rankIndex < 2 ? 17 : 19}
+          height="10"
+          rx="4.5"
+          fill={outer}
+          stroke={INK}
+          strokeWidth="3.5"
+          transform={rank === "bronze" ? "rotate(-5 58 98)" : undefined}
+        />
+      </g>
 
       {expression === "frozen" && (
         <path

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { computeUnlockedBadges } from "@/lib/progress";
 import { getRankInfo, RANKS, type Rank } from "@/lib/aura";
-import { fireConfetti } from "@/lib/confetti";
 import { sfx } from "@/lib/sound";
 import { BADGES } from "@/data";
 import type { AppState, Badge } from "@/types";
@@ -23,7 +22,10 @@ export type Celebration =
 // primary way to leave it: a deliberate full-screen moment should end on the student's own terms.
 const AUTO_DISMISS_MS: Record<Celebration["type"], number> = { badge: 2200, rank: 12000 };
 
-type CelebrationState = Pick<AppState, "streak" | "xp" | "everUsedFreeze" | "completedChapters">;
+type CelebrationState = Pick<
+  AppState,
+  "streak" | "xp" | "freezeArmed" | "freezes" | "completedChapters" | "everUsedFreeze"
+>;
 
 /** Rank-ups and badge unlocks were both real, already-computed milestones (getRankInfo,
  *  computeUnlockedBadges) that fired with zero acknowledgement anywhere in the app — a student
@@ -67,7 +69,7 @@ export function useMilestoneCelebrations(
     }
     setSeenBadgeIds(unlockedIds);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loaded, state.streak, state.xp, state.everUsedFreeze, state.completedChapters]);
+  }, [loaded, state.streak, state.xp, state.freezeArmed, state.freezes, state.completedChapters]);
 
   // Split in two, not one combined "pop + schedule dismissal" effect: under StrictMode's dev-only
   // double-invoke (mount, cleanup, remount), a single effect guarded by `if (active) return` would
@@ -80,8 +82,7 @@ export function useMilestoneCelebrations(
     const [next, ...rest] = queue;
     setActive(next);
     setQueue(rest);
-    if (next.type === "rank") fireConfetti();
-    sfx.complete(soundOn);
+    if (next.type === "badge") sfx.complete(soundOn);
   }, [queue, active, soundOn]);
 
   useEffect(() => {

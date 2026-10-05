@@ -86,6 +86,39 @@ export const sfx = {
     );
     haptic([15, 50, 15, 50, 30]);
   },
+  rankCharge: (on: boolean) => {
+    playTones(
+      [
+        { f: 196, d: 0.12, t: "triangle" },
+        { f: 262, d: 0.12, t: "triangle", delay: 0.2 },
+        { f: 392, d: 0.16, t: "triangle", delay: 0.4 },
+      ],
+      on,
+    );
+    haptic([10, 180, 14, 180, 20]);
+  },
+  rankImpact: (on: boolean) => {
+    playTones(
+      [
+        { f: 110, d: 0.12, t: "square" },
+        { f: 784, d: 0.18, t: "sine", delay: 0.04 },
+        { f: 1175, d: 0.2, t: "sine", delay: 0.1 },
+      ],
+      on,
+    );
+    haptic([24, 28, 48]);
+  },
+  rankReveal: (on: boolean) => {
+    playTones(
+      [
+        { f: 523, d: 0.16, t: "sine" },
+        { f: 659, d: 0.18, t: "sine", delay: 0.1 },
+        { f: 784, d: 0.24, t: "sine", delay: 0.2 },
+      ],
+      on,
+    );
+    haptic(18);
+  },
   streak: (on: boolean) => {
     playTones(
       [

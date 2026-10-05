@@ -5,6 +5,7 @@
    les utilitaires Tailwind posés dans le JSX reprennent le dessus. */
 @import "./braise.css" layer(components);
 @import "./subjects.css" layer(components);
+@import "./declic.css" layer(components);
 
 @custom-variant dark (&:is(.dark *));
 
@@ -31,6 +32,7 @@
   --color-sapie-neo-blue: #1e3a8a;
   --color-sapie-neo-paper: #faf8f3;
 
+  --font-impact: "Archivo Black", "Baloo 2", sans-serif;
   --font-display: "Baloo 2", sans-serif;
   --font-sans: "IBM Plex Sans", sans-serif;
   --font-mono: "IBM Plex Mono", monospace;

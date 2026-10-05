@@ -4775,3 +4775,249 @@ select {
 
 .home-view { position: relative; }
 .home-mission-zone { position: relative; isolation: isolate; }
+
+/* ===== Navigation basse — quatre boutons physiques, un seul signal fort ===== */
+.braise-tabbar {
+  position: absolute;
+  inset-inline: 12px;
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 5px;
+  min-height: 68px;
+  padding: 7px;
+  border: 3px solid var(--neo-ink);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  box-shadow: 5px 5px 0 var(--neo-ink);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.braise-tab {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  width: 100%;
+  height: 52px;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 2px;
+  border-radius: 11px;
+  color: var(--ink-soft);
+  transition: color 150ms ease, transform 100ms ease;
+}
+
+.braise-tab:hover {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+}
+
+.braise-tab:active {
+  transform: translate(2px, 2px);
+}
+
+.braise-tab.is-active {
+  color: var(--neo-ink);
+}
+
+.braise-tab.is-active:hover {
+  background: transparent;
+}
+
+.braise-tab-puck {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 11px;
+  background: var(--neo-orange);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+}
+
+.braise-tab:active .braise-tab-puck {
+  box-shadow: 1px 1px 0 var(--neo-ink);
+}
+
+.braise-tab-icon {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+}
+
+.braise-tab-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.braise-tab-label {
+  max-width: 100%;
+  overflow: hidden;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 0.66rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+@media (max-width: 360px) {
+  .braise-tabbar {
+    inset-inline: 9px;
+    gap: 3px;
+    padding: 6px;
+  }
+
+  .braise-tab-label {
+    font-size: 0.62rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .braise-tab,
+  .braise-tab-puck,
+  .braise-tab-icon {
+    transition: none;
+  }
+
+/* Passage de rang — la transformation vient de Braise, pas d'un badge générique. */
+.rank-up-stage {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(circle, color-mix(in srgb, var(--ink) 16%, transparent) 1.2px, transparent 1.2px),
+    linear-gradient(180deg, color-mix(in srgb, var(--rank-from) 22%, var(--bg)) 0%, var(--bg) 58%);
+  background-size: 18px 18px, 100% 100%;
+  color: var(--ink);
+}
+.rank-up-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 34%;
+  background: var(--rank-to);
+  border-bottom: 3px solid var(--ink);
+  clip-path: polygon(0 0, 100% 0, 100% 88%, 68% 94%, 38% 88%, 0 97%);
+  transition: clip-path .42s cubic-bezier(.2,.9,.25,1.1);
+}
+.rank-up-stage.is-impact::before {
+  clip-path: polygon(0 0, 100% 0, 100% 96%, 73% 89%, 42% 98%, 0 90%);
+}
+.rank-up-kicker,
+.rank-up-rank-stamp { letter-spacing: 0; }
+.rank-up-rank-stamp { font-family: var(--font-impact); }
+.rank-up-character-zone::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  bottom: 1px;
+  width: 156px;
+  height: 18px;
+  transform: translateX(-50%);
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--rank-from) 48%, var(--bg));
+}
+.rank-up-transform-label {
+  position: absolute;
+  z-index: 20;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  border: 2.5px solid var(--ink);
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--ink);
+  padding: 3px 10px;
+  font: 900 .7rem/1.2 var(--font-impact);
+  letter-spacing: 0;
+}
+.rank-up-braise { transform-origin: 50% 92%; }
+.rank-up-braise .braise-mascot,
+.rank-up-braise .braise-mascot .flame-outer,
+.rank-up-braise .braise-mascot .flame-middle,
+.rank-up-braise .braise-mascot .braise-eyes {
+  animation: none;
+}
+.braise-mascot .braise-body,
+.braise-mascot .braise-face,
+.braise-mascot .braise-arm,
+.braise-mascot .braise-foot {
+  transform-box: view-box;
+}
+.braise-mascot .braise-body { transform-origin: 54px 98px; }
+.braise-mascot .braise-face { transform-origin: 54px 67px; }
+.braise-mascot .braise-arm-left { transform-origin: 28px 68px; }
+.braise-mascot .braise-arm-right { transform-origin: 80px 68px; }
+.braise-mascot .braise-foot-left { transform-origin: 40px 103px; }
+.braise-mascot .braise-foot-right { transform-origin: 70px 103px; }
+.rank-up-braise .pose-focus .braise-face {
+  animation: rank-look-core .35s ease-out both;
+}
+.rank-up-braise .pose-focus .braise-arm-left { transform: rotate(-7deg) translate(2px, 1px); }
+.rank-up-braise .pose-focus .braise-arm-right { transform: rotate(7deg) translate(-2px, 1px); }
+.rank-up-braise .pose-charge .braise-body { animation: rank-body-brace .6s cubic-bezier(.55,0,.8,.35) both; }
+.rank-up-braise .pose-charge .braise-face { animation: rank-face-brace .6s cubic-bezier(.55,0,.8,.35) both; }
+.rank-up-braise .pose-charge .braise-arm-left { animation: rank-arm-brace-left .6s cubic-bezier(.55,0,.8,.35) both; }
+.rank-up-braise .pose-charge .braise-arm-right { animation: rank-arm-brace-right .6s cubic-bezier(.55,0,.8,.35) both; }
+.rank-up-braise .pose-charge .braise-foot-left { transform: translate(-3px, 1px) rotate(-5deg); }
+.rank-up-braise .pose-charge .braise-foot-right { transform: translate(3px, 1px) rotate(5deg); }
+.rank-up-braise .pose-land .braise-body { animation: rank-body-follow .72s cubic-bezier(.18,.85,.24,1.18) both; }
+.rank-up-braise .pose-land .braise-face { animation: rank-face-follow .72s cubic-bezier(.18,.85,.24,1.18) .05s both; }
+.rank-up-braise .pose-land .braise-arm-left { animation: rank-arm-celebrate-left .72s ease-out .08s both; }
+.rank-up-braise .pose-land .braise-arm-right { animation: rank-arm-celebrate-right .72s ease-out .08s both; }
+.rank-up-braise .pose-victory .braise-arm-left { transform: rotate(-5deg); }
+.rank-up-braise .pose-victory .braise-arm-right { transform: rotate(5deg); }
+.rank-up-braise.is-charging .braise-core {
+  animation: rank-core-charge .5s steps(3, end) both;
+}
+.rank-up-braise.is-charging .braise-eyes {
+  transform-origin: 54px 60px;
+  animation: rank-focus-eyes .5s ease-in both;
+}
+.rank-up-braise.is-evolved .braise-core {
+  animation: rank-core-settle .65s ease-out .2s both;
+}
+@keyframes rank-core-charge {
+  0% { transform: scale(1); }
+  18% { transform: scale(1.35); }
+  32% { transform: scale(1.06); }
+  55% { transform: scale(1.75); }
+  68% { transform: scale(1.22); }
+  100% { transform: scale(2.45); }
+}
+@keyframes rank-look-core { from { transform: translateY(0); } to { transform: translateY(2px) scaleY(.96); } }
+@keyframes rank-body-brace { from { transform: scale(1); } to { transform: translateY(5px) scaleX(1.06) scaleY(.93); } }
+@keyframes rank-face-brace { from { transform: translateY(1px); } to { transform: translateY(5px) scaleX(.97); } }
+@keyframes rank-arm-brace-left { from { transform: rotate(-7deg); } to { transform: translate(7px, 4px) rotate(13deg); } }
+@keyframes rank-arm-brace-right { from { transform: rotate(7deg); } to { transform: translate(-7px, 4px) rotate(-13deg); } }
+@keyframes rank-body-follow { 0% { transform: scaleY(1.08); } 58% { transform: translateY(4px) scaleX(1.08) scaleY(.92); } 78% { transform: translateY(-2px) scaleX(.98) scaleY(1.04); } 100% { transform: none; } }
+@keyframes rank-face-follow { 0%, 48% { transform: translateY(-2px); } 70% { transform: translateY(3px) scaleY(.96); } 100% { transform: none; } }
+@keyframes rank-arm-celebrate-left { 0% { transform: rotate(10deg); } 55% { transform: rotate(-13deg); } 100% { transform: rotate(-5deg); } }
+@keyframes rank-arm-celebrate-right { 0% { transform: rotate(-10deg); } 55% { transform: rotate(13deg); } 100% { transform: rotate(5deg); } }
+@keyframes rank-focus-eyes {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(.45); }
+}
+@keyframes rank-core-settle {
+  0% { transform: scale(1.8); }
+  55% { transform: scale(.86); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rank-up-braise.is-charging .braise-core,
+  .rank-up-braise.is-charging .braise-eyes,
+  .rank-up-braise.is-evolved .braise-core { animation: none; }
+  .rank-up-braise .braise-body,
+  .rank-up-braise .braise-face,
+  .rank-up-braise .braise-arm,
+  .rank-up-braise .braise-foot { animation: none !important; transform: none !important; }
+  .rank-up-stage::before { transition: none; }
+}
+}

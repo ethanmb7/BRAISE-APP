@@ -128,6 +128,9 @@ export function HomeView() {
       pct,
       level: currentIndex >= 0 ? currentIndex + 1 : chapters.length,
       chapterLabel: current ? stripLeadingArticle(current.title) : s.name,
+      chapterCount: chapters.length,
+      doneCount,
+      duration: current?.duration ?? null,
       currentChapterId: current?.id,
       // Same subject the hero card above already names as today's draw — surfacing it first
       // here too matters most on a fresh account, where all 6 decks look interchangeable and

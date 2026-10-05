@@ -25,6 +25,9 @@
 - [ ] Aura : progression, rang et badges — destination principale, jamais un sous-écran de Moi
 - [ ] Moi : profil, préférences et accessibilité
 - [ ] Documenter les composants et les trois niveaux de surface dans un système de design
+- [x] Refaire Matières et les parcours de cours en decks collector BRAISE pour les lycéens
+- [x] Faire du Déclic une expérience vivante et complice, inspirée des usages lycéens sans imitation artificielle
+- [x] Faire de Braise l’acteur central du Déclic avec gestes, réactions et transitions contextuelles
 
 ## Qualité produit
 
@@ -44,3 +47,7 @@
 - [x] Décliner ses évolutions pour un public lycéen large, liées à l’effort, la maîtrise et la méthode d’apprentissage BRAISE
 - [x] Décider du rôle stratégique des avatars de profil : Les Flambés (esprits de flamme à vibes d'ado), slug stable, 6 libres + 3 par rang, dessinés en SVG néobrutaliste
 - [ ] Automatiser la sauvegarde GitHub (synchro Git Lovable deux sens, ou push manuel ponctuel)
+- [x] Recréer le passage de niveau comme une transformation signature de Braise, avec version mouvement réduit
+- [x] Recentrer l’écran de passage de niveau sur Braise et la DA néobrutaliste propre à l’application
+- [x] Animer directement le nouveau personnage Braise pendant sa transformation de rang
+- [x] Donner à Braise un vrai jeu d’acteur articulé et synchroniser la transformation avec le son et le toucher

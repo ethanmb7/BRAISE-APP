@@ -3,7 +3,8 @@ import { Share2, X, Zap } from "lucide-react";
 import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
 import type { Rank } from "@/lib/aura";
-import { BRAISE_BODY_PATHS, BRAISE_RANK_COLORS, type BraiseRankId } from "@/lib/braiseArt";
+import { BRAISE_BODY_PATHS, BRAISE_RANK_COLORS } from "@/components/BraiseCharacter";
+import type { BraiseRankId } from "@/components/BraiseCharacter";
 
 // Native Story format (1080x1920) — the canvas is always rasterized at this true resolution
 // for a crisp export; on screen it's scaled down responsively via CSS (width:100%, height:auto
@@ -60,119 +61,124 @@ export function ShareAuraModal({
     canvas.width = CANVAS_W;
     canvas.height = CANVAS_H;
 
-    const bg = ctx.createLinearGradient(0, 0, CANVAS_W, CANVAS_H);
-    bg.addColorStop(0, rank.colorFrom);
-    bg.addColorStop(1, rank.colorTo);
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+    const pseudo = (state.user.name || "JOUEUR").toUpperCase();
 
-    // Wordmark, top-left
-    neoPill(ctx, 64, 64, 300, 76, "#faf8f3");
-    drawFlameIcon(ctx, 96, 78, 48);
-    ctx.fillStyle = "#151821";
-    ctx.font = '700 34px "IBM Plex Mono", monospace';
+    // ---- Background: the app's cream paper, plus a burst of the rank's own colour so the card
+    // reads as an object lying ON something, not as a flat poster.
+    ctx.fillStyle = "#FDF7EF";
+    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+    drawRays(ctx, CANVAS_W / 2, 800, rank.colorFrom);
+    drawDotGrid(ctx);
+
+    // ---- The collectible card itself ----------------------------------------------------
+    const CX = 64;
+    const CY = 208;
+    const CW = CANVAS_W - CX * 2;
+    const CH = 1322;
+    const PAD = 34;
+
+    neoRect(ctx, CX, CY, CW, CH, 46, "#FFFFFF", 26, 14);
+
+    // Header strip: wordmark + rarity, in the rank's gradient.
+    ctx.save();
+    roundedPath(ctx, CX, CY, CW, CH, 46);
+    ctx.clip();
+    const band = ctx.createLinearGradient(CX, CY, CX + CW, CY + 120);
+    band.addColorStop(0, rank.colorFrom);
+    band.addColorStop(1, rank.colorTo);
+    ctx.fillStyle = band;
+    ctx.fillRect(CX, CY, CW, 122);
+    ctx.fillStyle = INK;
+    ctx.fillRect(CX, CY + 122, CW, 10);
+    ctx.restore();
+
+    drawFlameIcon(ctx, CX + PAD, CY + 34, 56);
+    ctx.fillStyle = INK;
     ctx.textAlign = "left";
     ctx.textBaseline = "middle";
-    ctx.fillText("BRAISE", 154, 102);
+    ctx.font = '700 40px "IBM Plex Mono", monospace';
+    ctx.fillText("BRAISE", CX + PAD + 74, CY + 62);
 
-    // Main panel
-    const panelX = 90;
-    const panelY = 320;
-    const panelW = CANVAS_W - panelX * 2;
-    const panelH = 1230;
-    neoRect(ctx, panelX, panelY, panelW, panelH, 28, "#faf8f3", 10, 7);
-
-    // The real mascot, evolved per rank — same construction (flame body, rank accent, sunglasses)
-    // as BraiseMascot.tsx, ported to canvas path drawing since canvas can't render a React
-    // component directly. Used to be a rasterized flame emoji standing in for Braise entirely;
-    // this is the actual character people already recognize from the rest of the app.
-    drawMascot(ctx, CANVAS_W / 2, panelY + 230, 460, rank.id);
-
-    // Rank badge — icon drawn as its own vector shape, not `${rank.emoji}` inside the string,
-    // so this badge matches the same medal/gem/crown language as the rank rail on Ton Aura
-    // instead of falling back to platform emoji rendering.
-    const badgeW = 460;
-    const badgeY = panelY + 300;
-    neoPill(ctx, CANVAS_W / 2 - badgeW / 2, badgeY, badgeW, 92, rankBadgeFill(rank.id));
-    ctx.font = '800 42px "Baloo 2", sans-serif';
-    const badgeLabel = `RANG ${rank.name.toUpperCase()}`;
-    const badgeIconSize = 52;
-    const badgeGap = 16;
-    const labelW = ctx.measureText(badgeLabel).width;
-    const groupW = badgeIconSize + badgeGap + labelW;
-    const groupX = CANVAS_W / 2 - groupW / 2;
-    drawRankIcon(ctx, rank.id, groupX, badgeY + 20, badgeIconSize, rank.colorFrom);
-    ctx.fillStyle = "#151821";
-    ctx.textAlign = "left";
-    ctx.fillText(badgeLabel, groupX + badgeIconSize + badgeGap, badgeY + 46);
-
-    // Dynamic hook, tiered by streak/rank
-    ctx.font = '800 62px "Baloo 2", sans-serif';
-    ctx.fillStyle = "#151821";
-    wrapText(ctx, hookText(rank, streak), CANVAS_W / 2, panelY + 490, panelW - 140, 70);
-
-    // Stat chips — same flame/bolt/book vocabulary as the rest of the app (streak flame, XP
-    // bolt, subject book) instead of the generic ⭐🔥📚 platform glyphs.
-    //
-    // A "0 JOURS" chip in the middle slot of a card built to be shared reads as "this person
-    // just quit", the opposite of what a share card is for — so when the streak is 0, that slot
-    // shows mastered cards instead (a real, non-zero-looking number whenever there's anything to
-    // show at all) rather than featuring the one stat that's currently a zero.
-    const chipY = panelY + 700;
-    const chipGap = 28;
-    const chipW = (panelW - 120 - chipGap * 2) / 3;
-    const chipX0 = panelX + 60;
-    statChip(ctx, chipX0, chipY, chipW, 240, "#c4b5fd", drawBoltIcon, `${xp}`, "XP TOTAL");
-    if (streak > 0) {
-      statChip(
-        ctx,
-        chipX0 + chipW + chipGap,
-        chipY,
-        chipW,
-        240,
-        "#ffd166",
-        drawFlameIcon,
-        `${streak}`,
-        "JOURS",
-      );
-    } else {
-      statChip(
-        ctx,
-        chipX0 + chipW + chipGap,
-        chipY,
-        chipW,
-        240,
-        "#ffd166",
-        drawCheckIcon,
-        `${masteredCards}`,
-        "CARTES SUES",
-      );
-    }
-    statChip(
-      ctx,
-      chipX0 + (chipW + chipGap) * 2,
-      chipY,
-      chipW,
-      240,
-      "#a7f3d0",
-      drawBookIcon,
-      `${subjectsCount}`,
-      "MATIÈRES",
-    );
-
-    // CTA bar — a text/wordmark badge rather than a fake QR code: a QR that isn't wired to a
-    // real invite link would look functional and not be, which is worse than not having one.
-    // Wiring a real one just needs a `qrcode` dep plus a real deep-link once that exists.
-    const ctaY = panelY + panelH - 210;
-    ctx.fillStyle = "#151821";
-    roundedPath(ctx, panelX + 40, ctaY, panelW - 80, 150, 20);
-    ctx.fill();
-    ctx.fillStyle = "#fff";
+    const rarity = rarityLabel(rank.id);
+    ctx.font = '700 30px "IBM Plex Mono", monospace';
+    const rarW = ctx.measureText(rarity).width + 56;
+    neoRect(ctx, CX + CW - PAD - rarW, CY + 28, rarW, 68, 34, "#151821", 0, 5);
+    ctx.fillStyle = "#FDF7EF";
     ctx.textAlign = "center";
-    ctx.font = '800 40px "Baloo 2", sans-serif';
-    ctx.fillText("BATS MON SCORE SUR", CANVAS_W / 2, ctaY + 56);
+    ctx.font = '700 30px "IBM Plex Mono", monospace';
+    ctx.fillText(rarity, CX + CW - PAD - rarW / 2, CY + 63);
+
+    // Art window: Braise, full rank colours, holo stripes.
+    const AX = CX + PAD;
+    const AY = CY + 158;
+    const AW = CW - PAD * 2;
+    const AH = 716;
+    ctx.fillStyle = "#000";
+    roundedPath(ctx, AX + 10, AY + 10, AW, AH, 28);
+    ctx.fill();
+    ctx.save();
+    roundedPath(ctx, AX, AY, AW, AH, 28);
+    ctx.clip();
+    const art = ctx.createLinearGradient(AX, AY, AX + AW, AY + AH);
+    art.addColorStop(0, rank.colorTo);
+    art.addColorStop(1, rank.colorFrom);
+    ctx.fillStyle = art;
+    ctx.fillRect(AX, AY, AW, AH);
+    drawRays(ctx, AX + AW / 2, AY + AH * 0.55, "#FFFFFF", 0.22);
+    drawHolo(ctx, AX, AY, AW, AH);
+    drawMascot(ctx, AX + AW / 2, AY + AH / 2 - 10, 600, rank.id);
+    ctx.restore();
+    roundedPath(ctx, AX, AY, AW, AH, 28);
+    ctx.lineWidth = 10;
+    ctx.strokeStyle = INK;
+    ctx.stroke();
+
+    // Rank sticker slapped on the corner of the art.
+    drawRankStamp(ctx, AX + AW / 2, AY + AH - 18, rank);
+
+    // Name plate: the pseudo is the card's title — this is THEIR card.
+    const NY = AY + AH + 56;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillStyle = INK;
+    fitText(ctx, pseudo, AX, NY + 58, AW - 120, 84, "Baloo 2");
+    ctx.font = '700 28px "IBM Plex Mono", monospace';
+    ctx.fillStyle = "#5B6172";
+    ctx.fillText(hookText(rank, streak), AX, NY + 104);
+
+    // Stats: three real numbers, compact, inside the card.
+    const SY = NY + 128;
+    const gap = 22;
+    const sw = (AW - gap * 2) / 3;
+    miniStat(ctx, AX, SY, sw, 170, "#C4B5FD", `${xp}`, "XP");
+    if (streak > 0) miniStat(ctx, AX + sw + gap, SY, sw, 170, "#FFD166", `${streak}`, "JOURS");
+    else miniStat(ctx, AX + sw + gap, SY, sw, 170, "#FFD166", `${masteredCards}`, "SUES");
+    miniStat(ctx, AX + (sw + gap) * 2, SY, sw, 170, "#A7F3D0", `${subjectsCount}`, "MATIÈRES");
+
+    // Card footer: real proof + real date, like a serial line.
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#5B6172";
+    ctx.font = '700 26px "IBM Plex Mono", monospace';
+    ctx.fillText(`${masteredCards} CARTES MAÎTRISÉES`, AX, CY + CH - 34);
+    ctx.textAlign = "right";
+    ctx.fillText(editionCode(), AX + AW, CY + CH - 34);
+
+    // ---- Invitation, outside the card ----------------------------------------------------
+    const ctaY = 1566;
+    ctx.fillStyle = INK;
+    roundedPath(ctx, CX, ctaY, CW, 174, 30);
+    ctx.fill();
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#FDF7EF";
     ctx.font = '800 46px "Baloo 2", sans-serif';
-    ctx.fillText("BRAISE →", CANVAS_W / 2, ctaY + 106);
+    ctx.fillText("BATS MON SCORE SUR", CANVAS_W / 2, ctaY + 68);
+    ctx.fillStyle = "#FF7A1A";
+    ctx.font = '800 56px "Baloo 2", sans-serif';
+    ctx.fillText("BRAISE →", CANVAS_W / 2, ctaY + 130);
+
+    ctx.fillStyle = "#5B6172";
+    ctx.font = '700 28px "IBM Plex Mono", monospace';
+    ctx.fillText("2 MIN PAR JOUR · TA CARTE ÉVOLUE AVEC TOI", CANVAS_W / 2, 1822);
 
     ctx.textAlign = "left";
   }
@@ -248,6 +254,111 @@ function hookText(rank: Rank, streak: number): string {
   return `RANG ${rank.name.toUpperCase()}. VENEZ ME CHERCHER.`;
 }
 
+// Rarity mirrors the real rank — nothing decorative: a Bronze card cannot claim to be rare.
+function rarityLabel(rankId: string): string {
+  switch (rankId) {
+    case "argent":
+      return "RARE";
+    case "or":
+      return "ÉPIQUE";
+    case "platine":
+      return "MYTHIQUE";
+    case "legende":
+      return "LÉGENDAIRE";
+    default:
+      return "COMMUNE";
+  }
+}
+
+// The date the card was generated — a real edition marker, not a fake serial number.
+function editionCode(): string {
+  const d = new Date();
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `ÉDITION ${p(d.getDate())}.${p(d.getMonth() + 1)}.${String(d.getFullYear()).slice(2)}`;
+}
+
+// Radial burst behind the card and inside the art window — the "pull" of a collectible reveal.
+function drawRays(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  color: string,
+  alpha = 0.16,
+) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  const count = 18;
+  for (let i = 0; i < count; i += 2) {
+    const a0 = (i / count) * Math.PI * 2;
+    const a1 = ((i + 1) / count) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(a0) * 2200, cy + Math.sin(a0) * 2200);
+    ctx.lineTo(cx + Math.cos(a1) * 2200, cy + Math.sin(a1) * 2200);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+// Holographic sheen: hard-edged diagonal bands, no blur — the neobrutalist take on a foil card.
+function drawHolo(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
+  ctx.save();
+  ctx.globalAlpha = 0.16;
+  ctx.fillStyle = "#FFFFFF";
+  for (let i = -h; i < w + h; i += 120) {
+    ctx.beginPath();
+    ctx.moveTo(x + i, y + h);
+    ctx.lineTo(x + i + 54, y + h);
+    ctx.lineTo(x + i + 54 + h, y);
+    ctx.lineTo(x + i + h, y);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+// Shrinks the font until the string fits — a long pseudo must never run off the card.
+function fitText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  size: number,
+  family: string,
+) {
+  let s = size;
+  ctx.font = `800 ${s}px "${family}", sans-serif`;
+  while (ctx.measureText(text).width > maxWidth && s > 30) {
+    s -= 2;
+    ctx.font = `800 ${s}px "${family}", sans-serif`;
+  }
+  ctx.fillText(text, x, y);
+}
+
+// Compact stat block used inside the card frame.
+function miniStat(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  fill: string,
+  value: string,
+  label: string,
+) {
+  neoRect(ctx, x, y, w, h, 22, fill, 8, 6);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  ctx.fillStyle = INK;
+  fitText(ctx, value, x + w / 2, y + 98, w - 28, 68, "Baloo 2");
+  ctx.font = '700 26px "IBM Plex Mono", monospace';
+  ctx.fillText(label, x + w / 2, y + 142);
+  ctx.textAlign = "left";
+}
+
 function rankBadgeFill(rankId: string): string {
   switch (rankId) {
     case "argent":
@@ -315,6 +426,44 @@ function neoPill(
   neoRect(ctx, x, y, w, h, h / 2, fill, 5, 4);
 }
 
+// The app's cream paper texture: a faint ink dot grid, same rhythm as .app-content.
+function drawDotGrid(ctx: CanvasRenderingContext2D) {
+  ctx.save();
+  ctx.fillStyle = "rgba(21, 24, 33, 0.09)";
+  const step = 56;
+  for (let y = step / 2; y < CANVAS_H; y += step) {
+    for (let x = step / 2; x < CANVAS_W; x += step) {
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
+// Rank sticker: slapped at an angle across the banner edge, icon + name, hard shadow.
+function drawRankStamp(ctx: CanvasRenderingContext2D, cx: number, cy: number, rank: Rank) {
+  const label = `RANG ${rank.name.toUpperCase()}`;
+  const iconSize = 58;
+  const gap = 18;
+  ctx.save();
+  ctx.font = '800 48px "Baloo 2", sans-serif';
+  const labelW = ctx.measureText(label).width;
+  const w = iconSize + gap + labelW + 96;
+  const h = 108;
+  ctx.translate(cx, cy);
+  ctx.rotate(-0.045);
+  neoRect(ctx, -w / 2, -h / 2, w, h, 20, rankBadgeFill(rank.id), 10, 7);
+  drawRankIcon(ctx, rank.id, -w / 2 + 48, -iconSize / 2, iconSize, rank.colorFrom);
+  ctx.fillStyle = "#151821";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  ctx.font = '800 48px "Baloo 2", sans-serif';
+  ctx.fillText(label, -w / 2 + 48 + iconSize + gap, 4);
+  ctx.restore();
+}
+
+// Stat tile: coloured block, icon badge on white, big real number, mono label.
 function statChip(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -326,14 +475,17 @@ function statChip(
   value: string,
   label: string,
 ) {
-  neoRect(ctx, x, y, w, h, 18, fill, 6, 5);
-  drawIcon(ctx, x + w / 2 - 27, y + 24, 54);
+  neoRect(ctx, x, y, w, h, 24, fill, 9, 6);
+  neoRect(ctx, x + w / 2 - 46, y + 26, 92, 92, 22, "#FFFFFF", 5, 4);
+  drawIcon(ctx, x + w / 2 - 29, y + 43, 58);
   ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
   ctx.fillStyle = "#151821";
-  ctx.font = '800 46px "Baloo 2", sans-serif';
-  ctx.fillText(value, x + w / 2, y + 138);
+  ctx.font = '800 66px "Baloo 2", sans-serif';
+  ctx.fillText(value, x + w / 2, y + 208);
   ctx.font = '700 24px "IBM Plex Mono", monospace';
-  ctx.fillText(label, x + w / 2, y + 182);
+  ctx.fillText(label, x + w / 2, y + 256);
+  ctx.textBaseline = "middle";
 }
 
 // Canvas has no built-in text wrapping — breaks `text` into lines that fit `maxWidth`, each
