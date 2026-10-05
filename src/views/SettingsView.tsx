@@ -3,7 +3,7 @@ import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
 import { TopBar } from "@/components/TopBar";
 import { Switch } from "@/components/Switch";
-import { LEVELS } from "@/data";
+import { CONTENT_LEVEL_NOTE, LEVELS } from "@/data";
 import type { Level } from "@/types";
 
 export function SettingsView() {
@@ -85,6 +85,7 @@ export function SettingsView() {
             </select>
           </div>
         </div>
+        <p className="settings-note">{CONTENT_LEVEL_NOTE}</p>
 
         <p
           style={{

@@ -12,7 +12,7 @@ import { StreakFlameIcon } from "@/components/StreakFlameIcon";
 import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
 import { fireConfetti } from "@/lib/confetti";
-import { LEVELS } from "@/data";
+import { CONTENT_LEVEL_NOTE, LEVELS } from "@/data";
 import type { Level, Personality } from "@/types";
 
 type Mood = "happy" | "proud" | "cool" | "eager";
@@ -31,12 +31,14 @@ const LEVEL_INFO: Record<string, { tag: string; icon: string; reaction: string }
   "1ere": {
     tag: "Bac de français",
     icon: "✍️",
-    reaction: "La 1ère, avec le bac de français au bout. On va s’organiser.",
+    reaction:
+      "La 1ère, bac de français au bout. Pour l’instant je couvre la 2nde : les bases à avoir solides.",
   },
   term: {
     tag: "Année du bac",
     icon: "🎓",
-    reaction: "Terminale, l’année du bac. On va gérer ça ensemble.",
+    reaction:
+      "Terminale, l’année du bac. Pour l’instant je couvre la 2nde : les bases à avoir solides.",
   },
 };
 
@@ -255,31 +257,34 @@ export function OnboardingView() {
               )}
 
               {stepId === "level" && (
-                <div className="onb-stack onb-stack--fill">
-                  {LEVELS.map((l) => (
-                    <Tile
-                      key={l.id}
-                      selected={level?.id === l.id}
-                      className="onb-tile--row"
-                      onSelect={() => {
-                        tap();
-                        setLevel(l);
-                        setReaction({
-                          text: LEVEL_INFO[l.id]?.reaction ?? "Noté !",
-                          mood: "proud",
-                        });
-                      }}
-                    >
-                      <span>
-                        <b>{l.label}</b>
-                        <small>{LEVEL_INFO[l.id]?.tag}</small>
-                      </span>
-                      <span className="onb-tile-icon" aria-hidden="true">
-                        {LEVEL_INFO[l.id]?.icon}
-                      </span>
-                    </Tile>
-                  ))}
-                </div>
+                <>
+                  <div className="onb-stack onb-stack--fill">
+                    {LEVELS.map((l) => (
+                      <Tile
+                        key={l.id}
+                        selected={level?.id === l.id}
+                        className="onb-tile--row"
+                        onSelect={() => {
+                          tap();
+                          setLevel(l);
+                          setReaction({
+                            text: LEVEL_INFO[l.id]?.reaction ?? "Noté !",
+                            mood: "proud",
+                          });
+                        }}
+                      >
+                        <span>
+                          <b>{l.label}</b>
+                          <small>{LEVEL_INFO[l.id]?.tag}</small>
+                        </span>
+                        <span className="onb-tile-icon" aria-hidden="true">
+                          {LEVEL_INFO[l.id]?.icon}
+                        </span>
+                      </Tile>
+                    ))}
+                  </div>
+                  <p className="onb-hint">{CONTENT_LEVEL_NOTE}</p>
+                </>
               )}
 
               {stepId === "tone" && (

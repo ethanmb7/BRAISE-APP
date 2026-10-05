@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
-import { SUBJECTS, FLASHCARDS } from "@/data";
+import { SUBJECTS, FLASHCARDS, LEVELS, CONTENT_LEVEL_ID, CONTENT_LEVEL_NOTE } from "@/data";
 import { DECLIC_SCRIPTS } from "@/lib/declic";
 
 // Guard rails on the authored content, not on code: every one of these is a way adding or editing
@@ -94,5 +94,13 @@ describe("Flashcards", () => {
         expect((field.match(/\*\*/g) ?? []).length % 2, `${card.id} **`).toBe(0);
       }
     }
+  });
+});
+
+describe("Content level", () => {
+  it("names a level that exists, and says so in the note shown on the level screens", () => {
+    const level = LEVELS.find((l) => l.id === CONTENT_LEVEL_ID);
+    expect(level).toBeDefined();
+    expect(CONTENT_LEVEL_NOTE).toContain(level!.label);
   });
 });

@@ -14,6 +14,12 @@ export const LEVELS: Level[] = [
   { id: "term", label: "Terminale", group: "Lycée" },
 ];
 
+// The one level the chapters and cards are actually written for. The level a student picks only
+// changes Braise's voice, never the content, so every screen that shows the level says this out
+// loud instead of letting a Terminale student assume the chapters are theirs.
+export const CONTENT_LEVEL_ID = "2nde";
+export const CONTENT_LEVEL_NOTE = "BRAISE couvre pour l'instant le programme de 2nde.";
+
 export const SUBJECTS: Subject[] = [
   {
     id: "maths",

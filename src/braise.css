@@ -4283,6 +4283,13 @@ select {
   color: var(--ink-soft);
   padding: 10px 4px 7px;
 }
+/* Sits right under the group it explains (the level picker), so it pulls the group's own
+   bottom margin back in. */
+.settings-note {
+  margin: -10px 4px 18px;
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+}
 .settings-row {
   display: flex;
   justify-content: space-between;
