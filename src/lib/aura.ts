@@ -1,5 +1,4 @@
 import { SUBJECTS, FLASHCARDS } from "@/data";
-import { MASTERED_AT_REPETITIONS } from "@/lib/progress";
 import type { CardReview } from "@/types";
 
 export type Rank = {
@@ -11,10 +10,9 @@ export type Rank = {
   colorTo: string;
 };
 
-// Thresholds are still reachable within a handful of real sessions for Bronze->Argent on
-// purpose (see XP_REWARDS in lib/progress.ts for the per-action amounts they're pacing
-// against), so the very first rank-up lands fast; the curve stretches out after that so
-// Légende stays a genuine long-term target.
+// Thresholds match the base flashcard XP economy (+15/carte "sûre") — Bronze->Argent is
+// reachable within a handful of real sessions on purpose, so the very first rank-up lands
+// fast; the curve stretches out after that so Légende stays a genuine long-term target.
 export const RANKS: Rank[] = [
   // Same fix as Argent below, applied to the rank every single new user starts on and sees the
   // most: bronze used to be a pale, desaturated tan (#e8b088) that read as washed-out next to the
@@ -72,6 +70,13 @@ export type SubjectMastery = {
   totalCount: number;
   started: boolean;
 };
+
+// A card only counts as "acquise" once it's cleared the SM-2 learning phase (recalled
+// correctly at least twice in a row), not merely seen once — repetitions=1 just means "shown",
+// not "known". Subjects with zero reviewed cards are flagged `started: false` rather than
+// given a 0% score: "0%" reads as "tried and failed", "pas commencé" reads as what's actually
+// true — the player hasn't touched that subject in Réviser yet.
+const MASTERED_AT_REPETITIONS = 2;
 
 // Used to return a percentage of *reviewed* cards mastered — which quietly rewarded only ever
 // reviewing the easy cards you already knew (one card, mastered once, read as "100%"). Absolute

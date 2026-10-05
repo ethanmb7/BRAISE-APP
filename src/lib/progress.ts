@@ -1,39 +1,37 @@
 import type { AppState, CardReview, Chapter, Confidence, TabId, ViewId } from "@/types";
-import { FLASHCARDS, SUBJECTS } from "@/data";
+import { SUBJECTS } from "@/data";
 
 // Pure progress logic — daily goal, chapter unlocking, badges, the day boundary (streak), spaced
 // repetition and view restoration. No React here: AppProvider in store.tsx wires these into state,
 // and tests can exercise them directly.
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-// In real XP — the same unit as the header badge, Aura and everything else, not a separately
-// invented "card-equivalent" scale. Same relative spacing as before (6:10:18), just multiplied
-// by XP_REWARDS.REVIEW_LEARNING so "tranquille" still means roughly a handful of cards and
-// "a-fond" still means substantially more, but the number a student sees here is now the exact
-// same number that shows up on the header a moment later — no mental conversion between two
-// systems that used to weight a finished chapter differently (3x a card here, 5x a card in XP).
 const GOAL_TARGETS: Record<string, number> = {
-  tranquille: 60,
-  regulier: 100,
-  "a-fond": 180,
+  tranquille: 6,
+  regulier: 10,
+  "a-fond": 18,
   // Labels saved by the old onboarding, kept so existing students keep the same daily target.
-  "15 min/jour": 60,
-  "30 min/jour": 100,
-  "1 heure/jour": 180,
+  "15 min/jour": 6,
+  "30 min/jour": 10,
+  "1 heure/jour": 18,
 };
-const DEFAULT_GOAL_TARGET = 100;
+const DEFAULT_GOAL_TARGET = 10;
 
 export function goalTarget(s: AppState): number {
   return GOAL_TARGETS[s.user.goal] ?? DEFAULT_GOAL_TARGET;
 }
 
 export function computeGoalPct(s: AppState): number {
-  return Math.min(100, Math.round((s.sessionXpEarned / goalTarget(s)) * 100));
+  const activity = s.sessionCardsReviewed + s.sessionChaptersDone * 3;
+  return Math.min(100, Math.round((activity / goalTarget(s)) * 100));
 }
 
-/** Real XP remaining to hit today's goal — 0 once it's already met. */
+/** Remaining "card-equivalent" units to hit today's goal (cards count 1, chapters count 3 —
+ *  same weighting as computeGoalPct) — real, derived from the same activity formula, never a
+ *  separate guess. 0 once the goal is already met. */
 export function remainingToGoal(s: AppState): number {
-  return Math.max(0, goalTarget(s) - s.sessionXpEarned);
+  const activity = s.sessionCardsReviewed + s.sessionChaptersDone * 3;
+  return Math.max(0, goalTarget(s) - activity);
 }
 
 /** Real chapter progression, derived from `completedChapters` — the one dynamic signal the app
@@ -42,44 +40,17 @@ export function remainingToGoal(s: AppState): number {
  *  finishing a chapter anywhere actually unlocks the next one everywhere. Without this, `status`
  *  in data.ts never changes and every subject stays stuck on its first chapter forever — the
  *  same "static field never reflects real progress" bug the streak/XP fix addressed, just one
- *  level deeper. Completion is the only thing this decides — how well a chapter is actually
- *  known is `chapterMastery`'s job, from real card-review history, never a number stored here.
+ *  level deeper. A completed chapter shows 100% (real completion, not a graded score — nothing
+ *  in the data model tracks partial per-chapter mastery); anything not yet completed shows 0%,
+ *  never a fabricated in-between number.
  */
 export function resolveChapters(chapters: Chapter[], completedChapters: string[]): Chapter[] {
   const firstOpenIndex = chapters.findIndex((c) => !completedChapters.includes(c.id));
   return chapters.map((c, i) => {
-    if (completedChapters.includes(c.id)) return { ...c, status: "done" };
-    if (i === firstOpenIndex) return { ...c, status: "current" };
-    return { ...c, status: "locked" };
+    if (completedChapters.includes(c.id)) return { ...c, status: "done", mastery: 100 };
+    if (i === firstOpenIndex) return { ...c, status: "current", mastery: 0 };
+    return { ...c, status: "locked", mastery: 0 };
   });
-}
-
-export type ChapterMastery = {
-  /** Flashcards that drill this chapter. */
-  total: number;
-  /** Of those, how many cleared the SM-2 learning phase (see MASTERED_AT_REPETITIONS). */
-  mastered: number;
-  /** Of those, how many were last judged wrong — a real, current weak spot, not a hand-set flag. */
-  weak: number;
-};
-
-/** What a student actually knows of one chapter, from their real card-review history. Used to
- *  replace a "100% de maîtrise" that just meant "finished once" (whatever the score) and an
- *  "À renforcer" badge hardcoded onto three chapters regardless of how anyone had done. */
-export function chapterMastery(
-  chapterId: string,
-  cardReviews: Record<string, CardReview>,
-): ChapterMastery {
-  const cards = FLASHCARDS.filter((c) => c.chapterId === chapterId);
-  let mastered = 0;
-  let weak = 0;
-  for (const c of cards) {
-    const r = cardReviews[c.id];
-    if (!r) continue;
-    if (r.repetitions >= MASTERED_AT_REPETITIONS) mastered++;
-    if (r.lastConfidence === "not-sure") weak++;
-  }
-  return { total: cards.length, mastered, weak };
 }
 
 /** Real count of finished chapters across every subject — via `resolveChapters`, not the static
@@ -158,27 +129,9 @@ export function resolveRestoredTab(view: ViewId, savedTab: TabId | undefined): T
   return "home";
 }
 
-// A card counts as mastered once it's cleared the SM-2 learning phase (recalled correctly at
-// least twice in a row) — the one signal the whole XP economy and Aura's mastery display both
-// key off, so a review's real value and its "acquise" badge always agree with each other.
-export const MASTERED_AT_REPETITIONS = 2;
-
-// The one place every XP amount in the app is defined — everywhere else imports these instead
-// of writing its own number, so there is exactly one number to change if the economy is ever
-// retuned, and no risk of two call sites silently drifting apart (see git history: the "Super
-// Braise" bonus in RevisionsView used to hardcode its own copy of the base reward). Reviewing a
-// card you're still learning pays full price; reviewing one you've already mastered pays half —
-// real, but not worth restarting a session over, so replaying known cards for repeated full XP
-// stops being profitable without a hard cap or cooldown getting in a genuine study session's way.
-export const XP_REWARDS = {
-  REVIEW_LEARNING: 10,
-  REVIEW_MASTERED: 5,
-  CHAPTER_COMPLETE: 50,
-} as const;
-
 export function sm2(review: CardReview | undefined, confidence: Confidence): CardReview {
   const now = Date.now();
-  const quality = confidence === "sure" ? 5 : 1;
+  const quality = confidence === "sure" ? 5 : confidence === "doubt" ? 3 : 1;
 
   let { repetitions, interval, ease } = review
     ? { repetitions: review.repetitions, interval: review.interval, ease: review.ease }
@@ -217,7 +170,8 @@ export function ensureSession(s: AppState): Partial<AppState> {
 
   const reset = {
     sessionDate: today,
-    sessionXpEarned: 0,
+    sessionCardsReviewed: 0,
+    sessionChaptersDone: 0,
     dailyGoalMet: false,
   };
 

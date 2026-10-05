@@ -1,5 +1,4 @@
 import { getRankInfo } from "@/lib/aura";
-import { useCountUp } from "@/lib/useCountUp";
 import { RankIcon } from "@/components/RankIcon";
 import { AvatarGlyph } from "@/components/AvatarGlyph";
 
@@ -22,11 +21,6 @@ export function HeaderHUD({
   onAuraClick,
 }: HeaderHUDProps) {
   const rank = getRankInfo(xp).current;
-  // Every other reward number in the app (Aura, Profil) counts up instead of snapping to the
-  // new value — this is the one place a student sees their XP change right after actually
-  // earning it (finish a lesson, land back on Aujourd'hui), so it's the one place that most
-  // needed the same treatment, not the one place it was missing.
-  const animatedXp = useCountUp(xp);
 
   return (
     <header className="home-header" aria-label="Ton profil et ton rythme">
@@ -65,7 +59,7 @@ export function HeaderHUD({
         >
           <RankIcon rankId={rank.id} color="#fff" size={15} />
         </span>
-        <b>{animatedXp}</b>
+        <b>{xp}</b>
       </button>
     </header>
   );

@@ -1,11 +1,10 @@
 import type { Level, Subject, Flashcard, Badge, UserProfile } from "./types";
 
-// Chapter `status` below is only the fresh-install baseline (chapter 0 of each subject open, the
-// rest locked) — same logic as `INITIAL.streak/xp = 0` in store.tsx: a real new user hasn't done
-// anything yet, so nothing here claims otherwise. Real progression is computed at render time by
-// `resolveChapters()` in lib/progress.ts from the device's actual `completedChapters`, and real
-// mastery by `chapterMastery()` from its card-review history — which is what both HomeView and
-// SubjectView read.
+// Chapter `status`/`mastery` below are only the fresh-install baseline (chapter 0 of each
+// subject open at 0%, the rest locked) — same logic as `INITIAL.streak/xp = 0` in store.tsx: a
+// real new user hasn't done anything yet, so nothing here claims otherwise. Real progression is
+// computed at render time by `resolveChapters()` in store.tsx from the device's actual
+// `completedChapters`, which is what both HomeView and SubjectView now read.
 
 // BRAISE is for lycéens only.
 export const LEVELS: Level[] = [
@@ -22,16 +21,18 @@ export const SUBJECTS: Subject[] = [
     color: "#3B82F6",
     bg: "#EFF6FF",
     chapters: [
-      { id: "m1", title: "Les fractions", status: "current", duration: 3 },
-      { id: "m2", title: "Théorème de Pythagore", status: "locked", duration: 4 },
+      { id: "m1", title: "Les fractions", status: "current", mastery: 0, duration: 3 },
+      { id: "m2", title: "Théorème de Pythagore", status: "locked", mastery: 0, duration: 4 },
       {
         id: "m3",
         title: "Les équations",
         status: "locked",
+        mastery: 0,
+        reinforce: true,
         duration: 3,
       },
-      { id: "m4", title: "Fonctions affines", status: "locked", duration: 5 },
-      { id: "m5", title: "Statistiques", status: "locked", duration: 4 },
+      { id: "m4", title: "Fonctions affines", status: "locked", mastery: 0, duration: 5 },
+      { id: "m5", title: "Statistiques", status: "locked", mastery: 0, duration: 4 },
     ],
   },
   {
@@ -41,10 +42,10 @@ export const SUBJECTS: Subject[] = [
     color: "#8B5CF6",
     bg: "#F5F3FF",
     chapters: [
-      { id: "f1", title: "Le roman et le récit", status: "current", duration: 5 },
-      { id: "f2", title: "La poésie", status: "locked", duration: 3 },
-      { id: "f3", title: "Le théâtre", status: "locked", duration: 4 },
-      { id: "f4", title: "L'argumentation", status: "locked", duration: 5 },
+      { id: "f1", title: "Le roman et le récit", status: "current", mastery: 0, duration: 5 },
+      { id: "f2", title: "La poésie", status: "locked", mastery: 0, duration: 3 },
+      { id: "f3", title: "Le théâtre", status: "locked", mastery: 0, duration: 4 },
+      { id: "f4", title: "L'argumentation", status: "locked", mastery: 0, duration: 5 },
     ],
   },
   {
@@ -54,10 +55,10 @@ export const SUBJECTS: Subject[] = [
     color: "#F59E0B",
     bg: "#FFFBEB",
     chapters: [
-      { id: "h1", title: "La Révolution française", status: "current", duration: 4 },
-      { id: "h2", title: "L'Empire et Napoléon", status: "locked", duration: 5 },
-      { id: "h3", title: "Les régimes politiques", status: "locked", duration: 3 },
-      { id: "h4", title: "La mondialisation", status: "locked", duration: 4 },
+      { id: "h1", title: "La Révolution française", status: "current", mastery: 0, duration: 4 },
+      { id: "h2", title: "L'Empire et Napoléon", status: "locked", mastery: 0, duration: 5 },
+      { id: "h3", title: "Les régimes politiques", status: "locked", mastery: 0, duration: 3 },
+      { id: "h4", title: "La mondialisation", status: "locked", mastery: 0, duration: 4 },
     ],
   },
   {
@@ -67,10 +68,10 @@ export const SUBJECTS: Subject[] = [
     color: "#10B981",
     bg: "#ECFDF5",
     chapters: [
-      { id: "s1", title: "La respiration", status: "current", duration: 3 },
-      { id: "s2", title: "La digestion", status: "locked", duration: 4 },
-      { id: "s3", title: "La génétique", status: "locked", duration: 5 },
-      { id: "s4", title: "L'écosystème", status: "locked", duration: 3 },
+      { id: "s1", title: "La respiration", status: "current", mastery: 0, duration: 3 },
+      { id: "s2", title: "La digestion", status: "locked", mastery: 0, duration: 4 },
+      { id: "s3", title: "La génétique", status: "locked", mastery: 0, skip: true, duration: 5 },
+      { id: "s4", title: "L'écosystème", status: "locked", mastery: 0, duration: 3 },
     ],
   },
   {
@@ -80,15 +81,17 @@ export const SUBJECTS: Subject[] = [
     color: "#06B6D4",
     bg: "#ECFEFF",
     chapters: [
-      { id: "p1", title: "L'atome et la matière", status: "current", duration: 4 },
+      { id: "p1", title: "L'atome et la matière", status: "current", mastery: 0, duration: 4 },
       {
         id: "p2",
         title: "Les réactions chimiques",
         status: "locked",
+        mastery: 0,
+        reinforce: true,
         duration: 5,
       },
-      { id: "p3", title: "L'électricité", status: "locked", duration: 3 },
-      { id: "p4", title: "L'énergie", status: "locked", duration: 4 },
+      { id: "p3", title: "L'électricité", status: "locked", mastery: 0, duration: 3 },
+      { id: "p4", title: "L'énergie", status: "locked", mastery: 0, duration: 4 },
     ],
   },
   {
@@ -102,10 +105,10 @@ export const SUBJECTS: Subject[] = [
       // review (5 real cards tagged chapterId 'a1' below, ~25s each) ≈ 220s, rounded to 4 min —
       // was 3 with only 1 real card behind it (Pioche du jour showed "3 min · 1 carte", a mismatch
       // between the two numbers). Recalculate this if fc25/fc27-30 below ever change.
-      { id: "a1", title: "Present simple", status: "current", duration: 4 },
-      { id: "a2", title: "Past simple", status: "locked", duration: 3 },
-      { id: "a3", title: "Present perfect", status: "locked", duration: 4 },
-      { id: "a4", title: "Modals & advice", status: "locked", duration: 4 },
+      { id: "a1", title: "Present simple", status: "current", mastery: 0, duration: 4 },
+      { id: "a2", title: "Past simple", status: "locked", mastery: 0, duration: 3 },
+      { id: "a3", title: "Present perfect", status: "locked", mastery: 0, duration: 4 },
+      { id: "a4", title: "Modals & advice", status: "locked", mastery: 0, duration: 4 },
     ],
   },
 ];
@@ -2033,6 +2036,173 @@ export const STORIES: Record<
           "'Must' exprime une obligation forte, presque une règle incontournable, contrairement à 'should' ou 'could'.",
       },
     ],
+  },
+};
+
+export const LESSON_INTRO: Record<string, import("./types").LessonIntro> = {
+  m1: {
+    hook: "Partager une pizza entre potes sans embrouille ? C'est déjà des fractions.",
+    cheatCode:
+      "Numérateur en haut, dénominateur en bas. Pour simplifier, tu divises les deux par le même nombre.",
+    piege:
+      "Additionner les dénominateurs entre eux. Non ! On met au même dénominateur avant d'additionner.",
+  },
+  m2: {
+    hook: "Ton prof veut savoir si l'angle d'un mur est droit sans équerre géante ? Pythagore répond.",
+    cheatCode:
+      "Dans un triangle rectangle : a² + b² = c² (c = l'hypoténuse, le côté le plus long).",
+    piege:
+      "Utiliser Pythagore sur un triangle qui n'est pas rectangle. Vérifie toujours l'angle droit avant.",
+  },
+  m3: {
+    hook: "Trouver combien de V-Bucks il te manque sans compter à la main ? Une équation fait le calcul pour toi.",
+    cheatCode:
+      "Une équation, c'est une balance : ce que tu fais d'un côté, tu le fais de l'autre. Toujours.",
+    piege: "Changer un côté sans toucher l'autre. La balance bascule et ta réponse est fausse.",
+  },
+  m4: {
+    hook: "Calculer le prix d'une commande livraison selon le nombre d'articles ? Fonction affine direct.",
+    cheatCode: 'f(x) = ax + b. "a" c\'est la pente, "b" le point de départ (quand x = 0).',
+    piege: 'Confondre "a" et "b". Le "b" c\'est l\'ordonnée à l\'origine, pas la pente.',
+  },
+  m5: {
+    hook: "Savoir quel jeu la classe préfère sans demander à chacun ? Les stats font le tri.",
+    cheatCode:
+      "Moyenne = somme des valeurs ÷ nombre de valeurs. La médiane, c'est la valeur du milieu triée.",
+    piege: "Confondre moyenne et médiane. Une valeur extrême fausse la moyenne, pas la médiane.",
+  },
+  f1: {
+    hook: "Tu binges une série et tu devines la suite ? T'as déjà le réflexe du roman.",
+    cheatCode: "Un récit = narrateur + personnages + intrigue. Repère qui raconte et à quel temps.",
+    piege:
+      "Confondre l'auteur et le narrateur. Ce sont presque toujours deux personnes différentes.",
+  },
+  f2: {
+    hook: "La poésie c'est 3 points gratos au contrôle, viens on plie ça !",
+    cheatCode:
+      "Un alexandrin = 12 syllabes, un décasyllabe = 10. Compte les syllabes, pas les mots.",
+    piege:
+      'Oublier le "e" muet en fin de vers avant une consonne : il compte dans le décompte des syllabes.',
+  },
+  f3: {
+    hook: "Une scène de dispute filmée façon TikTok ? Au théâtre, ça s'appelle une réplique.",
+    cheatCode:
+      "Didascalies = indications de mise en scène (en italique). Répliques = ce que disent les personnages.",
+    piege:
+      "Croire que les didascalies sont dites à voix haute par les acteurs. Elles sont juste lues, pas jouées.",
+  },
+  f4: {
+    hook: "Convaincre tes parents de reculer l'heure du couvre-feu ? C'est de l'argumentation pure.",
+    cheatCode:
+      "Thèse = ton avis. Argument = pourquoi. Exemple = la preuve concrète. Les 3 dans l'ordre.",
+    piege: "Donner un exemple sans argument derrière. Un exemple seul ne prouve rien.",
+  },
+  h1: {
+    hook: "Une bande de citoyens qui gerbent leur roi ? C'est le season finale de 1789.",
+    cheatCode:
+      "Prise de la Bastille (14 juillet 1789) = début. Déclaration des droits de l'homme = août 1789.",
+    piege:
+      "Confondre la prise de la Bastille avec l'exécution de Louis XVI (1793, 4 ans plus tard).",
+  },
+  h2: {
+    hook: "Un mec devient empereur juste après une révolution anti-rois ? Contradiction ? Bienvenue chez Napoléon.",
+    cheatCode:
+      "Napoléon = général devenu empereur en 1804. Il garde certaines idées de la Révolution (Code civil).",
+    piege:
+      "Croire que Napoléon a annulé toute la Révolution. Il en garde une bonne partie, il la verrouille.",
+  },
+  h3: {
+    hook: "République, monarchie, dictature... c'est juste des règles du jeu différentes pour diriger un pays.",
+    cheatCode:
+      "République = pouvoir élu. Monarchie = pouvoir héréditaire. Dictature = pouvoir sans contre-pouvoir.",
+    piege:
+      "Croire qu'une élection suffit à faire une démocratie. Il faut aussi la liberté de la contester.",
+  },
+  h4: {
+    hook: "Tes sneakers fabriquées en Asie et vendues en France ? Bienvenue dans la mondialisation.",
+    cheatCode:
+      "Mondialisation = mise en réseau des échanges (biens, capitaux, infos) à l'échelle mondiale.",
+    piege:
+      "Croire que la mondialisation profite pareil à tout le monde. Elle crée aussi des inégalités.",
+  },
+  s1: {
+    hook: "Pourquoi t'es essoufflé après un sprint ? Ton corps réclame plus d'oxygène.",
+    cheatCode: "Respiration = O₂ inspiré, CO₂ expiré. Les poumons échangent ces gaz avec le sang.",
+    piege:
+      "Confondre respiration et digestion. La respiration, c'est l'échange de gaz, pas la nourriture.",
+  },
+  s2: {
+    hook: "Ton kebab de midi devient de l'énergie pour réviser ce soir ? Merci la digestion.",
+    cheatCode:
+      "La digestion transforme les aliments en nutriments absorbés par l'intestin grêle vers le sang.",
+    piege:
+      "Croire que la digestion se fait que dans l'estomac. Ça continue surtout dans l'intestin.",
+  },
+  s3: {
+    hook: "Pourquoi t'as les yeux de ta mère et le nez de ton père ? La génétique a la réponse.",
+    cheatCode:
+      "Un gène vient en 2 exemplaires (allèles), un de chaque parent. Le dominant s'exprime en premier.",
+    piege:
+      "Croire qu'un caractère vient d'un seul parent. Les deux allèles jouent, même si un seul se voit.",
+  },
+  s4: {
+    hook: "Une forêt, c'est un peu comme un groupe d'amis : chacun dépend des autres pour survivre.",
+    cheatCode:
+      "Écosystème = êtres vivants + milieu + leurs interactions (chaînes alimentaires, ressources).",
+    piege:
+      "Penser qu'un écosystème ne change jamais. Il évolue sans cesse, surtout si un élément disparaît.",
+  },
+  p1: {
+    hook: "Ton téléphone, la table, l'air : tout est fait des mêmes briques minuscules.",
+    cheatCode:
+      "Atome = noyau (protons + neutrons) + électrons qui tournent autour. Il est électriquement neutre.",
+    piege:
+      "Croire qu'un atome, c'est plein comme une bille. C'est surtout du vide autour du noyau.",
+  },
+  p2: {
+    hook: "Un feu d'artifice, c'est de la chimie qui explose littéralement sous tes yeux.",
+    cheatCode:
+      "Réactifs → Produits. La masse totale ne change jamais (conservation de la matière).",
+    piege:
+      "Oublier d'équilibrer l'équation chimique. Il doit y avoir le même nombre d'atomes de chaque côté.",
+  },
+  p3: {
+    hook: "Ton chargeur qui charge ton tel, c'est des électrons qui filent dans un circuit.",
+    cheatCode:
+      "U = R × I (tension = résistance × intensité). C'est la loi d'Ohm, retiens juste ces 3 lettres.",
+    piege: "Confondre tension (Volts) et intensité (Ampères). Ce ne sont pas la même grandeur.",
+  },
+  p4: {
+    hook: "Rien ne se crée, rien ne se perd. Ton énergie du matin devient ta fatigue du soir.",
+    cheatCode:
+      "L'énergie se transforme (électrique, mécanique, thermique...) mais ne disparaît jamais.",
+    piege:
+      'Croire que l\'énergie se "consomme" et disparaît. Elle se transforme juste en autre chose.',
+  },
+  a1: {
+    hook: "Décrire ta routine du matin en anglais sans te planter ? Present simple à la rescousse.",
+    cheatCode: 'I/you/we/they + verbe. He/she/it + verbe + S. "She likes" pas "she like".',
+    piege:
+      "Oublier le S à la 3e personne du singulier. C'est LE piège classique du present simple.",
+  },
+  a2: {
+    hook: "Raconter ce que t'as fait ce week-end en anglais ? Past simple, direct.",
+    cheatCode:
+      "Verbes réguliers + ED (played). Verbes irréguliers à apprendre par cœur (go → went).",
+    piege: 'Ajouter ED à un verbe irrégulier. "Goed" n\'existe pas, c\'est "went".',
+  },
+  a3: {
+    hook: '"I have lost my keys" : tu les as perdues et tu les cherches encore là maintenant.',
+    cheatCode:
+      "HAVE/HAS + participe passé. Utilisé quand le passé a un lien direct avec le présent.",
+    piege:
+      "Utiliser le present perfect pour une date précise (\"yesterday\"). Là, c'est le past simple qu'il faut.",
+  },
+  a4: {
+    hook: 'Donner un conseil à ton pote sans sonner comme sa mère ? "Should" fait le taf.',
+    cheatCode: "Should = conseil. Must = obligation forte. Can/could = capacité ou permission.",
+    piege:
+      'Confondre "must" (obligatoire) et "should" (juste un conseil). Le niveau de pression n\'est pas le même.',
   },
 };
 

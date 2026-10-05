@@ -21,7 +21,8 @@ type StoredProgress = {
   lastSubjectId: string | null;
   lastChapterId: string | null;
   sessionDate: string;
-  sessionXpEarned: number;
+  sessionCardsReviewed: number;
+  sessionChaptersDone: number;
   // Where the device was, not just its progress — a reload used to always drop back to 'home'
   // (hardcoded in store.tsx's mount effect) even mid-lesson, because none of this was ever saved.
   // Local-only, like bestCombo/lastSubjectId/lastChapterId below: "which screen this device was
@@ -30,15 +31,13 @@ type StoredProgress = {
   tab: TabId;
   currentSubjectId: string | null;
   currentChapterId: string | null;
+  currentLessonMode: "vocal" | "echanger";
 };
 
 // Mirrors the real `device_progress` columns (supabase/migrations/20260730074908_...). That
 // migration predates `bestCombo`/`lastSubjectId`/`lastChapterId` on AppState, so those three
 // still have no column here — they stay localStorage-only below rather than being silently
-// dropped or guessed into some other column. session_xp_earned joins them for the same reason:
-// it replaced session_cards_reviewed/session_chapters_done (the goal used to weight a chapter as
-// "worth 3 cards" while XP weighted it at 5x — two numbers for the same day that disagreed; see
-// their own removal in this file's history), and no migration for the new column exists yet.
+// dropped or guessed into some other column.
 type DeviceProgressRow = {
   device_id: string;
   device_secret: string;
@@ -53,6 +52,8 @@ type DeviceProgressRow = {
   profile: UserProfile;
   completed_chapters: string[];
   session_date: string;
+  session_cards_reviewed: number;
+  session_chapters_done: number;
 };
 
 type CardReviewRow = {
@@ -106,11 +107,13 @@ function toAppState(p: StoredProgress, cardReviews: Record<string, CardReview>):
     lastChapterId: p.lastChapterId ?? null,
     cardReviews,
     sessionDate: p.sessionDate ?? "",
-    sessionXpEarned: p.sessionXpEarned ?? 0,
+    sessionCardsReviewed: p.sessionCardsReviewed ?? 0,
+    sessionChaptersDone: p.sessionChaptersDone ?? 0,
     view: p.view ?? "home",
     tab: p.tab ?? "home",
     currentSubjectId: p.currentSubjectId ?? null,
     currentChapterId: p.currentChapterId ?? null,
+    currentLessonMode: p.currentLessonMode ?? "vocal",
   };
 }
 
@@ -165,12 +168,14 @@ export async function loadProgress(): Promise<Partial<AppState> | null> {
             lastSubjectId: local?.lastSubjectId ?? null,
             lastChapterId: local?.lastChapterId ?? null,
             sessionDate: cloudRow.session_date,
+            sessionCardsReviewed: cloudRow.session_cards_reviewed,
+            sessionChaptersDone: cloudRow.session_chapters_done,
             // Not in device_progress either — same reasoning as bestCombo above.
-            sessionXpEarned: local?.sessionXpEarned ?? 0,
             view: local?.view ?? "home",
             tab: local?.tab ?? "home",
             currentSubjectId: local?.currentSubjectId ?? null,
             currentChapterId: local?.currentChapterId ?? null,
+            currentLessonMode: local?.currentLessonMode ?? "vocal",
           },
           cardReviews,
         );
@@ -202,11 +207,13 @@ export async function saveProgress(state: AppState): Promise<void> {
     lastSubjectId: state.lastSubjectId,
     lastChapterId: state.lastChapterId,
     sessionDate: state.sessionDate,
-    sessionXpEarned: state.sessionXpEarned,
+    sessionCardsReviewed: state.sessionCardsReviewed,
+    sessionChaptersDone: state.sessionChaptersDone,
     view: state.view,
     tab: state.tab,
     currentSubjectId: state.currentSubjectId,
     currentChapterId: state.currentChapterId,
+    currentLessonMode: state.currentLessonMode,
   };
   try {
     localStorage.setItem(PROGRESS_KEY, JSON.stringify(row));
@@ -230,6 +237,8 @@ export async function saveProgress(state: AppState): Promise<void> {
         profile: state.user,
         completed_chapters: state.completedChapters,
         session_date: state.sessionDate,
+        session_cards_reviewed: state.sessionCardsReviewed,
+        session_chapters_done: state.sessionChaptersDone,
       };
       await supabase.from("device_progress").upsert(dbRow);
     } catch {

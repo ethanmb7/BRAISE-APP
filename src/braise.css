@@ -53,19 +53,6 @@
      dark mode by never changing at all. */
   --rev-paper: #faf8f3;
   --rev-ink-soft: rgba(22, 33, 58, 0.72);
-
-  /* Correct/wrong tinted surfaces (Déclic tiles, the fiche's à-retenir/piège blocks). A fixed
-     light tint with var(--ink) text reads fine here in light mode, but --ink flips to near-white
-     under .dark, leaving near-white text on a near-white tint — under 1.1:1 contrast, effectively
-     invisible (confirmed by computing WCAG contrast, not just eyeballing it). Own token pair per
-     state, redefined under .dark, so both the background AND its text stay a real pair instead of
-     mixing a fixed surface with a theme-adaptive text colour. */
-  --feedback-correct-bg: #dcfce7;
-  --feedback-correct-text: #065f46;
-  --feedback-correct-label: var(--mint-text);
-  --feedback-wrong-bg: #ffe1dc;
-  --feedback-wrong-text: #7f1d1d;
-  --feedback-wrong-label: var(--coral-2);
 }
 
 .dark {
@@ -75,13 +62,6 @@
   --ink-soft: rgba(234, 241, 255, 0.72);
   --line: rgba(234, 241, 255, 0.12);
   --bg: #0f1830;
-
-  --feedback-correct-bg: #123524;
-  --feedback-correct-text: #86efac;
-  --feedback-correct-label: #34d399;
-  --feedback-wrong-bg: #3a1512;
-  --feedback-wrong-text: #fecaca;
-  --feedback-wrong-label: #f87171;
 }
 
 .dyslexia-mode,
@@ -94,11 +74,7 @@
 .dyslexia-mode h2,
 .dyslexia-mode h3,
 .dyslexia-mode .story-text,
-.dyslexia-mode .quiz-q2,
-.dyslexia-mode .declic-bubble,
-.dyslexia-mode .declic-fiche-title,
-.dyslexia-mode .declic-fiche-text,
-.dyslexia-mode .declic-moment-line {
+.dyslexia-mode .quiz-q2 {
   font-family: 'IBM Plex Sans', sans-serif !important;
   font-weight: 600 !important;
 }
@@ -2642,6 +2618,42 @@ select {
   border-radius: 999px;
   transition: width 0.4s ease;
 }
+.lesson-modes {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 18px;
+  background: var(--bg);
+  border: 2px solid #000;
+  border-radius: 999px;
+  padding: 5px;
+}
+.lesson-mode-btn {
+  flex: 1;
+  text-align: center;
+  padding: 9px 4px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.lesson-mode-btn:not(.is-on) {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(21, 24, 33, 0.16);
+}
+.lesson-mode-btn.is-on {
+  background: var(--neo-ink);
+  color: #fff;
+  border-color: #000;
+}
 .lesson-panel {
   display: none;
 }
@@ -2658,21 +2670,6 @@ select {
   display: flex;
   flex-direction: column;
   min-height: 50vh;
-}
-/* Not a school-style bar — a row of small flames lighting up one by one, same dashed/muted
-   vocabulary as .onb-flames, so "how far am I from the Déclic" reads as a real cue, not decor. */
-.declic-progress {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 16px;
-}
-.declic-progress span {
-  opacity: 0.22;
-  filter: grayscale(1);
-}
-.declic-progress span.is-lit {
-  opacity: 1;
-  filter: none;
 }
 .declic-step {
   display: flex;
@@ -2727,16 +2724,14 @@ select {
   opacity: 0.65;
 }
 .declic-tile.is-correct {
-  background: var(--feedback-correct-bg);
+  background: #dcfce7;
   border-color: var(--mint-text);
   box-shadow: 3px 3px 0 var(--mint-text);
-  color: var(--feedback-correct-text);
 }
 .declic-tile.is-wrong {
-  background: var(--feedback-wrong-bg);
+  background: #ffe1dc;
   border-color: var(--coral-2);
   box-shadow: 3px 3px 0 var(--coral-2);
-  color: var(--feedback-wrong-text);
 }
 .declic-cta {
   display: flex;
@@ -2784,39 +2779,6 @@ select {
 .declic-bubble--reaction {
   border-radius: 20px 20px 20px 6px;
   font-size: 1rem;
-}
-/* The second, genuinely different explanation — shown only after "J'ai toujours pas compris".
-   Dashed violet border instead of the reaction bubble's solid one, so it visibly reads as a
-   second attempt rather than more of the same reply. */
-.declic-bubble--alt {
-  border-radius: 20px 20px 20px 6px;
-  border-style: dashed;
-  border-color: var(--violet);
-  background: color-mix(in srgb, var(--violet) 12%, var(--paper));
-  box-shadow: 3px 3px 0 var(--violet);
-  font-size: 1rem;
-}
-.declic-step-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-}
-/* Deliberately quiet — a text link, not a second CTA competing with "Suite". Getting it wrong
-   and moving on is the default path; asking for a different explanation is the exception. */
-.declic-link {
-  padding: 2px;
-  border: none;
-  background: none;
-  color: var(--ink-soft);
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 0.92rem;
-  font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-.declic-link:active {
-  opacity: 0.6;
 }
 .declic-reveal-kicker {
   display: block;
@@ -2924,80 +2886,6 @@ select {
   .declic-moment-flame {
     animation: none !important;
   }
-}
-
-/* The closing fiche — "ce que ton prof attend de toi". Deliberately plain paper, not the violet
-   full-bleed of .declic-moment: that card is the emotional payoff, this one is the practical
-   takeaway a student would screenshot before a contrôle. Retenir/piège reuse the same
-   correct/wrong tint pair as .declic-tile instead of inventing new colours. */
-.declic-fiche {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 22px 20px;
-  border: 3px solid var(--neo-ink);
-  border-radius: 22px;
-  background: var(--paper);
-  box-shadow: 5px 5px 0 var(--neo-ink);
-}
-.declic-fiche-kicker {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-}
-.declic-fiche-title {
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 1.4rem;
-  font-weight: 900;
-  color: var(--ink);
-}
-.declic-fiche-section {
-  padding: 12px 14px;
-  border: 2.5px solid var(--neo-ink);
-  border-radius: 14px;
-}
-.declic-fiche-section.is-retenir {
-  background: var(--feedback-correct-bg);
-  border-color: var(--mint-text);
-}
-.declic-fiche-section.is-piege {
-  background: var(--feedback-wrong-bg);
-  border-color: var(--coral-2);
-}
-.declic-fiche-label {
-  display: block;
-  margin-bottom: 4px;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-.declic-fiche-section.is-retenir .declic-fiche-label {
-  color: var(--feedback-correct-label);
-}
-.declic-fiche-section.is-piege .declic-fiche-label {
-  color: var(--feedback-wrong-label);
-}
-.declic-fiche-section.is-retenir .declic-fiche-text {
-  color: var(--feedback-correct-text);
-}
-.declic-fiche-section.is-piege .declic-fiche-text {
-  color: var(--feedback-wrong-text);
-}
-.declic-fiche-text {
-  font-family: 'Baloo 2', sans-serif;
-  font-weight: 700;
-  font-size: 0.95rem;
-  line-height: 1.35;
-  color: var(--ink);
-}
-.declic-fiche .declic-cta {
-  align-self: center;
-  margin-top: 4px;
 }
 
 /* Story / Vocal Animé — the card itself is neutral paper, not a full-bleed subject colour.
@@ -3267,6 +3155,87 @@ select {
   flex-shrink: 0;
 }
 
+/* Échanger / Chat */
+.peer-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.peer-msg {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  animation: msgIn 0.3s ease;
+}
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.peer-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--paper);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.peer-bubble {
+  background: var(--paper);
+  border-radius: 14px;
+  border-bottom-left-radius: 4px;
+  padding: 9px 13px;
+  font-size: 0.84rem;
+  max-width: 75%;
+  line-height: 1.45;
+}
+.peer-msg.me {
+  flex-direction: row-reverse;
+}
+.peer-msg.me .peer-bubble {
+  background: var(--blue);
+  color: var(--paper);
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 4px;
+}
+.peer-input-row {
+  display: flex;
+  gap: 8px;
+  position: sticky;
+  bottom: 0;
+  background: var(--bg);
+  padding: 8px 0;
+}
+.peer-input-row input {
+  flex: 1;
+  background: var(--paper);
+  border: none;
+  border-radius: 999px;
+  padding: 11px 16px;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+.peer-input-row input:focus {
+  outline: none;
+}
+.peer-send {
+  background: var(--blue);
+  color: var(--paper);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease;
+}
+.peer-send:active {
+  transform: scale(0.92);
+}
 .typing-dots {
   display: inline-flex;
   gap: 3px;
@@ -3330,6 +3299,22 @@ select {
   transition: opacity 0.5s ease;
 }
 .quiz-streak-badge.show { opacity: 1; }
+.xp-pop {
+  position: absolute;
+  transform: translateX(-50%);
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  color: var(--orange);
+  font-size: 1.15rem;
+  animation: xpFloat 0.9s ease forwards;
+  pointer-events: none;
+  z-index: 5;
+}
+@keyframes xpFloat {
+  0% { opacity: 0; transform: translateX(-50%) translateY(0); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-30px); }
+}
 .quiz-tag2 {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.68rem;
@@ -3465,6 +3450,27 @@ select {
   font-size: 0.84rem;
   color: var(--ink-soft);
   line-height: 1.45;
+}
+.quiz-bridge-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background: var(--coral);
+  color: #fff;
+  border: 2px solid #000;
+  border-radius: 999px;
+  padding: 13px;
+  font-weight: 700;
+  font-size: 0.86rem;
+  margin-top: 14px;
+  box-shadow: 3px 3px 0 #000;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.quiz-bridge-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000;
 }
 .quiz-summary2 {
   text-align: center;
@@ -4493,6 +4499,66 @@ select {
   50% { transform: scaleY(0.3); }
 }
 
+/* ===== Braise explain drawer ===== */
+.explain-drawer {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
+  width: 100%;
+  max-width: 428px;
+  background: var(--bg);
+  border-radius: 24px 24px 0 0;
+  padding: 10px 20px calc(14px + env(safe-area-inset-bottom, 0px));
+  z-index: 91;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+.explain-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0 12px;
+}
+.explain-head-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.explain-head-info b {
+  display: block;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 0.92rem;
+}
+.explain-head-info span {
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+}
+.explain-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.explain-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1.5px solid rgba(21, 24, 33, 0.35);
+  border-radius: 999px;
+  padding: 11px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  margin-top: 14px;
+  transition: transform 0.15s ease;
+}
+.explain-btn:active {
+  transform: scale(0.97);
+}
 .listen-btn {
   display: inline-flex;
   align-items: center;
@@ -4775,3 +4841,249 @@ select {
 
 .home-view { position: relative; }
 .home-mission-zone { position: relative; isolation: isolate; }
+
+/* ===== Navigation basse — quatre boutons physiques, un seul signal fort ===== */
+.braise-tabbar {
+  position: absolute;
+  inset-inline: 12px;
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 5px;
+  min-height: 68px;
+  padding: 7px;
+  border: 3px solid var(--neo-ink);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  box-shadow: 5px 5px 0 var(--neo-ink);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.braise-tab {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  width: 100%;
+  height: 52px;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 2px;
+  border-radius: 11px;
+  color: var(--ink-soft);
+  transition: color 150ms ease, transform 100ms ease;
+}
+
+.braise-tab:hover {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+}
+
+.braise-tab:active {
+  transform: translate(2px, 2px);
+}
+
+.braise-tab.is-active {
+  color: var(--neo-ink);
+}
+
+.braise-tab.is-active:hover {
+  background: transparent;
+}
+
+.braise-tab-puck {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 11px;
+  background: var(--neo-orange);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+}
+
+.braise-tab:active .braise-tab-puck {
+  box-shadow: 1px 1px 0 var(--neo-ink);
+}
+
+.braise-tab-icon {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+}
+
+.braise-tab-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.braise-tab-label {
+  max-width: 100%;
+  overflow: hidden;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 0.66rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+@media (max-width: 360px) {
+  .braise-tabbar {
+    inset-inline: 9px;
+    gap: 3px;
+    padding: 6px;
+  }
+
+  .braise-tab-label {
+    font-size: 0.62rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .braise-tab,
+  .braise-tab-puck,
+  .braise-tab-icon {
+    transition: none;
+  }
+
+/* Passage de rang — la transformation vient de Braise, pas d'un badge générique. */
+.rank-up-stage {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(circle, color-mix(in srgb, var(--ink) 16%, transparent) 1.2px, transparent 1.2px),
+    linear-gradient(180deg, color-mix(in srgb, var(--rank-from) 22%, var(--bg)) 0%, var(--bg) 58%);
+  background-size: 18px 18px, 100% 100%;
+  color: var(--ink);
+}
+.rank-up-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 34%;
+  background: var(--rank-to);
+  border-bottom: 3px solid var(--ink);
+  clip-path: polygon(0 0, 100% 0, 100% 88%, 68% 94%, 38% 88%, 0 97%);
+  transition: clip-path .42s cubic-bezier(.2,.9,.25,1.1);
+}
+.rank-up-stage.is-impact::before {
+  clip-path: polygon(0 0, 100% 0, 100% 96%, 73% 89%, 42% 98%, 0 90%);
+}
+.rank-up-kicker,
+.rank-up-rank-stamp { letter-spacing: 0; }
+.rank-up-rank-stamp { font-family: var(--font-impact); }
+.rank-up-character-zone::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  bottom: 1px;
+  width: 156px;
+  height: 18px;
+  transform: translateX(-50%);
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--rank-from) 48%, var(--bg));
+}
+.rank-up-transform-label {
+  position: absolute;
+  z-index: 20;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  border: 2.5px solid var(--ink);
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--ink);
+  padding: 3px 10px;
+  font: 900 .7rem/1.2 var(--font-impact);
+  letter-spacing: 0;
+}
+.rank-up-braise { transform-origin: 50% 92%; }
+.rank-up-braise .braise-mascot,
+.rank-up-braise .braise-mascot .flame-outer,
+.rank-up-braise .braise-mascot .flame-middle,
+.rank-up-braise .braise-mascot .braise-eyes {
+  animation: none;
+}
+.braise-mascot .braise-body,
+.braise-mascot .braise-face,
+.braise-mascot .braise-arm,
+.braise-mascot .braise-foot {
+  transform-box: view-box;
+}
+.braise-mascot .braise-body { transform-origin: 54px 98px; }
+.braise-mascot .braise-face { transform-origin: 54px 67px; }
+.braise-mascot .braise-arm-left { transform-origin: 28px 68px; }
+.braise-mascot .braise-arm-right { transform-origin: 80px 68px; }
+.braise-mascot .braise-foot-left { transform-origin: 40px 103px; }
+.braise-mascot .braise-foot-right { transform-origin: 70px 103px; }
+.rank-up-braise .pose-focus .braise-face {
+  animation: rank-look-core .35s ease-out both;
+}
+.rank-up-braise .pose-focus .braise-arm-left { transform: rotate(-7deg) translate(2px, 1px); }
+.rank-up-braise .pose-focus .braise-arm-right { transform: rotate(7deg) translate(-2px, 1px); }
+.rank-up-braise .pose-charge .braise-body { animation: rank-body-brace .6s cubic-bezier(.55,0,.8,.35) both; }
+.rank-up-braise .pose-charge .braise-face { animation: rank-face-brace .6s cubic-bezier(.55,0,.8,.35) both; }
+.rank-up-braise .pose-charge .braise-arm-left { animation: rank-arm-brace-left .6s cubic-bezier(.55,0,.8,.35) both; }
+.rank-up-braise .pose-charge .braise-arm-right { animation: rank-arm-brace-right .6s cubic-bezier(.55,0,.8,.35) both; }
+.rank-up-braise .pose-charge .braise-foot-left { transform: translate(-3px, 1px) rotate(-5deg); }
+.rank-up-braise .pose-charge .braise-foot-right { transform: translate(3px, 1px) rotate(5deg); }
+.rank-up-braise .pose-land .braise-body { animation: rank-body-follow .72s cubic-bezier(.18,.85,.24,1.18) both; }
+.rank-up-braise .pose-land .braise-face { animation: rank-face-follow .72s cubic-bezier(.18,.85,.24,1.18) .05s both; }
+.rank-up-braise .pose-land .braise-arm-left { animation: rank-arm-celebrate-left .72s ease-out .08s both; }
+.rank-up-braise .pose-land .braise-arm-right { animation: rank-arm-celebrate-right .72s ease-out .08s both; }
+.rank-up-braise .pose-victory .braise-arm-left { transform: rotate(-5deg); }
+.rank-up-braise .pose-victory .braise-arm-right { transform: rotate(5deg); }
+.rank-up-braise.is-charging .braise-core {
+  animation: rank-core-charge .5s steps(3, end) both;
+}
+.rank-up-braise.is-charging .braise-eyes {
+  transform-origin: 54px 60px;
+  animation: rank-focus-eyes .5s ease-in both;
+}
+.rank-up-braise.is-evolved .braise-core {
+  animation: rank-core-settle .65s ease-out .2s both;
+}
+@keyframes rank-core-charge {
+  0% { transform: scale(1); }
+  18% { transform: scale(1.35); }
+  32% { transform: scale(1.06); }
+  55% { transform: scale(1.75); }
+  68% { transform: scale(1.22); }
+  100% { transform: scale(2.45); }
+}
+@keyframes rank-look-core { from { transform: translateY(0); } to { transform: translateY(2px) scaleY(.96); } }
+@keyframes rank-body-brace { from { transform: scale(1); } to { transform: translateY(5px) scaleX(1.06) scaleY(.93); } }
+@keyframes rank-face-brace { from { transform: translateY(1px); } to { transform: translateY(5px) scaleX(.97); } }
+@keyframes rank-arm-brace-left { from { transform: rotate(-7deg); } to { transform: translate(7px, 4px) rotate(13deg); } }
+@keyframes rank-arm-brace-right { from { transform: rotate(7deg); } to { transform: translate(-7px, 4px) rotate(-13deg); } }
+@keyframes rank-body-follow { 0% { transform: scaleY(1.08); } 58% { transform: translateY(4px) scaleX(1.08) scaleY(.92); } 78% { transform: translateY(-2px) scaleX(.98) scaleY(1.04); } 100% { transform: none; } }
+@keyframes rank-face-follow { 0%, 48% { transform: translateY(-2px); } 70% { transform: translateY(3px) scaleY(.96); } 100% { transform: none; } }
+@keyframes rank-arm-celebrate-left { 0% { transform: rotate(10deg); } 55% { transform: rotate(-13deg); } 100% { transform: rotate(-5deg); } }
+@keyframes rank-arm-celebrate-right { 0% { transform: rotate(-10deg); } 55% { transform: rotate(13deg); } 100% { transform: rotate(5deg); } }
+@keyframes rank-focus-eyes {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(.45); }
+}
+@keyframes rank-core-settle {
+  0% { transform: scale(1.8); }
+  55% { transform: scale(.86); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rank-up-braise.is-charging .braise-core,
+  .rank-up-braise.is-charging .braise-eyes,
+  .rank-up-braise.is-evolved .braise-core { animation: none; }
+  .rank-up-braise .braise-body,
+  .rank-up-braise .braise-face,
+  .rank-up-braise .braise-arm,
+  .rank-up-braise .braise-foot { animation: none !important; transform: none !important; }
+  .rank-up-stage::before { transition: none; }
+}
+}

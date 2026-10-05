@@ -5,7 +5,7 @@ interface TodayStripProps {
    * the HUD; this quieter block only uses it to make the daily rhythm feel personal. */
   streak: number;
   dailyGoalMet: boolean;
-  /** Real XP remaining to hit today's goal — same unit as the header badge. */
+  /** Real card-equivalent activity remaining, derived from the same formula as the goal gauge. */
   remaining: number;
   goalPct: number;
   /** Real spaced-repetition cards currently due. */
@@ -37,7 +37,7 @@ export function TodayStrip({
     ? streak > 0
       ? `Belle régularité : ta série continue.`
       : `Ton objectif du jour est validé.`
-    : `Encore ${remaining} XP pour boucler ta journée.`;
+    : `Encore ${remaining} étape${remaining > 1 ? "s" : ""} pour boucler ta journée.`;
 
   return (
     <section

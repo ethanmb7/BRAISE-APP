@@ -32,11 +32,10 @@ export type Subject = {
 export type Chapter = {
   id: string;
   title: string;
-  /** Fresh-install baseline only — real status comes from resolveChapters(). Mastery and the
-   *  "à renforcer" signal are never stored on a chapter: they're derived from the student's real
-   *  card-review history (see chapterMastery in lib/progress.ts), so they can't be hand-set to
-   *  contradict what the student actually did. */
   status: "done" | "current" | "locked";
+  mastery: number;
+  reinforce?: boolean;
+  skip?: boolean;
   duration: number;
 };
 
@@ -45,6 +44,12 @@ export type StorySlide = {
   text: string;
   bg: string;
   duration: number;
+};
+
+export type LessonIntro = {
+  hook: string;
+  cheatCode: string;
+  piege: string;
 };
 
 export type QuizQuestion = {
@@ -74,7 +79,9 @@ export type Badge = {
   cond: string;
 };
 
-export type Confidence = "not-sure" | "sure";
+export type ChatMessage = { role: "user" | "model"; text: string };
+
+export type Confidence = "not-sure" | "doubt" | "sure";
 
 export type CardReview = {
   repetitions: number;
@@ -134,7 +141,9 @@ export type AppState = {
   currentChapterId: string | null;
   lastSubjectId: string | null;
   lastChapterId: string | null;
+  currentLessonMode: "vocal" | "echanger";
   completedChapters: string[];
+  chatBridgeMessage: string | null;
   /** Where "back" from a lesson should land when it wasn't reached through a subject (e.g.
    *  "Revoir la notion" mid-session on Réviser). In-memory only, never persisted. */
   lessonReturnTo: ViewId | null;
@@ -142,10 +151,6 @@ export type AppState = {
   lastCompletion: ChapterCompletion | null;
   cardReviews: Record<string, CardReview>;
   sessionDate: string;
-  /** Real XP earned today (resets at the day boundary, same as everything else prefixed
-   *  `session`) — the one number the daily goal is measured in, same unit the header/Aura/every
-   *  other reward number already shows. Replaced separate sessionCardsReviewed/
-   *  sessionChaptersDone counters that weighted a chapter as "worth 3 cards" for the goal while
-   *  XP itself weighted it at 5x — two numbers for the same day's effort that didn't agree. */
-  sessionXpEarned: number;
+  sessionCardsReviewed: number;
+  sessionChaptersDone: number;
 };

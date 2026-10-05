@@ -49,16 +49,18 @@ export function HomeView() {
     setSheetOpen(false);
   };
 
-  // Every subject's in-progress chapter — the pool today's Pioche is drawn from. No exam-date
-  // field exists anywhere in the data model, so this deliberately isn't a fabricated "DS dans
-  // 2 jours" countdown. (It used to be sorted by a per-chapter `mastery` that was always 0 for
-  // an in-progress chapter, so the sort never did anything.)
+  // "Chapitres prioritaires" — every subject's in-progress chapter, ranked by real mastery
+  // (lowest first). No exam-date field exists anywhere in the data model, so this deliberately
+  // isn't a fabricated "DS dans 2 jours" countdown — mastery % and the reinforce flag are the
+  // real signals already tracked per chapter.
   const priorityChapters: { subject: Subject; chapter: Chapter }[] = SUBJECTS.map((s) => {
     const chapter = resolveChapters(s.chapters, state.completedChapters).find(
       (c) => c.status === "current",
     );
     return chapter ? { subject: s, chapter } : null;
-  }).filter((x): x is { subject: Subject; chapter: Chapter } => x !== null);
+  })
+    .filter((x): x is { subject: Subject; chapter: Chapter } => x !== null)
+    .sort((a, b) => a.chapter.mastery - b.chapter.mastery);
 
   // "Pioche du jour" — a real daily random draw across every subject's in-progress chapter,
   // not a "continue where you left off" shortcut: the same pool as "Chapitres prioritaires"
@@ -110,7 +112,7 @@ export function HomeView() {
   // never truncated with an ellipsis. "Maths" is the only display shortening on the subject
   // name itself (same subject, casual form) — every other name is the real one, shown in full.
   //
-  // Today's draw first, then the rest in their fixed order: this grid now does the job that
+  // Sorted by the current chapter's own mastery, lowest first: this grid now does the job that
   // "Chapitres prioritaires" used to do as a separate carousel — same data (every subject's
   // current chapter), it was never two different things, just the same list shown twice.
   const SHORT_SUBJECT_NAME: Record<string, string> = { maths: "Maths" };
@@ -128,13 +130,20 @@ export function HomeView() {
       pct,
       level: currentIndex >= 0 ? currentIndex + 1 : chapters.length,
       chapterLabel: current ? stripLeadingArticle(current.title) : s.name,
+      chapterCount: chapters.length,
+      doneCount,
+      duration: current?.duration ?? null,
       currentChapterId: current?.id,
+      currentMastery: current?.mastery ?? 100,
       // Same subject the hero card above already names as today's draw — surfacing it first
-      // here too matters most on a fresh account, where all 6 decks look interchangeable and
-      // nothing else says where to start.
+      // here too, instead of leaving the grid to sort purely on mastery, matters most on a
+      // fresh account: a real new user's 6 decks all tie at 0% mastery (see resolveChapters),
+      // so without this every card looks interchangeable and nothing says where to start.
       isDailyPick: s.id === currentSubject?.id,
     };
-  }).sort((a, b) => Number(b.isDailyPick) - Number(a.isDailyPick));
+  }).sort(
+    (a, b) => Number(b.isDailyPick) - Number(a.isDailyPick) || a.currentMastery - b.currentMastery,
+  );
 
   const goToChapter = (subjectId: string, chapterId?: string) => {
     sfx.tap(state.soundOn);

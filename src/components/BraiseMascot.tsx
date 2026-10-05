@@ -1,24 +1,24 @@
-import { useApp } from "@/store";
-import { getRankInfo } from "@/lib/aura";
-import { BraiseCharacter, type BraiseExpression } from "./BraiseCharacter";
-import { BRAISE_RANK_COLORS } from "@/lib/braiseArt";
+import { useApp } from '@/store';
+import { getRankInfo } from '@/lib/aura';
+import { BraiseCharacter, BRAISE_RANK_COLORS, type BraiseExpression, type BraisePose } from './BraiseCharacter';
 
 // `eager` is new: a beckoning side-to-side rock, not `proud`'s big vertical bounce. `proud` is
 // the right tense for "you just did something" (a rank-up, a badge) — wrong tense for a card
 // whose whole job is inviting you to start something you haven't done yet. Built for the daily
 // pioche card specifically, real enough elsewhere to keep as a real mood, not a one-off hack.
-type Mood = "happy" | "hesitant" | "proud" | "sleepy" | "cool" | "frozen" | "eager";
+type Mood = 'happy' | 'hesitant' | 'proud' | 'sleepy' | 'cool' | 'frozen' | 'eager' | 'charging';
 
-type Props = { size?: number; className?: string; mood?: Mood; rankId?: string };
+type Props = { size?: number; className?: string; mood?: Mood; rankId?: string; pose?: BraisePose };
 
 const MOOD_CLASS: Record<Mood, string> = {
-  happy: "mood-happy",
-  hesitant: "mood-hesitant",
-  proud: "mood-proud",
-  sleepy: "mood-sleepy",
-  cool: "mood-proud",
-  frozen: "mood-frozen",
-  eager: "mood-eager",
+  happy: 'mood-happy',
+  hesitant: 'mood-hesitant',
+  proud: 'mood-proud',
+  sleepy: 'mood-sleepy',
+  cool: 'mood-proud',
+  frozen: 'mood-frozen',
+  eager: 'mood-eager',
+  charging: 'mood-charging',
 };
 
 // Per-rank flame palette, [outer, middle, inner] — reusing hex values already established
@@ -27,11 +27,11 @@ const MOOD_CLASS: Record<Mood, string> = {
 // snowflake, légende's inner gold matches bronze's own tip and the coral already used for
 // SapiLogo/badges. Optional and defaults to bronze, so every existing call site (onboarding,
 // SubjectView, TodayStrip) renders exactly as before — only the rank-up celebration passes this.
-const RANK_FLAME_COLORS: Record<string, [string, string, string]> = {
+export const RANK_FLAME_COLORS: Record<string, [string, string, string]> = {
   ...BRAISE_RANK_COLORS,
 };
 
-export function BraiseMascot({ size = 80, className = "", mood = "happy", rankId }: Props) {
+export function BraiseMascot({ size = 80, className = '', mood = 'happy', rankId, pose = 'idle' }: Props) {
   // Real, current rank by default — every existing call site (onboarding, lessons, the profile
   // trophy, the chat drawers...) picks it up for free with no prop drilling, so "Braise looks
   // like your rank" is true everywhere at once rather than only in the one screen that remembered
@@ -40,12 +40,9 @@ export function BraiseMascot({ size = 80, className = "", mood = "happy", rankId
   // rank for the first half-second of its own transformation, before morphing to the new one.
   const { state } = useApp();
   const effectiveRankId = rankId ?? getRankInfo(state.xp).current.id;
-  return (
-    <BraiseCharacter
-      size={size}
-      rankId={effectiveRankId}
-      expression={mood as BraiseExpression}
-      className={`${MOOD_CLASS[mood]} ${className}`}
-    />
-  );
+  return <BraiseCharacter size={size} rankId={effectiveRankId} expression={mood as BraiseExpression} pose={pose} className={`${MOOD_CLASS[mood]} ${className}`} />;
 }
+
+// SapiLogo was the old "SAPIE" brand mark. Replaced by BraiseLogo — re-export so any
+// lingering import still resolves without a runtime crash.
+export { BraiseLogo as SapiLogo } from './BraiseLogo';

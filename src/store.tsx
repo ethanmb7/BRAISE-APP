@@ -14,11 +14,9 @@ import { loadProgress, saveProgress, saveCardReview } from "@/lib/persist";
 import {
   ensureSession,
   goalTarget,
-  MASTERED_AT_REPETITIONS,
   resolveRestoredTab,
   resolveRestoredView,
   sm2,
-  XP_REWARDS,
 } from "@/lib/progress";
 
 type Ctx = {
@@ -38,11 +36,18 @@ type Ctx = {
   toggleDyslexia: () => void;
   toggleSound: () => void;
   openSubject: (subjectId: string, chapterId?: string) => void;
-  openLesson: (subjectId: string, chapterId: string, returnTo?: ViewId) => void;
+  openLesson: (subjectId: string, chapterId: string, mode?: "vocal" | "echanger") => void;
   completeChapter: (chapterId: string) => void;
   reviewCard: (cardId: string, confidence: Confidence) => void;
   getDueCards: () => string[];
   goBack: () => void;
+  bridgeToChat: (
+    subjectId: string,
+    chapterId: string,
+    bridgeMessage: string,
+    returnTo?: ViewId,
+  ) => void;
+  clearChatBridge: () => void;
 };
 
 const AppCtx = createContext<Ctx | null>(null);
@@ -74,12 +79,15 @@ const INITIAL: AppState = {
   currentChapterId: null,
   lastSubjectId: null,
   lastChapterId: null,
+  currentLessonMode: "vocal" as const,
   completedChapters: [],
+  chatBridgeMessage: null,
   lessonReturnTo: null,
   lastCompletion: null,
   cardReviews: {},
   sessionDate: new Date().toDateString(),
-  sessionXpEarned: 0,
+  sessionCardsReviewed: 0,
+  sessionChaptersDone: 0,
 };
 
 export function AppProvider({ children }: { children: ReactNode }) {
@@ -203,19 +211,49 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
-  const openLesson = useCallback((subjectId: string, chapterId: string, returnTo?: ViewId) => {
-    setState((s) => ({
-      ...s,
-      ...ensureSession(s),
-      view: "lesson",
-      currentSubjectId: subjectId,
-      currentChapterId: chapterId,
-      lastSubjectId: subjectId,
-      lastChapterId: chapterId,
-      // "Revoir la notion" from a Réviser session comes back to the session, not to the
-      // subject page it was never on.
-      lessonReturnTo: returnTo ?? null,
-    }));
+  const openLesson = useCallback(
+    (subjectId: string, chapterId: string, mode?: "vocal" | "echanger") => {
+      setState((s) => ({
+        ...s,
+        ...ensureSession(s),
+        view: "lesson",
+        currentSubjectId: subjectId,
+        currentChapterId: chapterId,
+        lastSubjectId: subjectId,
+        lastChapterId: chapterId,
+        currentLessonMode: mode ?? "vocal",
+        chatBridgeMessage: null,
+      }));
+    },
+    [],
+  );
+
+  const bridgeToChat = useCallback(
+    (subjectId: string, chapterId: string, bridgeMessage: string, returnTo?: ViewId) => {
+      setState((s) => ({
+        ...s,
+        ...ensureSession(s),
+        view: "lesson",
+        currentSubjectId: subjectId,
+        currentChapterId: chapterId,
+        currentLessonMode: "echanger",
+        chatBridgeMessage: bridgeMessage,
+        // "Revoir la notion" from a Réviser session comes back to the session, not to the
+        // subject page it was never on.
+        lessonReturnTo: returnTo ?? null,
+      }));
+    },
+    [],
+  );
+
+  // ChatMode used to track "already sent" with its own local useRef, which reset to false on
+  // every remount — toggling to "Vocal Animé" and back to "Échanger" unmounts/remounts ChatMode,
+  // and state.chatBridgeMessage itself was only ever cleared by openLesson (a fresh lesson entry),
+  // so the same bridged question got auto-sent and duplicated in the transcript on every toggle.
+  // Clearing it in the store, right when ChatMode actually consumes it, means the message is gone
+  // for good the moment it's been sent once — no local ref needed to survive a remount.
+  const clearChatBridge = useCallback(() => {
+    setState((s) => ({ ...s, ...ensureSession(s), chatBridgeMessage: null }));
   }, []);
 
   const completeChapter = useCallback((chapterId: string) => {
@@ -224,16 +262,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // happens after midnight while a previous session is still in local storage.
       const session = { ...s, ...ensureSession(s) };
       const already = session.completedChapters.includes(chapterId);
-      const xpGained = already ? 0 : XP_REWARDS.CHAPTER_COMPLETE;
-      const sessionXpEarned = session.sessionXpEarned + xpGained;
+      const xpGained = already ? 0 : 50;
+      const sessionChaptersDone = already
+        ? session.sessionChaptersDone
+        : session.sessionChaptersDone + 1;
+      const activity = session.sessionCardsReviewed + sessionChaptersDone * 3;
       return {
         ...session,
         completedChapters: already
           ? session.completedChapters
           : [...session.completedChapters, chapterId],
-        sessionXpEarned,
+        sessionChaptersDone,
         xp: session.xp + xpGained,
-        dailyGoalMet: sessionXpEarned >= goalTarget(session),
+        dailyGoalMet: activity >= goalTarget(session),
         lastCompletion: { chapterId, wasNewCompletion: !already, xpGained },
       };
     });
@@ -249,31 +290,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const session = { ...s, ...ensureSession(s) };
       const prev = session.cardReviews[cardId];
       const updated = sm2(prev, confidence);
+      const sessionCardsReviewed = session.sessionCardsReviewed + 1;
       // A wrong swipe-judgment (RevisionsView's only caller for 'not-sure') used to still grant
-      // XP here — invisible everywhere a student could see it: the "GRILLÉ" feedback line never
-      // mentioned it, and BraiseRecap's own +XP total only ever summed correct answers. The real
-      // account XP (this field) and the celebratory total shown at the end of a session could
-      // silently drift apart with no explanation offered.
-      //
-      // A correct review of a card already mastered before this attempt pays half price — see
-      // XP_REWARDS' own comment for why: reviewing something you already know is real
-      // consolidation and still worth something, but paying it full price is what let a student
-      // farm XP by restarting a Réviser session and re-answering cards they'd long since learned.
-      const wasMastered = !!prev && prev.repetitions >= MASTERED_AT_REPETITIONS;
-      const xpGain =
-        confidence === "sure"
-          ? wasMastered
-            ? XP_REWARDS.REVIEW_MASTERED
-            : XP_REWARDS.REVIEW_LEARNING
-          : 0;
-      const sessionXpEarned = session.sessionXpEarned + xpGain;
+      // +3 XP here — invisible everywhere a student could see it: the "GRILLÉ" feedback line
+      // never mentioned it, and BraiseRecap's own +XP total only ever summed correct answers.
+      // The real account XP (this field) and the celebratory total shown at the end of a
+      // session could silently drift apart by 3 XP per mistake with no explanation offered.
+      const xpGain = confidence === "sure" ? 15 : confidence === "doubt" ? 8 : 0;
+      const activity = sessionCardsReviewed + session.sessionChaptersDone * 3;
       void saveCardReview(cardId, updated);
       return {
         ...session,
         cardReviews: { ...session.cardReviews, [cardId]: updated },
-        sessionXpEarned,
+        sessionCardsReviewed,
         xp: session.xp + xpGain,
-        dailyGoalMet: sessionXpEarned >= goalTarget(session),
+        dailyGoalMet: activity >= goalTarget(session),
       };
     });
   }, []);
@@ -321,6 +352,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         toggleSound,
         openSubject,
         openLesson,
+        bridgeToChat,
+        clearChatBridge,
         completeChapter,
         reviewCard,
         getDueCards,
