@@ -21,6 +21,17 @@ export const LEVELS: Level[] = [
 export const CONTENT_LEVEL_ID = "2nde";
 export const CONTENT_LEVEL_NOTE = "BRAISE couvre pour l'instant les bases de la 2nde.";
 
+// The short form for tight spots (a chip on the Pioche card, the tag on a review card), where
+// "Physique-Chimie" would be cut off with an ellipsis.
+export const SUBJECT_SHORT_NAMES: Record<string, string> = {
+  maths: "Maths",
+  francais: "Français",
+  "histoire-geo": "Histoire-Géo",
+  svt: "SVT",
+  physique: "Physique",
+  anglais: "Anglais",
+};
+
 export const SUBJECTS: Subject[] = [
   {
     id: "maths",

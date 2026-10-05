@@ -3,6 +3,7 @@ import { motion, MotionConfig } from "framer-motion";
 import { Clock3, Play, Sparkles, Trophy } from "lucide-react";
 import { BraisePioche } from "@/components/BraisePioche";
 import { sfx } from "@/lib/sound";
+import { XP_REWARDS } from "@/lib/progress";
 import { getLastPiocheOpenDate, setLastPiocheOpenDate } from "@/lib/celebrations";
 import { firePiocheReveal, getPiocheRevealTiming } from "@/lib/piocheTransition";
 
@@ -201,12 +202,12 @@ export function HeroPiocheCard({
           </div>
         </div>
         <div
-          className="relative mt-4 grid grid-cols-3 gap-2"
+          className="relative mt-4 grid grid-cols-[auto_minmax(0,1fr)_auto] gap-2"
           aria-label="Les repères de ta mission"
         >
           <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
             <Clock3 size={15} strokeWidth={3} aria-hidden="true" />
-            <span className="font-mono text-[0.67rem] font-black text-[#151821]">
+            <span className="whitespace-nowrap font-mono text-[0.67rem] font-black text-[#151821]">
               {duration} MIN
             </span>
           </div>
@@ -222,12 +223,15 @@ export function HeroPiocheCard({
           </div>
           <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
             <Trophy size={15} strokeWidth={3} aria-hidden="true" />
-            <span className="font-mono text-[0.67rem] font-black text-[#151821]">+50 AURA</span>
+            <span className="whitespace-nowrap font-mono text-[0.67rem] font-black text-[#151821]">
+              +{XP_REWARDS.CHAPTER_COMPLETE} XP
+            </span>
           </div>
         </div>
         <span className="sr-only">
           {bubbleLine} Cette mission contient {cardCount} carte{cardCount > 1 ? "s" : ""}, dure
-          environ {duration} minutes et rapporte 50 points d'Aura à sa première validation.
+          environ {duration} minutes et rapporte {XP_REWARDS.CHAPTER_COMPLETE} XP à sa première
+          validation.
         </span>
 
         {launching && (

@@ -25,7 +25,7 @@ import {
 } from "@/lib/braiseVoice";
 import { reportCard } from "@/lib/reports";
 import { MASTERED_AT_REPETITIONS, reviewReward } from "@/lib/progress";
-import { FLASHCARDS, SUBJECTS } from "@/data";
+import { FLASHCARDS, SUBJECTS, SUBJECT_SHORT_NAMES } from "@/data";
 import type { Flashcard, Confidence } from "@/types";
 import { readSnapshot, writeSnapshot, type SessionSnapshot } from "@/lib/revisionSession";
 import { BevelButton } from "@/components/revisions/BevelButton";
@@ -51,14 +51,6 @@ const JOKER_CHARGE_NEEDED = 2;
 
 // Compact subject tag in the header pill ("⚗️ PHYSIQUE · ÉNERGIE"), not the full display name
 // — the pill has to stay one line next to the report/quit buttons.
-const SUBJECT_SHORT: Record<string, string> = {
-  maths: "Maths",
-  francais: "Français",
-  "histoire-geo": "Histoire-Géo",
-  svt: "SVT",
-  physique: "Physique",
-  anglais: "Anglais",
-};
 
 export function RevisionsView() {
   const { state, reviewCard, getDueCards } = useApp();
@@ -696,7 +688,7 @@ function SwipeDeck({
                   question={card.q}
                   emoji={subject?.emoji ?? "📚"}
                   color={subject?.color ?? "var(--sun)"}
-                  subjectLabel={SUBJECT_SHORT[card.subject] ?? subject?.name ?? ""}
+                  subjectLabel={SUBJECT_SHORT_NAMES[card.subject] ?? subject?.name ?? ""}
                   topic={card.topic}
                   alreadyMastered={currentCardMastered}
                 />

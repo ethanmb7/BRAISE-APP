@@ -11,7 +11,7 @@ import { MissedCardsBanner } from "@/components/MissedCardsBanner";
 import { SubjectDecks } from "@/components/SubjectDecks";
 import { TodayStrip } from "@/components/TodayStrip";
 import { ShareAuraModal } from "@/components/ShareAuraModal";
-import { SUBJECTS, FLASHCARDS } from "@/data";
+import { SUBJECTS, FLASHCARDS, SUBJECT_SHORT_NAMES } from "@/data";
 import { dailyPickLine, getAgeGroup } from "@/lib/braiseVoice";
 import { getRankInfo, countMasteredCards } from "@/lib/aura";
 import { getIntoxDismissedCount, setIntoxDismissedCount } from "@/lib/celebrations";
@@ -181,7 +181,7 @@ export function HomeView() {
           <motion.div variants={staggerItem} className="home-mission-zone">
             <HeroPiocheCard
               bubbleLine={bubbleLine}
-              subjectName={currentSubject?.name}
+              subjectName={currentSubject ? SUBJECT_SHORT_NAMES[currentSubject.id] : undefined}
               subjectColor={currentSubject?.color}
               chapterTitle={currentChapter?.title ?? "Leçon du jour"}
               duration={currentChapter?.duration ?? 0}

@@ -478,8 +478,11 @@ select {
 .onb--welcome .onb-scene {
   flex: 1;
 }
+/* Compact on purpose: the avatar, the title, the pass, its storage note and the button must all
+   fit above the fold on a 732px-high phone, or the note hides under the sticky button. */
 .onb--ready .onb-scene {
-  padding: 28px 0 24px;
+  gap: 14px;
+  padding: 8px 0 12px;
 }
 .onb-avatar {
   flex-shrink: 0;
@@ -528,6 +531,9 @@ select {
   font-size: 2.1rem;
   font-weight: 800;
   line-height: 1.02;
+  /* A name makes the title wrap at an arbitrary point: balance the lines so the closing "!" never
+     ends up alone on one (the non-breaking space in the string keeps it with the name). */
+  text-wrap: balance;
 }
 .onb-hero-copy p {
   max-width: 22ch;
@@ -553,6 +559,14 @@ select {
   font-weight: 800;
   line-height: 1.18;
 }
+.onb--level .onb-bubble,
+.onb--tone .onb-bubble,
+.onb--rhythm .onb-bubble {
+  /* Braise's question and its reaction to the answer swap into this same bubble. A fixed height
+     (three lines) means the tiles below never jump when the reaction arrives. */
+  min-height: 6.5rem;
+  align-content: center;
+}
 .onb-bubble-ghost,
 .onb-bubble-live {
   grid-area: 1 / 1;
@@ -565,20 +579,17 @@ select {
   display: flex;
   flex-direction: column;
 }
-/* Screens with a single block (the name field, the data notice): Braise's question and the
-   answer stay together as one group, centred in the page, instead of hugging the top and leaving
-   a hole above the button — the free space is split between the auto margins above and below. */
-.onb--name .onb-scene,
-.onb--consent .onb-scene {
+/* The name screen has a single block: Braise's question and the field stay together as one
+   group, centred in the page, instead of hugging the top and leaving a hole above the button —
+   the free space is split between the auto margins above and below. */
+.onb--name .onb-scene {
   margin-top: auto;
 }
-.onb-body--name,
-.onb-body--consent {
+.onb-body--name {
   flex: 0 0 auto;
   margin-bottom: auto;
 }
-.onb--name .onb-footer,
-.onb--consent .onb-footer {
+.onb--name .onb-footer {
   margin-top: 0;
 }
 .onb-hint {
@@ -586,6 +597,11 @@ select {
   color: var(--ink-soft);
   font-size: 0.84rem;
   text-align: center;
+}
+.onb-footnote {
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  line-height: 1.35;
 }
 
 /* Name */
@@ -718,61 +734,6 @@ select {
   filter: none;
 }
 
-/* Consent */
-.onb-info {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  padding: 18px;
-  border: 2.5px solid var(--neo-ink);
-  border-radius: 16px;
-  background: var(--paper);
-}
-.onb-info p {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  color: var(--ink);
-  font-size: 1rem;
-  line-height: 1.45;
-}
-.onb-info svg {
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-.onb-check {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 16px;
-  padding: 14px 16px;
-  border: 2.5px solid var(--neo-ink);
-  border-radius: 16px;
-  background: var(--paper);
-  box-shadow: 3px 3px 0 var(--neo-ink);
-  color: var(--ink);
-  font-family: 'Baloo 2', sans-serif;
-  font-size: 1.05rem;
-  font-weight: 800;
-  text-align: left;
-  transition: background 0.15s ease;
-}
-.onb-check.is-checked {
-  background: #ffd43b;
-  color: #151821;
-}
-.onb-check-box {
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  border: 2.5px solid #151821;
-  border-radius: 8px;
-  background: #fff;
-  color: #151821;
-}
-
 /* Ready — the pass: the student's own answers reflected back, like a ticket being handed over. */
 .onb-pass {
   padding: 16px 18px 6px;
@@ -824,9 +785,13 @@ select {
   padding: 18px 0 calc(18px + env(safe-area-inset-bottom, 0px));
   background: linear-gradient(to bottom, transparent, var(--bg) 35%);
 }
-.onb--welcome .onb-footer,
-.onb--ready .onb-footer {
+.onb--welcome .onb-footer {
   background: none;
+}
+/* The ready screen scrolls under its footer when a long first name wraps the title, so the footer
+   needs the screen's own colour behind the note and the button. */
+.onb--ready .onb-footer {
+  background: linear-gradient(to bottom, transparent, #ff6b35 35%);
 }
 .onb-cta {
   width: 100%;
