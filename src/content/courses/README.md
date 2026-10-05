@@ -18,8 +18,11 @@ données (JSON), jamais de code. Le moteur, la validation et l'écran les lisent
   seulement après des rappels différés réussis dans le deck de révision.
 - Aucun classement, aucune pénalité, aucune formulation culpabilisante (jamais « échec »).
 
-Ce qui est construit aujourd'hui : l'architecture, le Déclic `M2-ARI-D01` et son deck de 6 cartes.
-Le bilan de chapitre, les decks de 30 cartes et l'entraînement par paliers restent à faire.
+Ce qui est construit aujourd'hui : l'architecture, le Déclic `M2-ARI-D01` et son deck de 6 cartes, les
+variantes, la validation avec corrections après les trois étapes et nouvel essai, trois images
+(boîtes imbriquées, droite graduée, groupes). Le bilan de chapitre, les decks de 30 cartes, le
+rendu des autres images (barre, grille, schéma, bloc de code), la preuve à trous et l'entraînement
+par paliers restent à faire.
 
 Pour **livrer** un nouveau cours (le format à remplir, le prompt à donner à une IA), voir
 `BRIEF_TEMPLATE.md`.
@@ -56,11 +59,35 @@ Le type d'un fichier se reconnaît à sa forme : un chapitre a `declicIds`, un D
 
 Le Déclic apparaît seul dans l'écran du chapitre, avec son statut et son deck.
 
+## Variantes, validation et nouvel essai
+
+- **Variantes** (`variants`) sur une carte `choice` ou sur la validation : un second énoncé complet,
+  joué quand l'élève refait le Déclic (carte de transfert) ou réessaie la validation. La carte porte
+  la première version (`v1`), `variants` les suivantes ; les versions passent à tour de rôle.
+- **Validation** (`multi-step-choice`) : `feedbackTiming: "after-all"` recueille les trois réponses
+  puis montre les trois corrections, une par écran. Chaque variante a le même nombre d'étapes, sa
+  propre étape `discriminating`, et reprend le `conceptId` et la `remediation` de l'étape de même
+  rang quand elle n'en donne pas.
+- **Nouvel essai** : une étape peut porter `remediation` (cartes à rejouer). Sous le seuil, le
+  résultat propose « Revoir l'exemple, puis réessayer » : les cartes sont rejouées sans note, puis la
+  validation revient avec la variante suivante. Pas de nouvel essai s'il n'y a plus de variante
+  jamais vue.
+- **Historique** : chaque essai est gardé dans `attempts` (variante jouée, score, `evidence` ou
+  `practice`). Seul un essai `evidence` (variante jamais vue) change `understandingStatus` ; un essai
+  `practice` n'en change aucun.
+- **Images** (`visual`) : sur une carte, une étape ou un choix. Types : `nested-boxes`,
+  `number-line`, `groups`, dessinés depuis leurs paramètres. Le validateur exige un `ariaLabel` et
+  refuse ce qui ne se dessine pas (min ≥ max, plus de 60 graduations, point hors de la droite…).
+
 ## Ajouter un nouveau type de carte
 
 Un nouveau type (texte libre, curseur, classement, association…) demande trois ajouts, dans
 cet ordre : le type dans `types.ts`, sa transition dans `engine.ts`, son rendu dans
 `components/course/CoursePlayer.tsx`. Les Déclics existants ne changent pas.
+
+Une nouvelle **image** demande : son type dans l'union `Visual` de `types.ts`, son rendu dans
+`components/course/` avec un cas dans `VisualView.tsx`, et sa règle dans `checkVisual` du
+validateur. Rien ne change dans le moteur.
 
 ## Progression (locale à l'appareil)
 

@@ -144,3 +144,37 @@ cinq rendus paramétrables : droite graduée, groupes, barre/grille, schéma en 
    transfert, là où elles servent aux ré-essais.
 4. **Durée cible** : 150 à 210 s (D01 actuel) ou 4 à 7 minutes (plan).
 5. **Decks** : un par Déclic ou un pour le chapitre.
+
+## 7. Décisions prises et état du moteur (2026-10-05)
+
+Décisions de l'équipe produit sur les points de la section 6 :
+
+1. **Seuil de compréhension** : 2 sur 3 avec une étape discriminante réussie (règle en place). Sous le
+   seuil, retour à l'exemple concerné puis nouvel essai avec une autre variante.
+2. **Moment de la correction** : après les trois étapes (`feedbackTiming: "after-all"`).
+3. **Variantes** : sur la validation et sur les cartes de transfert seulement. Les cartes qui
+   construisent l'idée n'en ont pas.
+4. **Durée cible** : laissée à chaque Déclic (`targetDurationSec`), pas de règle de chapitre.
+5. **Decks** : un deck par Déclic. Le chapitre fera donc environ 33 cartes de révision au total
+   (D01 en garde 6, les neuf autres Déclics en apportent 3 chacun).
+
+Ce que le moteur sait faire maintenant (section 5) :
+
+| Demande du plan | État |
+| --- | --- |
+| Variantes complètes par validation et par carte de transfert | **fait** : `variants`, version choisie à tour de rôle, version jouée enregistrée avec la réponse, contrôles du validateur |
+| Trois réponses recueillies avant d'afficher les corrections | **fait** : `feedbackTiming: "after-all"` |
+| Retour ciblé vers l'exemple concerné, puis nouvel essai | **fait** : `remediation` par étape, « Revoir l'exemple, puis réessayer », variante suivante |
+| Un nouvel essai enregistré à part ; un essai recyclé = entraînement | **fait** : `attempts` (`evidence` / `practice`) |
+| Droite graduée, groupes et restes, paires + un isolé, ensembles imbriqués | **fait** : `number-line`, `groups` (paires = taille 2), `nested-boxes` |
+| Barre partagée, carré décomposé, schéma entrée → quotient/reste, diviseurs qui disparaissent, packs | **à faire avec le lot qui en a besoin** (lots 2 et 3) |
+| Preuve ou phrase « à compléter par sélection » ; fragment de code | **à faire avec le lot qui en a besoin** (D08 à D10) |
+| Tons Chill et Savage dans chaque feedback | accepté par le modèle, non exigé par le validateur |
+| Bilan de chapitre, entraînement A à D | à concevoir après les lots |
+
+Ce que l'auteur du plan doit savoir pour écrire le lot 1 (D01 à D03) : une validation = trois étapes ×
+au moins trois versions (la première et deux variantes), une étape discriminante par version, des
+corrections écrites pour être lues **après** les trois réponses (un feedback ne doit donc pas
+dépendre de la réponse à l'étape précédente), un message « à renforcer » compatible avec le retour à
+l'exemple, et, pour chaque étape, les cartes du Déclic à rejouer en cas d'erreur. Le format exact est
+dans `src/content/courses/BRIEF_TEMPLATE.md`.

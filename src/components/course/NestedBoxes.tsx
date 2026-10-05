@@ -1,11 +1,11 @@
 import { MathText } from "@/components/course/MathText";
-import type { BoxNode, Visual } from "@/lib/course/types";
+import type { BoxNode, NestedBoxesVisual } from "@/lib/course/types";
 
 // A set diagram made of boxes inside boxes: what "ℕ ⊂ ℤ" looks like. Drawn from data (see Visual in
 // lib/course/types.ts), so the next chapter's picture is a JSON tree, not a new component. The
 // shape cannot be read from the picture, so the whole thing is one labelled image for a screen
 // reader, written by the author.
-export function NestedBoxes({ visual }: { visual: Visual }) {
+export function NestedBoxes({ visual }: { visual: NestedBoxesVisual }) {
   return (
     <div className="course-boxes" role="img" aria-label={visual.ariaLabel}>
       {visual.boxes.map((box, i) => (

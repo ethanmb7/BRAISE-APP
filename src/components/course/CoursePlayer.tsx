@@ -4,23 +4,26 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { BraiseMascot } from "@/components/BraiseMascot";
 import { DeclicAsk, DeclicTile } from "@/components/declic/shared";
 import { MathText } from "@/components/course/MathText";
-import { NestedBoxes } from "@/components/course/NestedBoxes";
 import { ReviewPlayer } from "@/components/course/ReviewPlayer";
+import { VisualView } from "@/components/course/VisualView";
 import { fireConfetti } from "@/lib/confetti";
 import { sfx } from "@/lib/sound";
 import { useTone } from "@/lib/useTone";
 import {
   computeAssessment,
   currentCard,
-  currentStep,
+  currentChoiceContent,
+  currentSteps,
   followUpCards,
   progressRatio,
+  retryRemediation,
   selectedChoice,
   type Run,
 } from "@/lib/course/engine";
 import { courseProgressStore } from "@/lib/course/progressStore";
 import {
   beginFollowUp,
+  beginRetry,
   choose,
   closeMenu,
   endFollowUp,
@@ -31,7 +34,7 @@ import {
   pickMenuItem,
 } from "@/lib/course/session";
 import { resolveText } from "@/lib/course/text";
-import type { CardDef, Choice, DeclicDef, ReviewDeckDef } from "@/lib/course/types";
+import type { CardDef, Choice, DeclicDef, ReviewDeckDef, Text } from "@/lib/course/types";
 
 const CARD_SPRING = { type: "spring", stiffness: 420, damping: 26 } as const;
 
@@ -65,7 +68,12 @@ export function CoursePlayer({
 
   const card = currentCard(def, run);
   const picked = selectedChoice(def, run);
-  const say = (text: CardDef["text"]) => resolveText(text, personality);
+  // What the card shows in the version this run plays: other numbers on a second pass or a retry.
+  const content = currentChoiceContent(def, run);
+  const stepsView = currentSteps(def, run);
+  const step = stepsView?.steps[run.stepIndex];
+  const afterAll = card.type === "multi-step-choice" && card.feedbackTiming === "after-all";
+  const say = (text: Text) => resolveText(text, personality);
 
   // The summary is the moment the Déclic lands: one celebration, never on a replay back to it.
   useEffect(() => {
@@ -119,7 +127,19 @@ export function CoursePlayer({
   }
 
   const index = def.cards.findIndex((c) => c.id === card.id);
-  const screen = run.phase === "outcome" ? "outcome" : run.phase === "menu" ? "menu" : "card";
+  const screen =
+    run.phase === "outcome"
+      ? "outcome"
+      : run.phase === "menu"
+        ? "menu"
+        : run.phase === "corrections"
+          ? "corrections"
+          : "card";
+  const retry = retryRemediation(def, run);
+  const followUp =
+    assessment && assessment.status === "needs_reinforcement"
+      ? followUpCards(def, deck, assessment)
+      : [];
 
   const tile = (choice: Choice, graded: boolean) => {
     const isPicked = picked?.id === choice.id;
@@ -147,7 +167,7 @@ export function CoursePlayer({
         label={
           <>
             {choice.visual ? (
-              <NestedBoxes visual={choice.visual} />
+              <VisualView visual={choice.visual} />
             ) : (
               <span className="course-tile-label">
                 <MathText text={choice.label} />
@@ -211,20 +231,22 @@ export function CoursePlayer({
 
       {run.replay && (
         <p className="course-replay-note" role="status">
-          Petit rappel : on repasse par là, puis on revient au résumé.
+          {run.replay.returnCardId === def.assessment.cardId
+            ? "On revoit l’exemple, puis tu retentes une autre version."
+            : "Petit rappel : on repasse par là, puis on revient au résumé."}
         </p>
       )}
 
       <AnimatePresence mode="wait">
         <motion.div
-          key={`${card.id}-${screen}`}
+          key={`${card.id}-${screen}${afterAll ? `-${run.stepIndex}` : ""}`}
           className="declic-step"
           ref={focusStep}
           tabIndex={-1}
           {...cardMotion}
         >
           {/* ---- a question with its choices */}
-          {card.type === "choice" && screen === "card" && (
+          {card.type === "choice" && content && screen === "card" && (
             <>
               <DeclicAsk
                 scene="question"
@@ -246,12 +268,17 @@ export function CoursePlayer({
                 }
                 bubbleClassName="course-bubble"
               >
-                <MathText text={say(card.text)} />
+                <MathText text={say(content.text)} />
               </DeclicAsk>
+              {content.visual && (
+                <div className="course-visual">
+                  <VisualView visual={content.visual} />
+                </div>
+              )}
               <div
-                className={`declic-choices course-choices ${card.choices.some((c) => c.visual) ? "course-choices--visual" : ""}`}
+                className={`declic-choices course-choices ${content.choices.some((c) => c.visual) ? "course-choices--visual" : ""}`}
               >
-                {card.choices.map((c) => tile(c, card.gradeChoices !== false))}
+                {content.choices.map((c) => tile(c, card.gradeChoices !== false))}
               </div>
               {feedbackBlock(picked, card.continueLabel ?? "Continuer")}
             </>
@@ -263,35 +290,92 @@ export function CoursePlayer({
               <DeclicAsk mood="proud" scene="reveal" bubbleClassName="course-bubble">
                 <MathText text={say(card.text)} />
               </DeclicAsk>
+              {card.visual && (
+                <div className="course-visual">
+                  <VisualView visual={card.visual} />
+                </div>
+              )}
               <button type="button" className="declic-cta" onClick={goNext}>
                 {card.continueLabel} <ArrowRight size={18} />
               </button>
             </>
           )}
 
-          {/* ---- the validation: several items in a row, one score */}
-          {card.type === "multi-step-choice" && screen === "card" && (
+          {/* ---- the validation: several items in a row, one score. With held-back corrections
+                 the answer is only recorded, neutrally, and the corrections come after the last. */}
+          {card.type === "multi-step-choice" && screen === "card" && stepsView && step && (
             <>
               <DeclicAsk
                 scene="question"
-                mood={!picked ? "eager" : picked.correct ? "proud" : "hesitant"}
-                bump={!picked ? undefined : picked.correct ? "correct" : "wrong"}
+                mood={
+                  !picked ? "eager" : afterAll ? "happy" : picked.correct ? "proud" : "hesitant"
+                }
+                bump={!picked || afterAll ? undefined : picked.correct ? "correct" : "wrong"}
                 bubbleClassName="course-bubble"
               >
-                <MathText text={say(card.text)} />
+                <MathText text={say(stepsView.text)} />
               </DeclicAsk>
               <div className="course-subject" aria-live="polite">
                 <span className="course-subject-step">
-                  Étape {run.stepIndex + 1} / {card.steps.length}
+                  Étape {run.stepIndex + 1} / {stepsView.steps.length}
                 </span>
-                <span className="course-subject-value">{currentStep(def, run)?.subject}</span>
+                <span className="course-subject-value">{step.subject}</span>
               </div>
+              {step.visual && (
+                <div className="course-visual">
+                  <VisualView visual={step.visual} />
+                </div>
+              )}
               <div className="declic-choices course-choices course-choices--trio">
-                {currentStep(def, run)?.options.map((o) => tile(o, true))}
+                {step.options.map((o) => tile(o, !afterAll))}
+              </div>
+              {afterAll
+                ? picked && (
+                    <button type="button" className="declic-cta" onClick={goNext}>
+                      {run.stepIndex + 1 < stepsView.steps.length
+                        ? "Étape suivante"
+                        : "Voir les corrections"}{" "}
+                      <ArrowRight size={18} />
+                    </button>
+                  )
+                : feedbackBlock(
+                    picked,
+                    run.stepIndex + 1 < stepsView.steps.length
+                      ? "Étape suivante"
+                      : "Voir mon résultat",
+                  )}
+            </>
+          )}
+
+          {card.type === "multi-step-choice" && screen === "corrections" && stepsView && step && (
+            <>
+              <DeclicAsk
+                scene="question"
+                mood={picked?.correct ? "proud" : "hesitant"}
+                bump={!picked ? undefined : picked.correct ? "correct" : "wrong"}
+                bubbleClassName="course-bubble"
+              >
+                <MathText text={say(stepsView.text)} />
+              </DeclicAsk>
+              <div className="course-subject" aria-live="polite">
+                <span className="course-subject-step">
+                  Correction {run.stepIndex + 1} / {stepsView.steps.length}
+                </span>
+                <span className="course-subject-value">{step.subject}</span>
+              </div>
+              {step.visual && (
+                <div className="course-visual">
+                  <VisualView visual={step.visual} />
+                </div>
+              )}
+              <div className="declic-choices course-choices course-choices--trio">
+                {step.options.map((o) => tile(o, true))}
               </div>
               {feedbackBlock(
                 picked,
-                run.stepIndex + 1 < card.steps.length ? "Étape suivante" : "Voir mon résultat",
+                run.stepIndex + 1 < stepsView.steps.length
+                  ? "Correction suivante"
+                  : "Voir mon résultat",
               )}
             </>
           )}
@@ -315,21 +399,34 @@ export function CoursePlayer({
                 <b>
                   {assessment.score}/{assessment.max}
                 </b>{" "}
-                bien rangés
+                étapes réussies
               </p>
-              {assessment.status === "needs_reinforcement" &&
-              followUpCards(def, deck, assessment).length > 0 ? (
+              {retry || followUp.length > 0 ? (
                 <div className="course-actions">
-                  <button
-                    type="button"
-                    className="declic-cta"
-                    onClick={() => {
-                      sfx.tap(soundOn);
-                      setRun(beginFollowUp(def, run, courseProgressStore));
-                    }}
-                  >
-                    Les deux situations rapides <ArrowRight size={18} />
-                  </button>
+                  {retry && (
+                    <button
+                      type="button"
+                      className="declic-cta"
+                      onClick={() => {
+                        sfx.tap(soundOn);
+                        setRun(beginRetry(def, run, courseProgressStore));
+                      }}
+                    >
+                      Revoir l’exemple, puis réessayer <ArrowRight size={18} />
+                    </button>
+                  )}
+                  {followUp.length > 0 && (
+                    <button
+                      type="button"
+                      className={retry ? "declic-link" : "declic-cta"}
+                      onClick={() => {
+                        sfx.tap(soundOn);
+                        setRun(beginFollowUp(def, run, courseProgressStore));
+                      }}
+                    >
+                      Les deux situations rapides {!retry && <ArrowRight size={18} />}
+                    </button>
+                  )}
                   <button type="button" className="declic-link" onClick={goNext}>
                     Passer au résumé
                   </button>

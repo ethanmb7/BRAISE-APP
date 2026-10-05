@@ -4,20 +4,28 @@
 //
 // Standalone on purpose: only `import type` from sibling files (erased at runtime), so Node can run
 // it directly with no build step, like scripts/check-declic-content.ts.
+import { BASE_VARIANT } from "./variants.ts";
 import type {
   CardDef,
   ChapterDef,
   Choice,
   CoverageLevel,
   DeclicDef,
+  MultiStepCard,
+  Remediation,
   ReviewDeckDef,
+  Step,
   Text,
+  Visual,
 } from "./types.ts";
 
 const BARE_FEEDBACK =
   /^\s*(?:🔥\s*)?(faux|bravo|incorrect|échec|raté|mauvaise réponse)\s*[.!]*\s*$/i;
 const FORBIDDEN_WORDS = /échec/i;
 const MIN_FEEDBACK_CHARS = 24;
+// A picture is drawn in a few centimetres of a phone: past these it is unreadable, not just busy.
+const MAX_LINE_TICKS = 60;
+const MAX_GROUP_ITEMS = 40;
 
 function textOf(t: Text): string {
   return typeof t === "string" ? t : t.text;
@@ -107,8 +115,16 @@ function validateDeclic(
     if (a.understoodMinScore < 1 || a.understoodMinScore > maxScore) {
       err(d.id, `seuil de compréhension ${a.understoodMinScore} hors de 1..${maxScore}`);
     }
-    if (a.requireDiscriminatingStep && !assessed.steps.some((s) => s.discriminating)) {
-      err(at(a.cardId), "la règle exige une étape discriminante mais aucune n'est marquée");
+    // Every version of the validation is graded by the same rule, so each must be able to pass it.
+    if (a.requireDiscriminatingStep) {
+      for (const v of versionsOf(assessed)) {
+        if (!v.steps.some((s) => s.discriminating)) {
+          err(
+            at(a.cardId),
+            `la règle exige une étape discriminante mais aucune n'est marquée${v.id === BASE_VARIANT ? "" : ` (version "${v.id}")`}`,
+          );
+        }
+      }
     }
     if (a.followUpCount < 0) err(d.id, "followUpCount négatif");
   }
@@ -180,7 +196,7 @@ function validateDeclic(
   }
   // Every step of the validation points at a concept the deck can follow up on.
   if (assessed?.type === "multi-step-choice") {
-    for (const s of assessed.steps) {
+    for (const s of versionsOf(assessed).flatMap((v) => v.steps)) {
       if (s.conceptId && !concepts.has(s.conceptId)) {
         err(at(assessed.id), `l'étape "${s.id}" vise le concept "${s.conceptId}", absent du deck`);
       }
@@ -214,10 +230,66 @@ function validateChoices(
       err(where, `le choix "${c.id}" vise une conception inconnue "${c.misconceptionId}"`);
     }
     checkFeedback(c.feedback, `${where} (choix ${c.id})`, err);
-    if (c.visual && !c.visual.ariaLabel.trim())
-      err(where, `le choix "${c.id}" a un visuel sans libellé d'accessibilité`);
+    checkVisual(c.visual, `${where} (choix ${c.id})`, err);
   }
   if (correct !== 1) err(where, `exactement une réponse attendue (trouvé ${correct})`);
+}
+
+/** The versions of a validation card: its own steps, then each variant's. */
+function versionsOf(card: MultiStepCard): { id: string; steps: Step[] }[] {
+  return [
+    { id: BASE_VARIANT, steps: card.steps },
+    ...(card.variants ?? []).map((v) => ({ id: v.id, steps: v.steps })),
+  ];
+}
+
+function checkVisual(
+  v: Visual | undefined,
+  where: string,
+  err: (where: string, msg: string) => void,
+) {
+  if (!v) return;
+  if (!v.ariaLabel.trim()) err(where, "un visuel doit avoir un libellé pour les lecteurs d'écran");
+  if (v.kind === "number-line") {
+    const step = v.step ?? 1;
+    if (!(v.min < v.max)) err(where, "droite graduée : min doit être inférieur à max");
+    else if (!(step > 0)) err(where, "droite graduée : le pas doit être positif");
+    else {
+      if ((v.max - v.min) / step > MAX_LINE_TICKS)
+        err(
+          where,
+          `droite graduée : plus de ${MAX_LINE_TICKS} graduations, illisible sur un téléphone`,
+        );
+      const inside = (n: number) => n >= v.min && n <= v.max;
+      if ((v.points ?? []).some((p) => !inside(p.value)))
+        err(where, "droite graduée : un point est hors de la droite");
+      if ((v.marks ?? []).some((m) => !inside(m)))
+        err(where, "droite graduée : une marque est hors de la droite");
+      if (v.bound !== undefined && !inside(v.bound))
+        err(where, "droite graduée : la borne est hors de la droite");
+    }
+  } else if (v.kind === "groups") {
+    if (!(Number.isInteger(v.total) && v.total >= 1 && v.total <= MAX_GROUP_ITEMS))
+      err(where, `groupes : total entier entre 1 et ${MAX_GROUP_ITEMS}`);
+    if (!(Number.isInteger(v.groupSize) && v.groupSize >= 1))
+      err(where, "groupes : la taille d'un groupe doit être un entier positif");
+  }
+}
+
+/** Where a remediation sends the student must be earlier cards, in order, before `card`. */
+function checkRemediation(
+  r: Remediation,
+  card: CardDef,
+  d: DeclicDef,
+  where: string,
+  err: (where: string, msg: string) => void,
+) {
+  const from = d.cards.find((c) => c.id === r.fromCardId);
+  const to = d.cards.find((c) => c.id === r.toCardId);
+  if (!from || !to) err(where, "la remédiation vise une carte inconnue");
+  else if (from.order > to.order || to.order >= card.order) {
+    err(where, "la remédiation doit rejouer des cartes précédentes, dans l'ordre");
+  }
 }
 
 function validateCard(
@@ -229,22 +301,52 @@ function validateCard(
 ) {
   const where = at(card.id);
   if (!textOf(card.text).trim()) err(where, "texte vide");
+  checkVisual(card.visual, where, err);
   switch (card.type) {
-    case "choice":
+    case "choice": {
       validateChoices(card.choices, where, misconceptionIds, err);
+      const seen = new Set([BASE_VARIANT]);
+      for (const v of card.variants ?? []) {
+        const vwhere = `${where} › variante ${v.id}`;
+        if (seen.has(v.id)) err(where, `identifiant de variante en double ou réservé "${v.id}"`);
+        seen.add(v.id);
+        if (!textOf(v.text).trim()) err(vwhere, "texte vide");
+        validateChoices(v.choices, vwhere, misconceptionIds, err);
+        checkVisual(v.visual, vwhere, err);
+      }
       break;
+    }
     case "reveal":
       if (!card.continueLabel.trim()) err(where, "libellé du bouton manquant");
       break;
     case "multi-step-choice": {
       if (card.steps.length === 0) err(where, "aucune étape");
       const stepIds = new Set<string>();
-      for (const s of card.steps) {
-        if (stepIds.has(s.id)) err(where, `étape en double "${s.id}"`);
-        stepIds.add(s.id);
-        if (!s.id.startsWith(`${d.id}-`))
-          err(where, `l'étape "${s.id}" doit commencer par "${d.id}-"`);
-        validateChoices(s.options, `${where} › ${s.id}`, misconceptionIds, err);
+      const versionIds = new Set([BASE_VARIANT]);
+      for (const [position, v] of versionsOf(card).entries()) {
+        const isVariant = position > 0; // the card's own steps come first
+        const vwhere = isVariant ? `${where} › variante ${v.id}` : where;
+        if (isVariant) {
+          if (versionIds.has(v.id))
+            err(where, `identifiant de variante en double ou réservé "${v.id}"`);
+          versionIds.add(v.id);
+          if (v.steps.length !== card.steps.length) {
+            err(
+              vwhere,
+              `une variante a le même nombre d'étapes que la carte (${card.steps.length})`,
+            );
+          }
+        }
+        for (const s of v.steps) {
+          // Ids are unique across every version, so a saved answer names exactly one step.
+          if (stepIds.has(s.id)) err(where, `étape en double "${s.id}"`);
+          stepIds.add(s.id);
+          if (!s.id.startsWith(`${d.id}-`))
+            err(where, `l'étape "${s.id}" doit commencer par "${d.id}-"`);
+          validateChoices(s.options, `${vwhere} › ${s.id}`, misconceptionIds, err);
+          checkVisual(s.visual, `${vwhere} › ${s.id}`, err);
+          if (s.remediation) checkRemediation(s.remediation, card, d, `${vwhere} › ${s.id}`, err);
+        }
       }
       break;
     }

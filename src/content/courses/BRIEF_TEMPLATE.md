@@ -98,6 +98,8 @@ Réponse attendue: <C>
 Conception visée: A → <single_set_only> ; B → <…>   (facultatif, seulement pour les mauvaises réponses)
 Bouton après feedback: « <Continuer> »   (facultatif)
 Note: <« ne pas afficher les autres choix comme mauvais »>   (facultatif : question d'accroche non notée)
+Image: <voir « Les images » plus bas>   (facultatif)
+Variantes: <V2, V3>   (facultatif : surtout pour les cartes de transfert, voir « Variantes » plus bas)
 ```
 
 **Révélation** (`reveal`) : on nomme la notion ou la règle, une fois l'idée construite.
@@ -120,12 +122,16 @@ Type: multi-step-choice
 Rôle: <validation finale sans aide>
 Texte:
 « <consigne> »
+Corrections: <après les trois étapes>   (valeur à toujours mettre pour la validation : l'élève répond aux
+                                         trois items, puis voit les trois corrections ; sinon « après chaque étape »)
 ÉTAPE 1
 Élément affiché: <23>
 Boutons: <ℕ> | <ℤ> | <Aucune>
 Réponse attendue: <ℕ>
 Discriminante: <oui>        (oui = réussir cette étape sépare vraiment les notions enseignées)
 Concept testé: <inclusion_N_Z>   (un concept du deck de révision ; sert aux situations de rattrapage)
+Exemple à revoir si ratée: <rejouer les cartes C04 à C05>   (cartes précédentes, dans l'ordre ; voir « Nouvel essai »)
+Image: <voir « Les images »>   (facultatif)
 Feedback si <ℕ>: « <…> »
 Feedback si <ℤ>: « <…> »
 Feedback si <Aucune>: « <…> »
@@ -135,8 +141,45 @@ RÈGLE D'ÉVALUATION
 Compris si: <score ≥ 2 sur 3> ET <au moins une étape discriminante réussie>
 À renforcer sinon.
 Message « compris »: « <…> »
-Message « à renforcer »: « <🔥 T’as l’idée générale, mais … Je te remets deux situations rapides et on verrouille ça.> »
+Message « à renforcer »: « <🔥 T’as l’idée générale, mais … on revoit l’exemple et on retente.> »
 Situations de rattrapage proposées: <2>
+```
+
+**Variantes de la validation** (au moins 2 en plus de la première, pour le nouvel essai) : même nombre
+d'étapes, mêmes objectifs, **autres nombres et autre situation**. L'étape n°i d'une variante teste le
+même objectif que l'étape n°i de la première : elle reprend son concept et son exemple à revoir, sauf
+si tu en indiques d'autres. Chaque variante a sa propre étape discriminante, ses boutons, sa réponse
+attendue et ses feedbacks complets.
+
+```
+VARIANTE <V2> de <M2-ARI-D01-C14>
+ÉTAPE 1 <M2-ARI-D01-C14-T1>
+Élément affiché: <58>
+Boutons: <…>
+Réponse attendue: <…>
+Discriminante: <non>
+Feedback si <…>: « <…> »
+ÉTAPE 2 <M2-ARI-D01-C14-T2>
+<…>
+```
+
+**Nouvel essai** : sous 2/3 ou sans l'étape discriminante, l'élève voit **« Revoir l'exemple, puis
+réessayer »** : on rejoue sans note les cartes indiquées pour l'étape ratée (la discriminante en
+priorité), puis la validation revient avec la variante suivante. Chaque essai est enregistré à part ;
+un essai sur une variante déjà vue compte comme de l'entraînement et ne change aucun statut. Il n'y a
+donc de nouvel essai que s'il reste une variante jamais vue : prévoir au moins 2 variantes.
+
+**Variantes d'une carte de transfert** (facultatif, une carte `choice` de transfert) : un deuxième
+énoncé complet (texte, choix, feedbacks), joué quand l'élève refait le Déclic. Les cartes qui
+construisent l'idée n'ont pas besoin de variantes.
+
+```
+VARIANTE <V2> de <M2-ARI-D01-C12>
+Texte Braise: « <…> »
+Choix: A — « <…> » ; B — « <…> » ; C — « <…> »
+Feedback A / B / C: « <…> »
+Réponse attendue: <B>
+Image: <…>   (facultatif ; une variante n'hérite pas de l'image de la première)
 ```
 
 **Résumé du Déclic** (`declic-summary`) : toujours la **dernière** carte.
@@ -152,9 +195,34 @@ Menu « Revoir »:
 - « <∈ / ⊂> » → rejouer les cartes <C08> à <C09>
 ```
 
-Une question visuelle (ex. des boîtes dans des boîtes) se décrit en une ligne par choix :
-`A — [ ℕ ] [ ℤ ] (deux boîtes séparées)` · `B — [ ℤ [ ℕ ] ] (ℕ dans ℤ)` · `C — [ ℕ [ ℤ ] ]`.
-Ajouter une phrase qui décrit l'image pour un lecteur d'écran.
+#### Les images
+
+Une image se décrit en données, jamais en dessin. Elle peut accompagner une carte, une étape de
+validation ou un choix. **Chaque image a une phrase pour un lecteur d'écran** (obligatoire).
+Trois sont disponibles :
+
+```
+Image: boîtes imbriquées
+  ariaLabel: « ℕ est dans ℤ »
+  boîtes: [ ℕ ] [ ℤ [ ℕ ] ]            (les crochets imbriqués montrent qui est dans qui)
+
+Image: droite graduée
+  ariaLabel: « Droite de –5 à 6, avec –3 et 2 marqués »
+  de: <–5>  à: <6>  pas: <1>           (le pas est facultatif, 1 par défaut ; 60 graduations au plus)
+  points: <–3 « –3 »> ; <2 « 2 »>     (valeur et étiquette facultative)
+  marques: <0>                         (graduations mises en relief : multiples, par exemple)
+  borne: <4>                           (une limite en pointillés, facultative)
+
+Image: groupes
+  ariaLabel: « Treize points en groupes de quatre, il en reste un »
+  total: <13>  taille d'un groupe: <4>  (40 objets au plus)
+  objet: <🔥>                          (facultatif : une lettre, un emoji ; un point par défaut)
+```
+
+Le reste d'une division (ici 1) est toujours dessiné à part, en pointillés : c'est le propos de
+l'image. Des paires avec un seul isolé : `taille d'un groupe: 2`. Si une image manque pour un Déclic
+(barre partagée, grille, schéma entrée → sortie, bloc de code, preuve à trous), le dire dans la fiche :
+je l'ajoute avant d'intégrer le lot, plutôt que de contourner.
 
 ### B3. Deck de révision (Carré / Intox)
 

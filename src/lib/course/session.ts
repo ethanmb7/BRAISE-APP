@@ -15,6 +15,7 @@ import {
   selectedChoice,
   selectStepOption,
   startFollowUp,
+  startRetry,
   type Run,
 } from "./engine";
 import { applyMastery, computeMastery, isCorrect, newReviewState, recordReview } from "./review";
@@ -101,6 +102,11 @@ export function beginFollowUp(
   now = Date.now(),
 ): Run {
   return commit(def, startFollowUp(def, run), store, now);
+}
+
+/** "Revoir l'exemple, puis réessayer" after a validation that needs reinforcement. */
+export function beginRetry(def: DeclicDef, run: Run, store: ProgressStore, now = Date.now()): Run {
+  return commit(def, startRetry(def, run), store, now);
 }
 
 export function endFollowUp(def: DeclicDef, run: Run, store: ProgressStore, now = Date.now()): Run {

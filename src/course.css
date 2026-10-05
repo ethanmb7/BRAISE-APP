@@ -377,3 +377,93 @@
   font-size: 0.82rem;
   color: var(--ink-soft);
 }
+
+/* ----- pictures drawn from data: number line and groups ---------------------------------- */
+
+/* A picture that sits with a card's text, not inside an answer. */
+.course-visual {
+  display: flex;
+  justify-content: center;
+  padding: 10px 8px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 14px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+}
+.course-tile--visual .course-line,
+.course-tile--visual .course-groups {
+  max-width: 100%;
+}
+
+.course-line {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+}
+.course-line-axis {
+  stroke: var(--neo-ink);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+.course-line-tick {
+  stroke: var(--neo-ink);
+  stroke-width: 2;
+}
+.course-line-tick--mark {
+  stroke-width: 2.5;
+}
+.course-line-mark {
+  fill: var(--sun);
+  stroke: var(--neo-ink);
+  stroke-width: 2.5;
+}
+.course-line-point {
+  fill: var(--coral);
+  stroke: var(--neo-ink);
+  stroke-width: 2.5;
+}
+.course-line-bound {
+  stroke: var(--coral);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 5 4;
+}
+.course-line-label {
+  fill: var(--neo-ink);
+  font:
+    800 11px/1 "IBM Plex Mono",
+    monospace;
+}
+.course-line-point-label {
+  fill: var(--neo-ink);
+  font: 900 13px/1 var(--font-impact);
+}
+
+.course-groups {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 8px;
+}
+.course-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  max-width: 132px;
+  padding: 6px 8px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--mint) 45%, var(--paper));
+}
+/* What is left over is drawn apart, dashed: it is the point of the picture. */
+.course-group--rest {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--coral) 30%, var(--paper));
+}
+.course-group-item {
+  font-size: 1.1rem;
+  line-height: 1;
+}
