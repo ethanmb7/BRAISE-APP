@@ -23,6 +23,8 @@ Le bilan de chapitre, les decks de 30 cartes et l'entraînement par paliers rest
 
 Pour **livrer** un nouveau cours (le format à remplir, le prompt à donner à une IA), voir
 `BRIEF_TEMPLATE.md`.
+Pour le **processus** (plan du chapitre d'abord, puis les Déclics par lots, corrections, identifiants
+à ne jamais changer), voir `content-briefs/README.md` à la racine du dépôt.
 
 ## Les fichiers
 
