@@ -38,6 +38,7 @@ function baseState(overrides: Partial<AppState>): AppState {
     dailyGoalMet: false,
     darkMode: false,
     dyslexiaMode: false,
+    textSize: "normal",
     soundOn: true,
     currentSubjectId: null,
     currentChapterId: null,

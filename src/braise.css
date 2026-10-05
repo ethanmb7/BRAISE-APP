@@ -217,6 +217,14 @@ body {
   margin: 0;
 }
 
+/* Réglages > Taille du texte. Every font-size in the app is in rem, so scaling the root is enough. */
+html[data-text-size="large"] {
+  font-size: 112.5%;
+}
+html[data-text-size="xlarge"] {
+  font-size: 125%;
+}
+
 body {
   background: var(--bg);
   color: var(--ink);
@@ -4289,6 +4297,29 @@ select {
   margin: -10px 4px 18px;
   color: var(--ink-soft);
   font-size: 0.78rem;
+}
+/* Text-size picker: three "Aa" samples, the chosen one filled. */
+.settings-sizes {
+  display: flex;
+  gap: 6px;
+}
+.settings-size {
+  display: grid;
+  min-width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 20%, transparent);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  line-height: 1;
+}
+.settings-size.is-active {
+  background: var(--neo-orange);
+  border-color: var(--neo-ink);
+  color: #fff;
 }
 /* Backup panels: an expanded area under the row that opened it. */
 .settings-panel {

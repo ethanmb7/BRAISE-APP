@@ -18,7 +18,7 @@ export const LEVELS: Level[] = [
 // changes Braise's voice, never the content, so every screen that shows the level says this out
 // loud instead of letting a Terminale student assume the chapters are theirs.
 export const CONTENT_LEVEL_ID = "2nde";
-export const CONTENT_LEVEL_NOTE = "BRAISE couvre pour l'instant le programme de 2nde.";
+export const CONTENT_LEVEL_NOTE = "BRAISE couvre pour l'instant les bases de la 2nde.";
 
 export const SUBJECTS: Subject[] = [
   {

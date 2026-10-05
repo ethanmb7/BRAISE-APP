@@ -7,7 +7,15 @@ import {
   useRef,
   type ReactNode,
 } from "react";
-import type { ViewId, TabId, UserProfile, AppState, Confidence, Personality } from "@/types";
+import type {
+  ViewId,
+  TabId,
+  UserProfile,
+  AppState,
+  Confidence,
+  Personality,
+  TextSize,
+} from "@/types";
 import { DEFAULT_USER, FLASHCARDS } from "@/data";
 import { sfx } from "@/lib/sound";
 import { loadProgress, saveProgress, saveCardReview } from "@/lib/persist";
@@ -36,6 +44,7 @@ type Ctx = {
   setDailyGoalMet: (v: boolean) => void;
   toggleDark: () => void;
   toggleDyslexia: () => void;
+  setTextSize: (size: TextSize) => void;
   toggleSound: () => void;
   openSubject: (subjectId: string, chapterId?: string) => void;
   openLesson: (subjectId: string, chapterId: string, returnTo?: ViewId) => void;
@@ -69,6 +78,7 @@ const INITIAL: AppState = {
   dailyGoalMet: false,
   darkMode: false,
   dyslexiaMode: false,
+  textSize: "normal",
   soundOn: true,
   currentSubjectId: null,
   currentChapterId: null,
@@ -183,6 +193,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const toggleDyslexia = useCallback(() => {
     setState((s) => ({ ...s, ...ensureSession(s), dyslexiaMode: !s.dyslexiaMode }));
+  }, []);
+
+  const setTextSize = useCallback((textSize: TextSize) => {
+    setState((s) => ({ ...s, ...ensureSession(s), textSize }));
   }, []);
 
   const toggleSound = useCallback(() => {
@@ -318,6 +332,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setDailyGoalMet,
         toggleDark,
         toggleDyslexia,
+        setTextSize,
         toggleSound,
         openSubject,
         openLesson,

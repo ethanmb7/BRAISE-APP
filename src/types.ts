@@ -74,6 +74,8 @@ export type Badge = {
   cond: string;
 };
 
+export type TextSize = "normal" | "large" | "xlarge";
+
 export type Confidence = "not-sure" | "sure";
 
 export type CardReview = {
@@ -129,6 +131,8 @@ export type AppState = {
   dailyGoalMet: boolean;
   darkMode: boolean;
   dyslexiaMode: boolean;
+  /** Root text size for the whole app (every font-size is in rem, so this scales all of it). */
+  textSize: TextSize;
   soundOn: boolean;
   currentSubjectId: string | null;
   currentChapterId: string | null;

@@ -1,4 +1,12 @@
-import type { AppState, UserProfile, CardReview, Confidence, ViewId, TabId } from "@/types";
+import type {
+  AppState,
+  UserProfile,
+  CardReview,
+  Confidence,
+  ViewId,
+  TabId,
+  TextSize,
+} from "@/types";
 import { supabase, supabaseConfigured, getDeviceId, getDeviceSecret } from "./supabase";
 
 export const PROGRESS_KEY = "sapie_progress";
@@ -15,6 +23,8 @@ type StoredProgress = {
   dailyGoalMet: boolean;
   darkMode: boolean;
   dyslexiaMode: boolean;
+  // Local-only, like sessionXpEarned: device_progress has no matching column.
+  textSize?: TextSize;
   soundOn: boolean;
   user: UserProfile;
   completedChapters: string[];
@@ -99,6 +109,7 @@ function toAppState(p: StoredProgress, cardReviews: Record<string, CardReview>):
     dailyGoalMet: p.dailyGoalMet,
     darkMode: p.darkMode,
     dyslexiaMode: p.dyslexiaMode,
+    textSize: p.textSize ?? "normal",
     soundOn: p.soundOn,
     user: { ...p.user, personality: p.user?.personality ?? "chill" },
     completedChapters: p.completedChapters ?? [],
@@ -159,6 +170,7 @@ export async function loadProgress(): Promise<Partial<AppState> | null> {
             dailyGoalMet: cloudRow.daily_goal_met,
             darkMode: cloudRow.dark_mode,
             dyslexiaMode: cloudRow.dyslexia_mode,
+            textSize: local?.textSize,
             soundOn: cloudRow.sound_on,
             user: cloudRow.profile,
             completedChapters: cloudRow.completed_chapters ?? [],
@@ -196,6 +208,7 @@ export async function saveProgress(state: AppState): Promise<void> {
     dailyGoalMet: state.dailyGoalMet,
     darkMode: state.darkMode,
     dyslexiaMode: state.dyslexiaMode,
+    textSize: state.textSize,
     soundOn: state.soundOn,
     user: state.user,
     completedChapters: state.completedChapters,
