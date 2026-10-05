@@ -28,7 +28,7 @@ CHOIX
 À ton tour : tu défends l'idée « il faut des cours de théâtre au lycée ». Quel est un bon argument ?
 - Parce que c'est cool => C'est une opinion : elle dit ce que tu ressens, pas pourquoi ça vaut le coup pour les autres.
 ~ « C'est cool », quelqu'un d'autre peut répondre « moi je trouve ça nul » et vous êtes à égalité. Un argument doit donner une raison que l'autre ne peut pas écarter d'un haussement d'épaules.
-- [correct] Ça aide à parler en public, utile pour l'oral du bac => Oui : c'est une vraie raison, précise et utile à tout le monde.
+- [correct] Ça aide à parler en public (oral du bac) => Oui : c'est une vraie raison, précise et utile à tout le monde.
 - Tout le monde aime ça => C'est le même piège que « tout le monde y va » : la popularité ne prouve pas que c'est utile.
 
 REFORMULATION
@@ -39,7 +39,7 @@ Un élève écrit : « Le vélo est la meilleure façon d'aller au lycée. Il es
 
 CHOIX
 Quelle est la phrase qui sert d'exemple ?
-- « Le vélo est la meilleure façon d'aller au lycée » => C'est la thèse : ce que l'élève défend.
+- « Le vélo est la meilleure façon… » => C'est la thèse : ce que l'élève défend.
 - « Il est gratuit et rapide en ville » => C'est l'argument : la raison qui soutient la thèse.
 ~ L'argument, c'est la raison générale (gratuit, rapide). L'exemple vient après : un cas précis, avec des chiffres, qui illustre cette raison.
 - [correct] « Sam met 12 minutes en vélo contre 25 en bus » => Exact : un cas précis et chiffré qui illustre l'argument « rapide ».
