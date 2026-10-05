@@ -1,11 +1,12 @@
 import { useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, HelpCircle, Sparkles } from "lucide-react";
 import { BraiseMascot } from "@/components/BraiseMascot";
 import { sfx } from "@/lib/sound";
 import { fireConfetti } from "@/lib/confetti";
 import { recordDeclicMemory, type DeclicScript } from "@/lib/declic";
 import { DeclicTimeline } from "@/components/declic/DeclicTimeline";
+import { DeclicVisualScene } from "@/components/declic/DeclicVisualScene";
 
 const SPRING = { type: "spring", stiffness: 380, damping: 32 } as const;
 // A little bouncier than SPRING and paired with a bigger exit throw — cards should feel like
@@ -36,8 +37,20 @@ export function DeclicMode({
   const [pickedId, setPickedId] = useState<string | null>(null);
   const [thinking, setThinking] = useState(false);
   const [reformulation, setReformulation] = useState("");
+  const [showNudge, setShowNudge] = useState(false);
 
   const card = script.cards[index];
+  const progress = ((index + 1) / script.cards.length) * 100;
+  const beat =
+    card.kind === "situation"
+      ? "Capte"
+      : card.kind === "choice"
+        ? "Tente"
+        : card.kind === "reveal"
+          ? "Déclic"
+          : card.kind === "reformulation"
+            ? "À toi"
+            : "Validé";
 
   // Physical, not just a fade: a card pops in with a little overshoot and gets tossed up and
   // away on the way out, rather than cross-fading into the next one.
@@ -58,6 +71,7 @@ export function DeclicMode({
   const advance = () => {
     sfx.tap(soundOn);
     setPickedId(null);
+    setShowNudge(false);
     setIndex((i) => i + 1);
   };
 
@@ -80,11 +94,24 @@ export function DeclicMode({
   };
 
   return (
-    <div className="declic-stage">
+    <div className={`declic-stage declic-stage--${card.kind}`}>
+      <div className="declic-hud" aria-label={`Étape ${index + 1} sur ${script.cards.length}`}>
+        <div className="declic-hud-copy">
+          <span className="declic-hud-brand"><Sparkles size={13} /> Le Déclic</span>
+          <b>{beat}</b>
+        </div>
+        <span className="declic-hud-count">{index + 1}/{script.cards.length}</span>
+        <div className="declic-hud-track" aria-hidden="true">
+          <motion.span
+            animate={{ width: `${progress}%` }}
+            transition={reducedMotion ? { duration: 0 } : { type: "spring", stiffness: 280, damping: 28 }}
+          />
+        </div>
+      </div>
       <AnimatePresence mode="wait">
         {card.kind === "situation" && (
           <motion.div key={index} className="declic-step" {...cardMotion}>
-            <DeclicAsk mood="happy">{card.text}</DeclicAsk>
+            <DeclicAsk mood="happy" scene="story">{card.text}</DeclicAsk>
             {card.visual?.kind === "timeline" && <DeclicTimeline visual={card.visual} />}
             <button type="button" className="declic-cta" onClick={advance}>
               Suite <ArrowRight size={18} />
@@ -95,6 +122,7 @@ export function DeclicMode({
         {card.kind === "choice" && (
           <motion.div key={index} className="declic-step" {...cardMotion}>
             <DeclicAsk
+              scene="question"
               mood={
                 !pickedId
                   ? "eager"
@@ -112,6 +140,12 @@ export function DeclicMode({
             >
               {card.prompt}
             </DeclicAsk>
+            <DeclicVisualScene
+              chapterId={script.chapterId}
+              cardIndex={index}
+              pickedId={pickedId}
+              correct={card.options.find((o) => o.id === pickedId)?.correct}
+            />
             {card.visual?.kind === "timeline" && <DeclicTimeline visual={card.visual} />}
             <div className="declic-choices">
               {card.options.map((o) => (
@@ -132,6 +166,27 @@ export function DeclicMode({
                 />
               ))}
             </div>
+            {!pickedId && (
+              <button
+                type="button"
+                className="declic-nudge-trigger"
+                onClick={() => {
+                  sfx.tap(soundOn);
+                  setShowNudge((visible) => !visible);
+                }}
+              >
+                <HelpCircle size={16} /> Je bloque un peu
+              </button>
+            )}
+            {showNudge && !pickedId && (
+              <motion.p
+                className="declic-nudge"
+                initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                Pas besoin d’être sûr. Choisis la piste qui te semble la moins fausse — je rebondis dessus.
+              </motion.p>
+            )}
             {pickedId && (
               <>
                 {thinking ? (
@@ -159,8 +214,10 @@ export function DeclicMode({
 
         {card.kind === "reveal" && (
           <motion.div key={index} className="declic-step" {...cardMotion}>
-            <span className="declic-reveal-kicker">{card.kicker}</span>
-            <DeclicAsk mood="proud">{card.text}</DeclicAsk>
+            <DeclicAsk mood="proud" scene="reveal">
+              <span className="declic-reveal-kicker">{card.kicker}</span>
+              {card.text}
+            </DeclicAsk>
             {card.visual?.kind === "timeline" && <DeclicTimeline visual={card.visual} />}
             <button type="button" className="declic-cta" onClick={advance}>
               Suite <ArrowRight size={18} />
@@ -170,7 +227,7 @@ export function DeclicMode({
 
         {card.kind === "reformulation" && (
           <motion.div key={index} className="declic-step" {...cardMotion}>
-            <DeclicAsk mood="eager">{card.prompt}</DeclicAsk>
+            <DeclicAsk mood="eager" scene="reformulate">{card.prompt}</DeclicAsk>
             <textarea
               className="declic-textarea"
               value={reformulation}
@@ -231,6 +288,7 @@ export function DeclicMode({
 function DeclicAsk({
   mood,
   bump,
+  scene,
   children,
 }: {
   mood: Mood;
@@ -238,23 +296,38 @@ function DeclicAsk({
    *  when this prop first appears (see the `key`: it forces a fresh mount, which is what makes
    *  an `initial` → `animate` transition actually run instead of snapping straight to rest). */
   bump?: "correct" | "wrong";
+  scene: "story" | "question" | "reveal" | "reformulate";
   children: ReactNode;
 }) {
+  const reducedMotion = useReducedMotion();
+  const mascotMotion = reducedMotion
+    ? { initial: { opacity: 0 }, animate: { opacity: 1 } }
+    : bump === "wrong"
+      ? { initial: { rotate: 0, x: 0 }, animate: { rotate: [0, -8, 7, -4, 0], x: [0, -2, 2, 0] } }
+      : bump === "correct"
+        ? { initial: { y: 0, scale: 1 }, animate: { y: [0, -13, 0], scale: [1, 1.08, 1] } }
+        : { initial: { opacity: 0, y: 14, rotate: -3 }, animate: { opacity: 1, y: 0, rotate: 0 } };
   return (
-    <div className="declic-ask">
-      {bump ? (
-        <motion.div
-          key={bump}
-          initial={{ rotate: 0, y: 0 }}
-          animate={bump === "wrong" ? { rotate: [0, -10, 9, -6, 4, 0] } : { y: [0, -10, 0] }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-        >
-          <BraiseMascot size={64} mood={mood} />
-        </motion.div>
-      ) : (
-        <BraiseMascot size={64} mood={mood} />
-      )}
-      <h2 className="declic-bubble">{children}</h2>
+    <div className={`declic-ask declic-ask--${scene}`}>
+      <motion.div
+        key={`${scene}-${bump ?? mood}`}
+        className="declic-actor"
+        {...mascotMotion}
+        transition={
+          bump
+            ? { duration: 0.48, ease: "easeOut" }
+            : { type: "spring", stiffness: 360, damping: 22 }
+        }
+      >
+        <span className="declic-actor-shadow" aria-hidden="true" />
+        <BraiseMascot
+          size={scene === "reveal" ? 126 : 112}
+          mood={mood}
+          pose={scene === "question" ? "focus" : scene === "reveal" ? "victory" : "idle"}
+        />
+        <span className="declic-actor-tag">BRAISE</span>
+      </motion.div>
+      <h2 className="declic-bubble"><span>{children}</span></h2>
     </div>
   );
 }

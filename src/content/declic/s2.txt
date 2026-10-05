@@ -1,0 +1,48 @@
+NOTION: s2
+CARTE_REVISION: fc18
+ACCROCHE: Ton kebab de midi devient ton énergie pour réviser ce soir — comment ?
+
+SITUATION
+Tu manges un sandwich. Quelques heures plus tard, cette énergie circule dans tout ton corps.
+
+CHOIX
+Où penses-tu que la digestion se termine, principalement ?
+- Dans l'estomac => C'est là qu'elle commence vraiment, pas qu'elle se termine.
+~ L'estomac ne fait qu'un premier travail : il brasse et commence à décomposer les aliments. Le vrai travail fin — récupérer les nutriments un par un — se passe plus loin, dans un tube bien plus long.
+- [correct] Dans l'intestin grêle => Exact ! C'est là que les nutriments passent réellement dans le sang.
+
+SITUATION
+L'intestin grêle est un tube très long, avec une paroi immense pour absorber un maximum de nutriments.
+
+CHOIX
+Ces nutriments absorbés partent ensuite vers…
+- Les poumons => Non — les poumons gèrent l'air (O₂/CO₂), pas la nourriture.
+- [correct] Le sang => Exact ! Le sang transporte ensuite les nutriments vers toutes les cellules du corps.
+
+REVELATION: 🔥 L'intestin grêle, pas l'estomac
+La digestion transforme les aliments en nutriments, mais c'est l'intestin grêle — pas l'estomac — qui les absorbe réellement vers le sang.
+
+CHOIX
+L'estomac, alors, sert à quoi exactement ?
+- [correct] Décomposer les aliments avant l'intestin => Exact ! C'est une étape avant l'absorption, pas l'absorption elle-même.
+- Rien, on pourrait s'en passer => Non — sans ce premier brassage, l'intestin recevrait des aliments à peine digérés.
+
+REFORMULATION
+Explique avec tes mots pourquoi la digestion "se fait" dans l'intestin grêle et pas dans l'estomac.
+
+SITUATION
+Une personne a une maladie qui abîme son intestin grêle, mais son estomac fonctionne très bien.
+
+CHOIX
+Cette personne risque surtout…
+- Rien du tout, l'estomac suffit => Non — l'estomac ne peut pas absorber les nutriments à la place de l'intestin grêle.
+- [correct] De mal absorber les nutriments de sa nourriture => Exact ! Même bien digérés par l'estomac, les nutriments doivent passer par l'intestin grêle pour rejoindre le sang.
+
+DECLIC
+Voilà. Tu sais maintenant où ton sandwich devient vraiment de l'énergie.
+
+FICHE: Digestion et absorption
+RETENIR
+La digestion décompose les aliments (surtout dans l'estomac), mais l'absorption des nutriments vers le sang se fait dans l'intestin grêle.
+PIEGE
+Croire que tout se passe dans l'estomac — c'est l'intestin grêle qui fait le travail final d'absorption.

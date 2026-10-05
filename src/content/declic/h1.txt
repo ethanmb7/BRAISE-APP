@@ -1,0 +1,61 @@
+NOTION: h1
+CARTE_REVISION: fc5
+ACCROCHE: 1789, 1793… deux dates qu'on confond tout le temps
+
+SITUATION
+14 juillet 1789 : le peuple de Paris prend la Bastille. C'est le début de la Révolution.
+
+CHOIX
+À ton avis, le roi Louis XVI est exécuté…
+- La même année, en 1789 => Pas si vite : entre la prise de la Bastille et l'exécution du roi, il se passe bien plus de temps que ça.
+~ Pense à une histoire qui dure plusieurs années, pas un seul jour : la prise de la Bastille n'est que le tout début de la Révolution. Le roi reste en place encore un moment — son procès et son exécution arrivent bien plus tard, en 1793.
+- [correct] Plusieurs années plus tard => Exact ! Quatre ans plus tard, en 1793.
+
+SITUATION
+Entre les deux, beaucoup de choses changent : dès août 1789, la Déclaration des droits de l'homme proclame liberté et égalité.
+
+CHOIX
+La Déclaration des droits de l'homme arrive…
+- Avant la Bastille => Non — la Bastille tombe en premier, en juillet.
+~ La Bastille, symbole du pouvoir royal, doit d'abord tomber pour que l'Assemblée puisse proclamer de nouveaux droits contre ce pouvoir. Le texte est une conséquence de la prise de la Bastille, pas l'inverse.
+- [correct] Juste après la Bastille, la même année => Exact ! Un mois plus tard, toujours en 1789.
+- Après l'exécution du roi => Non, c'est même le contraire : elle arrive bien avant, dès 1789.
+~ La Déclaration des droits de l'homme est un texte fondateur, écrit dès le tout début de la Révolution pour poser ses nouveaux principes. Le roi, lui, reste en vie encore 4 ans après ce texte.
+
+VISUEL: timeline
+- 1789: Prise de la Bastille
+- 1793: Exécution de Louis XVI
+
+REVELATION: 🔥 1789 ≠ 1793
+La prise de la Bastille (1789) et l'exécution de Louis XVI (1793) sont deux événements bien distincts, séparés de 4 ans.
+
+CHOIX
+Parmi ces trois événements, lequel arrive en dernier ?
+- Prise de la Bastille => Non, celui-là ouvre la liste, en 1789.
+~ La prise de la Bastille est justement l'événement déclencheur de toute cette période — celui qui met en marche tout le reste. Cherche plutôt ce qui arrive après les deux autres.
+- Déclaration des droits de l'homme => Non, elle arrive dès 1789, juste après la Bastille.
+~ La Déclaration arrive vite après la Bastille, la même année 1789 — bien avant l'exécution du roi, qui a lieu 4 ans plus tard, en 1793.
+- [correct] Exécution de Louis XVI => Exact. 1793 — le dernier des trois, et de loin.
+
+REFORMULATION
+Explique avec tes mots pourquoi on ne doit pas confondre ces deux dates.
+
+SITUATION
+Un texte d'histoire évoque « la Terreur, qui suit l'exécution du roi ».
+
+CHOIX
+Cette Terreur se situe donc…
+- Avant 1789 => Impossible : l'exécution du roi a lieu en 1793, bien après 1789.
+~ 1789 est le tout début de la Révolution — rien dans cette histoire ne peut se passer avant cette date. Le texte dit que la Terreur SUIT l'exécution du roi : cherche un moment après 1793.
+- Entre 1789 et 1793 => Presque : mais elle suit l'exécution du roi, donc après 1793.
+~ Le mot « suit » veut dire « vient après ». L'exécution du roi a lieu en 1793 — donc tout ce qui la suit se situe forcément après cette date, pas avant.
+- [correct] Après 1793 => Exact ! Après l'exécution du roi, donc après 1793.
+
+DECLIC
+Voilà. Maintenant tu as la vraie chronologie en tête.
+
+FICHE: 1789 et 1793, deux repères à ne pas confondre
+RETENIR
+1789 : prise de la Bastille, début de la Révolution. 1793 : exécution de Louis XVI, quatre ans plus tard. Deux repères distincts de la chronologie révolutionnaire.
+PIEGE
+Beaucoup d'élèves collent les deux événements à la même année — retiens l'écart de 4 ans entre eux.

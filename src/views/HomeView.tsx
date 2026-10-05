@@ -130,6 +130,9 @@ export function HomeView() {
       pct,
       level: currentIndex >= 0 ? currentIndex + 1 : chapters.length,
       chapterLabel: current ? stripLeadingArticle(current.title) : s.name,
+      chapterCount: chapters.length,
+      doneCount,
+      duration: current?.duration ?? null,
       currentChapterId: current?.id,
       currentMastery: current?.mastery ?? 100,
       // Same subject the hero card above already names as today's draw — surfacing it first

@@ -110,6 +110,7 @@ function Screen() {
           )}
           onDismiss={dismiss}
           onShare={() => setShareOpen(true)}
+          soundOn={state.soundOn}
         />
       )}
 

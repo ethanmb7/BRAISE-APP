@@ -1,17 +1,11 @@
-import { Check, Lock, AlertCircle, SkipForward } from "lucide-react";
+import { Check, Lock, AlertCircle, SkipForward, Clock3, ArrowRight } from "lucide-react";
 import { useApp } from "@/store";
 import { resolveChapters } from "@/lib/progress";
 import { sfx } from "@/lib/sound";
 import { TopBar } from "@/components/TopBar";
 import { BraiseMascot } from "@/components/BraiseMascot";
 import { SUBJECTS, STORIES } from "@/data";
-
-const ROW_JUSTIFY: Record<string, string> = {
-  center: "justify-center",
-  right: "justify-end pr-[10%]",
-  left: "justify-start pl-[10%]",
-};
-const POSITIONS = ["center", "right", "center", "left"];
+import { SubjectIcon } from "@/components/SubjectIcon";
 
 // Every tap from Home lands here — this was still the pre-redesign soft/pastel skill path
 // (thin grey border, pale circles) while everything upstream had moved to the neobrutalist
@@ -29,100 +23,79 @@ export function SubjectView() {
   const doneCount = chapters.filter((c) => c.status === "done").length;
   const pct = Math.round((doneCount / chapters.length) * 100);
 
+  const currentChapter = chapters.find((chapter) => chapter.status === "current");
+
   return (
-    <div>
+    <div className="subject-path-page" style={{ "--subject-color": subject.color } as React.CSSProperties}>
       <TopBar
-        title={`${subject.emoji} ${subject.name}`}
+        title={subject.name}
         onBack={goBack}
-        right={<span className="font-mono text-xs font-bold text-[var(--ink-soft)]">{pct}%</span>}
+        right={<span className="subject-top-progress">{doneCount}/{chapters.length}</span>}
       />
-      <div className="view is-active">
-        <div className="mb-5 h-3 overflow-hidden rounded-full border-2 border-black bg-black/80">
-          <div
-            className="h-full rounded-full transition-[width] duration-500"
-            style={{ width: `${pct}%`, background: subject.color }}
-          />
+      <div className="view is-active subject-path-view">
+        <section className="subject-path-hero">
+          <div className="subject-path-icon">
+            <SubjectIcon subjectId={subject.id} color={subject.color} size={34} />
+          </div>
+          <div className="subject-path-hero-copy">
+            <span>Deck {subject.name}</span>
+            <h2>{currentChapter ? currentChapter.title : "Parcours terminé"}</h2>
+            <p>{currentChapter ? `${currentChapter.duration} min pour avancer` : "Tu as bouclé tous les cours."}</p>
+          </div>
+          <BraiseMascot size={70} mood={currentChapter ? "eager" : "proud"} />
+          <div className="subject-path-meter" aria-label={`${pct}% du parcours terminé`}>
+            <span style={{ width: `${pct}%` }} />
+          </div>
+        </section>
+
+        <div className="subject-path-section-title">
+          <span>Ton parcours</span>
+          <b>{doneCount}/{chapters.length} cours</b>
         </div>
 
-        <div className="relative px-1 pb-3 pt-3">
-          <div
-            aria-hidden="true"
-            className="absolute bottom-10 left-1/2 top-8 w-[3px] -translate-x-1/2"
-            style={{
-              background:
-                "repeating-linear-gradient(to bottom, rgba(22,33,58,0.22) 0 8px, transparent 8px 16px)",
-            }}
-          />
+        <div className="subject-path-list">
+          <div aria-hidden="true" className="subject-path-rail" />
 
           {chapters.map((c, i) => {
             const isLocked = c.status === "locked";
             const isDone = c.status === "done";
             const isCurrent = c.status === "current";
-            const pos = POSITIONS[i % POSITIONS.length];
-
-            const node = (
+            return (
               <button
-                className="relative flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border-[2.5px] border-black text-lg font-black transition-transform active:scale-90 disabled:cursor-default"
-                style={{
-                  background: isLocked ? undefined : subject.color,
-                  boxShadow: isLocked ? undefined : "3px 3px 0px 0px #000",
-                }}
+                key={c.id}
+                className={`subject-course-card ${isCurrent ? "is-current" : ""} ${isDone ? "is-done" : ""} ${isLocked ? "is-locked" : ""}`}
                 disabled={isLocked}
                 onClick={() => {
                   if (isLocked) return;
                   sfx.tap(state.soundOn);
-                  // Open the real narrated lesson (slides + quiz) when one exists for this
-                  // chapter, chat otherwise — previously always forced 'echanger', so even a
-                  // chapter with a full scripted story opened straight into open-ended AI chat,
-                  // with the actual lesson buried one tap away behind the "Vocal Animé" toggle.
                   openLesson(subject.id, c.id, STORIES[c.id] ? "vocal" : "echanger");
                 }}
               >
-                {isDone ? (
-                  <Check size={24} className="text-black" strokeWidth={3} />
-                ) : isLocked ? (
-                  <Lock size={18} className="text-black/35" />
-                ) : (
-                  <span className="text-black">{i + 1}</span>
-                )}
-              </button>
-            );
-
-            return (
-              <div key={c.id} className={`relative z-10 mb-8 flex ${ROW_JUSTIFY[pos]}`}>
-                <div className="relative flex flex-col items-center gap-2">
-                  {isCurrent ? <div className="tw-cta-pulse">{node}</div> : node}
-
-                  {isCurrent && (
-                    <div className="pointer-events-none absolute -right-3 -top-5 z-20">
-                      <BraiseMascot size={34} mood="happy" />
-                    </div>
-                  )}
-
-                  <div className="flex max-w-[9.5rem] flex-col items-center gap-1 text-center">
-                    <b className="block font-display text-sm font-black leading-tight text-[var(--ink)]">
-                      {c.title}
-                    </b>
-                    <span className="block text-xs font-semibold text-[var(--ink-soft)]">
-                      {isDone
-                        ? `${c.mastery}% de maîtrise`
-                        : isLocked
-                          ? `${c.duration} min · verrouillé`
-                          : `${c.duration} min`}
-                    </span>
+                <span className="subject-course-number">
+                  {isDone ? <Check size={20} strokeWidth={3} /> : isLocked ? <Lock size={16} /> : i + 1}
+                </span>
+                <span className="subject-course-copy">
+                  <span className="subject-course-state">
+                    {isDone ? "Terminé" : isCurrent ? "À faire maintenant" : "À débloquer"}
+                  </span>
+                  <b>{c.title}</b>
+                  <span className="subject-course-meta">
+                    <Clock3 size={13} aria-hidden="true" /> {c.duration} min
+                    {isDone && <> · {c.mastery}% maîtrisé</>}
+                  </span>
                     {c.reinforce && (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-black bg-sapie-coral px-2 py-0.5 text-[0.65rem] font-extrabold uppercase text-white">
+                      <span className="subject-course-flag is-reinforce">
                         <AlertCircle size={10} /> À renforcer
                       </span>
                     )}
                     {c.skip && (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-black bg-emerald-400 px-2 py-0.5 text-[0.65rem] font-extrabold uppercase text-black">
+                      <span className="subject-course-flag is-skip">
                         <SkipForward size={10} /> Passage rapide
                       </span>
                     )}
-                  </div>
-                </div>
-              </div>
+                </span>
+                {!isLocked && <span className="subject-course-arrow"><ArrowRight size={18} strokeWidth={3} /></span>}
+              </button>
             );
           })}
         </div>

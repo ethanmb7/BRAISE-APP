@@ -1,0 +1,48 @@
+NOTION: a2
+CARTE_REVISION: fc24
+ACCROCHE: Raconter ton week-end en anglais sans te planter sur les verbes
+
+SITUATION
+En anglais, pour raconter un truc déjà terminé : « Yesterday, I played football. »
+
+CHOIX
+Ce « -ed » ajouté à « play », ça sert à dire que l'action…
+- Se passe maintenant => Non — « play » tout seul, au présent, ne prend pas -ed.
+- [correct] S'est déjà passée, dans le passé => Exact ! Le -ED marque le passé pour un verbe régulier.
+
+SITUATION
+« Play » devient « played ». Mais tous les verbes ne suivent pas cette règle aussi simplement.
+
+CHOIX
+Le verbe « go » (aller) au passé, en suivant la règle du -ED, donnerait…
+- [correct] « Goed » — sauf que ça n'existe pas => Exact ! « Go » est irrégulier : sa forme au passé est « went », pas « goed ».
+- « Went », en suivant la règle => « Went » est la bonne forme, mais elle ne vient PAS de la règle du -ED — c'est une exception à apprendre par cœur.
+
+REVELATION: 🔥 Réguliers vs irréguliers
+Les verbes réguliers prennent -ED au passé (play → played). Les verbes irréguliers ont une forme à apprendre par cœur (go → went, have → had...).
+
+CHOIX
+Comment sait-on si un verbe est régulier ou irrégulier ?
+- [correct] Il n'y a pas de règle, ça s'apprend par cœur au fur et à mesure => Exact ! Il faut mémoriser les irréguliers un par un — ils reviennent souvent.
+- Un verbe court est toujours irrégulier => Non — « play », « walk », « watch » sont courts et pourtant bien réguliers.
+
+REFORMULATION
+Explique avec tes mots la différence entre un verbe régulier et irrégulier au passé.
+
+SITUATION
+Tu veux dire « Hier, j'ai mangé une pizza » en anglais : « Yesterday, I ___ a pizza. » (eat)
+
+CHOIX
+Le bon verbe ici est…
+- « Eated » => Non — « eat » est irrégulier, il n'existe pas de forme en -ed pour lui.
+~ « Eat » fait partie des verbes irréguliers les plus fréquents. Sa forme au passé ne suit aucune règle : c'est « ate », à apprendre par cœur comme « go → went ».
+- [correct] « Ate » => Exact ! « Eat » est irrégulier : eat → ate.
+
+DECLIC
+Voilà. T'as le réflexe réguliers/irréguliers, maintenant.
+
+FICHE: Le past simple
+RETENIR
+Verbe régulier + ED au passé (play → played). Verbe irrégulier : forme à apprendre par cœur (go → went, eat → ate).
+PIEGE
+Ajouter -ED à un verbe irrégulier (« goed », « eated ») — ça n'existe pas, ces verbes ont leur propre forme au passé.

@@ -1,0 +1,48 @@
+NOTION: p2
+CARTE_REVISION: fc21
+ACCROCHE: Un feu d'artifice, c'est de la chimie qui explose sous tes yeux
+
+SITUATION
+Un feu d'artifice explose : lumière, chaleur, bruit — on dirait que quelque chose disparaît dans l'explosion.
+
+CHOIX
+Pendant cette réaction chimique, la masse totale de matière…
+- Diminue, une partie part en chaleur => Logique à première vue, mais la chaleur n'est pas de la matière qui s'échappe.
+~ La chaleur et la lumière sont de l'ÉNERGIE libérée, pas de la matière qui disparaît. Chaque atome présent au départ est toujours là à la fin — juste réarrangé autrement.
+- [correct] Reste exactement la même => Exact ! Rien ne se perd, la matière change juste de forme.
+
+SITUATION
+Avant l'explosion, on appelle ça des « réactifs ». Après, ce sont des « produits » — mais toujours les mêmes atomes.
+
+CHOIX
+Donc les atomes des réactifs, à la fin de la réaction…
+- Disparaissent => Non — un atome ne disparaît jamais dans une réaction chimique ordinaire.
+- [correct] Se retrouvent dans les produits, juste réorganisés => Exact ! Même nombre d'atomes, seulement réorganisés autrement.
+
+REVELATION: 🔥 La conservation de la matière
+Dans une réaction chimique, réactifs → produits, mais la masse totale ne change JAMAIS : aucun atome n'apparaît ni ne disparaît, ils se réarrangent seulement.
+
+CHOIX
+Une équation chimique équilibrée doit donc avoir…
+- [correct] Le même nombre de chaque atome des deux côtés => Exact ! C'est précisément ça, « équilibrer » une équation.
+- Le même nombre de molécules des deux côtés => Non — c'est le nombre d'ATOMES qui doit s'équilibrer, pas le nombre de molécules.
+
+REFORMULATION
+Explique avec tes mots pourquoi la masse totale ne change jamais dans une réaction chimique.
+
+SITUATION
+Tu vois une équation chimique où il y a 4 atomes d'hydrogène à gauche, mais seulement 2 à droite.
+
+CHOIX
+Cette équation est…
+- Correcte, certains atomes ont pu disparaître => Non — un atome ne disparaît jamais, cette équation a une erreur.
+- [correct] Mal équilibrée, il manque des atomes à droite => Exact ! Le nombre d'atomes doit être identique des deux côtés.
+
+DECLIC
+Voilà. Tu sais maintenant pourquoi rien ne se perd jamais dans une réaction chimique.
+
+FICHE: Conservation de la matière
+RETENIR
+Dans une réaction chimique, réactifs → produits, mais la masse totale ne change jamais : les atomes se réarrangent, ils n'apparaissent ni ne disparaissent.
+PIEGE
+Une équation chimique doit toujours être équilibrée : le même nombre de chaque atome des deux côtés.

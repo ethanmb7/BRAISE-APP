@@ -1,0 +1,51 @@
+NOTION: s1
+CARTE_REVISION: fc20
+ACCROCHE: Pourquoi t'es à bout de souffle après un sprint ?
+
+SITUATION
+Tu sprintes 100 mètres. Juste après, t'es à bout de souffle.
+
+CHOIX
+Ton corps réclame quoi, en urgence, à ce moment-là ?
+- Plus de nourriture => Pas dans l'immédiat — ce dont tes muscles manquent là, tout de suite, c'est autre chose.
+~ Ton corps a de la nourriture stockée en réserve, même après l'effort — ce n'est pas ce qui manque tout de suite. Ce qui s'épuise en quelques secondes de sprint, c'est l'oxygène disponible dans ton sang pour faire fonctionner tes muscles.
+- [correct] Plus d'oxygène => Exact ! Tes muscles réclament de l'O₂ pour continuer à fonctionner.
+
+SITUATION
+Cet échange — l'oxygène qui entre, le CO₂ qui sort — se passe tout au fond de tes poumons, dans les alvéoles.
+
+CHOIX
+Donc respirer, c'est la même chose que digérer un repas ?
+- Oui, c'est pareil => Non — digérer transforme les aliments en énergie. Respirer, c'est un échange de gaz.
+~ Digérer se passe dans ton ventre et dure des heures : ça transforme un repas en énergie utilisable. Respirer se passe dans tes poumons et dure une seconde : c'est juste un échange de deux gaz avec l'air. Deux organes, deux vitesses, deux rôles différents.
+- [correct] Non, ce sont deux choses différentes => Exact ! Deux fonctions du corps bien distinctes.
+
+REVELATION: 🔥 Respirer = échanger des gaz
+La respiration, c'est l'échange de gaz entre l'air et le sang : O₂ inspiré, CO₂ expiré. Rien à voir avec la digestion des aliments.
+
+CHOIX
+Plus tu bouges, plus tes muscles ont besoin d'O₂. Donc plus tu cours vite, plus tu respires…
+- [correct] Vite => Exact ! Plus d'effort, plus d'O₂ nécessaire, donc une respiration plus rapide.
+- Lentement => À l'inverse : l'effort accélère la respiration.
+~ Imagine un moteur de voiture : plus tu accélères, plus vite il consomme du carburant. Tes muscles pendant l'effort, c'est pareil — plus ils travaillent, plus vite ils réclament de l'oxygène, donc plus vite tu dois respirer pour leur en fournir.
+
+REFORMULATION
+Explique avec tes mots pourquoi respirer et digérer, ce n'est pas la même chose.
+
+SITUATION
+En apnée sous l'eau, tu ne peux plus respirer pendant une minute.
+
+CHOIX
+Que se passe-t-il dans ton corps pendant ce temps ?
+- Rien de spécial, le corps arrête tout échange => Non — tes cellules continuent à produire du CO₂, mais il ne peut plus être évacué.
+~ Tes cellules ne s'arrêtent pas de fonctionner juste parce que tu retiens ta respiration — elles continuent à produire du CO₂ en permanence, apnée ou pas. Le problème, c'est que ce CO₂ n'a plus aucun moyen de sortir tant que tu ne respires pas.
+- [correct] Le CO₂ s'accumule car l'échange de gaz est coupé => Exact ! Sans respiration, l'échange O₂/CO₂ s'arrête — d'où l'envie irrépressible de respirer.
+
+DECLIC
+Voilà. Tu ne confonds plus respiration et digestion.
+
+FICHE: Respirer = échanger des gaz
+RETENIR
+La respiration est l'échange de gaz (O₂ entrant, CO₂ sortant) entre l'air et le sang, au niveau des alvéoles pulmonaires. Elle n'a rien à voir avec la digestion.
+PIEGE
+Ne pas confondre « respirer » (échange de gaz) et « digérer » (transformer les aliments en énergie) — deux fonctions du corps totalement différentes.
