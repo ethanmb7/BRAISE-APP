@@ -1,10 +1,11 @@
 import type { Level, Subject, Flashcard, Badge, UserProfile } from "./types";
 
-// Chapter `status`/`mastery` below are only the fresh-install baseline (chapter 0 of each
-// subject open at 0%, the rest locked) — same logic as `INITIAL.streak/xp = 0` in store.tsx: a
-// real new user hasn't done anything yet, so nothing here claims otherwise. Real progression is
-// computed at render time by `resolveChapters()` in store.tsx from the device's actual
-// `completedChapters`, which is what both HomeView and SubjectView now read.
+// Chapter `status` below is only the fresh-install baseline (chapter 0 of each subject open, the
+// rest locked) — same logic as `INITIAL.streak/xp = 0` in store.tsx: a real new user hasn't done
+// anything yet, so nothing here claims otherwise. Real progression is computed at render time by
+// `resolveChapters()` in lib/progress.ts from the device's actual `completedChapters`, and real
+// mastery by `chapterMastery()` from its card-review history — which is what both HomeView and
+// SubjectView read.
 
 // BRAISE is for lycéens only.
 export const LEVELS: Level[] = [
@@ -21,18 +22,16 @@ export const SUBJECTS: Subject[] = [
     color: "#3B82F6",
     bg: "#EFF6FF",
     chapters: [
-      { id: "m1", title: "Les fractions", status: "current", mastery: 0, duration: 3 },
-      { id: "m2", title: "Théorème de Pythagore", status: "locked", mastery: 0, duration: 4 },
+      { id: "m1", title: "Les fractions", status: "current", duration: 3 },
+      { id: "m2", title: "Théorème de Pythagore", status: "locked", duration: 4 },
       {
         id: "m3",
         title: "Les équations",
         status: "locked",
-        mastery: 0,
-        reinforce: true,
         duration: 3,
       },
-      { id: "m4", title: "Fonctions affines", status: "locked", mastery: 0, duration: 5 },
-      { id: "m5", title: "Statistiques", status: "locked", mastery: 0, duration: 4 },
+      { id: "m4", title: "Fonctions affines", status: "locked", duration: 5 },
+      { id: "m5", title: "Statistiques", status: "locked", duration: 4 },
     ],
   },
   {
@@ -42,10 +41,10 @@ export const SUBJECTS: Subject[] = [
     color: "#8B5CF6",
     bg: "#F5F3FF",
     chapters: [
-      { id: "f1", title: "Le roman et le récit", status: "current", mastery: 0, duration: 5 },
-      { id: "f2", title: "La poésie", status: "locked", mastery: 0, duration: 3 },
-      { id: "f3", title: "Le théâtre", status: "locked", mastery: 0, duration: 4 },
-      { id: "f4", title: "L'argumentation", status: "locked", mastery: 0, duration: 5 },
+      { id: "f1", title: "Le roman et le récit", status: "current", duration: 5 },
+      { id: "f2", title: "La poésie", status: "locked", duration: 3 },
+      { id: "f3", title: "Le théâtre", status: "locked", duration: 4 },
+      { id: "f4", title: "L'argumentation", status: "locked", duration: 5 },
     ],
   },
   {
@@ -55,10 +54,10 @@ export const SUBJECTS: Subject[] = [
     color: "#F59E0B",
     bg: "#FFFBEB",
     chapters: [
-      { id: "h1", title: "La Révolution française", status: "current", mastery: 0, duration: 4 },
-      { id: "h2", title: "L'Empire et Napoléon", status: "locked", mastery: 0, duration: 5 },
-      { id: "h3", title: "Les régimes politiques", status: "locked", mastery: 0, duration: 3 },
-      { id: "h4", title: "La mondialisation", status: "locked", mastery: 0, duration: 4 },
+      { id: "h1", title: "La Révolution française", status: "current", duration: 4 },
+      { id: "h2", title: "L'Empire et Napoléon", status: "locked", duration: 5 },
+      { id: "h3", title: "Les régimes politiques", status: "locked", duration: 3 },
+      { id: "h4", title: "La mondialisation", status: "locked", duration: 4 },
     ],
   },
   {
@@ -68,10 +67,10 @@ export const SUBJECTS: Subject[] = [
     color: "#10B981",
     bg: "#ECFDF5",
     chapters: [
-      { id: "s1", title: "La respiration", status: "current", mastery: 0, duration: 3 },
-      { id: "s2", title: "La digestion", status: "locked", mastery: 0, duration: 4 },
-      { id: "s3", title: "La génétique", status: "locked", mastery: 0, skip: true, duration: 5 },
-      { id: "s4", title: "L'écosystème", status: "locked", mastery: 0, duration: 3 },
+      { id: "s1", title: "La respiration", status: "current", duration: 3 },
+      { id: "s2", title: "La digestion", status: "locked", duration: 4 },
+      { id: "s3", title: "La génétique", status: "locked", duration: 5 },
+      { id: "s4", title: "L'écosystème", status: "locked", duration: 3 },
     ],
   },
   {
@@ -81,17 +80,15 @@ export const SUBJECTS: Subject[] = [
     color: "#06B6D4",
     bg: "#ECFEFF",
     chapters: [
-      { id: "p1", title: "L'atome et la matière", status: "current", mastery: 0, duration: 4 },
+      { id: "p1", title: "L'atome et la matière", status: "current", duration: 4 },
       {
         id: "p2",
         title: "Les réactions chimiques",
         status: "locked",
-        mastery: 0,
-        reinforce: true,
         duration: 5,
       },
-      { id: "p3", title: "L'électricité", status: "locked", mastery: 0, duration: 3 },
-      { id: "p4", title: "L'énergie", status: "locked", mastery: 0, duration: 4 },
+      { id: "p3", title: "L'électricité", status: "locked", duration: 3 },
+      { id: "p4", title: "L'énergie", status: "locked", duration: 4 },
     ],
   },
   {
@@ -105,10 +102,10 @@ export const SUBJECTS: Subject[] = [
       // review (5 real cards tagged chapterId 'a1' below, ~25s each) ≈ 220s, rounded to 4 min —
       // was 3 with only 1 real card behind it (Pioche du jour showed "3 min · 1 carte", a mismatch
       // between the two numbers). Recalculate this if fc25/fc27-30 below ever change.
-      { id: "a1", title: "Present simple", status: "current", mastery: 0, duration: 4 },
-      { id: "a2", title: "Past simple", status: "locked", mastery: 0, duration: 3 },
-      { id: "a3", title: "Present perfect", status: "locked", mastery: 0, duration: 4 },
-      { id: "a4", title: "Modals & advice", status: "locked", mastery: 0, duration: 4 },
+      { id: "a1", title: "Present simple", status: "current", duration: 4 },
+      { id: "a2", title: "Past simple", status: "locked", duration: 3 },
+      { id: "a3", title: "Present perfect", status: "locked", duration: 4 },
+      { id: "a4", title: "Modals & advice", status: "locked", duration: 4 },
     ],
   },
 ];

@@ -1,7 +1,25 @@
 import { describe, it, expect } from "vitest";
-import { ensureSession, resolveRestoredTab, resolveRestoredView } from "@/lib/progress";
-import { DEFAULT_USER } from "@/data";
-import type { AppState } from "@/types";
+import {
+  chapterMastery,
+  computeGoalPct,
+  ensureSession,
+  goalTarget,
+  MASTERED_AT_REPETITIONS,
+  remainingToGoal,
+  resolveChapters,
+  resolveRestoredTab,
+  resolveRestoredView,
+} from "@/lib/progress";
+import { DEFAULT_USER, FLASHCARDS, SUBJECTS } from "@/data";
+import type { AppState, CardReview } from "@/types";
+
+const review = (repetitions: number, lastConfidence: CardReview["lastConfidence"]): CardReview => ({
+  repetitions,
+  interval: 1,
+  ease: 2.5,
+  nextReviewAt: 0,
+  lastConfidence,
+});
 
 // A full, minimal-but-valid AppState so each test only has to override the handful of fields
 // its own case actually cares about — the rest never matters to ensureSession's own branching.
@@ -144,5 +162,68 @@ describe("resolveRestoredTab", () => {
     expect(resolveRestoredTab("settings", "progres")).toBe("progres");
     expect(resolveRestoredTab("lesson", "revisions")).toBe("revisions");
     expect(resolveRestoredTab("lesson", undefined)).toBe("home");
+  });
+});
+
+describe("resolveChapters", () => {
+  const maths = SUBJECTS[0].chapters;
+
+  it("opens only the first unfinished chapter and locks the rest", () => {
+    const resolved = resolveChapters(maths, []);
+    expect(resolved.map((c) => c.status)).toEqual([
+      "current",
+      "locked",
+      "locked",
+      "locked",
+      "locked",
+    ]);
+  });
+
+  it("marks finished chapters done and moves 'current' to the next one", () => {
+    const resolved = resolveChapters(maths, [maths[0].id, maths[1].id]);
+    expect(resolved.map((c) => c.status)).toEqual(["done", "done", "current", "locked", "locked"]);
+  });
+});
+
+describe("chapterMastery", () => {
+  const m1Total = FLASHCARDS.filter((c) => c.chapterId === "m1").length;
+  const m1Card = FLASHCARDS.find((c) => c.chapterId === "m1")!;
+
+  it("knows nothing before any review, and counts only that chapter's own cards", () => {
+    expect(chapterMastery("m1", {})).toEqual({ total: m1Total, mastered: 0, weak: 0 });
+  });
+
+  it("counts a card as mastered only once it has cleared the learning phase", () => {
+    const justShown = { [m1Card.id]: review(MASTERED_AT_REPETITIONS - 1, "sure") };
+    const cleared = { [m1Card.id]: review(MASTERED_AT_REPETITIONS, "sure") };
+    expect(chapterMastery("m1", justShown).mastered).toBe(0);
+    expect(chapterMastery("m1", cleared).mastered).toBe(1);
+  });
+
+  it("flags a card last judged wrong as a weak spot", () => {
+    const missed = { [m1Card.id]: review(0, "not-sure") };
+    expect(chapterMastery("m1", missed)).toEqual({ total: m1Total, mastered: 0, weak: 1 });
+  });
+
+  it("ignores reviews of cards from other chapters", () => {
+    const other = FLASHCARDS.find((c) => c.chapterId !== "m1")!;
+    expect(chapterMastery("m1", { [other.id]: review(5, "sure") }).mastered).toBe(0);
+  });
+});
+
+describe("daily goal (measured in real XP)", () => {
+  const user = { ...DEFAULT_USER, goal: "regulier" };
+
+  it("reads its target in XP and reports progress against it", () => {
+    const s = baseState({ user, sessionXpEarned: 45 });
+    expect(goalTarget(s)).toBe(100);
+    expect(computeGoalPct(s)).toBe(45);
+    expect(remainingToGoal(s)).toBe(55);
+  });
+
+  it("caps at 100% and never reports a negative remainder", () => {
+    const s = baseState({ user, sessionXpEarned: 250 });
+    expect(computeGoalPct(s)).toBe(100);
+    expect(remainingToGoal(s)).toBe(0);
   });
 });

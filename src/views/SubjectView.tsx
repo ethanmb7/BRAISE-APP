@@ -1,6 +1,6 @@
-import { Check, Lock, AlertCircle, SkipForward } from "lucide-react";
+import { Check, Lock, AlertCircle } from "lucide-react";
 import { useApp } from "@/store";
-import { resolveChapters } from "@/lib/progress";
+import { chapterMastery, resolveChapters } from "@/lib/progress";
 import { sfx } from "@/lib/sound";
 import { TopBar } from "@/components/TopBar";
 import { BraiseMascot } from "@/components/BraiseMascot";
@@ -64,6 +64,7 @@ export function SubjectView() {
             // primary label's place when a chapter has one — the real name moves to a small
             // caption underneath instead of disappearing, so the two stay connected.
             const hook = DECLIC_SCRIPTS[c.id]?.hook;
+            const mastery = chapterMastery(c.id, state.cardReviews);
 
             const node = (
               <button
@@ -115,19 +116,16 @@ export function SubjectView() {
                     )}
                     <span className="block text-xs font-semibold text-[var(--ink-soft)]">
                       {isDone
-                        ? `${c.mastery}% de maîtrise`
+                        ? mastery.total > 0
+                          ? `Terminé · ${mastery.mastered}/${mastery.total} acquises`
+                          : "Terminé"
                         : isLocked
                           ? `${c.duration} min · verrouillé`
                           : `${c.duration} min`}
                     </span>
-                    {c.reinforce && (
+                    {isDone && mastery.weak > 0 && (
                       <span className="inline-flex items-center gap-1 rounded-full border border-black bg-sapie-coral px-2 py-0.5 text-[0.65rem] font-extrabold uppercase text-white">
                         <AlertCircle size={10} /> À renforcer
-                      </span>
-                    )}
-                    {c.skip && (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-black bg-emerald-400 px-2 py-0.5 text-[0.65rem] font-extrabold uppercase text-black">
-                        <SkipForward size={10} /> Passage rapide
                       </span>
                     )}
                   </div>

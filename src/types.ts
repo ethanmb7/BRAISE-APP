@@ -32,10 +32,11 @@ export type Subject = {
 export type Chapter = {
   id: string;
   title: string;
+  /** Fresh-install baseline only — real status comes from resolveChapters(). Mastery and the
+   *  "à renforcer" signal are never stored on a chapter: they're derived from the student's real
+   *  card-review history (see chapterMastery in lib/progress.ts), so they can't be hand-set to
+   *  contradict what the student actually did. */
   status: "done" | "current" | "locked";
-  mastery: number;
-  reinforce?: boolean;
-  skip?: boolean;
   duration: number;
 };
 

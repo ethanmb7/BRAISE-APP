@@ -1,5 +1,5 @@
 import type { AppState, CardReview, Chapter, Confidence, TabId, ViewId } from "@/types";
-import { SUBJECTS } from "@/data";
+import { FLASHCARDS, SUBJECTS } from "@/data";
 
 // Pure progress logic — daily goal, chapter unlocking, badges, the day boundary (streak), spaced
 // repetition and view restoration. No React here: AppProvider in store.tsx wires these into state,
@@ -42,17 +42,44 @@ export function remainingToGoal(s: AppState): number {
  *  finishing a chapter anywhere actually unlocks the next one everywhere. Without this, `status`
  *  in data.ts never changes and every subject stays stuck on its first chapter forever — the
  *  same "static field never reflects real progress" bug the streak/XP fix addressed, just one
- *  level deeper. A completed chapter shows 100% (real completion, not a graded score — nothing
- *  in the data model tracks partial per-chapter mastery); anything not yet completed shows 0%,
- *  never a fabricated in-between number.
+ *  level deeper. Completion is the only thing this decides — how well a chapter is actually
+ *  known is `chapterMastery`'s job, from real card-review history, never a number stored here.
  */
 export function resolveChapters(chapters: Chapter[], completedChapters: string[]): Chapter[] {
   const firstOpenIndex = chapters.findIndex((c) => !completedChapters.includes(c.id));
   return chapters.map((c, i) => {
-    if (completedChapters.includes(c.id)) return { ...c, status: "done", mastery: 100 };
-    if (i === firstOpenIndex) return { ...c, status: "current", mastery: 0 };
-    return { ...c, status: "locked", mastery: 0 };
+    if (completedChapters.includes(c.id)) return { ...c, status: "done" };
+    if (i === firstOpenIndex) return { ...c, status: "current" };
+    return { ...c, status: "locked" };
   });
+}
+
+export type ChapterMastery = {
+  /** Flashcards that drill this chapter. */
+  total: number;
+  /** Of those, how many cleared the SM-2 learning phase (see MASTERED_AT_REPETITIONS). */
+  mastered: number;
+  /** Of those, how many were last judged wrong — a real, current weak spot, not a hand-set flag. */
+  weak: number;
+};
+
+/** What a student actually knows of one chapter, from their real card-review history. Used to
+ *  replace a "100% de maîtrise" that just meant "finished once" (whatever the score) and an
+ *  "À renforcer" badge hardcoded onto three chapters regardless of how anyone had done. */
+export function chapterMastery(
+  chapterId: string,
+  cardReviews: Record<string, CardReview>,
+): ChapterMastery {
+  const cards = FLASHCARDS.filter((c) => c.chapterId === chapterId);
+  let mastered = 0;
+  let weak = 0;
+  for (const c of cards) {
+    const r = cardReviews[c.id];
+    if (!r) continue;
+    if (r.repetitions >= MASTERED_AT_REPETITIONS) mastered++;
+    if (r.lastConfidence === "not-sure") weak++;
+  }
+  return { total: cards.length, mastered, weak };
 }
 
 /** Real count of finished chapters across every subject — via `resolveChapters`, not the static
