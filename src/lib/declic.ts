@@ -90,7 +90,7 @@ export function hasDeclicScript(chapterId: string): boolean {
 // localStorage, like every other local-only record in this app — same reasoning as
 // lib/celebrations.ts, not routed through the account-sync model in lib/persist.ts because this
 // is per-notion history, not account progress.
-const DECLIC_MEMORY_KEY = "sapie_declic_memory";
+export const DECLIC_MEMORY_KEY = "sapie_declic_memory";
 
 export type DeclicMemoryEntry = {
   reformulation: string;

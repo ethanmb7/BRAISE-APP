@@ -4290,6 +4290,63 @@ select {
   color: var(--ink-soft);
   font-size: 0.78rem;
 }
+/* Backup panels: an expanded area under the row that opened it. */
+.settings-panel {
+  display: grid;
+  gap: 10px;
+  padding: 4px 14px 14px;
+}
+.settings-hint {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+.settings-error {
+  margin: 0;
+  color: var(--coral-2);
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+.settings-textarea {
+  width: 100%;
+  border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--ink);
+  padding: 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  word-break: break-all;
+  resize: vertical;
+}
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.settings-btn {
+  flex: 0 0 auto;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 20%, transparent);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.settings-btn:active {
+  transform: scale(0.97);
+}
+.settings-btn:disabled {
+  opacity: 0.4;
+}
+.settings-btn--primary {
+  background: var(--neo-orange);
+  border-color: var(--neo-ink);
+  color: #fff;
+}
 .settings-row {
   display: flex;
   justify-content: space-between;

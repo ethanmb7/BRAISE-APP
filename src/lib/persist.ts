@@ -1,8 +1,8 @@
 import type { AppState, UserProfile, CardReview, Confidence, ViewId, TabId } from "@/types";
 import { supabase, supabaseConfigured, getDeviceId, getDeviceSecret } from "./supabase";
 
-const PROGRESS_KEY = "sapie_progress";
-const CARDS_KEY = "sapie_card_reviews";
+export const PROGRESS_KEY = "sapie_progress";
+export const CARDS_KEY = "sapie_card_reviews";
 
 type StoredProgress = {
   xp: number;
