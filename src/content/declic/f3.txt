@@ -1,0 +1,54 @@
+NOTION: f3
+CARTE_REVISION: fc13
+ACCROCHE: Dans une pièce de théâtre, certaines phrases ne sont jamais dites. Lesquelles ?
+
+SITUATION
+Tu lis le texte d'une pièce. Tu tombes sur : « (Léa claque la porte et s'assoit en soupirant.) LÉA — Non mais franchement… »
+
+CHOIX
+Sur scène, qu'est-ce que l'actrice qui joue Léa dit à voix haute ?
+- Tout, y compris « Léa claque la porte » => Elle commenterait ce qu'elle fait au lieu de le faire, alors que le public le voit déjà.
+~ Imagine un acteur qui dirait « Je claque la porte ! » en la claquant. Ce serait absurde : l'action se voit, pas besoin de la raconter. La phrase entre parenthèses est une consigne pour l'actrice, pas du texte à dire.
+- [correct] Seulement « Non mais franchement… » => Exactement : elle joue le reste (la porte, le soupir) sans le prononcer.
+- Rien : elle joue seulement l'action => Presque : elle joue l'action, mais elle prend aussi la parole juste après.
+
+SITUATION
+Ces indications entre parenthèses (souvent en italique dans le livre), c'est l'auteur qui parle à l'équipe : où se placer, avec quel ton, dans quel décor.
+
+CHOIX
+Dans « (Elle chuchote.) Je t'ai menti. », que fait l'actrice ?
+- Elle dit « Elle chuchote », puis la phrase => Non : « Elle chuchote » est une indication pour elle. Elle chuchote, mais ne le dit pas.
+~ Une indication de jeu, c'est comme un mode d'emploi : tu le suis, tu ne le lis pas à voix haute. L'actrice se contente de chuchoter la phrase « Je t'ai menti. »
+- [correct] Elle chuchote « Je t'ai menti. » => Voilà : l'indication change la façon de dire la phrase, pas ce qu'on dit.
+
+REVELATION: 🔥 Répliques et didascalies
+Un texte de théâtre a deux voix. Les répliques : ce que disent les personnages, précédées de leur nom. Les didascalies : les indications de l'auteur sur le décor, les gestes, le ton. Elles ne sont jamais prononcées.
+
+CHOIX
+« (Dans une cuisine, minuit. Une lumière bleue éclaire le frigo.) » C'est…
+- Une réplique du narrateur => Dans une pièce, il n'y a pas de narrateur qui raconte : cette phrase donne le décor, et personne ne la dit.
+~ Dans un roman, un narrateur décrit le décor. Au théâtre, le public voit le décor sur scène : l'auteur le décrit juste pour l'équipe, entre parenthèses.
+- [correct] Une didascalie de décor => Oui : on la voit sur scène, on ne la prononce pas.
+- Une réplique de personnage => Aucun nom de personnage devant : ce n'est la parole de personne.
+
+REFORMULATION
+Explique à un pote la différence entre une réplique et une didascalie.
+
+SITUATION
+Autre extrait : « MAXIME (les dents serrées) — Je suis ravi que tu sois là. »
+
+CHOIX
+Que t'apprend la didascalie « les dents serrées » ?
+- Maxime est vraiment ravi => Regarde la didascalie : des dents serrées, ça ne ressemble pas à de la joie sincère.
+~ Les mots disent « ravi », mais la didascalie montre un corps tendu. Quand les deux se contredisent, c'est souvent là que l'auteur glisse le vrai sens de la scène.
+- [correct] Il fait semblant : elle contredit ses mots => Exactement : les mots disent ravi, la didascalie montre le contraire.
+- Rien, puisqu'on ne la dit pas => Au contraire : elle donne le ton, donc le sens de la scène.
+
+DECLIC
+Voilà. Maintenant, tu sais lire ce que le théâtre ne dit pas à voix haute.
+
+FICHE: Répliques et didascalies
+RETENIR
+Une pièce est écrite pour être jouée. Elle contient des répliques (les paroles des personnages, précédées de leur nom) et des didascalies (les indications de l'auteur sur le décor, les gestes, le ton, en italique ou entre parenthèses) qui ne sont jamais prononcées par les acteurs.
+PIEGE
+Citer une didascalie comme une parole (« Maxime dit qu'il serre les dents »), ou la négliger dans un commentaire : elle donne souvent le vrai sens de la scène.

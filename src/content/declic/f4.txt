@@ -1,0 +1,54 @@
+NOTION: f4
+CARTE_REVISION: fc14
+ACCROCHE: « Tout le monde y va ! » : pourquoi ça ne convainc jamais tes parents
+
+SITUATION
+Tu veux convaincre tes parents de te laisser aller à un concert un soir de semaine. Version A : « C'est trop bien, tout le monde y va ! » Version B : « Ça finit à 22 h, Inès me ramène, et la dernière fois, j'ai eu 15 au contrôle le lendemain. »
+
+CHOIX
+Quelle version a le plus de chances de les convaincre ?
+- La version A => Possible, mais « tout le monde y va » ne leur donne aucune raison précise de dire oui.
+~ « Tout le monde y va » dit que c'est populaire, pas que c'est une bonne idée pour toi. Tes parents n'ont toujours aucune raison concrète de changer d'avis.
+- [correct] La version B => Oui : elle donne des raisons précises (l'heure, le trajet) et un fait vécu qui rassure.
+
+SITUATION
+Dans la version B, il y a deux choses : une raison (« Inès me ramène, ça finit tôt ») et une preuve concrète (« j'ai eu 15 le lendemain »).
+
+CHOIX
+« La dernière fois, j'ai eu 15 au contrôle le lendemain », c'est…
+- Une simple opinion => Une opinion, c'est « je trouve ça bien ». Là, c'est un fait précis, qu'on peut vérifier.
+- [correct] Un exemple concret qui appuie la raison => Voilà : il montre que la raison tient la route dans la vraie vie.
+~ Un exemple est un fait précis (un chiffre, une situation vécue) qui illustre une raison. Ici, le 15 prouve que sortir un soir de semaine ne t'empêche pas de réussir.
+- La conclusion de la demande => La conclusion, c'est « laissez-moi y aller ». Le 15 sert à la justifier, il n'est pas la demande elle-même.
+
+REVELATION: 🔥 Thèse, argument, exemple
+La thèse, c'est ce que tu défends (« je dois pouvoir y aller »). Un argument, c'est une raison qui la soutient. L'exemple est un fait précis qui illustre l'argument. Sans argument, c'est juste une opinion. Sans exemple, ça reste abstrait.
+
+CHOIX
+À ton tour : tu défends l'idée « il faut des cours de théâtre au lycée ». Quel est un bon argument ?
+- Parce que c'est cool => C'est une opinion : elle dit ce que tu ressens, pas pourquoi ça vaut le coup pour les autres.
+~ « C'est cool », quelqu'un d'autre peut répondre « moi je trouve ça nul » et vous êtes à égalité. Un argument doit donner une raison que l'autre ne peut pas écarter d'un haussement d'épaules.
+- [correct] Ça aide à parler en public, utile pour l'oral du bac => Oui : c'est une vraie raison, précise et utile à tout le monde.
+- Tout le monde aime ça => C'est le même piège que « tout le monde y va » : la popularité ne prouve pas que c'est utile.
+
+REFORMULATION
+Explique à un pote la différence entre une opinion et un argument.
+
+SITUATION
+Un élève écrit : « Le vélo est la meilleure façon d'aller au lycée. Il est gratuit et rapide en ville. Par exemple, Sam met 12 minutes en vélo contre 25 en bus aux heures de pointe. »
+
+CHOIX
+Quelle est la phrase qui sert d'exemple ?
+- « Le vélo est la meilleure façon d'aller au lycée » => C'est la thèse : ce que l'élève défend.
+- « Il est gratuit et rapide en ville » => C'est l'argument : la raison qui soutient la thèse.
+~ L'argument, c'est la raison générale (gratuit, rapide). L'exemple vient après : un cas précis, avec des chiffres, qui illustre cette raison.
+- [correct] « Sam met 12 minutes en vélo contre 25 en bus » => Exact : un cas précis et chiffré qui illustre l'argument « rapide ».
+
+DECLIC
+Voilà. Maintenant, tu sais ce qui fait la différence entre dire ce que tu penses et convaincre.
+
+FICHE: Thèse, argument, exemple
+RETENIR
+Pour convaincre, on défend une thèse avec des arguments (des raisons) que l'on illustre chacun par un exemple précis : un fait, un chiffre, une situation vécue. Les connecteurs comme « car », « en effet » ou « par exemple » montrent le lien entre ces étapes.
+PIEGE
+Confondre opinion et argument : « c'est nul » ou « tout le monde le fait » ne prouvent rien. Empiler des arguments sans aucun exemple est une autre erreur fréquente.

@@ -1,0 +1,54 @@
+NOTION: m5
+CARTE_REVISION: fc11
+ACCROCHE: Un influenceur dans ton groupe de potes : que devient la moyenne ?
+
+SITUATION
+Dans ton groupe de 5 potes, vous avez 120, 130, 140, 150… et 10 000 followers. Le dernier, c'est l'influenceur du groupe.
+
+CHOIX
+Si tu devais dire « un pote du groupe a à peu près… followers », tu dirais quoi ?
+- 2 000 => C'est ce que donne la moyenne (tout additionner, diviser par 5). Mais aucun d'entre vous n'a un nombre proche de ça.
+~ Imagine que l'influenceur partage ses followers pour que tout le monde en ait autant : chacun en aurait 2 108. Ça ne ressemble à aucun de vous cinq, parce qu'un seul gros score a tout tiré vers le haut.
+- [correct] 140 => Voilà : c'est le pote du milieu quand on les range du plus petit au plus grand.
+- 10 000 => C'est le plus gros score, mais c'est l'exception du groupe, pas le pote type.
+
+SITUATION
+Deux façons de résumer un groupe. La moyenne : on additionne tout, puis on divise par le nombre de potes, ce qui donne 2 108. La médiane : le pote du milieu une fois rangés, ce qui donne 140.
+
+CHOIX
+L'influenceur passe de 10 000 à 20 000 followers. Laquelle des deux bouge le plus ?
+- La médiane => Elle reste à 140 : le pote du milieu n'a pas changé, même si le dernier est devenu énorme.
+~ Pour la médiane, on regarde seulement qui est au milieu de la file. Que le dernier ait 10 000 ou 20 000 followers, il reste le dernier : la file ne change pas.
+- [correct] La moyenne => Oui : elle monte à 4 108, alors que la médiane reste à 140.
+- Aucune des deux => Si : la moyenne double presque, alors que la médiane ne bouge pas.
+
+REVELATION: 🔥 Moyenne ≠ médiane
+La moyenne : on additionne toutes les valeurs et on divise par leur nombre, donc une valeur extrême la tire. La médiane : la valeur du milieu quand on range les valeurs par ordre croissant, donc elle ne bouge presque pas à cause d'une valeur extrême.
+
+CHOIX
+À toi : les notes d'un élève sont 15, 8, 12, 9 et 6. Quelle est la médiane ?
+- 12 => Tu as pris celle du milieu de la liste telle qu'elle est écrite. Il faut d'abord ranger : 6, 8, 9, 12, 15.
+~ La médiane, c'est le milieu une fois les notes rangées. Écrite en vrac, la liste n'a pas de vrai milieu. Range-les : 6, 8, 9, 12, 15. Celle du milieu est 9.
+- [correct] 9 => Exactement : rangées, ça donne 6, 8, 9, 12, 15, et celle du milieu est 9.
+- 10 => 10, c'est la moyenne (50 ÷ 5). La médiane, c'est la note du milieu une fois rangées, pas un calcul sur toutes les notes.
+
+REFORMULATION
+Explique à un pote pourquoi la médiane représente mieux le groupe quand il y a une valeur extrême.
+
+SITUATION
+Dans un quartier, 5 logements sont à vendre : 150 000 €, 160 000 €, 170 000 €, 180 000 € et un château à 2 000 000 €.
+
+CHOIX
+Une agence veut annoncer un prix « typique » pour ce quartier, sans tromper personne. Elle donne…
+- La moyenne : 532 000 € => Ce prix ferait croire que le quartier est bien plus cher que ce que coûtent 4 logements sur 5 : le château a tout tiré vers le haut.
+~ 532 000 €, c'est plus de deux fois le prix de chacun des quatre autres logements. À cause d'un seul bien hors norme, la moyenne ne ressemble plus à aucune maison réelle du quartier.
+- [correct] La médiane : 170 000 € => Oui : c'est le logement du milieu, et ça ressemble au prix de la plupart des logements du quartier.
+
+DECLIC
+Voilà. Maintenant, tu sauras quand une moyenne ment un peu.
+
+FICHE: Moyenne et médiane
+RETENIR
+Moyenne = somme des valeurs ÷ nombre de valeurs. Médiane = valeur du milieu quand on range les valeurs par ordre croissant (avec un nombre pair de valeurs, c'est la moyenne des deux valeurs centrales). Une valeur extrême tire la moyenne mais ne change presque pas la médiane.
+PIEGE
+Chercher la médiane sans avoir rangé les valeurs d'abord.

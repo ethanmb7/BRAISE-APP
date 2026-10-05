@@ -1,0 +1,56 @@
+NOTION: m4
+CARTE_REVISION: fc9
+ACCROCHE: Un trajet en taxi : comment prévoir le prix avant d'arriver ?
+
+SITUATION
+Un taxi te facture 3 € dès que tu montes dedans, puis 2 € par kilomètre parcouru.
+
+CHOIX
+Combien tu paies pour un trajet de 5 km ?
+- 10 € => Tu as compté les kilomètres (5 × 2) mais oublié les 3 € facturés dès le départ.
+~ Dès que tu t'assois, le compteur affiche déjà 3 €, avant même d'avoir roulé. Ensuite chaque kilomètre ajoute 2 € : 5 × 2 = 10 €, à ajouter aux 3 € de départ.
+- [correct] 13 € => Exactement ! 3 € de départ + 5 × 2 € = 13 €.
+- 25 € => Tu as additionné 3 + 2 puis multiplié par 5 : les 3 € ne se paient qu'une fois, pas à chaque kilomètre.
+~ Les 3 € se paient une seule fois, en montant. Seuls les 2 € se répètent à chaque kilomètre : 3 + (5 × 2) = 13 €, et non (3 + 2) × 5.
+
+SITUATION
+5 km, c'est 3 + 5 × 2 = 13 €. 6 km, c'est 3 + 6 × 2 = 15 €. 7 km, c'est 17 €. À chaque kilomètre en plus, il se passe toujours la même chose.
+
+CHOIX
+Quand tu fais 1 km de plus, le prix augmente de combien ?
+- Ça dépend du moment => Non : chaque kilomètre supplémentaire coûte pareil, et c'est justement ce qui rend le prix facile à prévoir.
+~ Regarde : 13 €, 15 €, 17 €. À chaque kilomètre, le prix grimpe de la même quantité. Il n'y a pas de kilomètre plus cher qu'un autre.
+- [correct] Toujours de 2 € => Oui : au 1er km comme au 20e, un kilomètre de plus coûte 2 €.
+- De 3 € => Les 3 € ne se paient qu'une fois, au départ. C'est le prix du kilomètre qui se répète.
+
+REVELATION: 🔥 Fonction affine : f(x) = ax + b
+Ici, x est le nombre de kilomètres et f(x) le prix : f(x) = 2x + 3. Le nombre a (ici 2) est ce que chaque unité en plus ajoute. Le nombre b (ici 3) est la valeur de départ, quand x = 0.
+
+CHOIX
+Un vélo en libre-service te facture 1 € pour le débloquer, puis 0,15 € par minute. Quelle fonction donne le prix pour x minutes ?
+- f(x) = x + 0,15 => Tu as inversé : ce qui se répète à chaque minute (0,15 €) multiplie x, et le 1 € de départ s'ajoute une seule fois.
+~ Le nombre qui multiplie x, c'est ce qui se répète à chaque minute : ici 0,15 €. Le 1 € de déverrouillage ne se paie qu'une fois, donc il se place à la fin, tout seul.
+- [correct] f(x) = 0,15x + 1 => Exactement : 0,15 € par minute (a) et 1 € au départ (b).
+- f(x) = 1,15x => Tu as fusionné les deux nombres, mais 1 € se paie une fois et 0,15 € à chaque minute.
+
+REFORMULATION
+Explique à un pote ce que veulent dire a et b dans f(x) = ax + b, avec l'exemple du taxi.
+
+SITUATION
+Une bougie mesure 20 cm quand tu l'allumes. Elle fond de 2 cm par heure. Sa hauteur au bout de x heures est h(x) = −2x + 20.
+
+CHOIX
+Dans h(x) = −2x + 20, que représente le −2 ?
+- La hauteur de départ de la bougie => La hauteur de départ, c'est le 20 : la valeur quand x = 0.
+~ Pour trouver le départ, remplace x par 0 : h(0) = −2 × 0 + 20 = 20. Le départ est donc 20 cm, et le −2 est autre chose.
+- [correct] Ce que la bougie perd chaque heure => Voilà : a peut être négatif, et dans ce cas la valeur descend à chaque unité.
+- Le nombre d'heures => Les heures, c'est x : la quantité qui change d'un instant à l'autre.
+
+DECLIC
+Voilà. Maintenant, une droite, tu la lis comme un départ et un rythme.
+
+FICHE: Fonction affine
+RETENIR
+Une fonction affine s'écrit f(x) = ax + b. Le nombre a est le coefficient directeur : de combien f(x) change quand x augmente de 1 (la droite monte si a est positif, descend s'il est négatif). Le nombre b est la valeur de départ : f(0) = b. Sa représentation graphique est une droite.
+PIEGE
+Confondre a et b : le nombre qui multiplie x est celui qui se répète à chaque unité, celui qui est seul est la valeur de départ.

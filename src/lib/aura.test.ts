@@ -6,7 +6,12 @@ import {
   computeNextMilestone,
   RANKS,
 } from "@/lib/aura";
+import { FLASHCARDS } from "@/data";
 import type { CardReview } from "@/types";
+
+// Derived, not hard-coded: the deck grows every time cards are added, and what these tests pin
+// down is that totals come from the real deck, whatever its size.
+const MATHS_DECK_SIZE = FLASHCARDS.filter((c) => c.subject === "maths").length;
 
 function review(repetitions: number): CardReview {
   return { repetitions, interval: 1, ease: 2.5, nextReviewAt: Date.now(), lastConfidence: "sure" };
@@ -56,11 +61,11 @@ describe("computeSubjectMastery", () => {
     const maths = rows.find((r) => r.id === "maths")!;
     expect(maths.started).toBe(false);
     expect(maths.masteredCount).toBe(0);
-    expect(maths.totalCount).toBe(6); // real maths deck: fc1, fc2, fc3, fc9, fc10, fc11
+    expect(maths.totalCount).toBe(MATHS_DECK_SIZE);
   });
 
   it("only counts a card as mastered once it clears the SM-2 learning phase (repetitions >= 2)", () => {
-    // Real maths deck: fc1, fc2, fc3, fc9, fc10, fc11 (6 cards). Review all 6, master 3 of them.
+    // Review six real maths cards (fc1, fc2, fc3, fc9, fc10, fc11), master 3 of them.
     const rows = computeSubjectMastery({
       fc1: review(2),
       fc2: review(3),
@@ -72,14 +77,14 @@ describe("computeSubjectMastery", () => {
     const maths = rows.find((r) => r.id === "maths")!;
     expect(maths.started).toBe(true);
     expect(maths.masteredCount).toBe(3);
-    expect(maths.totalCount).toBe(6);
+    expect(maths.totalCount).toBe(MATHS_DECK_SIZE);
   });
 
-  it("counts mastered against the subject's real total, not just what was reviewed — a single mastered card out of a 6-card deck is 1/6, never a fabricated 100%", () => {
+  it("counts mastered against the subject's real total, not just what was reviewed — a single mastered card is 1 out of the whole deck, never a fabricated 100%", () => {
     const rows = computeSubjectMastery({ fc1: review(2) });
     const maths = rows.find((r) => r.id === "maths")!;
     expect(maths.masteredCount).toBe(1);
-    expect(maths.totalCount).toBe(6);
+    expect(maths.totalCount).toBe(MATHS_DECK_SIZE);
   });
 
   it("treats a card seen once (repetitions 1) as started but not mastered", () => {

@@ -1,0 +1,57 @@
+NOTION: m3
+CARTE_REVISION: fc3
+ACCROCHE: Un sac mystère sur une balance : comment trouver ce qu'il y a dedans ?
+
+SITUATION
+Une balance est parfaitement en équilibre. À gauche : un sac mystère et 3 billes. À droite : 11 billes. Toutes les billes pèsent pareil.
+
+CHOIX
+Tu veux savoir combien de billes pèse le sac tout seul. Tu fais quoi, sans casser l'équilibre ?
+- Je rajoute 3 billes à droite => Ça penche : tu as alourdi un seul côté, et tu ne sais toujours pas ce que pèse le sac.
+~ Pour garder l'équilibre, il faut faire exactement la même chose des deux côtés. Ajouter d'un seul côté, c'est comme poser la main sur un plateau : la balance bascule et plus rien n'est comparable.
+- [correct] J'enlève 3 billes de chaque côté => Voilà ! Il reste le sac seul à gauche et 8 billes à droite : le sac pèse 8 billes.
+- J'enlève 3 billes à gauche seulement => Tu retrouves le sac seul… mais la balance penche à droite, et ces 11 billes en face ne veulent plus rien dire.
+~ Enlever d'un seul côté change le poids de ce côté-là seulement : la balance n'est plus en équilibre, donc l'égalité n'est plus vraie. Il faut retirer les 3 billes à gauche ET à droite.
+
+SITUATION
+Maintenant, il y a deux sacs identiques et 3 billes à gauche, toujours 11 billes à droite. Tu enlèves 3 billes de chaque côté : il reste 2 sacs à gauche et 8 billes à droite.
+
+CHOIX
+Combien pèse un seul sac ?
+- 8 billes => 8 billes, c'est le poids des DEUX sacs ensemble. Il faut encore les partager.
+~ À gauche il y a 2 sacs, à droite 8 billes. Si tu partages les deux côtés en deux, tu obtiens 1 sac d'un côté et 4 billes de l'autre.
+- [correct] 4 billes => Oui ! Tu partages en 2 des deux côtés : 1 sac = 4 billes.
+- 16 billes => Tu as doublé au lieu de partager : si 2 sacs pèsent 8 billes, un seul sac pèse forcément moins.
+
+REVELATION: 🔥 Une équation, c'est une balance
+Une équation est une égalité qui contient une inconnue (souvent x). Pour la résoudre, on fait la même opération des deux côtés du signe = jusqu'à avoir x tout seul. Ici : 2x + 3 = 11, donc 2x = 8, donc x = 4.
+
+CHOIX
+À ton tour : 3x + 2 = 14. Que vaut x ?
+- 12 => Tu as bien retiré 2 des deux côtés, mais 3x = 12 veut dire 3 sacs pour 12 billes : il reste à partager.
+~ 3x, c'est trois sacs. Si trois sacs pèsent 12 billes, un seul pèse 12 ÷ 3. Tu t'es arrêté une étape trop tôt.
+- [correct] 4 => Exactement : 3x = 12, donc x = 12 ÷ 3 = 4.
+- 16 => Tu as ajouté 2 alors qu'il faut le retirer pour le faire disparaître à gauche.
+~ Pour faire disparaître le « + 2 », on fait l'opération inverse : on retire 2. Ajouter 2, c'est empiler encore plus de billes à gauche, et x ne se retrouve pas tout seul.
+
+REFORMULATION
+Explique à un pote pourquoi on fait la même chose des deux côtés du signe égal.
+
+SITUATION
+Une salle de sport te fait payer 10 € d'inscription, puis 15 € par mois. Tu as déjà payé 85 € en tout et tu veux savoir depuis combien de mois tu y vas.
+
+CHOIX
+Depuis combien de mois ?
+- 6 mois => Tu as oublié les 10 € d'inscription : 6 × 15 = 90 €, ça dépasse déjà ce que tu as payé.
+~ Les 85 € contiennent d'abord les 10 € d'inscription, qui ne dépendent pas du nombre de mois. Retire-les : il reste 75 € pour les mensualités, soit 75 ÷ 15 mois.
+- [correct] 5 mois => Oui ! 15x + 10 = 85, donc 15x = 75, donc x = 5.
+- 75 mois => 75 €, c'est ce qui reste après l'inscription, mais il faut encore diviser par 15 € par mois.
+
+DECLIC
+Voilà. Maintenant, une équation, c'est juste une balance qu'on garde en équilibre.
+
+FICHE: Résoudre une équation
+RETENIR
+Une équation reste vraie si on fait la même opération des deux côtés du signe =. Pour isoler x : on enlève d'abord ce qui s'ajoute ou se soustrait, puis on divise par le nombre qui multiplie x. Exemple : 2x + 3 = 11 donne 2x = 8, puis x = 4. On vérifie en remplaçant x dans l'équation de départ.
+PIEGE
+S'arrêter à 2x = 8 sans diviser, ou faire l'opération d'un seul côté du signe égal.
