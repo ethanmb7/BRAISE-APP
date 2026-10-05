@@ -11,7 +11,7 @@ import { MissedCardsBanner } from "@/components/MissedCardsBanner";
 import { SubjectDecks } from "@/components/SubjectDecks";
 import { TodayStrip } from "@/components/TodayStrip";
 import { ShareAuraModal } from "@/components/ShareAuraModal";
-import { SUBJECTS, FLASHCARDS, SUBJECT_SHORT_NAMES } from "@/data";
+import { SUBJECTS, FLASHCARDS, SUBJECT_SHORT_NAMES, FIRST_CHAPTER_ID } from "@/data";
 import { dailyPickLine, getAgeGroup } from "@/lib/braiseVoice";
 import { getRankInfo, countMasteredCards } from "@/lib/aura";
 import { getIntoxDismissedCount, setIntoxDismissedCount } from "@/lib/celebrations";
@@ -69,8 +69,16 @@ export function HomeView() {
   const todaySeed = new Date().toISOString().slice(0, 10);
   let hash = 0;
   for (let i = 0; i < todaySeed.length; i++) hash = (hash * 31 + todaySeed.charCodeAt(i)) >>> 0;
+  // Day zero is not a draw: a student who has done nothing yet starts on the same, well-chosen
+  // chapter, instead of possibly landing on whichever subject the date hash happens to select.
+  const isFirstSession =
+    state.completedChapters.length === 0 && Object.keys(state.cardReviews).length === 0;
+  const firstPick = isFirstSession
+    ? priorityChapters.find((p) => p.chapter.id === FIRST_CHAPTER_ID)
+    : undefined;
   const dailyPick =
-    priorityChapters.length > 0 ? priorityChapters[hash % priorityChapters.length] : null;
+    firstPick ??
+    (priorityChapters.length > 0 ? priorityChapters[hash % priorityChapters.length] : null);
   const currentSubject = dailyPick?.subject;
   const currentChapter = dailyPick?.chapter;
   // Real per-chapter deck size (FLASHCARDS filtered by chapterId) — the card used to show a

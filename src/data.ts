@@ -32,6 +32,11 @@ export const SUBJECT_SHORT_NAMES: Record<string, string> = {
   anglais: "Anglais",
 };
 
+// What a brand-new student's very first Pioche offers instead of a random draw. Fractions and the
+// pizzas: three minutes, no prior knowledge needed, and the Déclic opens on an everyday image —
+// the best first impression of the method the app has.
+export const FIRST_CHAPTER_ID = "m1";
+
 export const SUBJECTS: Subject[] = [
   {
     id: "maths",

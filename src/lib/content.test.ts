@@ -1,7 +1,14 @@
 import { describe, it, expect } from "vitest";
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
-import { SUBJECTS, FLASHCARDS, LEVELS, CONTENT_LEVEL_ID, CONTENT_LEVEL_NOTE } from "@/data";
+import {
+  SUBJECTS,
+  FLASHCARDS,
+  LEVELS,
+  CONTENT_LEVEL_ID,
+  CONTENT_LEVEL_NOTE,
+  FIRST_CHAPTER_ID,
+} from "@/data";
 import { DECLIC_SCRIPTS } from "@/lib/declic";
 
 // Guard rails on the authored content, not on code: every one of these is a way adding or editing
@@ -102,5 +109,13 @@ describe("Content level", () => {
     const level = LEVELS.find((l) => l.id === CONTENT_LEVEL_ID);
     expect(level).toBeDefined();
     expect(CONTENT_LEVEL_NOTE).toContain(level!.label);
+  });
+});
+
+describe("First chapter", () => {
+  it("is a real chapter that has a Déclic, for a new student's first Pioche", () => {
+    const chapter = CHAPTERS.find((c) => c.id === FIRST_CHAPTER_ID);
+    expect(chapter).toBeDefined();
+    expect(DECLIC_SCRIPTS[FIRST_CHAPTER_ID]).toBeDefined();
   });
 });
