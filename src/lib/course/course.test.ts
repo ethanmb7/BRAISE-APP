@@ -533,6 +533,50 @@ describe("saving and resuming", () => {
     expect(run.cardId).toBe(def.cards[0].id);
   });
 
+  it("treats an answer whose choice no longer exists as not answered, so the card is never stuck", () => {
+    const c02 = def.cards[1];
+    const saved = {
+      declicId: def.id,
+      contentVersion: "0.9",
+      completionStatus: "in_progress" as const,
+      understandingStatus: "unknown" as const,
+      masteryStatus: "not_mastered" as const,
+      currentCardId: c02.id,
+      startedAt: T0,
+      updatedAt: T0,
+      answers: { [c02.id]: { kind: "choice" as const, choiceId: "REMOVED" } },
+    };
+    const run = initRun(def, saved);
+    expect(run.cardId).toBe(c02.id);
+    expect(run.phase).toBe("asking");
+    expect(run.answers).toEqual({});
+    // and it can be answered normally
+    expect(selectChoice(def, run, "A").phase).toBe("feedback");
+  });
+
+  it("keeps the still-valid steps of a validation whose options changed", () => {
+    const c14 = def.cards[13];
+    if (c14.type !== "multi-step-choice") throw new Error("validation");
+    const [s1, s2] = c14.steps;
+    const saved = {
+      declicId: def.id,
+      contentVersion: "0.9",
+      completionStatus: "in_progress" as const,
+      understandingStatus: "unknown" as const,
+      masteryStatus: "not_mastered" as const,
+      currentCardId: c14.id,
+      startedAt: T0,
+      updatedAt: T0,
+      answers: {
+        [c14.id]: { kind: "steps" as const, stepAnswers: { [s1.id]: "N", [s2.id]: "GONE" } },
+      },
+    };
+    const run = initRun(def, saved);
+    expect(run.answers[c14.id]).toEqual({ kind: "steps", stepAnswers: { [s1.id]: "N" } });
+    expect(run.phase).toBe("feedback");
+    expect(run.stepIndex).toBe(0);
+  });
+
   it("reads broken or foreign storage as an empty progress", () => {
     expect(parseCourseProgress(null)).toEqual(emptyCourseProgress());
     expect(parseCourseProgress("{not json")).toEqual(emptyCourseProgress());

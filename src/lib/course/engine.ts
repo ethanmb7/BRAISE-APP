@@ -97,6 +97,33 @@ function freshRun(def: DeclicDef): Run {
   };
 }
 
+/** Keeps only the saved answers that still mean something in the current content. A correction or
+ *  a new version can remove or renumber a choice; an answer pointing at a choice that no longer
+ *  exists must read as "not answered", or the card would wait for a tap it will never accept. */
+function sanitizeAnswers(
+  def: DeclicDef,
+  saved: Record<string, CardAnswer>,
+): Record<string, CardAnswer> {
+  const kept: Record<string, CardAnswer> = {};
+  for (const [cardId, answer] of Object.entries(saved)) {
+    const card = def.cards.find((c) => c.id === cardId);
+    if (!card) continue;
+    if (card.type === "choice" && answer.kind === "choice") {
+      if (card.choices.some((c) => c.id === answer.choiceId)) kept[cardId] = answer;
+    } else if (card.type === "multi-step-choice" && answer.kind === "steps") {
+      const stepAnswers = Object.fromEntries(
+        Object.entries(answer.stepAnswers).filter(([stepId, optionId]) =>
+          card.steps.find((s) => s.id === stepId)?.options.some((o) => o.id === optionId),
+        ),
+      );
+      if (Object.keys(stepAnswers).length > 0) kept[cardId] = { kind: "steps", stepAnswers };
+    } else if (card.type === "declic-summary" && answer.kind === "summary") {
+      kept[cardId] = answer;
+    }
+  }
+  return kept;
+}
+
 /** A run for this Déclic: resumed where saved progress says the student stopped, or from the first
  *  card (a finished Déclic starts over, keeping its statuses until a new validation replaces them).
  *  Saved progress that no longer matches the content is ignored rather than trusted. */
@@ -106,9 +133,7 @@ export function initRun(def: DeclicDef, saved?: DeclicProgress | null): Run {
   const card = def.cards.find((c) => c.id === saved.currentCardId);
   if (!card) return run;
 
-  const answers = Object.fromEntries(
-    Object.entries(saved.answers).filter(([id]) => def.cards.some((c) => c.id === id)),
-  );
+  const answers = sanitizeAnswers(def, saved.answers);
   const resumed: Run = { ...run, cardId: card.id, answers };
   const answer = answers[card.id];
 
