@@ -47,6 +47,7 @@ Que risque-t-il d'arriver à l'écosystème de l'île ?
 
 DECLIC
 Voilà. Maintenant, tu vois une mare, une forêt ou une île comme un réseau où tout se tient.
+@savage Une mare, une forêt, une île : tout se tient. Retire un maillon et tu sais ce qui bouge.
 
 FICHE: L'écosystème
 RETENIR

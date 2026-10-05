@@ -46,6 +46,7 @@ Quelle est l'intensité ?
 
 DECLIC
 Voilà. Maintenant, tension, intensité et résistance sont liées, et tu sais comment.
+@savage Tension, intensité, résistance : tu sais comment elles se tiennent. U = R × I n'a plus de secrets.
 
 FICHE: La loi d'Ohm
 RETENIR

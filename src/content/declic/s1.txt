@@ -43,6 +43,7 @@ Que se passe-t-il dans ton corps pendant ce temps ?
 
 DECLIC
 Voilà. Tu ne confonds plus respiration et digestion.
+@savage Respiration et digestion : tu ne les confonds plus. Tes poumons te remercient.
 
 FICHE: Respirer = échanger des gaz
 RETENIR

@@ -45,6 +45,7 @@ Quel est ce régime ?
 
 DECLIC
 Voilà. Maintenant, tu ne te fies plus au nom d'un régime : tu regardes qui contrôle le pouvoir.
+@savage Un nom de régime ne t'impressionne plus : tu regardes qui tient les rênes.
 
 FICHE: Monarchie, république, démocratie, dictature
 RETENIR

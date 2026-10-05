@@ -13,6 +13,8 @@ import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
 import { fireConfetti } from "@/lib/confetti";
 import { CONTENT_LEVEL_NOTE, LEVELS } from "@/data";
+import { COPY } from "@/lib/copy";
+import { DEFAULT_TONE, pickLine } from "@/lib/tone";
 import type { Level, Personality } from "@/types";
 
 type Mood = "happy" | "proud" | "cool" | "eager";
@@ -65,21 +67,18 @@ const RHYTHMS = [
     title: "Tranquille",
     desc: "Un peu chaque jour, sans prise de tête.",
     flames: 1,
-    reaction: "Tranquille, ça marche. Un peu chaque jour, c’est déjà énorme.",
   },
   {
     id: "regulier",
     title: "Régulier",
     desc: "Le bon rythme pour progresser.",
     flames: 2,
-    reaction: "Régulier, le bon plan. C’est comme ça qu’on retient pour de vrai.",
   },
   {
     id: "a-fond",
     title: "À fond",
     desc: "Pour les périodes de contrôles.",
     flames: 3,
-    reaction: "À fond ! Je te préviens, je vais te suivre de près.",
   },
 ];
 
@@ -105,6 +104,8 @@ export function OnboardingView() {
   const hero = stepId === "welcome" || stepId === "ready";
   const trimmedName = name.trim();
   const tone = TONES.find((t) => t.id === personality);
+  // Until a tone is picked the app speaks Chill; every later line follows the student's choice.
+  const voiceTone = personality ?? DEFAULT_TONE;
   const rhythm = RHYTHMS.find((r) => r.id === goal);
 
   const canContinue: Record<StepId, boolean> = {
@@ -121,7 +122,8 @@ export function OnboardingView() {
     name: { text: "Comment je t’appelle ?", mood: "eager" },
     level: { text: `Enchanté, ${trimmedName} ! T’es en quelle classe ?`, mood: "happy" },
     tone: { text: "Et tu me préfères comment ? Touche pour m’entendre.", mood: "eager" },
-    rhythm: { text: "Tu passes me voir à quel rythme ?", mood: "happy" },
+    // Said after the tone was picked, so it is already in that tone.
+    rhythm: { text: pickLine(voiceTone, COPY.onboarding.rhythmQuestion), mood: "happy" },
     ready: { text: "", mood: "proud" },
   };
   const line = reaction ?? question[stepId];
@@ -226,7 +228,7 @@ export function OnboardingView() {
             {stepId === "ready" && (
               <HeroCopy
                 title={`Bienvenue, ${trimmedName}\u00a0!`}
-                subtitle="Ton Braise est prêt."
+                subtitle={pickLine(voiceTone, COPY.onboarding.readySubtitle)}
               />
             )}
             {!hero && <Bubble key={line.text} text={line.text} />}
@@ -328,7 +330,7 @@ export function OnboardingView() {
                         tap();
                         setGoal(r.id);
                         setReaction({
-                          text: r.reaction,
+                          text: pickLine(voiceTone, COPY.onboarding.rhythm[r.id]),
                           mood: r.id === "a-fond" ? "cool" : "happy",
                         });
                       }}

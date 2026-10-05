@@ -46,6 +46,7 @@ Une agence veut annoncer un prix « typique » pour ce quartier, sans tromper pe
 
 DECLIC
 Voilà. Maintenant, tu sauras quand une moyenne ment un peu.
+@savage Tu sais maintenant quand une moyenne raconte n'importe quoi. Bien joué.
 
 FICHE: Moyenne et médiane
 RETENIR

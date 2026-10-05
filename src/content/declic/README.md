@@ -69,6 +69,40 @@ PIEGE
 Une confusion fréquente à éviter (facultatif — enlevez tout le bloc PIEGE si aucun piège net).
 ```
 
+## Donner une voix Savage à un texte (facultatif)
+
+L'élève choisit son Braise : **Chill** (doux, rassurant) ou **Savage** (direct, second degré, piques
+amicales). Le texte écrit tel quel dans le fichier sert pour les deux. Pour qu'un passage sonne
+différemment en Savage, ajoutez juste en dessous une ligne `@savage` :
+
+```
+SITUATION
+Imagine une pizza coupée en 2 parts égales. Tu manges 1 part.
+@savage Une pizza, 2 parts, t'en manges 1. Rien de compliqué (pour l'instant).
+
+CHOIX
+Combien de parts pour manger pareil sur une pizza coupée en 4 ?
+- 1 part => Pas tout à fait : sur 4 parts, 1 seule c'est moins que sur 2.
+@savage Une seule part sur 4 ? Elle est deux fois plus petite que ta moitié.
+~ Une explication vraiment différente, montrée si l'élève ne comprend pas.
+- [correct] 2 parts => Exactement !
+
+DECLIC
+Voilà. Maintenant t'as capté les fractions équivalentes.
+@savage Fractions équivalentes : captées. Les pizzas te remercient.
+```
+
+- Une ligne `@savage` (ou `@chill`, pour réécrire la version douce) se met **juste sous** le texte
+  qu'elle remplace : une SITUATION, la question d'un CHOIX, la réaction d'une option (avant ou
+  après son `~`), une REVELATION, une REFORMULATION, le DECLIC. Pas de ligne vide entre les deux.
+- **Seule la voix de Braise change.** Les explications (`~`), le titre de la REVELATION et la FICHE
+  restent un seul texte : un fait ne change pas avec l'humeur. Une réaction Savage chambre la
+  situation, jamais l'élève ni son erreur.
+- Aucune obligation de tout traduire : un passage sans ligne `@savage` garde son texte pour les
+  deux tons. Seule exigence : **le DECLIC final doit avoir sa ligne `@savage`**, pour que le ton se
+  sente dans chaque chapitre (vérifié par les tests).
+- `m1.txt` est l'exemple complet.
+
 ## Règles
 
 - **`NOTION: <id>`** doit être la toute première ligne (l'identifiant du chapitre — demandez-le

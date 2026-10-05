@@ -41,6 +41,7 @@ Comment savoir si CE triangle est vraiment rectangle ?
 
 DECLIC
 Voilà. Tu sais maintenant reconnaître — et utiliser — un triangle rectangle rien qu'avec des calculs.
+@savage Un triangle ne peut plus te mentir : tes calculs savent s'il est rectangle.
 
 FICHE: Le théorème de Pythagore
 RETENIR

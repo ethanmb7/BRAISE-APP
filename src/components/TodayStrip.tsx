@@ -1,4 +1,6 @@
 import { ArrowRight, Check, Flame, Sparkles } from "lucide-react";
+import { COPY } from "@/lib/copy";
+import { useTone } from "@/lib/useTone";
 
 interface TodayStripProps {
   /** Number of consecutive days completed before today. The detailed count remains available in
@@ -30,14 +32,17 @@ export function TodayStrip({
   onContinue,
   onShare,
 }: TodayStripProps) {
+  const { t } = useTone();
   const goalMet = dailyGoalMet || remaining === 0;
   const allDone = goalMet && dueCount === 0;
   const progressLabel = goalMet ? "Objectif du jour validé" : `${goalPct}% de ton objectif du jour`;
-  const rhythmLine = goalMet
-    ? streak > 0
-      ? `Belle régularité : ta série continue.`
-      : `Ton objectif du jour est validé.`
-    : `Encore ${remaining} XP pour boucler ta journée.`;
+  const rhythmLine = t(
+    goalMet
+      ? streak > 0
+        ? COPY.home.rhythmMetWithStreak
+        : COPY.home.rhythmMet
+      : COPY.home.rhythmRemaining(remaining),
+  );
 
   return (
     <section
@@ -92,7 +97,7 @@ export function TodayStrip({
               className="mt-3 inline-flex min-h-10 items-center gap-1.5 rounded-xl border-2 border-black bg-white px-3 py-2 text-sm font-black text-black shadow-[2px_2px_0px_0px_#000] transition-transform active:translate-y-[2px] active:shadow-none"
             >
               <Sparkles size={15} />
-              Revoir {dueCount} notion{dueCount > 1 ? "s" : ""}
+              {t(COPY.home.reviewDue(dueCount))}
               <ArrowRight size={15} />
             </button>
           )}
@@ -104,7 +109,7 @@ export function TodayStrip({
               className="mt-3 inline-flex min-h-10 items-center gap-1.5 rounded-xl border-2 border-black bg-white px-3 py-2 text-sm font-black text-black shadow-[2px_2px_0px_0px_#000] transition-transform active:translate-y-[2px] active:shadow-none"
             >
               <Sparkles size={15} />
-              Garder ce moment
+              {t(COPY.home.keepMoment)}
             </button>
           )}
         </div>

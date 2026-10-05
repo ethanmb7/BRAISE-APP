@@ -46,6 +46,7 @@ Où est passée l'énergie de mouvement du vélo ?
 
 DECLIC
 Voilà. Maintenant, tu ne diras plus que l'énergie disparaît : tu chercheras où elle est partie.
+@savage L'énergie ne disparaît pas, elle se planque. Maintenant, tu sais où chercher.
 
 FICHE: La conservation de l'énergie
 RETENIR

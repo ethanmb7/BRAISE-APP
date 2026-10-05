@@ -44,6 +44,7 @@ Quel type de flux est-ce ?
 
 DECLIC
 Voilà. Maintenant, tu vois la mondialisation dans ta poche et dans ton fil d'actu.
+@savage La mondialisation, tu la vois partout. Surtout dans ta poche.
 
 FICHE: La mondialisation
 RETENIR

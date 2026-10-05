@@ -5,6 +5,8 @@ import { SUBJECTS } from "@/data";
 import { sfx } from "@/lib/sound";
 import { useApp } from "@/store";
 import { resolveChapters } from "@/lib/progress";
+import { COPY } from "@/lib/copy";
+import { useTone } from "@/lib/useTone";
 
 const stagger = {
   hidden: {},
@@ -19,6 +21,7 @@ const item = {
 /** The voluntary exploration space: Home recommends; Matières lets the student choose. */
 export function SubjectsView() {
   const { state, openSubject } = useApp();
+  const { t } = useTone();
 
   const decks: SubjectDeckItem[] = SUBJECTS.map((subject) => {
     const chapters = resolveChapters(subject.chapters, state.completedChapters);
@@ -48,7 +51,7 @@ export function SubjectsView() {
           <div>
             <p>Ton espace libre</p>
             <h1>Tes matières</h1>
-            <span>Choisis ce que tu veux comprendre aujourd’hui.</span>
+            <span>{t(COPY.home.subjectsIntro)}</span>
           </div>
         </motion.header>
 

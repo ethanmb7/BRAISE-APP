@@ -7,6 +7,8 @@ import { fireConfetti } from "@/lib/confetti";
 import { recordDeclicMemory, type DeclicScript } from "@/lib/declic";
 import { DeclicTimeline } from "@/components/declic/DeclicTimeline";
 import { DeclicVisualScene } from "@/components/declic/DeclicVisualScene";
+import { COPY } from "@/lib/copy";
+import { useTone } from "@/lib/useTone";
 
 const SPRING = { type: "spring", stiffness: 380, damping: 32 } as const;
 // A little bouncier than SPRING and paired with a bigger exit throw — cards should feel like
@@ -33,6 +35,8 @@ export function DeclicMode({
   onComplete: () => void;
 }) {
   const reducedMotion = useReducedMotion();
+  // Braise's own lines follow the student's tone; explanations and the fiche stay as written.
+  const { t, authored } = useTone();
   const [index, setIndex] = useState(0);
   const [pickedId, setPickedId] = useState<string | null>(null);
   const [thinking, setThinking] = useState(false);
@@ -150,7 +154,7 @@ export function DeclicMode({
             {...cardMotion}
           >
             <DeclicAsk mood="happy" scene="story">
-              {card.text}
+              {authored(card.text, card.variants)}
             </DeclicAsk>
             {card.visual?.kind === "timeline" && <DeclicTimeline visual={card.visual} />}
             <button type="button" className="declic-cta" onClick={advance}>
@@ -172,7 +176,7 @@ export function DeclicMode({
               mood={!pickedOption ? "eager" : pickedOption.correct ? "proud" : "hesitant"}
               bump={!pickedOption ? undefined : pickedOption.correct ? "correct" : "wrong"}
             >
-              {card.prompt}
+              {authored(card.prompt, card.variants)}
             </DeclicAsk>
             <DeclicVisualScene
               chapterId={script.chapterId}
@@ -209,7 +213,7 @@ export function DeclicMode({
                   setShowNudge((visible) => !visible);
                 }}
               >
-                <HelpCircle size={16} /> Je bloque un peu
+                <HelpCircle size={16} /> {t(COPY.declic.stuck)}
               </button>
             )}
             {showNudge && !pickedId && (
@@ -219,8 +223,7 @@ export function DeclicMode({
                 initial={reducedMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                Pas besoin d’être sûr. Choisis la piste qui te semble la moins fausse — je rebondis
-                dessus.
+                {t(COPY.declic.nudge)}
               </motion.p>
             )}
             {pickedOption && (
@@ -236,7 +239,7 @@ export function DeclicMode({
                 ) : (
                   <>
                     <p className="declic-bubble declic-bubble--reaction" aria-live="polite">
-                      {pickedOption.reaction}
+                      {authored(pickedOption.reaction, pickedOption.variants)}
                     </p>
                     {showAlt && pickedOption.altExplanation && (
                       <p className="declic-bubble declic-bubble--alt" aria-live="polite">
@@ -246,7 +249,7 @@ export function DeclicMode({
                     <div className="declic-step-actions">
                       {!showAlt && !pickedOption.correct && pickedOption.altExplanation && (
                         <button type="button" className="declic-link" onClick={explainDifferently}>
-                          J'ai toujours pas compris
+                          {t(COPY.declic.stillLost)}
                         </button>
                       )}
                       <button type="button" className="declic-cta" onClick={advance}>
@@ -270,7 +273,7 @@ export function DeclicMode({
           >
             <DeclicAsk mood="proud" scene="reveal">
               <span className="declic-reveal-kicker">{card.kicker}</span>
-              {card.text}
+              {authored(card.text, card.variants)}
             </DeclicAsk>
             {card.visual?.kind === "timeline" && <DeclicTimeline visual={card.visual} />}
             <button type="button" className="declic-cta" onClick={advance}>
@@ -282,13 +285,13 @@ export function DeclicMode({
         {card.kind === "reformulation" && (
           <motion.div key={index} className="declic-step" {...cardMotion}>
             <DeclicAsk mood="eager" scene="reformulate">
-              {card.prompt}
+              {authored(card.prompt, card.variants)}
             </DeclicAsk>
             <textarea
               className="declic-textarea"
               value={reformulation}
               onChange={(e) => setReformulation(e.target.value)}
-              placeholder="Avec tes mots…"
+              placeholder={t(COPY.declic.reformulatePlaceholder)}
               aria-label={card.prompt}
               rows={3}
               autoFocus
@@ -326,7 +329,7 @@ export function DeclicMode({
               <BraiseMascot size={104} mood="proud" />
             </motion.div>
             <span className="declic-moment-kicker">🔥 déclic</span>
-            <p className="declic-moment-line">{card.line}</p>
+            <p className="declic-moment-line">{authored(card.line, card.variants)}</p>
             <button type="button" className="declic-cta" onClick={advance}>
               Suite <ArrowRight size={18} />
             </button>
@@ -341,7 +344,7 @@ export function DeclicMode({
             tabIndex={-1}
             {...cardMotion}
           >
-            <span className="declic-fiche-kicker">🔥 ce que ton prof attend de toi</span>
+            <span className="declic-fiche-kicker">{t(COPY.declic.ficheKicker)}</span>
             <h2 className="declic-fiche-title">{card.title}</h2>
             <div className="declic-fiche-section is-retenir">
               <span className="declic-fiche-label">À retenir</span>

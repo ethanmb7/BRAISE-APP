@@ -1,4 +1,6 @@
 import { X, ChevronRight, ShieldCheck } from "lucide-react";
+import { COPY } from "@/lib/copy";
+import { useTone } from "@/lib/useTone";
 
 interface MissedCardsBannerProps {
   /** Real count of FLASHCARDS whose last review was judged wrong (cardReviews[id].lastConfidence
@@ -17,6 +19,7 @@ interface MissedCardsBannerProps {
 // notions that can be secured calmly, so the optional review path remains supportive rather
 // than competing with, or emotionally punishing, the daily mission.
 export function MissedCardsBanner({ count, onOpen, onDismiss }: MissedCardsBannerProps) {
+  const { t } = useTone();
   return (
     <div className="relative">
       <span
@@ -41,10 +44,10 @@ export function MissedCardsBanner({ count, onOpen, onDismiss }: MissedCardsBanne
             <ShieldCheck size={22} strokeWidth={2.5} className="flex-shrink-0 text-[#151821]" />
             <span>
               <b className="block font-display text-lg font-black leading-tight text-[#151821]">
-                À sécuriser
+                {t(COPY.home.missedTitle)}
               </b>
               <span className="text-sm font-bold text-[#151821]/75">
-                Revoir {count} notion{count > 1 ? "s" : ""}, sans pression.
+                {t(COPY.home.missedSub(count))}
               </span>
             </span>
           </div>

@@ -10,6 +10,7 @@
 // touching this file. See src/content/declic/README.md for the format, src/lib/declicParser.ts
 // for the parser, and `npm run declic:check` to validate every file before it ships.
 import { parseDeclicScript } from "@/lib/declicParser";
+import type { ToneVariants } from "@/lib/tone";
 
 export type DeclicVisual = {
   kind: "timeline";
@@ -22,6 +23,8 @@ export type DeclicChoiceOption = {
   correct?: boolean;
   /** What Braise says back the instant this option is tapped — never a bare "faux". */
   reaction: string;
+  /** The same reaction in another tone (`@savage …` under the option); absent = the base one. */
+  variants?: ToneVariants;
   /** A genuinely different angle on the same idea, offered only if the student taps "j'ai
    *  toujours pas compris" after this reaction — never the same explanation said more slowly. */
   altExplanation?: string;
@@ -29,17 +32,23 @@ export type DeclicChoiceOption = {
 
 export type DeclicCard =
   /** Braise sets the scene. One line, then "Suite". */
-  | { kind: "situation"; text: string; visual?: DeclicVisual }
+  | { kind: "situation"; text: string; variants?: ToneVariants; visual?: DeclicVisual }
   /** The student takes a position before anything is explained — the question opens the notion,
    *  it doesn't close it. */
-  | { kind: "choice"; prompt: string; options: DeclicChoiceOption[]; visual?: DeclicVisual }
+  | {
+      kind: "choice";
+      prompt: string;
+      variants?: ToneVariants;
+      options: DeclicChoiceOption[];
+      visual?: DeclicVisual;
+    }
   /** The name/definition/rule, shown only once the student has already built the idea. */
-  | { kind: "reveal"; kicker: string; text: string; visual?: DeclicVisual }
+  | { kind: "reveal"; kicker: string; text: string; variants?: ToneVariants; visual?: DeclicVisual }
   /** Explaining it back, in the student's own words — the one part of the old method kept
    *  deliberately: retrieval in your own words is real evidence of understanding, a tap isn't. */
-  | { kind: "reformulation"; prompt: string }
+  | { kind: "reformulation"; prompt: string; variants?: ToneVariants }
   /** The payoff. Full-bleed, same theatrical weight regardless of which notion led here. */
-  | { kind: "declic"; line: string }
+  | { kind: "declic"; line: string; variants?: ToneVariants }
   /** "Ce que ton prof attend de toi" — the bridge from "j'ai compris" to "je sais l'écrire au
    *  contrôle". Always the last card: BRAISE stays serious about the bac even while the way there
    *  is anti-scolaire. */

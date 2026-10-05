@@ -48,6 +48,7 @@ Dans h(x) = −2x + 20, que représente le −2 ?
 
 DECLIC
 Voilà. Maintenant, une droite, tu la lis comme un départ et un rythme.
+@savage Une droite, c'est un départ et un rythme. Tu lis ça les yeux fermés.
 
 FICHE: Fonction affine
 RETENIR

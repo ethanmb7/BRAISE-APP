@@ -162,3 +162,67 @@ describe("parseDeclicScript", () => {
     });
   });
 });
+
+describe("tone variants (@savage / @chill)", () => {
+  const withVariants = VALID.replace(
+    "SITUATION\nLe décor.",
+    "SITUATION\nLe décor.\n@savage Le décor, sans chichis.",
+  )
+    .replace(
+      "- Mauvaise => Réaction un.\n~ Une autre façon de l'expliquer.",
+      "- Mauvaise => Réaction un.\n@savage Raté, mais avec panache.\n~ Une autre façon de l'expliquer.",
+    )
+    .replace("DECLIC\nVoilà.", "DECLIC\nVoilà.\n@savage Voilà. Enfin.");
+
+  it("attaches the variant to the block it follows, and keeps the base text", () => {
+    const [situation, choice, , declic] = parseDeclicScript(withVariants, "t.txt").cards;
+    if (situation.kind !== "situation") throw new Error("expected a situation");
+    expect(situation.text).toBe("Le décor.");
+    expect(situation.variants).toEqual({ savage: "Le décor, sans chichis." });
+    if (declic.kind !== "declic") throw new Error("expected a declic");
+    expect(declic.line).toBe("Voilà.");
+    expect(declic.variants?.savage).toBe("Voilà. Enfin.");
+    if (choice.kind !== "choice") throw new Error("expected a choice");
+    expect(choice.variants).toBeUndefined();
+  });
+
+  it("reads an option's variant next to its reaction, before or after the ~ explanation", () => {
+    const choice = parseDeclicScript(withVariants, "t.txt").cards[1];
+    if (choice.kind !== "choice") throw new Error("expected a choice");
+    const wrong = choice.options[0];
+    expect(wrong.reaction).toBe("Réaction un.");
+    expect(wrong.variants?.savage).toBe("Raté, mais avec panache.");
+    expect(wrong.altExplanation).toBe("Une autre façon de l'expliquer.");
+    expect(choice.options[1].variants).toBeUndefined();
+
+    const after = withVariants.replace(
+      "@savage Raté, mais avec panache.\n~ Une autre façon de l'expliquer.",
+      "~ Une autre façon de l'expliquer.\n@savage Raté, mais avec panache.",
+    );
+    const reordered = parseDeclicScript(after, "t.txt").cards[1];
+    if (reordered.kind !== "choice") throw new Error("expected a choice");
+    expect(reordered.options[0].variants?.savage).toBe("Raté, mais avec panache.");
+    expect(reordered.options[0].altExplanation).toBe("Une autre façon de l'expliquer.");
+  });
+
+  it("does not swallow an @ line into the paragraph above it", () => {
+    const [situation] = parseDeclicScript(withVariants, "t.txt").cards;
+    if (situation.kind !== "situation") throw new Error("expected a situation");
+    expect(situation.text).not.toContain("@savage");
+  });
+
+  it("accepts both tones on one block", () => {
+    const both = VALID.replace(
+      "DECLIC\nVoilà.",
+      "DECLIC\nVoilà.\n@chill Voilà, doucement.\n@savage Voilà. Enfin.",
+    );
+    const declic = parseDeclicScript(both, "t.txt").cards[3];
+    if (declic.kind !== "declic") throw new Error("expected a declic");
+    expect(declic.variants).toEqual({ chill: "Voilà, doucement.", savage: "Voilà. Enfin." });
+  });
+
+  it("rejects two lines for the same tone on one block", () => {
+    const dup = VALID.replace("DECLIC\nVoilà.", "DECLIC\nVoilà.\n@savage Un.\n@savage Deux.");
+    expect(parseError(dup)).toMatch(/@savage/);
+  });
+});

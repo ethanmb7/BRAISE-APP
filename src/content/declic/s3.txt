@@ -45,6 +45,7 @@ Comment est-ce possible ?
 
 DECLIC
 Voilà. Maintenant, tu sais comment un caractère peut sauter une génération.
+@savage Un caractère qui saute une génération : tu sais comment. La génétique, c'est pas de la magie.
 
 FICHE: Gène et allèles
 RETENIR

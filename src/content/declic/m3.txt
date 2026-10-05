@@ -49,6 +49,7 @@ Depuis combien de mois ?
 
 DECLIC
 Voilà. Maintenant, une équation, c'est juste une balance qu'on garde en équilibre.
+@savage Une équation, c'est une balance, et tu l'as à l'œil. Elle ne penchera plus.
 
 FICHE: Résoudre une équation
 RETENIR

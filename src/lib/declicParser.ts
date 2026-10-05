@@ -3,6 +3,7 @@
 // src/content/declic/README.md for the format itself; this file is the parser + validator, not
 // documentation.
 import type { DeclicCard, DeclicChoiceOption, DeclicScript, DeclicVisual } from "@/lib/declic";
+import type { ToneVariants } from "@/lib/tone";
 
 // Plain field assignments, not TypeScript's "parameter properties" shortcut: Node's native
 // type-stripping (used by scripts/check-declic-content.mjs to run this file with no build step)
@@ -36,6 +37,11 @@ const VISUAL_ITEM_RE = /^-\s*(\d{3,4})\s*:\s*(.+)$/;
 // A second, different explanation for a wrong option — shown only if the student says the first
 // reaction didn't land ("j'ai toujours pas compris"), never surfaced automatically.
 const ALT_EXPLANATION_RE = /^~\s*(.+)$/;
+// The same line in another tone: `@savage <texte>` right under the text it replaces. Base text is
+// the default for every tone; a tone with no `@` line just uses it. Only Braise's own voice takes
+// variants (situations, questions, reactions, the closing line) — explanations, the REVELATION
+// title and the FICHE stay one neutral text, because a fact does not change with the mood.
+const VARIANT_RE = /^@(chill|savage)\s+(.+)$/;
 
 export function parseDeclicScript(rawText: string, source: string): DeclicScript {
   const lines = rawText.replace(/\r\n/g, "\n").split("\n");
@@ -60,7 +66,8 @@ export function parseDeclicScript(rawText: string, source: string): DeclicScript
         KEYWORD_RE.test(l) ||
         OPTION_RE.test(l) ||
         VISUAL_ITEM_RE.test(l) ||
-        ALT_EXPLANATION_RE.test(l)
+        ALT_EXPLANATION_RE.test(l) ||
+        VARIANT_RE.test(l)
       )
         break;
       parts.push(l.trim());
@@ -68,6 +75,19 @@ export function parseDeclicScript(rawText: string, source: string): DeclicScript
     }
     if (parts.length === 0) err("attendu du texte ici, ligne vide trouvée à la place");
     return parts.join(" ");
+  };
+
+  // Consumes the `@tone …` lines that immediately follow a block, if any.
+  const readVariants = (): ToneVariants | undefined => {
+    let variants: ToneVariants | undefined;
+    for (;;) {
+      const m = peek().match(VARIANT_RE);
+      if (!m) return variants;
+      const tone = m[1] as keyof ToneVariants;
+      if (variants?.[tone]) err(`deux lignes "@${tone}" pour le même texte`);
+      variants = { ...variants, [tone]: m[2].trim() };
+      i++;
+    }
   };
 
   const KEYWORD_RE =
@@ -122,11 +142,18 @@ export function parseDeclicScript(rawText: string, source: string): DeclicScript
     if (line === "SITUATION") {
       i++;
       const text = readText();
-      cards.push({ kind: "situation", text, visual: pendingVisual });
+      const variants = readVariants();
+      cards.push({
+        kind: "situation",
+        text,
+        ...(variants ? { variants } : {}),
+        visual: pendingVisual,
+      });
       pendingVisual = undefined;
     } else if (line === "CHOIX") {
       i++;
       const prompt = readText();
+      const promptVariants = readVariants();
       const options: DeclicChoiceOption[] = [];
       let correctCount = 0;
       const seenIds = new Set<string>();
@@ -139,11 +166,17 @@ export function parseDeclicScript(rawText: string, source: string): DeclicScript
         if (!reaction) err(`l'option "${label}" n'a pas de réaction après "=>"`);
         i++;
         let altExplanation: string | undefined;
-        const altMatch = peek().match(ALT_EXPLANATION_RE);
-        if (altMatch) {
-          altExplanation = altMatch[1].trim();
-          if (!altExplanation) err('"~" doit être suivi d\'une explication');
-          i++;
+        let variants: ToneVariants | undefined;
+        // After an option: its `@tone` reaction lines and its `~` second explanation, either order.
+        for (;;) {
+          const altMatch = peek().match(ALT_EXPLANATION_RE);
+          if (altMatch && altExplanation === undefined) {
+            altExplanation = altMatch[1].trim();
+            if (!altExplanation) err('"~" doit être suivi d\'une explication');
+            i++;
+          } else if (VARIANT_RE.test(peek()) && variants === undefined) {
+            variants = readVariants();
+          } else break;
         }
         let id = slugify(label);
         while (seenIds.has(id)) id += "-2";
@@ -155,6 +188,7 @@ export function parseDeclicScript(rawText: string, source: string): DeclicScript
           reaction,
           ...(correct ? { correct: true } : {}),
           ...(altExplanation ? { altExplanation } : {}),
+          ...(variants ? { variants } : {}),
         });
       }
       if (options.length < 2)
@@ -163,23 +197,38 @@ export function parseDeclicScript(rawText: string, source: string): DeclicScript
         err(
           `une carte CHOIX doit avoir exactement une option marquée [correct] (trouvé ${correctCount})`,
         );
-      cards.push({ kind: "choice", prompt, options, visual: pendingVisual });
+      cards.push({
+        kind: "choice",
+        prompt,
+        ...(promptVariants ? { variants: promptVariants } : {}),
+        options,
+        visual: pendingVisual,
+      });
       pendingVisual = undefined;
     } else if (/^REVELATION:/.test(line)) {
       const kicker = line.slice(line.indexOf(":") + 1).trim();
       if (!kicker) err('"REVELATION:" doit être suivi d\'un titre court sur la même ligne');
       i++;
       const text = readText();
-      cards.push({ kind: "reveal", kicker, text, visual: pendingVisual });
+      const variants = readVariants();
+      cards.push({
+        kind: "reveal",
+        kicker,
+        text,
+        ...(variants ? { variants } : {}),
+        visual: pendingVisual,
+      });
       pendingVisual = undefined;
     } else if (line === "REFORMULATION") {
       i++;
       const prompt = readText();
-      cards.push({ kind: "reformulation", prompt });
+      const variants = readVariants();
+      cards.push({ kind: "reformulation", prompt, ...(variants ? { variants } : {}) });
     } else if (line === "DECLIC") {
       i++;
       const declicLine = readText();
-      cards.push({ kind: "declic", line: declicLine });
+      const variants = readVariants();
+      cards.push({ kind: "declic", line: declicLine, ...(variants ? { variants } : {}) });
     } else if (/^FICHE:/.test(line)) {
       const title = line.slice(line.indexOf(":") + 1).trim();
       if (!title) err('"FICHE:" doit être suivi d\'un titre sur la même ligne');

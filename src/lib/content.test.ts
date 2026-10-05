@@ -51,6 +51,13 @@ describe("Déclic lessons", () => {
     }
   });
 
+  it("gives every lesson's closing line a Savage voice, so the tone is felt in every chapter", () => {
+    for (const script of Object.values(DECLIC_SCRIPTS)) {
+      const closing = script.cards.find((c) => c.kind === "declic");
+      expect(closing?.kind === "declic" && closing.variants?.savage, script.chapterId).toBeTruthy();
+    }
+  });
+
   it("keeps every answer tile short enough for a phone", () => {
     for (const script of Object.values(DECLIC_SCRIPTS)) {
       for (const card of script.cards) {
