@@ -23,7 +23,7 @@ Les verbes réguliers prennent -ED au passé (play → played). Les verbes irré
 
 CHOIX
 Comment sait-on si un verbe est régulier ou irrégulier ?
-- [correct] Il n'y a pas de règle, ça s'apprend par cœur au fur et à mesure => Exact ! Il faut mémoriser les irréguliers un par un — ils reviennent souvent.
+- [correct] Aucune règle, ça s'apprend par cœur au fur et à mesure => Exact ! Il faut mémoriser les irréguliers un par un — ils reviennent souvent.
 - Un verbe court est toujours irrégulier => Non — « play », « walk », « watch » sont courts et pourtant bien réguliers.
 
 REFORMULATION

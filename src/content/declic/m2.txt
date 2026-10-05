@@ -35,7 +35,7 @@ Un triangle a des côtés 5, 6 et 8 — mais personne ne t'a dit s'il est rectan
 
 CHOIX
 Comment savoir si CE triangle est vraiment rectangle ?
-- Il l'est forcément, tous les triangles marchent avec Pythagore => Non — le théorème ne marche QUE sur un triangle déjà rectangle, sinon le calcul ne tombe pas juste.
+- Pas besoin : Pythagore marche pour tous les triangles => Non — le théorème ne marche QUE sur un triangle déjà rectangle, sinon le calcul ne tombe pas juste.
 ~ Pythagore n'est pas une formule magique pour tous les triangles — c'est un test réservé aux triangles rectangles. Sur un triangle quelconque, a² + b² ne fait pas forcément c² : ça ne veut rien dire du tout.
 - [correct] Je vérifie si 5² + 6² = 8² => Exact ! 25 + 36 = 61, alors que 8² = 64. Ce n'est pas égal : ce triangle n'est PAS rectangle.
 
