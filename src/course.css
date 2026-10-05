@@ -1,0 +1,379 @@
+/* The course service's screens: the chapter list, the course player's extras on top of the Déclic
+   look (declic.css), and the review player. Same grammar as the rest of BRAISE — 2.5px ink borders,
+   hard offset shadows, flat fills — and the same tokens, so a course Déclic and an older one
+   read as the same app. */
+
+/* ----- shared by the players ------------------------------------------------------------- */
+
+/* Course texts are written on several lines (a set, then its notation, then a note): keep them. */
+.course-bubble {
+  white-space: pre-line;
+}
+
+.course-choices--duo {
+  grid-template-columns: 1fr 1fr;
+}
+.course-choices--trio {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.course-tile {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  min-height: 58px;
+}
+.course-choices--duo .course-tile,
+.course-choices--trio .course-tile,
+.course-tile--visual {
+  justify-content: center;
+  padding: 12px 10px;
+  text-align: center;
+}
+/* The arrow is for a list of answers; a pair, a trio or a picture does not want it. */
+.course-choices--duo .declic-tile::after,
+.course-choices--trio .declic-tile::after,
+.course-tile--visual::after {
+  content: none;
+}
+.course-tile-label {
+  font-weight: 800;
+  line-height: 1.2;
+}
+.course-choices--duo .course-tile-label {
+  font-size: 1.15rem;
+}
+.course-choices--trio .course-tile-label {
+  font-size: 1.35rem;
+}
+/* Shown next to the colour, never instead of it: a tick for the expected answer, a turning arrow
+   ("look again") for another path, a dot for an answer that is not graded. */
+.course-tile-mark {
+  position: absolute;
+  top: 5px;
+  right: 9px;
+  font: 900 1rem/1 var(--font-impact);
+}
+.declic-tile.is-picked {
+  background: color-mix(in srgb, var(--sun) 42%, var(--paper));
+}
+.declic-tile.is-picked:disabled {
+  opacity: 1;
+}
+
+.course-replay-note {
+  position: relative;
+  z-index: 3;
+  margin: -6px 0 12px;
+  padding: 7px 11px;
+  border: 2px dashed var(--neo-ink);
+  border-radius: 10px;
+  background: var(--paper);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* ----- boxes inside boxes (the set diagram) ---------------------------------------------- */
+
+.course-boxes {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.course-box {
+  position: relative;
+  min-width: 68px;
+  padding: 24px 12px 12px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--sun) 40%, var(--paper));
+  text-align: center;
+}
+.course-box--depth-1 {
+  background: color-mix(in srgb, var(--mint) 45%, var(--paper));
+}
+.course-box--depth-2 {
+  background: color-mix(in srgb, var(--coral) 35%, var(--paper));
+}
+.course-box-label {
+  position: absolute;
+  top: 3px;
+  left: 9px;
+  font: 900 1.05rem/1.2 var(--font-impact);
+}
+.course-box-children {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+.course-box-children > .course-box {
+  padding-top: 22px;
+}
+
+/* ----- the validation card ----------------------------------------------------------------- */
+
+.course-subject {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 12px 14px 14px;
+  border: 3px solid var(--neo-ink);
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: 4px 4px 0 var(--neo-ink);
+}
+.course-subject-step {
+  font:
+    800 0.7rem/1 "IBM Plex Mono",
+    monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.course-subject-value {
+  font: 900 3.1rem/1 var(--font-impact);
+}
+.course-score {
+  margin: 0;
+  text-align: center;
+  font-weight: 700;
+}
+.course-score b {
+  font: 900 2.3rem/1 var(--font-impact);
+}
+.course-actions {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+
+/* ----- the summary -------------------------------------------------------------------------- */
+
+.course-summary {
+  display: grid;
+  gap: 12px;
+}
+.course-summary-flame {
+  display: flex;
+  justify-content: center;
+}
+.course-summary-text {
+  margin: 0;
+  white-space: pre-line;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+/* ----- the chapter screen --------------------------------------------------------------------- */
+
+.course-chapter {
+  display: grid;
+  gap: 14px;
+  padding-bottom: 28px;
+}
+.course-chapter-head {
+  padding: 4px 2px 0;
+}
+.course-chapter-kicker {
+  font:
+    800 0.68rem/1 "IBM Plex Mono",
+    monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.course-chapter-head h1 {
+  margin: 6px 0 4px;
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1.9rem;
+  font-weight: 800;
+  line-height: 1.05;
+}
+.course-chapter-head p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+.course-list {
+  display: grid;
+  gap: 14px;
+}
+.course-item {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  padding: 14px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: 4px 4px 0 var(--neo-ink);
+}
+.course-item-num {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 50%;
+  background: var(--sun);
+  font: 900 1.2rem/1 var(--font-impact);
+}
+.course-item--deck .course-item-num {
+  background: var(--mint);
+}
+.course-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.course-item-kicker {
+  font:
+    800 0.66rem/1 "IBM Plex Mono",
+    monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.course-item h2 {
+  margin: 6px 0 4px;
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1.12rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+.course-item-meta {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+.course-item-note {
+  margin: 8px 0 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--coral-2);
+}
+.course-item-cta {
+  margin-top: 12px;
+}
+
+.course-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border: 2px solid var(--neo-ink);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--neo-ink);
+  font:
+    800 0.64rem/1.1 "IBM Plex Mono",
+    monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.course-status--in_progress {
+  background: color-mix(in srgb, var(--sun) 55%, var(--paper));
+}
+.course-status--discovered {
+  background: color-mix(in srgb, var(--violet) 22%, var(--paper));
+}
+.course-status--understood {
+  background: var(--mint);
+}
+.course-status--needs_reinforcement {
+  background: color-mix(in srgb, var(--coral) 50%, var(--paper));
+}
+.course-status--mastered {
+  background: var(--sun);
+}
+
+.course-coverage {
+  padding: 12px 14px;
+  border: 2px solid color-mix(in srgb, var(--ink) 16%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--paper) 70%, transparent);
+  font-size: 0.84rem;
+}
+.course-coverage summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+.course-coverage ul {
+  display: grid;
+  gap: 10px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.course-coverage small {
+  display: block;
+  margin-top: 2px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.68rem;
+  color: var(--ink-soft);
+}
+
+/* ----- the entry on a subject's path ---------------------------------------------------------- */
+
+.course-path {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.course-path-title {
+  margin: 0;
+  font:
+    800 0.68rem/1 "IBM Plex Mono",
+    monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.course-card {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  padding: 14px 16px 14px 20px;
+  border: 2.5px solid var(--neo-ink);
+  border-left: 12px solid var(--subject-color, var(--sun));
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: 4px 4px 0 var(--neo-ink);
+  text-align: left;
+  transition: transform 0.12s ease;
+}
+.course-card:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--neo-ink);
+}
+.course-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.course-card-badge {
+  font:
+    800 0.66rem/1 "IBM Plex Mono",
+    monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.course-card-title {
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+.course-card-meta {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}

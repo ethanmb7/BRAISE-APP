@@ -1,0 +1,553 @@
+{
+  "id": "M2-ARI-D01",
+  "chapterId": "M2-ARI",
+  "order": 1,
+  "title": "Tous les nombres ne vivent pas dans la même boîte",
+  "version": "1.0",
+  "targetDurationSec": [150, 210],
+  "difficulty": {
+    "level": 1,
+    "label": "introduction"
+  },
+  "objective": "Je sais reconnaître les nombres de ℕ et de ℤ, et utiliser ∈ et ⊂ sans les confondre.",
+  "prerequisites": [
+    "reconnaître un nombre entier",
+    "reconnaître un nombre positif ou négatif",
+    "lire un nombre décimal"
+  ],
+  "detailedObjectives": [
+    "identifier les entiers naturels",
+    "identifier les entiers relatifs",
+    "savoir que 0 appartient à ℕ",
+    "comprendre que ℕ est inclus dans ℤ",
+    "lire et utiliser ∈",
+    "distinguer appartenance et inclusion",
+    "comprendre qu’un décimal non entier n’appartient ni à ℕ ni à ℤ"
+  ],
+  "coverage": [
+    {
+      "mappingId": "BO26-M2-ARI-CONT-01",
+      "coverage": "full"
+    },
+    {
+      "mappingId": "BO26-M2-VEL-APP-01",
+      "coverage": "introduced_and_practised"
+    },
+    {
+      "mappingId": "BO26-M2-VEL-INC-01",
+      "coverage": "introduced_and_practised"
+    },
+    {
+      "mappingId": "BO26-M2-VEL-NUMSET-01",
+      "coverage": "introduced_and_practised"
+    }
+  ],
+  "misconceptionIds": [
+    "n_starts_at_1",
+    "z_only_negatives",
+    "positive_means_natural",
+    "positive_decimal_in_z",
+    "membership_vs_inclusion",
+    "single_set_only",
+    "negative_in_n"
+  ],
+  "cards": [
+    {
+      "id": "M2-ARI-D01-C01",
+      "order": 1,
+      "type": "choice",
+      "objective": "Accroche : provoquer le besoin de classer les nombres.",
+      "text": "Ton jeu affiche deux nombres :\n12 pièces\net\n–3 places au classement\nLes deux sont des nombres entiers.\nMais est-ce qu’on les range exactement dans la même catégorie ?",
+      "gradeChoices": false,
+      "choices": [
+        {
+          "id": "A",
+          "label": "Oui, forcément",
+          "feedback": "🔥 Presque.\nIls ont bien un point commun : ce sont tous les deux des entiers.\nMais 12 appartient aussi à une famille plus petite dans laquelle –3 ne rentre pas.\nOn va voir laquelle."
+        },
+        {
+          "id": "B",
+          "label": "Non, jamais",
+          "feedback": "🔥 Ils sont quand même plus proches que tu ne le penses.\n12 et –3 sont tous les deux des entiers.\nLa différence, c’est que 12 appartient aussi à une famille plus petite."
+        },
+        {
+          "id": "C",
+          "label": "Ça dépend de la catégorie",
+          "correct": true,
+          "feedback": "🔥 Exactement.\nTout dépend de la “boîte” de nombres qu’on regarde.\nEt en maths, ces boîtes ont des noms très précis."
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D01-C02",
+      "order": 2,
+      "type": "choice",
+      "objective": "Faire sentir qu’une quantité qu’on compte ne peut pas être négative.",
+      "text": "🔥 Imagine maintenant que tu comptes le nombre de messages reçus aujourd’hui.\nTu peux en avoir :\n0, 1, 2, 3, 4, 5…\nParmi ces nombres, lequel ne pourrait jamais être ton nombre de messages reçus ?",
+      "continueLabel": "Voir la boîte",
+      "choices": [
+        {
+          "id": "A",
+          "label": "0",
+          "feedback": "🔥 0 fonctionne.\nZéro message, c’est triste pour le groupe WhatsApp… mais mathématiquement, ça marche très bien.\n0 fait partie des entiers naturels.",
+          "misconceptionId": "n_starts_at_1"
+        },
+        {
+          "id": "B",
+          "label": "8",
+          "feedback": "🔥 8 fonctionne aussi.\nOn peut parfaitement recevoir 8 messages.\nIl faut chercher le nombre qui n’a pas de sens pour compter une quantité."
+        },
+        {
+          "id": "C",
+          "label": "–2",
+          "correct": true,
+          "feedback": "🔥 Voilà.\nOn ne peut pas recevoir –2 messages.\nPour compter une quantité, on utilise :\n0, 1, 2, 3, 4…"
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D01-C03",
+      "order": 3,
+      "type": "reveal",
+      "objective": "Nommer ℕ : les entiers naturels, 0 compris.",
+      "text": "🔥 Cette première boîte s’appelle :\nℕ\nOn lit : “N”.\nElle contient les entiers naturels :\nℕ = {0 ; 1 ; 2 ; 3 ; 4 ; …}\nEn gros : les entiers qu’on utilise naturellement pour compter.",
+      "continueLabel": "OK, mais –3 alors ?"
+    },
+    {
+      "id": "M2-ARI-D01-C04",
+      "order": 4,
+      "type": "choice",
+      "objective": "Constater qu’un entier négatif n’est pas dans ℕ.",
+      "text": "🔥 Il fait –6 °C dehors.\nEst-ce que –6 appartient à ℕ ?",
+      "continueLabel": "Ouvrir la boîte suivante",
+      "choices": [
+        {
+          "id": "A",
+          "label": "Oui",
+          "feedback": "🔥 Pas dans ℕ.\nℕ commence à 0 puis continue :\n0, 1, 2, 3…\nIl n’y a aucun entier négatif dedans.",
+          "misconceptionId": "negative_in_n"
+        },
+        {
+          "id": "B",
+          "label": "Non",
+          "correct": true,
+          "feedback": "🔥 Exact.\n–6 est bien un entier, mais pas un entier naturel.\nIl nous faut donc une boîte plus grande."
+        },
+        {
+          "id": "C",
+          "label": "Seulement quand on parle de température",
+          "feedback": "🔥 Le contexte explique pourquoi on utilise –6, mais il ne change pas la nature du nombre.\n–6 reste le même nombre en température, en dette ou en altitude.\nEt il n’appartient pas à ℕ."
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D01-C05",
+      "order": 5,
+      "type": "reveal",
+      "objective": "Nommer ℤ : tous les entiers, négatifs, zéro et positifs.",
+      "text": "🔥 Voici la boîte qui accepte aussi les entiers négatifs :\nℤ\nℤ = {… ; –3 ; –2 ; –1 ; 0 ; 1 ; 2 ; 3 ; …}\nElle contient tous les entiers :\nnégatifs, zéro et positifs.",
+      "continueLabel": "Donc 12 est où ?"
+    },
+    {
+      "id": "M2-ARI-D01-C06",
+      "order": 6,
+      "type": "choice",
+      "objective": "Comprendre qu’un nombre peut appartenir à deux ensembles à la fois.",
+      "text": "🔥 On reprend 12.\nDans quelle boîte se trouve-t-il ?",
+      "choices": [
+        {
+          "id": "A",
+          "label": "Seulement dans ℕ",
+          "feedback": "🔥 12 est bien dans ℕ…\nmais regarde ℤ :\n… –2, –1, 0, 1, 2, 3…\nCette liste contient aussi tous les entiers positifs.\nDonc 12 est dans les deux.",
+          "misconceptionId": "single_set_only"
+        },
+        {
+          "id": "B",
+          "label": "Seulement dans ℤ",
+          "feedback": "🔥 12 est bien dans ℤ, mais il sert aussi parfaitement à compter.\nIl appartient donc également à ℕ.",
+          "misconceptionId": "single_set_only"
+        },
+        {
+          "id": "C",
+          "label": "Dans ℕ ET dans ℤ",
+          "correct": true,
+          "feedback": "🔥 Exact.\n12 appartient aux deux ensembles.\nC’est là que les “boîtes” deviennent intéressantes :\nℕ est entièrement contenue dans ℤ."
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D01-C07",
+      "order": 7,
+      "type": "choice",
+      "objective": "Voir ℕ contenue dans ℤ, puis nommer l’inclusion ℕ ⊂ ℤ.",
+      "text": "🔥 Si tous les nombres de ℕ se trouvent aussi dans ℤ…\nquelle image représente le mieux la situation ?",
+      "choices": [
+        {
+          "id": "A",
+          "label": "[ ℕ ] [ ℤ ]",
+          "feedback": "🔥 Si elles étaient séparées, 12 ne pourrait pas appartenir aux deux.\nPourtant 12 est naturel et entier.\nIl faut donc qu’une boîte soit contenue dans l’autre.",
+          "misconceptionId": "single_set_only",
+          "visual": {
+            "kind": "nested-boxes",
+            "ariaLabel": "Deux boîtes côte à côte, sans contact : la boîte ℕ et la boîte ℤ.",
+            "boxes": [
+              {
+                "label": "ℕ"
+              },
+              {
+                "label": "ℤ"
+              }
+            ]
+          }
+        },
+        {
+          "id": "B",
+          "label": "[ ℤ [ ℕ ] ]",
+          "correct": true,
+          "feedback": "🔥 C’est exactement ça.\nTout nombre naturel est aussi un entier.\nOn écrit :\nℕ ⊂ ℤ",
+          "visual": {
+            "kind": "nested-boxes",
+            "ariaLabel": "La boîte ℕ est dessinée à l’intérieur de la boîte ℤ.",
+            "boxes": [
+              {
+                "label": "ℤ",
+                "children": [
+                  {
+                    "label": "ℕ"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "C",
+          "label": "[ ℕ [ ℤ ] ]",
+          "feedback": "🔥 C’est dans l’autre sens.\nSi ℤ était dans ℕ, alors –6 serait naturel.\nOr –6 n’appartient pas à ℕ.",
+          "visual": {
+            "kind": "nested-boxes",
+            "ariaLabel": "La boîte ℤ est dessinée à l’intérieur de la boîte ℕ.",
+            "boxes": [
+              {
+                "label": "ℕ",
+                "children": [
+                  {
+                    "label": "ℤ"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D01-C08",
+      "order": 8,
+      "type": "choice",
+      "objective": "Écrire l’appartenance d’un nombre à un ensemble avec ∈.",
+      "text": "🔥 Les maths aiment éviter d’écrire trois kilomètres de texte.\nAu lieu de dire :\n“–4 appartient à l’ensemble ℤ”\non écrit…",
+      "choices": [
+        {
+          "id": "A",
+          "label": "–4 ∈ ℤ",
+          "correct": true,
+          "feedback": "🔥 Oui.\n–4 ∈ ℤ\nLe symbole ∈ veut dire :\n“appartient à”."
+        },
+        {
+          "id": "B",
+          "label": "–4 ⊂ ℤ",
+          "feedback": "🔥 Tu viens de tomber sur le piège principal.\n⊂ compare des ensembles entre eux.\n–4 est un nombre, pas un ensemble.\nPour dire qu’un nombre appartient à une boîte :\n–4 ∈ ℤ",
+          "misconceptionId": "membership_vs_inclusion"
+        },
+        {
+          "id": "C",
+          "label": "ℤ ∈ –4",
+          "feedback": "🔥 Les rôles sont inversés.\nC’est le nombre qui appartient à l’ensemble :\n–4 ∈ ℤ",
+          "misconceptionId": "membership_vs_inclusion"
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D01-C09",
+      "order": 9,
+      "type": "choice",
+      "objective": "Distinguer appartenance (nombre ∈ ensemble) et inclusion (ensemble ⊂ ensemble).",
+      "text": "🔥 Mini duel de symboles.\nLaquelle est correctement écrite ?",
+      "choices": [
+        {
+          "id": "A",
+          "label": "3 ⊂ ℕ",
+          "feedback": "🔥 3 est un nombre.\nPour un nombre dans un ensemble, on utilise ∈.\n3 ∈ ℕ",
+          "misconceptionId": "membership_vs_inclusion"
+        },
+        {
+          "id": "B",
+          "label": "3 ∈ ℕ",
+          "correct": true,
+          "feedback": "🔥 Carré.\n3 ∈ ℕ\nsignifie :\n“3 appartient à ℕ”."
+        },
+        {
+          "id": "C",
+          "label": "ℕ ∈ ℤ",
+          "feedback": "🔥 ℕ n’est pas un nombre : c’est un ensemble.\nPour dire que tous ses éléments sont contenus dans ℤ, on écrit :\nℕ ⊂ ℤ",
+          "misconceptionId": "membership_vs_inclusion"
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D01-C10",
+      "order": 10,
+      "type": "choice",
+      "objective": "Préfigurer Carré / Intox : 0 appartient à ℕ.",
+      "text": "🔥 Braise affirme :\n“0 n’est pas dans ℕ, parce que compter commence à 1.”\nTu lui réponds quoi ?",
+      "choices": [
+        {
+          "id": "A",
+          "label": "Carré",
+          "feedback": "🔥 Intox.\nDans le programme qu’on utilise ici :\n0 ∈ ℕ\nL’ensemble commence bien par :\n0, 1, 2, 3…",
+          "misconceptionId": "n_starts_at_1"
+        },
+        {
+          "id": "B",
+          "label": "Intox",
+          "correct": true,
+          "feedback": "🔥 Exact.\n0 ∈ ℕ\net puisque ℕ ⊂ ℤ :\n0 ∈ ℤ\naussi."
+        },
+        {
+          "id": "C",
+          "label": "Ça dépend",
+          "feedback": "🔥 Ici, pas de suspense.\nDans notre convention :\n0 ∈ ℕ\nDonc la phrase de Braise est Intox."
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D01-C11",
+      "order": 11,
+      "type": "choice",
+      "objective": "Constater qu’un décimal non entier n’est ni dans ℕ ni dans ℤ.",
+      "text": "🔥 Et 3,5 ?\nOù le ranges-tu ?",
+      "metadata": {
+        "note": "∉ est présenté ici en lecture : ce n’est pas l’objectif de maîtrise principal de ce Déclic."
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "Dans ℕ",
+          "feedback": "🔥 3,5 est positif, mais ça ne suffit pas.\nℕ ne contient que des entiers :\n0, 1, 2, 3, 4…\nPas 3,5.",
+          "misconceptionId": "positive_means_natural"
+        },
+        {
+          "id": "B",
+          "label": "Dans ℤ",
+          "feedback": "🔥 Même problème pour ℤ.\nℤ contient les entiers positifs et négatifs…\nmais toujours uniquement des entiers.",
+          "misconceptionId": "positive_decimal_in_z"
+        },
+        {
+          "id": "C",
+          "label": "Dans aucun des deux",
+          "correct": true,
+          "feedback": "🔥 Exact.\n3,5 n’est pas entier.\nDonc :\n3,5 ∉ ℕ\net\n3,5 ∉ ℤ\nOn rencontrera bientôt les boîtes qui l’accueillent."
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D01-C12",
+      "order": 12,
+      "type": "choice",
+      "objective": "Transfert : appliquer ∈ à une situation nouvelle (profondeur, –18 m).",
+      "text": "🔥 Nouveau cas.\nLe niveau d’un plongeur est :\n–18 m\nQuelle écriture est vraie ?",
+      "choices": [
+        {
+          "id": "A",
+          "label": "–18 ∈ ℕ",
+          "feedback": "🔥 –18 est négatif.\nIl ne peut donc pas appartenir à ℕ.\nMais il reste un entier.",
+          "misconceptionId": "negative_in_n"
+        },
+        {
+          "id": "B",
+          "label": "–18 ∈ ℤ",
+          "correct": true,
+          "feedback": "🔥 Oui.\n–18 est un entier négatif :\n–18 ∈ ℤ"
+        },
+        {
+          "id": "C",
+          "label": "ℤ ∈ –18",
+          "feedback": "🔥 Attention au sens.\nC’est –18 qui appartient à l’ensemble :\n–18 ∈ ℤ",
+          "misconceptionId": "membership_vs_inclusion"
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D01-C13",
+      "order": 13,
+      "type": "choice",
+      "objective": "Reformulation : choisir l’explication juste de ℕ, ℤ et de leur inclusion.",
+      "text": "🔥 Si tu devais l’expliquer à quelqu’un qui vient de rater le cours, tu dirais quoi ?",
+      "choices": [
+        {
+          "id": "A",
+          "label": "ℕ, c’est les positifs ; ℤ, c’est les négatifs.",
+          "feedback": "🔥 Il manque un truc important.\nℤ ne contient pas seulement les négatifs : il contient aussi 0 et tous les entiers positifs.\nDonc 7 appartient aux deux ensembles.",
+          "misconceptionId": "z_only_negatives"
+        },
+        {
+          "id": "B",
+          "label": "ℕ contient 0 et les entiers positifs. ℤ contient tous les entiers, donc aussi ceux de ℕ.",
+          "correct": true,
+          "feedback": "🔥 Nickel.\nTu viens de reformuler l’idée essentielle avec tes propres mots.\nEt ça donne :\nℕ ⊂ ℤ"
+        },
+        {
+          "id": "C",
+          "label": "ℕ et ℤ, c’est pareil sauf pour zéro.",
+          "feedback": "🔥 Pas tout à fait.\nZéro appartient justement aux deux.\nLa vraie différence, ce sont les entiers négatifs, présents dans ℤ mais pas dans ℕ.",
+          "misconceptionId": "n_starts_at_1"
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D01-C14",
+      "order": 14,
+      "type": "multi-step-choice",
+      "objective": "Validation finale sans aide : placer trois nombres dans la plus petite boîte.",
+      "text": "🔥 Dernier check. Pas d’aide.\nPour chacun, choisis la plus petite boîte parmi ℕ, ℤ, ou “aucune des deux”.",
+      "steps": [
+        {
+          "id": "M2-ARI-D01-C14-S1",
+          "subject": "23",
+          "discriminating": true,
+          "conceptId": "inclusion_N_Z",
+          "options": [
+            {
+              "id": "N",
+              "label": "ℕ",
+              "correct": true,
+              "feedback": "🔥 Oui. 23 est naturel, donc il est aussi entier."
+            },
+            {
+              "id": "Z",
+              "label": "ℤ",
+              "feedback": "🔥 23 appartient bien à ℤ, mais on cherchait la plus petite boîte.\nComme 23 est naturel, la meilleure réponse est ℕ."
+            },
+            {
+              "id": "NONE",
+              "label": "Aucune",
+              "feedback": "🔥 23 est un entier positif.\nIl appartient donc à ℕ, et aussi à ℤ."
+            }
+          ]
+        },
+        {
+          "id": "M2-ARI-D01-C14-S2",
+          "subject": "–9",
+          "discriminating": true,
+          "conceptId": "N_vs_Z",
+          "options": [
+            {
+              "id": "N",
+              "label": "ℕ",
+              "feedback": "🔥 –9 est négatif : impossible dans ℕ.",
+              "misconceptionId": "negative_in_n"
+            },
+            {
+              "id": "Z",
+              "label": "ℤ",
+              "correct": true,
+              "feedback": "🔥 Oui. Entier négatif → ℤ."
+            },
+            {
+              "id": "NONE",
+              "label": "Aucune",
+              "feedback": "🔥 –9 est négatif, mais c’est toujours un entier.\nDonc :\n–9 ∈ ℤ"
+            }
+          ]
+        },
+        {
+          "id": "M2-ARI-D01-C14-S3",
+          "subject": "2,7",
+          "conceptId": "integer_vs_positive",
+          "options": [
+            {
+              "id": "N",
+              "label": "ℕ",
+              "feedback": "🔥 2,7 est positif, mais il n’est pas entier.",
+              "misconceptionId": "positive_means_natural"
+            },
+            {
+              "id": "Z",
+              "label": "ℤ",
+              "feedback": "🔥 ℤ accepte les négatifs, mais pas les nombres à virgule non entiers.",
+              "misconceptionId": "positive_decimal_in_z"
+            },
+            {
+              "id": "NONE",
+              "label": "Aucune",
+              "correct": true,
+              "feedback": "🔥 Exact.\n2,7 n’appartient ni à ℕ, ni à ℤ."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D01-C15",
+      "order": 15,
+      "type": "declic-summary",
+      "objective": "Le moment Déclic : fixer ℕ, ℤ, ∈, ⊂ et le piège de contrôle.",
+      "text": "🔥 DÉCLIC\nLes nombres sont rangés dans des ensembles.\nℕ = {0 ; 1 ; 2 ; 3 ; …}\nℕ = les entiers naturels.\nℤ = {… ; –2 ; –1 ; 0 ; 1 ; 2 ; …}\nℤ = tous les entiers.\nComme tous les naturels sont aussi des entiers :\nℕ ⊂ ℤ\nPour un nombre :\n5 ∈ ℕ\nsignifie :\n“5 appartient à ℕ”.\n⚠️ Piège contrôle\nPositif ne veut pas forcément dire naturel :\n2,5 est positif mais 2,5 ∉ ℕ.",
+      "actions": [
+        {
+          "id": "done",
+          "label": "J’ai capté 🔥",
+          "kind": "complete"
+        },
+        {
+          "id": "review",
+          "label": "Revoir le point qui me piège",
+          "kind": "menu"
+        }
+      ],
+      "menu": [
+        {
+          "id": "n-z",
+          "label": "ℕ / ℤ",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D01-C03",
+            "toCardId": "M2-ARI-D01-C06"
+          }
+        },
+        {
+          "id": "in-sub",
+          "label": "∈ / ⊂",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D01-C08",
+            "toCardId": "M2-ARI-D01-C09"
+          }
+        },
+        {
+          "id": "decimals",
+          "label": "Les nombres à virgule",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D01-C11",
+            "toCardId": "M2-ARI-D01-C11"
+          }
+        }
+      ]
+    }
+  ],
+  "assessment": {
+    "cardId": "M2-ARI-D01-C14",
+    "understoodMinScore": 2,
+    "requireDiscriminatingStep": true,
+    "understoodMessage": "🔥 Là, tu ranges les nombres dans les bonnes boîtes.\nOn te les remontre dans quelques jours pour que ça reste.",
+    "needsReinforcementMessage": "🔥 T’as l’idée générale, mais les boîtes se mélangent encore un peu.\nJe te remets deux situations rapides et on verrouille ça.",
+    "followUpCount": 2
+  },
+  "mastery": {
+    "requiredDeferredSuccesses": 2,
+    "requiredCardRatio": 0.8
+  },
+  "deckId": "M2-ARI-D01-REV"
+}

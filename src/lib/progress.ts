@@ -1,5 +1,6 @@
 import type { AppState, CardReview, Chapter, Confidence, TabId, ViewId } from "@/types";
 import { FLASHCARDS, SUBJECTS } from "@/data";
+import { isCourseChapterId } from "@/lib/course/registry";
 
 // Pure progress logic — daily goal, chapter unlocking, badges, the day boundary (streak), spaced
 // repetition and view restoration. No React here: AppProvider in store.tsx wires these into state,
@@ -131,7 +132,11 @@ export function resolveRestoredView(saved: Partial<AppState>): ViewId {
   if (view === "lesson" || view === "subject") {
     const subject = SUBJECTS.find((s) => s.id === saved.currentSubjectId);
     if (!subject) return "home";
-    if (view === "lesson" && !subject.chapters.find((c) => c.id === saved.currentChapterId))
+    if (
+      view === "lesson" &&
+      !subject.chapters.find((c) => c.id === saved.currentChapterId) &&
+      !isCourseChapterId(saved.currentChapterId)
+    )
       return "home";
     return view;
   }

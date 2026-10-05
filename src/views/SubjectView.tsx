@@ -6,6 +6,10 @@ import { TopBar } from "@/components/TopBar";
 import { BraiseMascot } from "@/components/BraiseMascot";
 import { SUBJECTS } from "@/data";
 import { DECLIC_SCRIPTS } from "@/lib/declic";
+import { StatusChip } from "@/components/course/StatusChip";
+import { aggregateStatus, displayStatus } from "@/lib/course/engine";
+import { courseChaptersOfSubject, declicsOfChapter } from "@/lib/course/registry";
+import { useCourseProgress } from "@/lib/course/useCourseProgress";
 
 const ROW_JUSTIFY: Record<string, string> = {
   center: "justify-center",
@@ -23,8 +27,11 @@ const POSITIONS = ["center", "right", "center", "left"];
 export function SubjectView() {
   const { state, goBack, openLesson } = useApp();
   const subject = SUBJECTS.find((s) => s.id === state.currentSubjectId);
+  const courseProgress = useCourseProgress();
 
   if (!subject) return null;
+
+  const courseChapters = courseChaptersOfSubject(subject.id);
 
   const chapters = resolveChapters(subject.chapters, state.completedChapters);
   const doneCount = chapters.filter((c) => c.status === "done").length;
@@ -44,6 +51,45 @@ export function SubjectView() {
             style={{ width: `${pct}%`, background: subject.color }}
           />
         </div>
+
+        {courseChapters.length > 0 && (
+          <section className="course-path" aria-label="Cours du programme officiel">
+            <h2 className="course-path-title">Cours du programme</h2>
+            {courseChapters.map((chapter) => {
+              const declics = declicsOfChapter(chapter);
+              const status = aggregateStatus(
+                declics.map((d) => displayStatus(courseProgress.declics[d.id])),
+              );
+              return (
+                <button
+                  key={chapter.id}
+                  type="button"
+                  className="course-card"
+                  style={{ ["--subject-color" as string]: subject.color }}
+                  onClick={() => {
+                    sfx.tap(state.soundOn);
+                    openLesson(subject.id, chapter.id);
+                  }}
+                >
+                  <span className="course-card-top">
+                    <span className="course-card-badge">
+                      {chapter.level === "seconde"
+                        ? "Seconde"
+                        : chapter.level === "premiere"
+                          ? "Première"
+                          : "Terminale"}
+                    </span>
+                    <StatusChip status={status} />
+                  </span>
+                  <b className="course-card-title">{chapter.title}</b>
+                  <span className="course-card-meta">
+                    {declics.length} Déclic{declics.length > 1 ? "s" : ""} · révision incluse
+                  </span>
+                </button>
+              );
+            })}
+          </section>
+        )}
 
         <div className="relative px-1 pb-3 pt-3">
           <div

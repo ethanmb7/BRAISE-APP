@@ -5,6 +5,7 @@
 // nothing is collected.
 import { PROGRESS_KEY, CARDS_KEY } from "@/lib/persist";
 import { DECLIC_MEMORY_KEY } from "@/lib/declic";
+import { COURSE_PROGRESS_KEY } from "@/lib/course/progressStore";
 import {
   SEEN_RANK_KEY,
   SEEN_BADGES_KEY,
@@ -19,6 +20,7 @@ export const BACKUP_KEYS = [
   PROGRESS_KEY,
   CARDS_KEY,
   DECLIC_MEMORY_KEY,
+  COURSE_PROGRESS_KEY,
   SEEN_RANK_KEY,
   SEEN_BADGES_KEY,
   BADGE_UNLOCKED_AT_KEY,

@@ -1,11 +1,15 @@
 @import "tailwindcss" source(none);
 @source "../src";
+/* KaTeX's own stylesheet and fonts. Without it every formula renders twice (its HTML and its MathML
+   copy, both visible) and \mathbb letters fall back to a plain font. */
+@import "katex/dist/katex.min.css";
 /* layer(components) : du CSS non-« layered » bat TOUTES les classes Tailwind, quelle que soit
    la spécificité. En le plaçant dans la couche components, les styles maison restent la base et
    les utilitaires Tailwind posés dans le JSX reprennent le dessus. */
 @import "./braise.css" layer(components);
 @import "./subjects.css" layer(components);
 @import "./declic.css" layer(components);
+@import "./course.css" layer(components);
 
 @custom-variant dark (&:is(.dark *));
 

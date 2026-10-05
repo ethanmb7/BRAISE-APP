@@ -1,0 +1,73 @@
+{
+  "id": "M2-ARI",
+  "subjectId": "maths",
+  "level": "seconde",
+  "title": "Arithmétique",
+  "source": {
+    "authority": "Ministère de l’Éducation nationale",
+    "programme": "Mathématiques, Seconde générale et technologique",
+    "applicationYear": "2026-2027",
+    "bulletin": "BO n°14 du 2 avril 2026",
+    "nor": "MENE2602914A",
+    "path": [
+      "Programme de mathématiques",
+      "Nombres et calculs, algèbre",
+      "Arithmétique",
+      "Contenus",
+      "Notations ℕ et ℤ"
+    ]
+  },
+  "mappings": [
+    {
+      "id": "BO26-M2-ARI-CONT-01",
+      "requirement": "Notations ℕ et ℤ",
+      "type": "direct"
+    },
+    {
+      "id": "BO26-M2-VEL-APP-01",
+      "requirement": "notions d’élément d’un ensemble et d’appartenance ; utilisation du symbole ∈",
+      "type": "transversal"
+    },
+    {
+      "id": "BO26-M2-VEL-INC-01",
+      "requirement": "notions de sous-ensemble et d’inclusion ; utilisation du symbole ⊂",
+      "type": "transversal"
+    },
+    {
+      "id": "BO26-M2-VEL-NUMSET-01",
+      "requirement": "utiliser la notation des ensembles de nombres",
+      "type": "transversal"
+    }
+  ],
+  "misconceptions": [
+    {
+      "id": "n_starts_at_1",
+      "label": "ℕ commence obligatoirement à 1"
+    },
+    {
+      "id": "z_only_negatives",
+      "label": "ℤ contient uniquement les nombres négatifs"
+    },
+    {
+      "id": "positive_means_natural",
+      "label": "un nombre positif appartient forcément à ℕ"
+    },
+    {
+      "id": "positive_decimal_in_z",
+      "label": "un nombre décimal positif appartient à ℤ"
+    },
+    {
+      "id": "membership_vs_inclusion",
+      "label": "confusion entre ∈ (appartenance) et ⊂ (inclusion)"
+    },
+    {
+      "id": "single_set_only",
+      "label": "un nombre ne peut appartenir qu’à un seul ensemble"
+    },
+    {
+      "id": "negative_in_n",
+      "label": "un entier négatif appartient à ℕ"
+    }
+  ],
+  "declicIds": ["M2-ARI-D01"]
+}

@@ -1,0 +1,94 @@
+{
+  "id": "M2-ARI-D01-REV",
+  "declicId": "M2-ARI-D01",
+  "chapterId": "M2-ARI",
+  "title": "Révision : ℕ, ℤ, ∈ et ⊂",
+  "cards": [
+    {
+      "id": "M2-ARI-D01-REV-01",
+      "order": 1,
+      "statement": "–7 appartient à ℤ.",
+      "answer": "carre",
+      "concept": "Z_membership",
+      "difficulty": 1,
+      "tags": ["Z", "appartenance", "entiers-negatifs"],
+      "feedback": {
+        "correct": "🔥 Oui. –7 est un entier négatif, donc –7 ∈ ℤ.",
+        "incorrect": "🔥 –7 est négatif, mais il reste entier.\nLes entiers négatifs vivent dans ℤ."
+      }
+    },
+    {
+      "id": "M2-ARI-D01-REV-02",
+      "order": 2,
+      "statement": "0 n’appartient pas à ℕ.",
+      "answer": "intox",
+      "concept": "N_zero",
+      "difficulty": 1,
+      "tags": ["N", "zero", "piege-classique"],
+      "feedback": {
+        "correct": "🔥 Exact. Le piège classique.\n0 ∈ ℕ",
+        "incorrect": "🔥 Dans notre convention, ℕ commence bien à 0 :\n0, 1, 2, 3…"
+      },
+      "correction": "0 ∈ ℕ",
+      "misconceptionId": "n_starts_at_1"
+    },
+    {
+      "id": "M2-ARI-D01-REV-03",
+      "order": 3,
+      "statement": "Tout nombre de ℕ appartient aussi à ℤ.",
+      "answer": "carre",
+      "concept": "inclusion_N_Z",
+      "difficulty": 2,
+      "tags": ["N", "Z", "inclusion"],
+      "feedback": {
+        "correct": "🔥 Oui.\nC’est exactement ce que signifie :\nℕ ⊂ ℤ",
+        "incorrect": "🔥 Regarde : 0, 1, 2, 3… sont tous des entiers.\nDonc toute la boîte ℕ se trouve dans ℤ."
+      },
+      "misconceptionId": "single_set_only"
+    },
+    {
+      "id": "M2-ARI-D01-REV-04",
+      "order": 4,
+      "statement": "4,2 appartient à ℤ parce qu’il est positif.",
+      "answer": "intox",
+      "concept": "integer_vs_positive",
+      "difficulty": 2,
+      "tags": ["Z", "decimal", "entier"],
+      "feedback": {
+        "correct": "🔥 Oui. Positif ≠ entier.\n4,2 ∉ ℤ.",
+        "incorrect": "🔥 Le signe n’est pas le vrai critère.\nPour être dans ℤ, il faut être entier."
+      },
+      "correction": "4,2 ∉ ℤ",
+      "misconceptionId": "positive_decimal_in_z"
+    },
+    {
+      "id": "M2-ARI-D01-REV-05",
+      "order": 5,
+      "statement": "6 ⊂ ℕ est une écriture correcte.",
+      "answer": "intox",
+      "concept": "membership_vs_inclusion",
+      "difficulty": 2,
+      "tags": ["appartenance", "inclusion", "symboles"],
+      "feedback": {
+        "correct": "🔥 Exact.\n6 est un nombre, donc :\n6 ∈ ℕ\n⊂ sert à comparer des ensembles.",
+        "incorrect": "🔥 Attention :\nnombre → ∈\nensemble dans ensemble → ⊂"
+      },
+      "correction": "6 ∈ ℕ",
+      "misconceptionId": "membership_vs_inclusion"
+    },
+    {
+      "id": "M2-ARI-D01-REV-06",
+      "order": 6,
+      "statement": "–12 est un entier, mais ce n’est pas un entier naturel.",
+      "answer": "carre",
+      "concept": "N_vs_Z",
+      "difficulty": 2,
+      "tags": ["N", "Z", "entier-negatif"],
+      "feedback": {
+        "correct": "🔥 Exact :\n–12 ∈ ℤ\nmais\n–12 ∉ ℕ",
+        "incorrect": "🔥 Un entier peut être négatif.\n“Naturel” et “entier” ne veulent donc pas exactement dire la même chose."
+      },
+      "misconceptionId": "negative_in_n"
+    }
+  ]
+}

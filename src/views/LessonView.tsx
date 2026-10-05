@@ -8,9 +8,11 @@ import { getAgeGroup, quizCorrect, quizWrong } from "@/lib/braiseVoice";
 import { SUBJECTS, STORIES, AUDIO_TRANSCRIPTS } from "@/data";
 import { DECLIC_SCRIPTS } from "@/lib/declic";
 import { DeclicMode } from "@/components/declic/DeclicMode";
+import { ChapterView } from "@/views/ChapterView";
+import { getCourseChapter } from "@/lib/course/registry";
 import type { QuizQuestion } from "@/types";
 
-export function LessonView() {
+function ScriptLessonView() {
   const { state, goBack, completeChapter, setView, reviewCard } = useApp();
   const subject = SUBJECTS.find((s) => s.id === state.currentSubjectId);
   const chapter = subject?.chapters.find((c) => c.id === state.currentChapterId);
@@ -461,4 +463,12 @@ function Quiz({
       )}
     </div>
   );
+}
+
+/** A chapter of the official programme (course service) opens its chapter screen; every other
+ *  chapter plays its older Déclic script. One tap from the path either way. */
+export function LessonView() {
+  const { state } = useApp();
+  const courseChapter = getCourseChapter(state.currentChapterId);
+  return courseChapter ? <ChapterView chapter={courseChapter} /> : <ScriptLessonView />;
 }

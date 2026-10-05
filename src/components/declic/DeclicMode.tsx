@@ -7,6 +7,7 @@ import { fireConfetti } from "@/lib/confetti";
 import { recordDeclicMemory, type DeclicScript } from "@/lib/declic";
 import { DeclicTimeline } from "@/components/declic/DeclicTimeline";
 import { DeclicVisualScene } from "@/components/declic/DeclicVisualScene";
+import { DeclicAsk, DeclicTile } from "@/components/declic/shared";
 import { COPY } from "@/lib/copy";
 import { useTone } from "@/lib/useTone";
 
@@ -17,8 +18,6 @@ const CARD_SPRING = { type: "spring", stiffness: 420, damping: 26 } as const;
 // How long the "Braise réfléchit…" beat holds before a choice's reaction appears — long enough
 // to read as a real pause, short enough to never feel like waiting on the app.
 const THINK_MS = 550;
-
-type Mood = "happy" | "eager" | "hesitant" | "cool" | "proud";
 
 // "Le Déclic" — BRAISE's learning loop (PRODUCT_VISION.md, section 4): situation → choix →
 // réaction → déclic. A notion is a chain of small cards — never more than one tap or one short
@@ -370,78 +369,5 @@ export function DeclicMode({
         )}
       </AnimatePresence>
     </div>
-  );
-}
-
-function DeclicAsk({
-  mood,
-  bump,
-  scene,
-  children,
-}: {
-  mood: Mood;
-  /** A one-shot physical reaction — a headshake on a miss, a little nod on a hit — played once
-   *  when this prop first appears (see the `key`: it forces a fresh mount, which is what makes
-   *  an `initial` → `animate` transition actually run instead of snapping straight to rest). */
-  bump?: "correct" | "wrong";
-  scene: "story" | "question" | "reveal" | "reformulate";
-  children: ReactNode;
-}) {
-  const reducedMotion = useReducedMotion();
-  const mascotMotion = reducedMotion
-    ? { initial: { opacity: 0 }, animate: { opacity: 1 } }
-    : bump === "wrong"
-      ? { initial: { rotate: 0, x: 0 }, animate: { rotate: [0, -8, 7, -4, 0], x: [0, -2, 2, 0] } }
-      : bump === "correct"
-        ? { initial: { y: 0, scale: 1 }, animate: { y: [0, -13, 0], scale: [1, 1.08, 1] } }
-        : { initial: { opacity: 0, y: 14, rotate: -3 }, animate: { opacity: 1, y: 0, rotate: 0 } };
-  return (
-    <div className={`declic-ask declic-ask--${scene}`}>
-      <motion.div
-        key={`${scene}-${bump ?? mood}`}
-        className="declic-actor"
-        {...mascotMotion}
-        transition={
-          bump
-            ? { duration: 0.48, ease: "easeOut" }
-            : { type: "spring", stiffness: 360, damping: 22 }
-        }
-      >
-        <span className="declic-actor-shadow" aria-hidden="true" />
-        <BraiseMascot
-          size={scene === "reveal" ? 126 : 112}
-          mood={mood}
-          pose={scene === "question" ? "focus" : scene === "reveal" ? "victory" : "idle"}
-        />
-        <span className="declic-actor-tag">BRAISE</span>
-      </motion.div>
-      <h2 className="declic-bubble">
-        <span>{children}</span>
-      </h2>
-    </div>
-  );
-}
-
-function DeclicTile({
-  label,
-  state,
-  onClick,
-  disabled,
-}: {
-  label: string;
-  state: "idle" | "correct" | "wrong";
-  onClick: () => void;
-  disabled?: boolean;
-}) {
-  return (
-    <motion.button
-      type="button"
-      className={`declic-tile is-${state}`}
-      onClick={onClick}
-      disabled={disabled}
-      whileTap={!disabled ? { x: 2, y: 2 } : undefined}
-    >
-      {label}
-    </motion.button>
   );
 }
