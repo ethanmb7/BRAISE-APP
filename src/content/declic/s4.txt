@@ -1,0 +1,55 @@
+NOTION: s4
+CARTE_REVISION: fc6
+ACCROCHE: Si tu retires les hérons d'une mare, qui y gagne… et qui y perd ?
+
+SITUATION
+Une mare : des algues, des petits poissons qui mangent les algues, et un héron qui mange les poissons.
+
+CHOIX
+Qui fabrique la matière vivante au départ, à partir de la lumière du soleil ?
+- Le héron => Le héron mange des poissons : il se nourrit, il ne fabrique pas de matière à partir de la lumière.
+- Les poissons => Eux aussi se nourrissent d'autres êtres vivants (les algues) : ils ne tirent rien de la lumière directement.
+~ Seuls les êtres vivants qui font de la photosynthèse, comme les algues et les plantes, fabriquent leur matière à partir de la lumière, de l'eau et du CO₂. Les animaux, eux, la reçoivent en mangeant.
+- [correct] Les algues => Exact : grâce à la photosynthèse, elles fabriquent leur propre matière avec la lumière.
+
+SITUATION
+Algues, puis poissons, puis héron : chacun mange celui d'avant. On appelle ça une chaîne alimentaire, et tout part de la lumière du soleil captée par les algues.
+
+CHOIX
+Un été, on chasse tous les hérons de la mare. Que va-t-il se passer ?
+- Rien, les hérons ne servent à rien dans la mare => Si : le héron limite le nombre de poissons. Sans lui, ce frein disparaît.
+~ Imagine un frein sur un vélo : tu ne le remarques que lorsqu'il manque. Sans héron, plus personne ne mange les poissons, et leur nombre grimpe.
+- [correct] Les poissons prolifèrent et mangent trop d'algues => Exact : en retirant un maillon, tout l'équilibre de la mare bouge.
+- Les poissons disparaissent aussi => Au début, c'est plutôt l'inverse : sans prédateur, ils se multiplient. C'est après, quand il n'y a plus assez d'algues, qu'ils manquent de nourriture.
+
+REVELATION: 🔥 L'écosystème
+Un écosystème, c'est un milieu (eau, sol, climat : le biotope) et tous les êtres vivants qui y vivent (la biocénose), reliés par des relations alimentaires. Producteurs : les végétaux, qui fabriquent leur matière. Consommateurs : ceux qui mangent d'autres êtres vivants. Décomposeurs : ceux qui recyclent la matière morte.
+
+CHOIX
+À toi : dans une forêt, des champignons et des bactéries du sol transforment les feuilles mortes en matière minérale. Ce sont…
+- Des producteurs => Les producteurs, ce sont les végétaux, qui fabriquent leur matière avec la lumière. Ici, on recycle de la matière morte.
+- [correct] Des décomposeurs => Exact : ils recyclent la matière morte, que les végétaux réutilisent ensuite.
+~ Les décomposeurs (bactéries, champignons) transforment feuilles et cadavres en matière minérale : de l'eau, des sels minéraux… Les plantes les réabsorbent pour fabriquer de nouvelles feuilles. Rien n'est perdu, tout circule.
+- Des prédateurs => Un prédateur chasse des proies vivantes. Ici, ils s'occupent de matière déjà morte.
+
+REFORMULATION
+Explique à un pote pourquoi supprimer un seul animal peut dérégler tout un écosystème.
+
+SITUATION
+Sur une petite île, on introduit des chèvres pour leur viande. Elles mangent les jeunes plantes, et aucun prédateur ne les chasse : elles se multiplient.
+
+CHOIX
+Que risque-t-il d'arriver à l'écosystème de l'île ?
+- Rien, une espèce de plus ne change pas grand-chose => Si : elles mangent beaucoup de plantes, et d'autres espèces dépendent de ces plantes.
+- Les plantes se multiplient pour compenser => Non : si les jeunes plantes sont mangées avant de grandir, elles disparaissent peu à peu.
+~ Une plante mangée trop jeune ne peut pas grandir, ni faire de graines : il y en a de moins en moins. Et tous les animaux qui vivent de ces plantes ou s'y abritent en pâtissent aussi.
+- [correct] Les plantes et les espèces qui en dépendent reculent => Exact : introduire une espèce, c'est déséquilibrer toute la chaîne.
+
+DECLIC
+Voilà. Maintenant, tu vois une mare, une forêt ou une île comme un réseau où tout se tient.
+
+FICHE: L'écosystème
+RETENIR
+Un écosystème associe un milieu (biotope) et les êtres vivants qui y vivent (biocénose), reliés par des chaînes alimentaires : producteurs (végétaux, par photosynthèse), consommateurs, décomposeurs. L'énergie vient du Soleil. Si un maillon change (disparition ou introduction d'une espèce), l'équilibre de tout l'écosystème est modifié.
+PIEGE
+Croire qu'une espèce « inutile » peut disparaître sans conséquences, ou imaginer une chaîne alimentaire comme une ligne isolée : en réalité, les êtres vivants forment un réseau.

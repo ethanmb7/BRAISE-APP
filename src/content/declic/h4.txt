@@ -1,0 +1,52 @@
+NOTION: h4
+CARTE_REVISION: fc17
+ACCROCHE: Ton téléphone a voyagé dans combien de pays avant d'arriver dans ta poche ?
+
+SITUATION
+Ton téléphone a été conçu dans un pays, ses puces fabriquées dans un deuxième, ses métaux extraits dans un troisième, puis il a été assemblé dans un quatrième et vendu partout dans le monde.
+
+CHOIX
+Pourquoi les entreprises répartissent-elles la fabrication entre autant de pays ?
+- Parce que c'est interdit de tout fabriquer chez soi => Aucune règle n'oblige ça : c'est un choix des entreprises.
+- [correct] Pour produire moins cher et vendre partout => Exact : chaque étape est faite là où elle coûte le moins ou là où se trouve le savoir-faire.
+~ Une entreprise cherche à baisser ses coûts : salaires moins élevés, matières premières sur place, usines spécialisées. Répartir la fabrication entre plusieurs pays lui permet de produire moins cher et de vendre partout.
+
+SITUATION
+Ce n'est pas que des objets qui voyagent : une vidéo tournée au Brésil est vue le soir même au Japon, une entreprise japonaise achète des parts d'une entreprise française, un étudiant part un an en Corée.
+
+CHOIX
+Qu'est-ce qui circule autour du monde dans la mondialisation ?
+- Seulement des marchandises => Pas seulement : regarde les exemples (vidéo, argent, étudiant).
+~ Les marchandises (objets) ne sont qu'un des flux. Ta vidéo est de l'information, l'achat de parts est un flux d'argent (capitaux), l'étudiant est un flux de personnes.
+- [correct] Marchandises, argent, informations et personnes => Exact : quatre grands flux, tous de plus en plus intenses.
+
+REVELATION: 🔥 La mondialisation
+C'est l'intensification des échanges de marchandises, de capitaux, d'informations et de personnes entre toutes les régions du monde, grâce à la baisse du coût des transports et à internet.
+
+CHOIX
+À toi : une entreprise ferme son usine en France pour produire dans un pays où les salaires sont plus bas. Qui y gagne ?
+- Tout le monde gagne pareil => Pas vraiment : les salariés de l'usine fermée n'y gagnent rien.
+~ Les effets de la mondialisation ne sont pas partagés équitablement. Ici, les clients et l'entreprise peuvent y gagner (prix plus bas, profits plus grands), mais les salariés de l'usine perdent leur emploi.
+- [correct] Ça dépend : clients gagnants, salariés perdants => Exact : la mondialisation a des gagnants et des perdants.
+- Personne ne gagne rien => Si : les prix peuvent baisser pour les clients et l'entreprise peut gagner plus.
+
+REFORMULATION
+Explique à un pote pourquoi la mondialisation a des gagnants ET des perdants.
+
+SITUATION
+Un fonds d'investissement japonais achète des parts d'une entreprise française.
+
+CHOIX
+Quel type de flux est-ce ?
+- Un flux de marchandises => Aucun objet ne voyage ici : c'est une opération financière.
+- [correct] Un flux de capitaux => Exact : de l'argent circule d'un pays à l'autre pour être investi.
+- Un flux d'informations => Il y a sûrement des échanges d'informations, mais ce qui est au cœur de l'opération, c'est l'argent investi.
+
+DECLIC
+Voilà. Maintenant, tu vois la mondialisation dans ta poche et dans ton fil d'actu.
+
+FICHE: La mondialisation
+RETENIR
+La mondialisation, c'est l'intensification des échanges de marchandises, de capitaux, d'informations et de personnes à l'échelle du monde, favorisée par la baisse du coût des transports et par internet. Les entreprises répartissent souvent leur production dans plusieurs pays. Elle a des gagnants (consommateurs, entreprises, régions attractives) et des perdants (emplois délocalisés, régions en difficulté).
+PIEGE
+La réduire à du commerce entre deux pays, ou la décrire comme uniquement bonne ou uniquement mauvaise : ses effets dépendent de qui on est et d'où on vit.

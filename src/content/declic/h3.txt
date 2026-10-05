@@ -1,0 +1,53 @@
+NOTION: h3
+CARTE_REVISION: fc16
+ACCROCHE: Un roi, un président… et un pays qui s'appelle « République » sans être libre ?
+
+SITUATION
+Dans le pays A, le chef de l'État est le fils de l'ancien chef de l'État. Mais une constitution limite ses pouvoirs, un parlement élu vote les lois, et les citoyens votent librement.
+
+CHOIX
+Ce pays est une dictature ?
+- Oui, le roi est héréditaire, donc dictature => Pas du tout : transmettre le pouvoir par hérédité, ce n'est pas la même chose que gouverner sans limites.
+~ Ce qui définit une dictature, ce n'est pas la présence d'un roi, c'est l'absence de limites au pouvoir. Ici, la constitution et le parlement empêchent le roi de faire ce qu'il veut, donc ce n'est pas une dictature.
+- [correct] Non, c'est une monarchie où le pouvoir est limité => Exact : on appelle ça une monarchie constitutionnelle.
+
+SITUATION
+Dans le pays B, le président est élu tous les 5 ans. Mais il interdit les journaux d'opposition, emprisonne ses adversaires et truque les résultats.
+
+CHOIX
+Ce pays est une démocratie parce qu'il y a des élections ?
+- Oui, élections = démocratie => Des élections truquées ne suffisent pas : sans libertés ni opposition possible, ce n'est pas une démocratie.
+~ Voter ne veut rien dire si tu ne peux pas choisir librement : si les adversaires sont en prison et les résultats arrangés, le vote n'est qu'un décor.
+- [correct] Non, il manque les libertés et les contre-pouvoirs => Exact : une démocratie, ce n'est pas seulement voter, c'est aussi pouvoir critiquer et changer de dirigeants.
+
+REVELATION: 🔥 Comment on prend le pouvoir ≠ comment il est contrôlé
+Monarchie : le pouvoir se transmet par hérédité. République : le chef de l'État n'est pas un monarque. Démocratie : le peuple choisit librement ses dirigeants et les libertés sont protégées. Dictature : le pouvoir est concentré, sans contre-pouvoirs.
+
+CHOIX
+À toi : un pays s'appelle « République » dans son nom officiel, mais le même homme dirige depuis 30 ans et aucune opposition n'est autorisée. C'est…
+- Une démocratie, puisque c'est une république => Le mot « république » ne suffit pas : ici, rien ne limite le pouvoir et personne ne peut s'y opposer.
+~ « République » dit seulement que le chef n'est pas un monarque. Pour savoir si c'est une démocratie, il faut regarder si les citoyens peuvent voter librement et critiquer le pouvoir.
+- [correct] Une dictature qui s'appelle république => Exact : le nom du régime ne garantit pas les libertés.
+- Une monarchie constitutionnelle => Rien ici ne parle de roi, ni de constitution qui limite le pouvoir.
+
+REFORMULATION
+Explique à un pote pourquoi « république » ne veut pas dire automatiquement « démocratie ».
+
+SITUATION
+Dans un autre pays, le roi nomme lui-même les ministres, décide seul des lois et aucune élection n'existe. À sa mort, son fils prend sa place.
+
+CHOIX
+Quel est ce régime ?
+- Une monarchie constitutionnelle => Non : ici, rien ne limite le pouvoir du roi. Ni constitution, ni parlement, ni élections.
+~ Dans une monarchie constitutionnelle, une constitution et un parlement encadrent le roi. Ici, le roi décide seul : il n'y a aucune limite à son pouvoir.
+- [correct] Une monarchie absolue => Exact : le pouvoir est héréditaire, et le roi gouverne sans contre-pouvoir.
+- Une démocratie => Aucune élection, aucun contre-pouvoir : ce n'est pas une démocratie.
+
+DECLIC
+Voilà. Maintenant, tu ne te fies plus au nom d'un régime : tu regardes qui contrôle le pouvoir.
+
+FICHE: Monarchie, république, démocratie, dictature
+RETENIR
+Monarchie : le pouvoir se transmet par hérédité (absolue si le roi décide seul, constitutionnelle si une constitution et un parlement le limitent). République : le chef de l'État n'est pas un monarque. Démocratie : les citoyens choisissent librement leurs dirigeants, dans le respect des libertés et avec des pouvoirs limités. Dictature : pouvoir concentré, sans contre-pouvoirs.
+PIEGE
+Croire qu'une république est forcément démocratique, ou qu'un roi veut forcément dire dictature : le nom du régime dit comment on obtient le pouvoir, pas s'il est contrôlé.

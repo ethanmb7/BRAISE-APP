@@ -1,0 +1,53 @@
+NOTION: a3
+CARTE_REVISION: fc8
+ACCROCHE: « J'ai perdu mes clés » : en anglais, ça dépend si tu les cherches encore
+
+SITUATION
+En français, « j'ai perdu mes clés » se dit pareil que tu les aies perdues hier ou que tu les cherches en ce moment. En anglais, il y a deux façons de le dire : « I lost my keys » et « I have lost my keys ».
+
+CHOIX
+Tu es devant ta porte, bloqué, et tu cherches encore tes clés. Laquelle choisis-tu ?
+- « I lost my keys » => Elle n'est pas fausse, mais elle parle d'un moment du passé, alors que ton problème est là maintenant.
+~ « I lost my keys » raconte un fait passé, comme une histoire finie. Mais toi, tu es toujours sans clés : le passé a une conséquence maintenant, et on le montre avec « have ».
+- [correct] « I have lost my keys » => Exact : tu relies le passé au présent, parce que les clés sont toujours perdues maintenant.
+
+SITUATION
+Autre phrase : « I lost my keys yesterday, but I found them this morning. » Ici, « yesterday » donne un moment précis, déjà terminé.
+
+CHOIX
+Peut-on dire « I have lost my keys yesterday » ?
+- Oui, avec « have », ça marche toujours => Non : « have » relie au présent, et « yesterday » est un moment fini.
+~ « Yesterday » appartient entièrement au passé. Il n'y a plus de lien avec maintenant, donc on n'utilise pas « have ». On raconte simplement un fait passé.
+- [correct] Non : « I lost my keys yesterday » => Exact : un moment précis et terminé demande le past simple.
+
+REVELATION: 🔥 Le present perfect
+have / has + participe passé. On l'emploie pour une action passée qui a un lien avec le présent : un résultat visible maintenant, une expérience de vie, une durée qui va jusqu'à aujourd'hui. Avec un moment précis et terminé (yesterday, last year, in 2019), on garde le past simple.
+
+CHOIX
+À toi : « I ___ never ___ sushi. » (eat) Quelle forme ?
+- have never ate => Après « have », il faut le participe passé : « eaten », pas « ate ».
+~ « Ate » est le past simple de « eat ». Avec « have », on utilise le participe passé, qui est « eaten » : « I have never eaten sushi ».
+- [correct] have never eaten => Exact : expérience de vie, donc present perfect avec « eaten ».
+- never ate => On peut dire ça pour un moment précis du passé, mais pour une expérience de vie jusqu'à aujourd'hui, on prend le present perfect.
+
+REFORMULATION
+Explique à un pote quand on dit « I have lost » et quand on dit « I lost ».
+
+SITUATION
+Deux phrases à compléter. « Last summer, she ___ Rome. » et « She ___ Rome three times in her life. »
+
+CHOIX
+Quelle paire est correcte ?
+- visited / visited => La deuxième parle d'une expérience de vie qui va jusqu'à aujourd'hui : il faut le present perfect.
+- has visited / has visited => « Last summer » est un moment précis et terminé : il faut le past simple.
+~ Dans la première phrase, « last summer » est fini : past simple. Dans la deuxième, « in her life » couvre tout jusqu'à maintenant : present perfect.
+- [correct] visited / has visited => Exact : un moment fini demande le past simple, une expérience de vie demande le present perfect.
+
+DECLIC
+Voilà. Maintenant, tu sais choisir entre « I lost » et « I have lost ».
+
+FICHE: Le present perfect
+RETENIR
+have / has + participe passé (I have eaten, she has gone). On l'emploie pour une action passée qui a un lien avec le présent : un résultat visible maintenant, une expérience de vie (ever, never), une durée qui continue jusqu'à aujourd'hui (for, since). Avec un moment précis terminé (yesterday, last year, in 2019), on utilise le past simple.
+PIEGE
+Dire « I have seen him yesterday » : le passé composé français ne se traduit pas toujours par le present perfect en anglais.

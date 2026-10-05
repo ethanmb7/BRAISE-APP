@@ -1,0 +1,53 @@
+NOTION: s3
+CARTE_REVISION: fc19
+ACCROCHE: Deux parents du groupe A et B, un enfant du groupe O : c'est possible ?
+
+SITUATION
+Un gène détermine ton groupe sanguin. Il existe en trois versions dans la population : A, B et O. Toi, tu reçois une version de ta mère et une de ton père.
+
+CHOIX
+Combien de versions de ce gène as-tu dans chacune de tes cellules ?
+- Une seule => Tu en reçois une de chaque parent, donc pas une seule.
+- Trois, A, B et O => Les trois existent dans la population, mais toi tu n'en reçois que deux.
+~ Une version vient de ta mère, une de ton père : ça fait deux. Les trois versions A, B et O existent dans l'ensemble des gens, mais chaque personne n'en reçoit que deux.
+- [correct] Deux, une de chaque parent => Exact : un exemplaire du gène vient de ta mère, l'autre de ton père.
+
+SITUATION
+Ton père te transmet la version A. Ta mère te transmet la version O. Tu as donc A et O. La version A domine : ton groupe sanguin est A.
+
+CHOIX
+Le O a-t-il disparu parce que ton groupe est A ?
+- Oui, il a disparu => Il est toujours là dans chacune de tes cellules : il ne s'exprime juste pas.
+~ Un allèle qui ne se voit pas n'est pas effacé : il reste dans l'ADN. Il se voit seulement quand il n'y a pas d'allèle dominant à côté.
+- [correct] Non, il est toujours là, mais caché => Exact : tu le portes toujours, et tu peux le transmettre à tes enfants.
+
+REVELATION: 🔥 Gène et allèles
+Un gène est une portion d'ADN qui détermine un caractère (ici le groupe sanguin). Ses différentes versions s'appellent des allèles. Tu en reçois deux par gène, un de chaque parent. Un allèle peut être présent sans s'exprimer.
+
+CHOIX
+À toi : un parent est de groupe A (allèles A et O), l'autre de groupe B (allèles B et O). Leur enfant peut-il être de groupe O ?
+- Non, aucun des deux parents n'est de groupe O => Pas besoin d'être O soi-même : chacun porte un allèle O caché.
+~ Chaque parent a un allèle O, même si on ne le voit pas dans son groupe sanguin. Si l'enfant reçoit le O de son père et le O de sa mère, il a deux O : son groupe est O.
+- [correct] Oui, s'il reçoit l'allèle O de chacun => Exact : deux allèles O cachés se retrouvent et l'enfant est de groupe O.
+- Oui, mais seulement si un parent est de groupe O => Non : même sans parent de groupe O, deux allèles O cachés suffisent.
+
+REFORMULATION
+Explique à un pote ce qu'est un allèle, avec l'exemple du groupe sanguin.
+
+SITUATION
+Chez les pois, la couleur de la fleur dépend d'un gène à deux allèles : violet (dominant) et blanc. Deux plants à fleurs violettes donnent un plant à fleurs blanches.
+
+CHOIX
+Comment est-ce possible ?
+- C'est une erreur de l'expérience => Ce n'est pas une erreur : ça arrive vraiment, et les allèles l'expliquent.
+- [correct] Chaque parent portait un allèle blanc caché => Exact : l'enfant a reçu l'allèle blanc des deux, donc il est blanc.
+~ Un plant violet peut avoir un allèle violet et un allèle blanc : le violet domine, donc on ne voit que le violet. Si les deux parents transmettent leur allèle blanc, l'enfant a deux allèles blancs, et le blanc s'exprime.
+
+DECLIC
+Voilà. Maintenant, tu sais comment un caractère peut sauter une génération.
+
+FICHE: Gène et allèles
+RETENIR
+Un gène est une portion d'ADN qui détermine un caractère. Ses différentes versions sont les allèles. On possède deux allèles de chaque gène, un hérité de chaque parent. Un allèle peut être présent sans s'exprimer, et être transmis aux enfants.
+PIEGE
+Confondre gène et allèle : le gène est la « recette », l'allèle en est une version. Autre erreur : croire qu'un allèle non exprimé a disparu.

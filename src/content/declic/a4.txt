@@ -1,0 +1,53 @@
+NOTION: a4
+CARTE_REVISION: fc26
+ACCROCHE: Un pote te demande conseil en anglais : tu dis « must » ou « should » ?
+
+SITUATION
+Ton pote a mal à la tête depuis deux jours. Tu veux juste lui conseiller d'aller voir un médecin. En anglais : « You ___ see a doctor. »
+
+CHOIX
+Quel mot choisis-tu ?
+- must => Possible, mais « must » exprime une obligation forte, presque un ordre. Pour un simple conseil, on dit autre chose.
+~ « Must » met de la pression : c'est une règle ou une obligation. Entre potes, quand tu proposes une idée sans l'imposer, il existe un mot plus doux.
+- [correct] should => Exact : « should » sert à donner un conseil, sans obliger.
+- can => « Can » exprime une possibilité ou une capacité, pas un conseil.
+
+SITUATION
+Dans le labo de chimie de ton lycée, une affiche dit : « You ___ wear safety glasses. » C'est une règle, personne n'a le choix.
+
+CHOIX
+Quel mot complète la phrase ?
+- should => « Should » serait un simple conseil. Ici, c'est une règle obligatoire.
+- [correct] must => Exact : « must » exprime une obligation forte, comme une règle de sécurité.
+
+REVELATION: 🔥 Should et must
+should + verbe = un conseil (« You should sleep more »). must + verbe = une obligation forte ou une règle (« You must wear a helmet »). Plus la situation est sérieuse, plus on est proche de « must ».
+
+CHOIX
+À toi : « You ___ drive faster than 50 here. » Il y a un panneau, c'est interdit. Quel mot complète la phrase ?
+- don't have to => « Don't have to » veut dire « pas obligé », mais autorisé. Ici, c'est interdit.
+~ Attention au piège : « don't have to » ne veut pas dire « interdit », ça veut dire « ce n'est pas nécessaire ». Pour interdire, on dit « mustn't ».
+- [correct] mustn't => Exact : « mustn't » exprime une interdiction.
+- shouldn't => « Shouldn't » est un conseil de ne pas le faire. Ici, c'est interdit, donc plus fort.
+
+REFORMULATION
+Explique à un pote la différence entre « should » et « must », avec un exemple pour chacun.
+
+SITUATION
+À l'entrée d'un lycée anglais, un panneau dit : « Students don't have to wear a uniform. »
+
+CHOIX
+Qu'est-ce que ça veut dire ?
+- Ils n'ont pas le droit d'en porter un => Ça, ce serait « mustn't ». « Don't have to » veut dire « pas obligé ».
+~ « Mustn't » interdit. « Don't have to » dit seulement que ce n'est pas obligatoire : un élève peut en porter un s'il veut, mais personne ne l'y force.
+- [correct] Ils ne sont pas obligés d'en porter un => Exact : ils peuvent en porter un, mais ce n'est pas obligatoire.
+- Ils devraient en porter un => Ça, ce serait « should ». « Don't have to » dit que ce n'est pas obligatoire.
+
+DECLIC
+Voilà. Maintenant, tu ne confonderas plus « mustn't » et « don't have to ».
+
+FICHE: Should, must, mustn't, don't have to
+RETENIR
+should + verbe = conseil (« You should sleep more »). must + verbe = obligation forte ou règle (« You must wear a helmet »). mustn't = interdiction. don't / doesn't have to = pas obligé (mais c'est permis).
+PIEGE
+« Mustn't » et « don't have to » ne veulent pas dire la même chose : l'un interdit, l'autre dit seulement que ce n'est pas nécessaire.

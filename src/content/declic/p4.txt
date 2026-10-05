@@ -1,0 +1,54 @@
+NOTION: p4
+CARTE_REVISION: fc23
+ACCROCHE: Une balle qui rebondit de moins en moins haut : où est passée son énergie ?
+
+SITUATION
+Tu lâches une balle de basket. Elle rebondit, un peu moins haut à chaque fois, puis s'arrête.
+
+CHOIX
+À la fin, la balle est immobile. Son énergie de mouvement, elle est passée où ?
+- Elle a disparu => Quand quelque chose s'arrête, l'énergie ne s'efface pas : elle change de forme.
+~ Une règle de la physique : l'énergie ne disparaît jamais, elle se transforme. Chaque rebond a transformé un peu de mouvement en autre chose, et c'est cette « autre chose » qu'il faut retrouver.
+- [correct] Elle s'est transformée en chaleur et en bruit => Exact : la balle et le sol ont un peu chauffé, et le rebond a fait du bruit.
+- Elle est gardée en réserve dans la balle => Une balle immobile n'a plus d'énergie de mouvement : elle est passée dans autre chose.
+
+SITUATION
+À chaque rebond, un peu d'énergie de mouvement se transforme en chaleur (la balle et le sol chauffent à peine) et en bruit. Rien n'a disparu, tout a changé de forme.
+
+CHOIX
+Si tu pouvais tout mesurer (mouvement, chaleur, bruit), la somme d'énergie après le dernier rebond serait…
+- Plus petite qu'avant => Elle paraît plus petite parce que la chaleur est difficile à voir, mais elle est bien là.
+- [correct] La même qu'avant => Exact : l'énergie totale se conserve, seule sa forme change.
+- Plus grande qu'avant => L'énergie ne se crée pas non plus : le total reste le même.
+
+REVELATION: 🔥 L'énergie se conserve
+L'énergie ne se crée pas et ne disparaît pas : elle se transfère d'un objet à un autre ou se convertit d'une forme à une autre (mouvement, chaleur, électricité…). Quand on dit qu'on « perd » de l'énergie, elle est en fait dispersée, souvent sous forme de chaleur.
+
+CHOIX
+À toi : une ampoule à incandescence est allumée. Elle transforme l'énergie électrique en…
+- Lumière uniquement => Pas seulement : touche-la et tu te brûles. Une grande partie part en chaleur.
+~ Une ampoule à incandescence chauffe un filament jusqu'à ce qu'il brille. Il produit de la lumière, mais aussi beaucoup de chaleur, d'où le fait qu'on se brûle en la touchant.
+- [correct] Lumière et chaleur => Exact : seule une petite partie devient de la lumière, le reste chauffe.
+- Rien, une ampoule ne transforme pas d'énergie => Si : elle reçoit de l'énergie électrique et la transforme en lumière et en chaleur.
+
+REFORMULATION
+Explique à un pote pourquoi dire « l'énergie a disparu » est faux, avec l'exemple de la balle.
+
+SITUATION
+Un cycliste descend une longue pente et freine fort. Les disques de frein deviennent brûlants.
+
+CHOIX
+Où est passée l'énergie de mouvement du vélo ?
+- Elle a disparu en freinant => Elle ne peut pas disparaître : regarde les disques de frein.
+- Elle s'est transformée en vitesse => La vitesse, c'est justement l'énergie de mouvement qu'on retire en freinant.
+~ Freiner, c'est ralentir. Si le vélo avait gagné de la vitesse, il irait plus vite. Là, il ralentit : son énergie de mouvement part ailleurs, et les freins brûlants montrent où.
+- [correct] Elle s'est transformée en chaleur dans les freins => Exact : le mouvement devient chaleur, et le vélo ralentit.
+
+DECLIC
+Voilà. Maintenant, tu ne diras plus que l'énergie disparaît : tu chercheras où elle est partie.
+
+FICHE: La conservation de l'énergie
+RETENIR
+L'énergie ne se crée pas et ne disparaît pas : elle se transfère et se convertit d'une forme à une autre (mouvement, chaleur, électricité, chimie…), son total reste constant. Elle se mesure en joules (J). Une partie est souvent dispersée sous forme de chaleur, difficile à récupérer : c'est ce qu'on appelle une perte.
+PIEGE
+Dire que l'énergie « disparaît » ou « est consommée » : elle est convertie. Il faut toujours dire dans quelle forme elle est partie.

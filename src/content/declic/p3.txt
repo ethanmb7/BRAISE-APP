@@ -1,0 +1,54 @@
+NOTION: p3
+CARTE_REVISION: fc22
+ACCROCHE: Un tuyau d'eau pour comprendre l'électricité
+
+SITUATION
+Imagine de l'eau qui circule dans un tuyau. Une pompe pousse l'eau : c'est la tension (en volts). La quantité d'eau qui passe par seconde : c'est l'intensité (en ampères). Un robinet freine l'eau : c'est la résistance (en ohms).
+
+CHOIX
+Tu serres le robinet, sans toucher à la pompe. Que devient le débit d'eau ?
+- Il augmente => Un robinet qu'on serre freine l'eau, il ne l'accélère pas.
+- [correct] Il diminue => Exact : plus la résistance est grande, moins il passe d'eau.
+- Il ne change pas => Si : la pompe pousse pareil, mais le passage est plus étroit, donc il passe moins d'eau.
+
+SITUATION
+Dans un circuit électrique, c'est pareil : une pile pousse (la tension), le courant circule (l'intensité), et une résistance, comme celle d'un fil chauffant, le freine.
+
+CHOIX
+La pile reste la même, mais tu remplaces la résistance par une résistance deux fois plus grande. L'intensité devient…
+- Deux fois plus grande => Une résistance plus grande freine davantage : le courant ne peut pas augmenter.
+~ Reviens au tuyau : un robinet deux fois plus fermé laisse passer moins d'eau, pas plus. Pour un circuit, c'est pareil : plus de résistance, moins de courant.
+- [correct] Deux fois plus petite => Exact : avec la même pile, une résistance double laisse passer deux fois moins de courant.
+- Inchangée => Une résistance plus grande freine davantage : l'intensité diminue.
+
+REVELATION: 🔥 La loi d'Ohm
+U = R × I. La tension U (en volts) est égale à la résistance R (en ohms) multipliée par l'intensité I (en ampères). Pour une même tension, plus R est grande, plus I est petite.
+
+CHOIX
+À toi : une résistance de 10 Ω est traversée par un courant de 0,5 A. Quelle est la tension à ses bornes ?
+- 10,5 V => Tu as additionné. La loi d'Ohm, c'est une multiplication : U = R × I.
+~ Pour trouver U, on multiplie la résistance par l'intensité : 10 × 0,5 = 5. L'addition n'a rien à faire ici.
+- [correct] 5 V => Exact : U = R × I = 10 × 0,5 = 5 V.
+- 20 V => Tu as divisé 10 par 0,5. Pour la tension, il faut multiplier : 10 × 0,5.
+
+REFORMULATION
+Explique à un pote, avec l'image du tuyau, ce que sont la tension, l'intensité et la résistance.
+
+SITUATION
+Un fer à repasser est branché sur 230 V. Sa résistance chauffante vaut 46 Ω. On veut savoir quelle intensité traverse le fer.
+
+CHOIX
+Quelle est l'intensité ?
+- 276 A => Tu as additionné 230 et 46. La loi d'Ohm ne s'additionne jamais.
+- [correct] 5 A => Exact : U = R × I, donc I = U ÷ R = 230 ÷ 46 = 5 A.
+~ U = R × I. Pour trouver I, on divise les deux côtés par R : I = U ÷ R. Donc 230 ÷ 46 = 5.
+- 10 580 A => Tu as multiplié 230 par 46, mais U = R × I : pour trouver I, on divise U par R.
+
+DECLIC
+Voilà. Maintenant, tension, intensité et résistance sont liées, et tu sais comment.
+
+FICHE: La loi d'Ohm
+RETENIR
+Pour un conducteur ohmique : U = R × I, avec U la tension en volts (V), R la résistance en ohms (Ω) et I l'intensité en ampères (A). On en déduit I = U ÷ R : à tension fixée, plus la résistance est grande, plus l'intensité est faible.
+PIEGE
+Additionner au lieu de multiplier, ou oublier de convertir les unités avant de calculer (par exemple des mA en A).
