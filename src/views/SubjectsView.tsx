@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
-import { BookOpen, Layers3 } from "lucide-react";
+import { BookOpen, CheckCircle2 } from "lucide-react";
 import { SubjectDecks, type SubjectDeckItem } from "@/components/SubjectDecks";
-import { BraiseMascot } from "@/components/BraiseMascot";
 import { SUBJECTS } from "@/data";
 import { sfx } from "@/lib/sound";
 import { useApp } from "@/store";
@@ -34,9 +33,6 @@ export function SubjectsView() {
       pct: Math.round((doneCount / chapters.length) * 100),
       level: currentIndex >= 0 ? currentIndex + 1 : chapters.length,
       chapterLabel: current?.title.replace(/^(les |la |le |l')/i, "") ?? "Parcours terminé",
-      chapterCount: chapters.length,
-      doneCount,
-      duration: current?.duration ?? null,
     };
   });
 
@@ -45,17 +41,14 @@ export function SubjectsView() {
   return (
     <div className="view is-active subjects-view">
       <motion.div variants={stagger} initial="hidden" animate="show">
-        <motion.header variants={item} className="subjects-heading subjects-collector-heading">
-          <div className="subjects-heading-copy">
-            <p>
-              <Layers3 size={13} aria-hidden="true" /> Collection de cours
-            </p>
-            <h1>Choisis ton deck.</h1>
-            <span>Une matière, un cours rapide, un vrai déclic.</span>
-          </div>
-          <div className="subjects-braise" aria-hidden="true">
-            <span className="subjects-braise-bubble">Tu prends quoi ?</span>
-            <BraiseMascot size={76} mood="eager" />
+        <motion.header variants={item} className="subjects-heading">
+          <span className="subjects-heading-icon" aria-hidden="true">
+            <BookOpen size={22} strokeWidth={2.7} />
+          </span>
+          <div>
+            <p>Ton espace libre</p>
+            <h1>Tes matières</h1>
+            <span>Choisis ce que tu veux comprendre aujourd’hui.</span>
           </div>
         </motion.header>
 
@@ -66,17 +59,15 @@ export function SubjectsView() {
         >
           <span>
             <BookOpen size={16} aria-hidden="true" />
-            <b>{SUBJECTS.length}</b> decks
+            <b>{SUBJECTS.length}</b> matières
           </span>
           <span>
-            <b>
-              {completed}/{SUBJECTS.length}
-            </b>{" "}
-            terminés
+            <CheckCircle2 size={16} aria-hidden="true" />
+            <b>{completed}</b> terminée{completed > 1 ? "s" : ""}
           </span>
         </motion.div>
 
-        <motion.div variants={item} className="subjects-decks-zone">
+        <motion.div variants={item} className="mt-5">
           <SubjectDecks
             items={decks}
             onSelect={(id) => {

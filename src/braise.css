@@ -2931,6 +2931,10 @@ select {
    takeaway a student would screenshot before a contrôle. Retenir/piège reuse the same
    correct/wrong tint pair as .declic-tile instead of inventing new colours. */
 .declic-fiche {
+  /* Above the stage's decorative colour band (declic.css paints it absolutely-positioned): an
+     un-positioned card sat underneath it and lost its own title. */
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 12px;

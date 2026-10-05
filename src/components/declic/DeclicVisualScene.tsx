@@ -109,7 +109,8 @@ export function DeclicVisualScene({ chapterId, cardIndex, pickedId, correct }: P
               cy="45"
               r="5"
               fill="#3373D6"
-              animate={reduced ? {} : { cx: [170, 30, 170] }}
+              initial={{ x: 0 }}
+              animate={reduced ? { x: 0 } : { x: [0, -140, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             />
           </g>
