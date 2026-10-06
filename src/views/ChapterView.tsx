@@ -4,17 +4,23 @@ import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
 import { TopBar } from "@/components/TopBar";
 import { CoursePlayer } from "@/components/course/CoursePlayer";
+import { CoursePresentation } from "@/components/course/CoursePresentation";
 import { ReviewPlayer } from "@/components/course/ReviewPlayer";
 import { StatusChip } from "@/components/course/StatusChip";
 import { MathText } from "@/components/course/MathText";
 import { displayStatus } from "@/lib/course/engine";
+import { courseSlides } from "@/lib/course/slides";
 import { daysUntil, dueCards, soonestDue } from "@/lib/course/review";
 import { declicsOfChapter, getDeck } from "@/lib/course/registry";
 import { coverageReport } from "@/lib/course/validate";
 import { useCourseProgress } from "@/lib/course/useCourseProgress";
 import type { ChapterDef } from "@/lib/course/types";
 
-type Active = { kind: "declic"; id: string } | { kind: "deck"; id: string } | null;
+type Active =
+  | { kind: "declic"; id: string }
+  | { kind: "cours"; id: string }
+  | { kind: "deck"; id: string }
+  | null;
 
 const LEVEL_LABEL: Record<ChapterDef["level"], string> = {
   seconde: "Seconde",
@@ -50,6 +56,24 @@ export function ChapterView({ chapter }: { chapter: ChapterDef }) {
               deck={deck}
               soundOn={state.soundOn}
               onExit={() => setActive(null)}
+            />
+          </div>
+        </div>
+      );
+    }
+  }
+
+  if (active?.kind === "cours") {
+    const def = declics.find((d) => d.id === active.id);
+    if (def) {
+      return (
+        <div>
+          <TopBar title={def.title} onBack={() => setActive(null)} />
+          <div className="view is-active">
+            <CoursePresentation
+              def={def}
+              soundOn={state.soundOn}
+              onStart={() => setActive({ kind: "declic", id: def.id })}
             />
           </div>
         </div>
@@ -131,7 +155,7 @@ export function ChapterView({ chapter }: { chapter: ChapterDef }) {
                   </p>
                   {status === "needs_reinforcement" && (
                     <p className="course-item-note">
-                      Les boîtes se mélangent encore un peu : la révision de ce Déclic va t’aider.
+                      Quelques points se mélangent encore : la révision de ce Déclic va t’aider.
                     </p>
                   )}
                   <button
@@ -144,6 +168,18 @@ export function ChapterView({ chapter }: { chapter: ChapterDef }) {
                   >
                     {verb} <ArrowRight size={18} />
                   </button>
+                  {courseSlides(def).length > 0 && (
+                    <button
+                      type="button"
+                      className="declic-link course-item-link"
+                      onClick={() => {
+                        sfx.tap(state.soundOn);
+                        setActive({ kind: "cours", id: def.id });
+                      }}
+                    >
+                      Voir le cours
+                    </button>
+                  )}
                 </div>
               </article>
             );

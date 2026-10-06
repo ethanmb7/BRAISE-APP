@@ -608,3 +608,198 @@
   transform: translateX(-50%);
   white-space: nowrap;
 }
+
+/* ----- the course as a presentation ------------------------------------------------------- */
+
+.course-item-link {
+  align-self: flex-start;
+  margin-top: 12px;
+}
+
+.course-deck {
+  display: grid;
+  gap: 14px;
+  outline: none;
+}
+.course-deck-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font:
+    800 0.72rem/1 "IBM Plex Mono",
+    monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.course-deck-empty {
+  padding: 18px;
+  border: 2.5px dashed var(--neo-ink);
+  border-radius: 16px;
+  font-weight: 700;
+  text-align: center;
+}
+.course-deck-stage {
+  overflow: hidden;
+  padding: 2px 8px 10px 2px;
+  margin: -2px -8px -10px -2px;
+}
+
+.course-slide {
+  --slide-color: var(--sun);
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  min-height: 440px;
+  padding: 16px 16px 20px;
+  border: 3px solid var(--neo-ink);
+  border-radius: 22px;
+  background: var(--paper);
+  box-shadow: 5px 5px 0 var(--neo-ink);
+  touch-action: pan-y;
+}
+.course-slide--example {
+  --slide-color: var(--mint);
+}
+.course-slide--trap {
+  --slide-color: var(--coral);
+}
+.course-slide--recap {
+  --slide-color: var(--neo-ink);
+}
+.course-slide-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.course-slide-tag {
+  padding: 4px 14px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 999px;
+  background: var(--slide-color);
+  box-shadow: 2px 2px 0 var(--neo-ink);
+  font: 900 0.85rem/1.3 var(--font-impact);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.course-slide--recap .course-slide-tag {
+  color: var(--paper);
+}
+.course-slide-text {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 700;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+/* The summary slide: one point per line, the control trap set apart. */
+.course-slide-heading {
+  font-size: 1.25rem;
+}
+.course-slide-points {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.course-slide-point {
+  position: relative;
+  padding-left: 22px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+.course-slide-point::before {
+  position: absolute;
+  top: 0.5em;
+  left: 0;
+  width: 11px;
+  height: 11px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 3px;
+  background: var(--sun);
+  content: "";
+}
+.course-slide-point--warn {
+  padding: 10px 12px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--coral) 32%, var(--paper));
+}
+.course-slide-point--warn::before {
+  content: none;
+}
+.course-slide .course-visual {
+  box-shadow: 3px 3px 0 var(--neo-ink);
+}
+
+/* The solved part of an example or a trap: the answer, then why. */
+.course-slide-answer {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--slide-color) 35%, var(--paper));
+}
+.course-slide-answer-label {
+  font:
+    800 0.68rem/1 "IBM Plex Mono",
+    monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.course-slide-answer b {
+  font-size: 1.2rem;
+  line-height: 1.25;
+}
+.course-slide-answer p {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.course-deck-dots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+.course-deck-dot {
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 999px;
+  background: var(--paper);
+  transition:
+    width 0.2s,
+    background 0.2s;
+}
+.course-deck-dot[aria-current="true"] {
+  width: 30px;
+  background: var(--sun);
+}
+.course-deck-nav {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+.course-deck-arrow {
+  display: grid;
+  width: 56px;
+  flex: none;
+  place-items: center;
+  border: 3px solid var(--neo-ink);
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+}
+.course-deck-arrow:disabled {
+  opacity: 0.35;
+  box-shadow: none;
+}
+.course-deck-cta {
+  flex: 1;
+}

@@ -70,6 +70,16 @@ validation peut porter sa propre `question` (la bulle de Braise) au lieu d'un `s
 `groups` accepte `shareAmong` (partager entre N) à la place de `groupSize`. Exemple complet :
 `M2-ARI-D02.json` (pilote).
 
+## La présentation du cours
+
+Depuis la page d'un chapitre, « Voir le cours » ouvre le Déclic comme un diaporama : une idée par
+diapositive, de grandes images, on glisse ou on appuie sur « Suivant », et la dernière diapositive
+mène au Déclic. Elle se fabrique toute seule à partir du Déclic (`lib/course/slides.ts`), sans second
+texte à écrire : une carte d'explication devient une diapositive « Je te montre », une carte
+`together` un « Exemple » (la question, puis la réponse attendue et pourquoi), une carte `trap` un
+« Piège », le résumé « À garder ». Les questions faites seul et la validation n'y figurent pas. Lire
+ne donne aucun point.
+
 ## Variantes, validation et nouvel essai
 
 - **Variantes** (`variants`) sur une carte `choice` ou sur la validation : un second énoncé complet,
