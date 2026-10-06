@@ -248,8 +248,19 @@ Image: groupes, partagés entre N personnes
   total: <24>  partagé entre: <5>      (N groupes égaux, puis le reste en pointillés)
 ```
 
+Options communes et par image :
+
+- `Légende` (toutes les images) : une ligne courte sous l'image qui la relie à l'écriture
+  (« 24 = 6 × 4 »). C'est ce qui fait passer de l'image au calcul.
+- Droite graduée : `sauts: oui` dessine un saut entre chaque paire de marques consécutives, avec sa
+  longueur (« +4 »), pour montrer les multiples comme des pas de même longueur. Il faut au moins deux
+  marques. Le côté négatif est teinté à part du côté positif.
+- Groupes partagés : `destinataire: 🙂` dessine qui reçoit chaque groupe, `étiquette du reste: reste`
+  nomme ce qui reste (16 caractères au plus).
+
 Une image peut n'apparaître qu'après la réponse : `Apparition: après la réponse` (par défaut elle est
-là dès le début de la carte).
+là dès le début de la carte). Les images apparaissent avec une petite animation (qui disparaît si
+l'élève a demandé moins de mouvement).
 
 Le reste d'une division (ici 1) est toujours dessiné à part, en pointillés : c'est le propos de
 l'image. Des paires avec un seul isolé : `taille d'un groupe: 2`. Si une image manque pour un Déclic

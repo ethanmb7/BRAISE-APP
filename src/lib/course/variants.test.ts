@@ -758,6 +758,35 @@ describe("the validator on the rhythm, the beats and the new pictures", () => {
     expect(groups({ shareAmong: 2.5 })).toMatch(/shareAmong/);
   });
 
+  it("checks the caption, the jumps, the recipient and the tag of a picture", () => {
+    const picture = (visual: object) => {
+      const a = clone();
+      a.cards[1].visual = visual as never;
+      return problems(a);
+    };
+    const line = {
+      kind: "number-line",
+      ariaLabel: "droite",
+      min: 0,
+      max: 12,
+      marks: [0, 4, 8, 12],
+    };
+    expect(picture({ ...line, jumps: true, caption: "de 4 en 4" })).toBe("");
+    expect(picture({ ...line, caption: "  " })).toMatch(/légende de visuel vide/);
+    expect(picture({ ...line, marks: [4], jumps: true })).toMatch(
+      /sauts demandent au moins deux marques/,
+    );
+    const share = { kind: "groups", ariaLabel: "partage", total: 24, shareAmong: 5 };
+    expect(picture({ ...share, recipient: "🙂", restLabel: "reste", caption: "5 × 4 = 20" })).toBe(
+      "",
+    );
+    expect(
+      picture({ kind: "groups", ariaLabel: "x", total: 24, groupSize: 6, recipient: "🙂" }),
+    ).toMatch(/recipient n'a de sens qu'avec shareAmong/);
+    expect(picture({ ...share, restLabel: " " })).toMatch(/restLabel/);
+    expect(picture({ ...share, restLabel: "un reste vraiment trop long" })).toMatch(/restLabel/);
+  });
+
   it("lets a step ask its own question, but needs a subject or a question", () => {
     const a = clone();
     const step = val(a).steps[0];

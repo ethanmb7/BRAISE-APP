@@ -259,6 +259,7 @@ function checkVisual(
 ) {
   if (!v) return;
   if (!v.ariaLabel.trim()) err(where, "un visuel doit avoir un libellé pour les lecteurs d'écran");
+  if (v.caption !== undefined && !v.caption.trim()) err(where, "légende de visuel vide");
   if (v.kind === "number-line") {
     const step = v.step ?? 1;
     if (!(v.min < v.max)) err(where, "droite graduée : min doit être inférieur à max");
@@ -276,10 +277,16 @@ function checkVisual(
         err(where, "droite graduée : une marque est hors de la droite");
       if (v.bound !== undefined && !inside(v.bound))
         err(where, "droite graduée : la borne est hors de la droite");
+      if (v.jumps && (v.marks ?? []).length < 2)
+        err(where, "droite graduée : des sauts demandent au moins deux marques");
     }
   } else if (v.kind === "groups") {
     if (!(Number.isInteger(v.total) && v.total >= 1 && v.total <= MAX_GROUP_ITEMS))
       err(where, `groupes : total entier entre 1 et ${MAX_GROUP_ITEMS}`);
+    if (v.recipient !== undefined && v.shareAmong === undefined)
+      err(where, "groupes : recipient n'a de sens qu'avec shareAmong");
+    if (v.restLabel !== undefined && (!v.restLabel.trim() || v.restLabel.length > 16))
+      err(where, "groupes : restLabel non vide, 16 caractères au plus");
     const bySize = v.groupSize !== undefined;
     const byShare = v.shareAmong !== undefined;
     if (bySize === byShare) {

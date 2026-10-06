@@ -52,8 +52,10 @@
       "visual": {
         "kind": "groups",
         "item": "🍕",
+        "recipient": "🙂",
         "total": 24,
         "shareAmong": 6,
+        "caption": "24 = 6 × 4",
         "ariaLabel": "24 parts de pizza partagées entre 6 potes : chacun en reçoit 4, il n’en reste aucune."
       },
       "id": "M2-ARI-D02-C01",
@@ -84,8 +86,11 @@
       "visual": {
         "kind": "groups",
         "item": "🍕",
+        "recipient": "🙂",
+        "restLabel": "reste",
         "total": 24,
         "shareAmong": 5,
+        "caption": "5 × 4 = 20 : il en reste 4",
         "ariaLabel": "24 parts de pizza partagées entre 5 potes : chacun en reçoit 4, et 4 parts restent sur la table."
       },
       "id": "M2-ARI-D02-C02",
@@ -224,6 +229,8 @@
         "min": -12,
         "max": 12,
         "marks": [-12, -8, -4, 0, 4, 8, 12],
+        "jumps": true,
+        "caption": "Les multiples de 4, de 4 en 4",
         "ariaLabel": "Droite graduée de −12 à 12 sur laquelle les multiples de 4 sont mis en relief : −12, −8, −4, 0, 4, 8 et 12."
       },
       "id": "M2-ARI-D02-C08",

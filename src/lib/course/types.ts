@@ -76,19 +76,26 @@ export type ChapterDef = {
  *  screen reader says in its place. */
 export type Visual = NestedBoxesVisual | NumberLineVisual | GroupsVisual;
 
-/** Sets inside sets: what "ℕ ⊂ ℤ" looks like. */
-export type NestedBoxesVisual = {
-  kind: "nested-boxes";
+/** What every picture carries. */
+type VisualBase = {
+  /** What a screen reader says in place of the picture. */
   ariaLabel: string;
+  /** A short line under the picture that ties it to the notation ("24 = 6 × 4"). Plain text, with
+   *  the same symbols as the course texts. */
+  caption?: string;
+};
+
+/** Sets inside sets: what "ℕ ⊂ ℤ" looks like. */
+export type NestedBoxesVisual = VisualBase & {
+  kind: "nested-boxes";
   /** Top-level boxes, side by side; each may contain boxes. */
   boxes: BoxNode[];
 };
 export type BoxNode = { label: string; children?: BoxNode[] };
 
 /** A graduated line with some points, some highlighted marks (multiples, say) and an optional bound. */
-export type NumberLineVisual = {
+export type NumberLineVisual = VisualBase & {
   kind: "number-line";
-  ariaLabel: string;
   min: number;
   max: number;
   /** Distance between two ticks; 1 by default. */
@@ -99,14 +106,16 @@ export type NumberLineVisual = {
   marks?: number[];
   /** A limit drawn as a vertical bar, e.g. "never go above". */
   bound?: number;
+  /** Draw a jump between each pair of consecutive marks, labelled with its length: what "multiples
+   *  of 4" looks like as steps of 4. Needs at least two marks. */
+  jumps?: boolean;
 };
 
 /** `total` items, either cut into groups of `groupSize` (the complete groups, then what is left
  *  over; with a size of 2 it is pairs and the one without a partner), or shared among `shareAmong`
  *  recipients (each gets the same number, then what is left over). Exactly one of the two. */
-export type GroupsVisual = {
+export type GroupsVisual = VisualBase & {
   kind: "groups";
-  ariaLabel: string;
   total: number;
   /** Cut into groups of this size. */
   groupSize?: number;
@@ -114,6 +123,10 @@ export type GroupsVisual = {
   shareAmong?: number;
   /** What each item looks like (an emoji, a letter); a dot by default. */
   item?: string;
+  /** When shared, who gets each group (an emoji drawn above it). */
+  recipient?: string;
+  /** A tag on what is left over ("reste"). */
+  restLabel?: string;
 };
 
 export type Choice = {
