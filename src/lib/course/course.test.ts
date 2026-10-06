@@ -120,7 +120,7 @@ describe("the M2-ARI-D01 content", () => {
     expect(chapter.title).toBe("Arithmétique");
     expect(chapter.level).toBe("seconde");
     expect(courseChaptersOfSubject("maths").map((c) => c.id)).toContain("M2-ARI");
-    expect(declicsOfChapter(chapter).map((d) => d.id)).toEqual(["M2-ARI-D01"]);
+    expect(declicsOfChapter(chapter).map((d) => d.id)).toEqual(["M2-ARI-D01", "M2-ARI-D02"]);
   });
 
   it("carries its identity, objective and official source", () => {
@@ -175,7 +175,10 @@ describe("the M2-ARI-D01 content", () => {
     ]);
     expect(def.coverage[0].coverage).toBe("full");
     const report = coverageReport(getCourseChapter("M2-ARI")!, [def]);
-    expect(report.every((r) => r.coveredBy.length === 1)).toBe(true);
+    const own = new Set(def.coverage.map((c) => c.mappingId));
+    expect(report.filter((r) => own.has(r.mappingId)).every((r) => r.coveredBy.length === 1)).toBe(
+      true,
+    );
   });
 
   it("links wrong answers to the misconceptions of the chapter", () => {
@@ -331,7 +334,7 @@ describe("the C14 validation", () => {
     while (currentCard(def, run).type !== "multi-step-choice") run = playCard(run, bestPick);
     const subjects: string[] = [];
     for (let i = 0; i < 3; i++) {
-      subjects.push(currentStep(def, run)!.subject);
+      subjects.push(currentStep(def, run)!.subject ?? "");
       run = advance(def, selectStepOption(def, run, currentStep(def, run)!.options[0].id));
     }
     expect(subjects).toEqual(["23", "–9", "2,7"]);

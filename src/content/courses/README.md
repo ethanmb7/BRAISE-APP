@@ -59,6 +59,17 @@ Le type d'un fichier se reconnaît à sa forme : un chapitre a `declicIds`, un D
 
 Le Déclic apparaît seul dans l'écran du chapitre, avec son statut et son deck.
 
+## Le rythme d'un Déclic
+
+Un Déclic alterne explication et question : **je te montre** (situation, explication, mot officiel) →
+**on le fait ensemble** (l'élève fait l'étape clé) → **à toi** (sans aide). Chaque carte peut porter un
+`beat` (`show`, `together`, `you`, `trap`) qui n'est que l'étiquette en haut de l'écran. Le validateur
+refuse deux cartes `reveal` d'affilée. Une image qui donne la réponse se déclare
+`visualTiming: "after-answer"`. Un `reveal` sans `continueLabel` dit « Continuer ». Une étape de
+validation peut porter sa propre `question` (la bulle de Braise) au lieu d'un `subject`. L'image
+`groups` accepte `shareAmong` (partager entre N) à la place de `groupSize`. Exemple complet :
+`M2-ARI-D02.json` (pilote).
+
 ## Variantes, validation et nouvel essai
 
 - **Variantes** (`variants`) sur une carte `choice` ou sur la validation : un second énoncé complet,

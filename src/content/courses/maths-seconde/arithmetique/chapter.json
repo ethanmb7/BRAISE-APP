@@ -37,6 +37,21 @@
       "id": "BO26-M2-VEL-NUMSET-01",
       "requirement": "utiliser la notation des ensembles de nombres",
       "type": "transversal"
+    },
+    {
+      "id": "BO26-M2-ARI-CONT-02",
+      "requirement": "Définir un multiple par une égalité avec un facteur entier : a est multiple de b s’il existe un entier k tel que a = kb",
+      "type": "direct"
+    },
+    {
+      "id": "BO26-M2-ARI-CONT-03",
+      "requirement": "Définir un diviseur : b est un diviseur de a lorsque a est un multiple de b",
+      "type": "direct"
+    },
+    {
+      "id": "BO26-M2-ARI-CAP-01",
+      "requirement": "Modéliser et résoudre un problème mobilisant les notions de multiple et de diviseur",
+      "type": "direct"
     }
   ],
   "misconceptions": [
@@ -67,7 +82,39 @@
     {
       "id": "negative_in_n",
       "label": "un entier négatif appartient à ℕ"
+    },
+    {
+      "id": "reverses_multiple_divisor_roles",
+      "label": "retourner multiple et diviseur : dire que 6 est un multiple de 24 à partir de 24 = 6 × 4"
+    },
+    {
+      "id": "accepts_non_integer_multiplier",
+      "label": "croire qu’un quotient non entier suffit pour être un multiple"
+    },
+    {
+      "id": "excludes_zero_as_multiple",
+      "label": "croire que zéro ne peut pas être un multiple"
+    },
+    {
+      "id": "excludes_negative_multiples",
+      "label": "croire qu’un multiple est forcément positif"
+    },
+    {
+      "id": "confuses_common_divisor_with_common_multiple",
+      "label": "chercher un diviseur commun là où il faut un multiple commun"
+    },
+    {
+      "id": "takes_product_as_first_common_multiple",
+      "label": "prendre le produit de deux nombres pour leur premier multiple commun"
+    },
+    {
+      "id": "counts_pairs_not_divisors",
+      "label": "compter les paires au lieu des diviseurs"
+    },
+    {
+      "id": "misses_divisors_in_list",
+      "label": "oublier des diviseurs dans une liste (1, le nombre lui-même ou la moitié d’une paire)"
     }
   ],
-  "declicIds": ["M2-ARI-D01"]
+  "declicIds": ["M2-ARI-D01", "M2-ARI-D02"]
 }

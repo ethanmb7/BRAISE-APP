@@ -1,0 +1,777 @@
+{
+  "id": "M2-ARI-D02",
+  "chapterId": "M2-ARI",
+  "order": 2,
+  "title": "Ça tombe pile",
+  "version": "0.1",
+  "targetDurationSec": [420, 600],
+  "difficulty": {
+    "level": 1,
+    "label": "introduction"
+  },
+  "objective": "Je sais dire si un nombre est un multiple d’un autre et lister tous les diviseurs d’un nombre sans en oublier.",
+  "prerequisites": ["savoir multiplier et diviser"],
+  "detailedObjectives": [
+    "reconnaître un multiple et un diviseur à partir d’une égalité a = k × b",
+    "ne pas retourner multiple et diviseur",
+    "comprendre qu’un quotient non entier ne donne pas un multiple",
+    "savoir que 0 et les nombres négatifs peuvent être des multiples",
+    "lister les diviseurs d’un nombre par paires, sans en oublier",
+    "trouver le premier multiple commun à deux nombres dans un petit problème"
+  ],
+  "coverage": [
+    {
+      "mappingId": "BO26-M2-ARI-CONT-02",
+      "coverage": "full"
+    },
+    {
+      "mappingId": "BO26-M2-ARI-CONT-03",
+      "coverage": "full"
+    },
+    {
+      "mappingId": "BO26-M2-ARI-CAP-01",
+      "coverage": "introduced"
+    }
+  ],
+  "misconceptionIds": [
+    "reverses_multiple_divisor_roles",
+    "accepts_non_integer_multiplier",
+    "excludes_zero_as_multiple",
+    "excludes_negative_multiples",
+    "confuses_common_divisor_with_common_multiple",
+    "takes_product_as_first_common_multiple",
+    "counts_pairs_not_divisors",
+    "misses_divisors_in_list"
+  ],
+  "cards": [
+    {
+      "type": "reveal",
+      "beat": "show",
+      "continueLabel": "Et à 5 ?",
+      "text": "🔥 Samedi soir, tu commandes 3 pizzas coupées en 8 parts : ça fait 24 parts.\nVous êtes 6 potes. Chacun prend 4 parts, et il ne reste rien. Parfait.",
+      "visual": {
+        "kind": "groups",
+        "item": "🍕",
+        "total": 24,
+        "shareAmong": 6,
+        "ariaLabel": "24 parts de pizza partagées entre 6 potes : chacun en reçoit 4, il n’en reste aucune."
+      },
+      "id": "M2-ARI-D02-C01",
+      "order": 1
+    },
+    {
+      "type": "choice",
+      "text": "Maintenant, vous n’êtes que 5 potes pour les mêmes 24 parts. Qu’est-ce qui se passe ?",
+      "choices": [
+        {
+          "id": "A",
+          "label": "Chacun prend 5 parts, et il n’en reste aucune.",
+          "feedback": "5 × 5 = 25, et il n’y a que 24 parts : il en manquerait une. Chacun peut en prendre 4, pas 5, et il en reste alors 4 sur la table."
+        },
+        {
+          "id": "B",
+          "label": "Chacun prend 4 parts, et il en reste 4 sur la table.",
+          "feedback": "🔥 Voilà : 5 × 4 = 20, et 24 − 20 = 4 parts traînent sur la table. Partager sans reste ne marche pas avec tous les nombres de potes.",
+          "correct": true
+        },
+        {
+          "id": "C",
+          "label": "Chacun prend 4 parts, et il ne reste rien.",
+          "feedback": "5 × 4 = 20, pas 24 : il reste 4 parts sur la table. Avec 5 potes, ça ne tombe pas pile."
+        }
+      ],
+      "visualTiming": "after-answer",
+      "visual": {
+        "kind": "groups",
+        "item": "🍕",
+        "total": 24,
+        "shareAmong": 5,
+        "ariaLabel": "24 parts de pizza partagées entre 5 potes : chacun en reçoit 4, et 4 parts restent sur la table."
+      },
+      "id": "M2-ARI-D02-C02",
+      "order": 2
+    },
+    {
+      "type": "choice",
+      "text": "Un seul de ces nombres de potes ne permet pas de partager les 24 parts sans en laisser. Lequel ?",
+      "choices": [
+        {
+          "id": "A",
+          "label": "3",
+          "feedback": "3 potes : chacun prend 8 parts, 3 × 8 = 24. Ça tombe pile, ce n’est donc pas l’intrus."
+        },
+        {
+          "id": "B",
+          "label": "4",
+          "feedback": "4 potes : chacun prend 6 parts, 4 × 6 = 24. Ça tombe pile, ce n’est pas l’intrus."
+        },
+        {
+          "id": "C",
+          "label": "7",
+          "feedback": "🔥 Oui. 7 × 3 = 21 et 7 × 4 = 28 : on saute par-dessus 24, ça ne tombe jamais pile. Avec 3, 4 ou 8 potes, tout se partage.",
+          "correct": true
+        },
+        {
+          "id": "D",
+          "label": "8",
+          "feedback": "8 potes : chacun prend 3 parts, 8 × 3 = 24. Ça tombe pile, ce n’est pas l’intrus."
+        }
+      ],
+      "id": "M2-ARI-D02-C03",
+      "order": 3
+    },
+    {
+      "type": "reveal",
+      "beat": "show",
+      "text": "🔥 Ces nombres qui « rentrent pile » dans 24, voilà ce que les maths étudient.\nAvec 6 potes, ça marche parce que **24 = 6 × 4**. On dit que 24 est un ==multiple== de 6, et que 6 est un ==diviseur== de 24.\nTraduction prof : a est un multiple de b s’il existe un entier k tel que a = k × b (avec b ≠ 0).",
+      "id": "M2-ARI-D02-C04",
+      "order": 4
+    },
+    {
+      "type": "choice",
+      "beat": "together",
+      "text": "On le fait ensemble. 30 parts de gâteau pour 5 potes.\n30 = 5 × … ?",
+      "choices": [
+        {
+          "id": "A",
+          "label": "6",
+          "feedback": "🔥 5 × 6 = 30 : chacun prend 6 parts, rien ne reste. Donc 30 est un multiple de 5, et 5 est un diviseur de 30.",
+          "correct": true
+        },
+        {
+          "id": "B",
+          "label": "25",
+          "feedback": "25, c’est 30 − 5 : tu as retiré au lieu de chercher le bon multiplicateur. Il faut k tel que 5 × k = 30, et 5 × 25 = 125."
+        },
+        {
+          "id": "C",
+          "label": "35",
+          "feedback": "35, c’est 30 + 5 : tu as ajouté. Pour un multiple, on multiplie : 5 × k = 30, donc k = 6."
+        },
+        {
+          "id": "D",
+          "label": "5",
+          "feedback": "5 × 5 = 25, pas 30 : il manquerait 5 parts. Le multiplicateur cherché est un peu plus grand."
+        }
+      ],
+      "id": "M2-ARI-D02-C05",
+      "order": 5
+    },
+    {
+      "type": "choice",
+      "beat": "you",
+      "text": "À toi. 27 = 3 × 9. Quelle phrase est juste ?",
+      "choices": [
+        {
+          "id": "A",
+          "label": "3 est un multiple de 27.",
+          "feedback": "Attention aux rôles. 3 × 9 = 27 : c’est 27 qui est dans la table de 3. 3 est un diviseur de 27, pas un multiple.",
+          "misconceptionId": "reverses_multiple_divisor_roles"
+        },
+        {
+          "id": "B",
+          "label": "27 est un diviseur de 9.",
+          "feedback": "27 ÷ 9 = 3, donc 9 rentre pile dans 27 : c’est 9 qui est un diviseur de 27, pas l’inverse.",
+          "misconceptionId": "reverses_multiple_divisor_roles"
+        },
+        {
+          "id": "C",
+          "label": "27 est un multiple de 3.",
+          "feedback": "🔥 Oui : 27 = 3 × 9 avec 9 entier, donc 27 est un multiple de 3. Et dans l’autre sens, 3 est un diviseur de 27.",
+          "correct": true
+        },
+        {
+          "id": "D",
+          "label": "9 n’est pas un diviseur de 27.",
+          "feedback": "27 = 9 × 3 avec 3 entier : 9 divise bien 27. La phrase dit l’inverse de ce qui est vrai."
+        }
+      ],
+      "id": "M2-ARI-D02-C06",
+      "order": 6
+    },
+    {
+      "type": "choice",
+      "beat": "trap",
+      "text": "⚠️ Léo balance : « 7 est un multiple de 35, puisque 35 = 7 × 5. » Il a raison ?",
+      "choices": [
+        {
+          "id": "A",
+          "label": "Oui, l’égalité 35 = 7 × 5 le prouve.",
+          "feedback": "Léo a retourné la phrase. 35 = 7 × 5 montre que 35 est dans la table de 7 : 35 est un multiple de 7, et 7 est un diviseur de 35.",
+          "misconceptionId": "reverses_multiple_divisor_roles"
+        },
+        {
+          "id": "B",
+          "label": "Non : c’est 35 qui est un multiple de 7.",
+          "feedback": "🔥 Voilà. Le multiple, c’est le résultat de la table ; le diviseur, c’est celui qui entre pile. Astuce : entre deux entiers positifs non nuls, le multiple est le plus grand, ou égal.",
+          "correct": true
+        },
+        {
+          "id": "C",
+          "label": "Non, 35 n’est pas un multiple de 7.",
+          "feedback": "Si : 35 = 7 × 5 avec 5 entier, donc 35 est bien un multiple de 7. Léo se trompe de sens, pas de calcul."
+        }
+      ],
+      "id": "M2-ARI-D02-C07",
+      "order": 7
+    },
+    {
+      "type": "reveal",
+      "beat": "show",
+      "text": "🔥 Petite surprise : la définition marche aussi avec 0 et avec les négatifs.\n0 = 6 × 0, donc 0 est un multiple de 6. Et −12 = 4 × (−3), donc −12 est un multiple de 4.\nCe qui compte, c’est que k soit un entier : il peut être nul ou négatif.",
+      "visual": {
+        "kind": "number-line",
+        "min": -12,
+        "max": 12,
+        "marks": [-12, -8, -4, 0, 4, 8, 12],
+        "ariaLabel": "Droite graduée de −12 à 12 sur laquelle les multiples de 4 sont mis en relief : −12, −8, −4, 0, 4, 8 et 12."
+      },
+      "id": "M2-ARI-D02-C08",
+      "order": 8
+    },
+    {
+      "type": "choice",
+      "beat": "you",
+      "text": "À toi. −55 = 11 × (−5). Alors −55 est…",
+      "choices": [
+        {
+          "id": "A",
+          "label": "pas un multiple de 11, parce qu’il est négatif.",
+          "feedback": "Le signe ne change rien. −55 = 11 × (−5) et −5 est un entier : un multiple peut être négatif.",
+          "misconceptionId": "excludes_negative_multiples"
+        },
+        {
+          "id": "B",
+          "label": "un multiple de 11 : −5 est un entier, même négatif.",
+          "feedback": "🔥 Oui : −5 est un entier (négatif, mais entier), donc −55 est un multiple de 11. Négatif ne veut pas dire « hors de la table ».",
+          "correct": true
+        },
+        {
+          "id": "C",
+          "label": "un diviseur de 11.",
+          "feedback": "On a retourné les rôles. −55 est le résultat de 11 × (−5) : c’est un multiple de 11, pas un diviseur de 11.",
+          "misconceptionId": "reverses_multiple_divisor_roles"
+        }
+      ],
+      "id": "M2-ARI-D02-C09",
+      "order": 9
+    },
+    {
+      "type": "reveal",
+      "beat": "show",
+      "text": "🔥 Lister tous les diviseurs d’un nombre sans en oublier ? Cherche par paires.\nPour 24 : 1 × 24, 2 × 12, 3 × 8, 4 × 6.\nLes diviseurs, ce sont tous les nombres de ces paires : 1, 2, 3, 4, 6, 8, 12 et 24. Ça fait 8 diviseurs.",
+      "id": "M2-ARI-D02-C10",
+      "order": 10
+    },
+    {
+      "type": "choice",
+      "beat": "together",
+      "text": "On le fait ensemble : les diviseurs de 36.\nLes paires : 1 × 36, 2 × 18, 3 × 12, 4 × 9, … Quelle est la paire suivante ?",
+      "choices": [
+        {
+          "id": "A",
+          "label": "5 × 7",
+          "feedback": "5 × 7 = 35, pas 36 : 5 ne divise pas 36. Pour chaque paire, le produit doit faire exactement 36."
+        },
+        {
+          "id": "B",
+          "label": "9 × 4",
+          "feedback": "9 × 4, c’est la paire 4 × 9 à l’envers : on l’a déjà. La prochaine paire nouvelle est celle où le nombre se multiplie par lui-même."
+        },
+        {
+          "id": "C",
+          "label": "6 × 6",
+          "feedback": "🔥 6 × 6 = 36. Et on s’arrête là : après, on retomberait sur les mêmes paires à l’envers. Les diviseurs de 36 : 1, 2, 3, 4, 6, 9, 12, 18, 36. Ça fait 9 diviseurs.",
+          "correct": true
+        }
+      ],
+      "id": "M2-ARI-D02-C11",
+      "order": 11
+    },
+    {
+      "type": "choice",
+      "beat": "you",
+      "text": "À toi. Combien 50 a-t-il de diviseurs ?",
+      "choices": [
+        {
+          "id": "A",
+          "label": "3",
+          "feedback": "3, c’est le nombre de paires (1 × 50, 2 × 25, 5 × 10). Chaque paire donne deux diviseurs : il y en a 6.",
+          "misconceptionId": "counts_pairs_not_divisors"
+        },
+        {
+          "id": "B",
+          "label": "4",
+          "feedback": "4 : tu as oublié 1 et 50, qui sont toujours des diviseurs (1 × 50 = 50). La liste complète : 1, 2, 5, 10, 25, 50.",
+          "misconceptionId": "misses_divisors_in_list"
+        },
+        {
+          "id": "C",
+          "label": "6",
+          "feedback": "🔥 Oui : 1 × 50, 2 × 25, 5 × 10, donc 1, 2, 5, 10, 25 et 50. Ça fait 6 diviseurs.",
+          "correct": true
+        },
+        {
+          "id": "D",
+          "label": "7",
+          "feedback": "On trouve 1, 2, 5, 10, 25 et 50, soit 6 diviseurs. 7 n’en fait pas partie (7 × 7 = 49) : en compter 7, c’est en inventer un."
+        }
+      ],
+      "id": "M2-ARI-D02-C12",
+      "order": 12
+    },
+    {
+      "type": "choice",
+      "beat": "trap",
+      "text": "⚠️ Lou liste les diviseurs de 30 : 1, 2, 3, 5, 10, 15, 30. Il en manque un. Lequel ?",
+      "choices": [
+        {
+          "id": "A",
+          "label": "4",
+          "feedback": "30 ÷ 4 = 7,5 : 4 × 7 = 28 et 4 × 8 = 32, ça saute 30. Ce n’est pas un diviseur."
+        },
+        {
+          "id": "B",
+          "label": "6",
+          "feedback": "🔥 Oui : 5 × 6 = 30, donc 6 est un diviseur. Lou a gardé le 5 de la paire 5 × 6 mais pas le 6. Pour chaque paire, note les deux nombres.",
+          "correct": true
+        },
+        {
+          "id": "C",
+          "label": "8",
+          "feedback": "8 × 3 = 24 et 8 × 4 = 32 : ça saute 30. Ce n’est pas un diviseur de 30."
+        },
+        {
+          "id": "D",
+          "label": "Aucun : la liste est complète.",
+          "feedback": "Il y a bien un oubli : 5 × 6 = 30, mais 6 ne figure pas dans la liste de Lou.",
+          "misconceptionId": "misses_divisors_in_list"
+        }
+      ],
+      "id": "M2-ARI-D02-C13",
+      "order": 13
+    },
+    {
+      "type": "choice",
+      "beat": "you",
+      "text": "À toi, version vraie vie. Un bus part toutes les 12 minutes, un tram toutes les 8 minutes. Ils partent ensemble à 8 h 00. À quelle heure repartent-ils ensemble pour la première fois ?",
+      "choices": [
+        {
+          "id": "A",
+          "label": "8 h 04",
+          "feedback": "4 divise 12 et 8, mais ce n’est pas ça qu’on cherche : 4 n’est ni dans la table de 12 ni dans celle de 8. Il faut un nombre qui soit dans les deux tables.",
+          "misconceptionId": "confuses_common_divisor_with_common_multiple"
+        },
+        {
+          "id": "B",
+          "label": "8 h 20",
+          "feedback": "20 = 12 + 8 : tu as additionné. Il faut un nombre qui soit dans la table de 12 ET dans celle de 8 : 12, 24… et 8, 16, 24…"
+        },
+        {
+          "id": "C",
+          "label": "8 h 24",
+          "feedback": "🔥 Oui : les multiples de 12 sont 12, 24…, ceux de 8 sont 8, 16, 24… Le premier commun est 24.",
+          "correct": true
+        },
+        {
+          "id": "D",
+          "label": "9 h 36",
+          "feedback": "96 = 12 × 8 est bien dans les deux tables, mais ce n’est pas le premier : 24 y est déjà (24 = 12 × 2 = 8 × 3). On cherche le plus petit.",
+          "misconceptionId": "takes_product_as_first_common_multiple"
+        }
+      ],
+      "variants": [
+        {
+          "id": "v2",
+          "text": "Une navette passe toutes les 10 minutes, un métro toutes les 15 minutes. Ils partent ensemble à 8 h 00. À quelle heure repartent-ils ensemble pour la première fois ?",
+          "choices": [
+            {
+              "id": "A",
+              "label": "8 h 30",
+              "feedback": "🔥 Oui : les multiples de 10 sont 10, 20, 30…, ceux de 15 sont 15, 30… Le premier commun est 30.",
+              "correct": true
+            },
+            {
+              "id": "B",
+              "label": "8 h 05",
+              "feedback": "5 divise 10 et 15, mais ce n’est pas ça qu’on cherche : 5 n’est ni dans la table de 10 ni dans celle de 15. Il faut un nombre qui soit dans les deux tables.",
+              "misconceptionId": "confuses_common_divisor_with_common_multiple"
+            },
+            {
+              "id": "C",
+              "label": "8 h 25",
+              "feedback": "25 = 10 + 15 : tu as additionné. Il faut un nombre qui soit dans la table de 10 ET dans celle de 15 : 10, 20, 30… et 15, 30…"
+            },
+            {
+              "id": "D",
+              "label": "10 h 30",
+              "feedback": "150 = 10 × 15 est bien dans les deux tables, mais ce n’est pas le premier : 30 y est déjà (30 = 10 × 3 = 15 × 2). On cherche le plus petit.",
+              "misconceptionId": "takes_product_as_first_common_multiple"
+            }
+          ]
+        },
+        {
+          "id": "v3",
+          "text": "Deux guirlandes clignotent ensemble à l’instant 0. L’une clignote toutes les 9 secondes, l’autre toutes les 12 secondes. Au bout de combien de temps clignotent-elles de nouveau ensemble pour la première fois ?",
+          "choices": [
+            {
+              "id": "A",
+              "label": "3 secondes",
+              "feedback": "3 divise 9 et 12, mais ce n’est pas ça qu’on cherche : 3 n’est ni dans la table de 9 ni dans celle de 12. Il faut un nombre qui soit dans les deux tables.",
+              "misconceptionId": "confuses_common_divisor_with_common_multiple"
+            },
+            {
+              "id": "B",
+              "label": "21 secondes",
+              "feedback": "21 = 9 + 12 : tu as additionné. Il faut un nombre qui soit dans la table de 9 ET dans celle de 12 : 9, 18, 27, 36… et 12, 24, 36…"
+            },
+            {
+              "id": "C",
+              "label": "108 secondes",
+              "feedback": "108 = 9 × 12 est bien dans les deux tables, mais ce n’est pas le premier : 36 y est déjà (36 = 9 × 4 = 12 × 3). On cherche le plus petit.",
+              "misconceptionId": "takes_product_as_first_common_multiple"
+            },
+            {
+              "id": "D",
+              "label": "36 secondes",
+              "feedback": "🔥 Oui : les multiples de 9 sont 9, 18, 27, 36…, ceux de 12 sont 12, 24, 36… Le premier commun est 36.",
+              "correct": true
+            }
+          ]
+        }
+      ],
+      "id": "M2-ARI-D02-C14",
+      "order": 14
+    },
+    {
+      "type": "multi-step-choice",
+      "text": "🔥 Dernier check, sans moi. Trois questions : tu réponds à toutes, et je te montre les corrections ensuite.",
+      "feedbackTiming": "after-all",
+      "steps": [
+        {
+          "id": "M2-ARI-D02-C15-S1",
+          "question": "72 = 8 × 9. Quelle phrase est juste ?",
+          "options": [
+            {
+              "id": "A",
+              "label": "8 est un multiple de 72.",
+              "feedback": "Rôles retournés : 8 × 9 = 72, c’est donc 72 qui est dans la table de 8. 8 est un diviseur de 72, pas un multiple.",
+              "misconceptionId": "reverses_multiple_divisor_roles"
+            },
+            {
+              "id": "B",
+              "label": "72 est un multiple de 8.",
+              "feedback": "🔥 Oui : 72 = 8 × 9 avec 9 entier, donc 72 est un multiple de 8. Et 8 est un diviseur de 72.",
+              "correct": true
+            },
+            {
+              "id": "C",
+              "label": "72 est un diviseur de 8.",
+              "feedback": "72 ne rentre pas pile dans 8 : c’est 8 qui rentre dans 72 (8 × 9 = 72). 8 est un diviseur de 72, pas l’inverse.",
+              "misconceptionId": "reverses_multiple_divisor_roles"
+            }
+          ],
+          "conceptId": "roles_sens",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D02-C04",
+            "toCardId": "M2-ARI-D02-C07"
+          }
+        },
+        {
+          "id": "M2-ARI-D02-C15-S2",
+          "question": "81 est-il un multiple de 6 ?",
+          "discriminating": true,
+          "options": [
+            {
+              "id": "A",
+              "label": "Oui : 81 est plus grand que 6.",
+              "feedback": "Être plus grand ne suffit pas : il faut que 81 soit dans la table de 6. Or 6 × 13 = 78 et 6 × 14 = 84, on saute 81."
+            },
+            {
+              "id": "B",
+              "label": "Non : 81 ÷ 6 n’est pas un entier.",
+              "feedback": "🔥 Oui : il faudrait un entier k tel que 6 × k = 81. Or 6 × 13 = 78 et 6 × 14 = 84 : 81 tombe entre les deux.",
+              "correct": true
+            },
+            {
+              "id": "C",
+              "label": "Oui : 81 ÷ 6 = 13,5, ça se calcule.",
+              "feedback": "Ça se calcule, mais le résultat n’est pas un entier. Pour être un multiple de 6, 81 devrait s’écrire 6 × k avec k entier.",
+              "misconceptionId": "accepts_non_integer_multiplier"
+            }
+          ],
+          "conceptId": "problems",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D02-C02",
+            "toCardId": "M2-ARI-D02-C04"
+          }
+        },
+        {
+          "id": "M2-ARI-D02-C15-S3",
+          "question": "Combien 32 a-t-il de diviseurs ?",
+          "options": [
+            {
+              "id": "A",
+              "label": "3",
+              "feedback": "3, c’est le nombre de paires (1 × 32, 2 × 16, 4 × 8). Chaque paire donne deux diviseurs : il y en a 6.",
+              "misconceptionId": "counts_pairs_not_divisors"
+            },
+            {
+              "id": "B",
+              "label": "4",
+              "feedback": "4 : tu as oublié 1 et 32, qui sont toujours des diviseurs (1 × 32 = 32). La liste complète : 1, 2, 4, 8, 16, 32.",
+              "misconceptionId": "misses_divisors_in_list"
+            },
+            {
+              "id": "C",
+              "label": "5",
+              "feedback": "La liste est 1, 2, 4, 8, 16, 32 : 6 diviseurs, pas 5. Vérifie chaque paire : 1 × 32, 2 × 16, 4 × 8."
+            },
+            {
+              "id": "D",
+              "label": "6",
+              "feedback": "🔥 Oui : 1 × 32, 2 × 16, 4 × 8, donc 1, 2, 4, 8, 16, 32. Ça fait 6 diviseurs.",
+              "correct": true
+            }
+          ],
+          "conceptId": "divisors_list",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D02-C10",
+            "toCardId": "M2-ARI-D02-C13"
+          }
+        }
+      ],
+      "variants": [
+        {
+          "id": "v2",
+          "steps": [
+            {
+              "id": "M2-ARI-D02-C15-V2-S1",
+              "question": "66 = 6 × 11. Quelle phrase est juste ?",
+              "options": [
+                {
+                  "id": "A",
+                  "label": "66 est un multiple de 6.",
+                  "feedback": "🔥 Oui : 66 = 6 × 11 avec 11 entier, donc 66 est un multiple de 6. Et 6 est un diviseur de 66.",
+                  "correct": true
+                },
+                {
+                  "id": "B",
+                  "label": "66 est un diviseur de 6.",
+                  "feedback": "66 ne rentre pas pile dans 6 : c’est 6 qui rentre dans 66 (6 × 11 = 66). 6 est un diviseur de 66, pas l’inverse.",
+                  "misconceptionId": "reverses_multiple_divisor_roles"
+                },
+                {
+                  "id": "C",
+                  "label": "6 est un multiple de 66.",
+                  "feedback": "Rôles retournés : 6 × 11 = 66, c’est donc 66 qui est dans la table de 6. 6 est un diviseur de 66, pas un multiple.",
+                  "misconceptionId": "reverses_multiple_divisor_roles"
+                }
+              ]
+            },
+            {
+              "id": "M2-ARI-D02-C15-V2-S2",
+              "question": "90 est-il un multiple de 8 ?",
+              "discriminating": true,
+              "options": [
+                {
+                  "id": "A",
+                  "label": "Oui : 90 est plus grand que 8.",
+                  "feedback": "Être plus grand ne suffit pas : il faut que 90 soit dans la table de 8. Or 8 × 11 = 88 et 8 × 12 = 96, on saute 90."
+                },
+                {
+                  "id": "B",
+                  "label": "Oui : 90 ÷ 8 = 11,25, ça se calcule.",
+                  "feedback": "Ça se calcule, mais le résultat n’est pas un entier. Pour être un multiple de 8, 90 devrait s’écrire 8 × k avec k entier.",
+                  "misconceptionId": "accepts_non_integer_multiplier"
+                },
+                {
+                  "id": "C",
+                  "label": "Non : 90 ÷ 8 n’est pas un entier.",
+                  "feedback": "🔥 Oui : il faudrait un entier k tel que 8 × k = 90. Or 8 × 11 = 88 et 8 × 12 = 96 : 90 tombe entre les deux.",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "id": "M2-ARI-D02-C15-V2-S3",
+              "question": "Combien 70 a-t-il de diviseurs ?",
+              "options": [
+                {
+                  "id": "A",
+                  "label": "4",
+                  "feedback": "4, c’est le nombre de paires (1 × 70, 2 × 35, 5 × 14, 7 × 10). Chaque paire donne deux diviseurs : il y en a 8.",
+                  "misconceptionId": "counts_pairs_not_divisors"
+                },
+                {
+                  "id": "B",
+                  "label": "8",
+                  "feedback": "🔥 Oui : 1 × 70, 2 × 35, 5 × 14, 7 × 10, donc 1, 2, 5, 7, 10, 14, 35, 70. Ça fait 8 diviseurs.",
+                  "correct": true
+                },
+                {
+                  "id": "C",
+                  "label": "6",
+                  "feedback": "6 : tu as oublié 1 et 70, qui sont toujours des diviseurs (1 × 70 = 70). La liste complète : 1, 2, 5, 7, 10, 14, 35, 70.",
+                  "misconceptionId": "misses_divisors_in_list"
+                },
+                {
+                  "id": "D",
+                  "label": "10",
+                  "feedback": "La liste est 1, 2, 5, 7, 10, 14, 35, 70 : 8 diviseurs, pas 10. Vérifie chaque paire : 1 × 70, 2 × 35, 5 × 14, 7 × 10."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "v3",
+          "steps": [
+            {
+              "id": "M2-ARI-D02-C15-V3-S1",
+              "question": "84 = 7 × 12. Quelle phrase est juste ?",
+              "options": [
+                {
+                  "id": "A",
+                  "label": "7 est un multiple de 84.",
+                  "feedback": "Rôles retournés : 7 × 12 = 84, c’est donc 84 qui est dans la table de 7. 7 est un diviseur de 84, pas un multiple.",
+                  "misconceptionId": "reverses_multiple_divisor_roles"
+                },
+                {
+                  "id": "B",
+                  "label": "84 est un diviseur de 7.",
+                  "feedback": "84 ne rentre pas pile dans 7 : c’est 7 qui rentre dans 84 (7 × 12 = 84). 7 est un diviseur de 84, pas l’inverse.",
+                  "misconceptionId": "reverses_multiple_divisor_roles"
+                },
+                {
+                  "id": "C",
+                  "label": "84 est un multiple de 7.",
+                  "feedback": "🔥 Oui : 84 = 7 × 12 avec 12 entier, donc 84 est un multiple de 7. Et 7 est un diviseur de 84.",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "id": "M2-ARI-D02-C15-V3-S2",
+              "question": "100 est-il un multiple de 9 ?",
+              "discriminating": true,
+              "options": [
+                {
+                  "id": "A",
+                  "label": "Non : 100 ÷ 9 n’est pas un entier.",
+                  "feedback": "🔥 Oui : il faudrait un entier k tel que 9 × k = 100. Or 9 × 11 = 99 et 9 × 12 = 108 : 100 tombe entre les deux.",
+                  "correct": true
+                },
+                {
+                  "id": "B",
+                  "label": "Oui : 100 ÷ 9 ≈ 11,11, ça se calcule.",
+                  "feedback": "Ça se calcule, mais le résultat n’est pas un entier. Pour être un multiple de 9, 100 devrait s’écrire 9 × k avec k entier.",
+                  "misconceptionId": "accepts_non_integer_multiplier"
+                },
+                {
+                  "id": "C",
+                  "label": "Oui : 100 est plus grand que 9.",
+                  "feedback": "Être plus grand ne suffit pas : il faut que 100 soit dans la table de 9. Or 9 × 11 = 99 et 9 × 12 = 108, on saute 100."
+                }
+              ]
+            },
+            {
+              "id": "M2-ARI-D02-C15-V3-S3",
+              "question": "Combien 64 a-t-il de diviseurs ?",
+              "options": [
+                {
+                  "id": "A",
+                  "label": "4",
+                  "feedback": "4, c’est le nombre de paires (1 × 64, 2 × 32, 4 × 16, 8 × 8). Mais la paire 8 × 8 ne donne qu’un seul diviseur : il y en a 7.",
+                  "misconceptionId": "counts_pairs_not_divisors"
+                },
+                {
+                  "id": "B",
+                  "label": "5",
+                  "feedback": "5 : tu as oublié 1 et 64, qui sont toujours des diviseurs (1 × 64 = 64). La liste complète : 1, 2, 4, 8, 16, 32, 64.",
+                  "misconceptionId": "misses_divisors_in_list"
+                },
+                {
+                  "id": "C",
+                  "label": "7",
+                  "feedback": "🔥 Oui : 1 × 64, 2 × 32, 4 × 16, 8 × 8, donc 1, 2, 4, 8, 16, 32, 64. Ça fait 7 diviseurs.",
+                  "correct": true
+                },
+                {
+                  "id": "D",
+                  "label": "8",
+                  "feedback": "8 : tu as compté le 8 deux fois (il vient de 8 × 8). La liste est 1, 2, 4, 8, 16, 32, 64 : 7 diviseurs."
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "id": "M2-ARI-D02-C15",
+      "order": 15
+    },
+    {
+      "type": "declic-summary",
+      "text": "🔥 À garder\na est un ==multiple== de b (b ≠ 0) s’il existe un entier k tel que a = k × b. Alors b est un ==diviseur== de a.\nUn multiple, c’est un résultat de la table de b. Un diviseur, c’est celui qui entre pile.\nk peut être nul ou négatif, mais il doit être entier.\nPour lister les diviseurs : cherche les paires de produits.\n⚠️ Piège contrôle : multiple et diviseur se retournent. 24 est un multiple de 6, et 6 est un diviseur de 24.",
+      "actions": [
+        {
+          "id": "done",
+          "label": "J’ai capté 🔥",
+          "kind": "complete"
+        },
+        {
+          "id": "review",
+          "label": "Revoir le point qui me piège",
+          "kind": "menu"
+        }
+      ],
+      "menu": [
+        {
+          "id": "multiple-diviseur",
+          "label": "Multiple / diviseur",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D02-C04",
+            "toCardId": "M2-ARI-D02-C07"
+          }
+        },
+        {
+          "id": "zero-negatifs",
+          "label": "0 et les négatifs",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D02-C08",
+            "toCardId": "M2-ARI-D02-C09"
+          }
+        },
+        {
+          "id": "paires",
+          "label": "Lister les diviseurs",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D02-C10",
+            "toCardId": "M2-ARI-D02-C13"
+          }
+        }
+      ],
+      "id": "M2-ARI-D02-C16",
+      "order": 16
+    }
+  ],
+  "assessment": {
+    "cardId": "M2-ARI-D02-C15",
+    "understoodMinScore": 2,
+    "requireDiscriminatingStep": true,
+    "understoodMessage": "🔥 Là, tu fais la différence entre « ça se calcule » et « ça tombe pile ».\nOn te le remontre dans quelques jours pour que ça reste.",
+    "needsReinforcementMessage": "🔥 T’as l’idée, mais ça se mélange encore un peu.\nOn revoit les points qui coincent.",
+    "followUpCount": 2
+  },
+  "mastery": {
+    "requiredDeferredSuccesses": 2,
+    "requiredCardRatio": 0.8
+  },
+  "deckId": "M2-ARI-D02-REV"
+}

@@ -127,6 +127,15 @@
   background: var(--paper);
   box-shadow: 4px 4px 0 var(--neo-ink);
 }
+/* The card's instruction, under a step that asks its own question. */
+.course-subject-caption {
+  max-width: 34ch;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--ink-soft);
+}
 .course-subject-step {
   font:
     800 0.7rem/1 "IBM Plex Mono",

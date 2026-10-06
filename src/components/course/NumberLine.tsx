@@ -5,10 +5,10 @@ const PAD = 20;
 const AXIS_Y = 46;
 const MAX_LABELS = 14;
 
-// Negative numbers are written with the en dash the course texts use, decimals with a comma.
+// Negative numbers are written with the real minus sign (−), decimals with a comma.
 const fmt = (n: number) =>
   String(Number(n.toFixed(6)))
-    .replace("-", "–")
+    .replace("-", "−")
     .replace(".", ",");
 
 // A graduated line drawn from data (see NumberLineVisual in lib/course/types.ts): ticks, points,

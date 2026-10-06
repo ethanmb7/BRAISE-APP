@@ -34,7 +34,7 @@ import {
   pickMenuItem,
 } from "@/lib/course/session";
 import { resolveText } from "@/lib/course/text";
-import type { CardDef, Choice, DeclicDef, ReviewDeckDef, Text } from "@/lib/course/types";
+import type { Beat, CardDef, Choice, DeclicDef, ReviewDeckDef, Text } from "@/lib/course/types";
 
 const CARD_SPRING = { type: "spring", stiffness: 420, damping: 26 } as const;
 
@@ -44,6 +44,17 @@ const BEAT: Record<CardDef["type"], string> = {
   reveal: "Déclic",
   "multi-step-choice": "À toi",
   "declic-summary": "Retiens",
+};
+
+// …unless the author placed the card in the show / together / alone rhythm.
+/** Three short answers ("ℕ", "ℤ", "Aucune") sit side by side; sentences need the full width. */
+const shortOptions = (options: Choice[]) => options.every((o) => o.label.length <= 8);
+
+const RHYTHM: Record<Beat, string> = {
+  show: "Je te montre",
+  together: "On le fait",
+  you: "À toi",
+  trap: "Le piège",
 };
 
 /** Plays one Déclic from its data. It renders whatever card the engine says is current and sends
@@ -207,7 +218,7 @@ export function CoursePlayer({
           <span className="declic-hud-brand">
             <Sparkles size={13} /> Le Déclic
           </span>
-          <b>{BEAT[card.type]}</b>
+          <b>{card.beat ? RHYTHM[card.beat] : BEAT[card.type]}</b>
         </div>
         <span className="declic-hud-count">
           {index + 1}/{def.cards.length}
@@ -270,7 +281,7 @@ export function CoursePlayer({
               >
                 <MathText text={say(content.text)} />
               </DeclicAsk>
-              {content.visual && (
+              {content.visual && (content.visualTiming !== "after-answer" || picked) && (
                 <div className="course-visual">
                   <VisualView visual={content.visual} />
                 </div>
@@ -296,7 +307,7 @@ export function CoursePlayer({
                 </div>
               )}
               <button type="button" className="declic-cta" onClick={goNext}>
-                {card.continueLabel} <ArrowRight size={18} />
+                {card.continueLabel ?? "Continuer"} <ArrowRight size={18} />
               </button>
             </>
           )}
@@ -313,20 +324,27 @@ export function CoursePlayer({
                 bump={!picked || afterAll ? undefined : picked.correct ? "correct" : "wrong"}
                 bubbleClassName="course-bubble"
               >
-                <MathText text={say(stepsView.text)} />
+                <MathText text={say(step.question ?? stepsView.text)} />
               </DeclicAsk>
               <div className="course-subject" aria-live="polite">
                 <span className="course-subject-step">
                   Étape {run.stepIndex + 1} / {stepsView.steps.length}
                 </span>
-                <span className="course-subject-value">{step.subject}</span>
+                {step.subject && <span className="course-subject-value">{step.subject}</span>}
+                {step.question && (
+                  <span className="course-subject-caption">
+                    <MathText text={say(stepsView.text)} />
+                  </span>
+                )}
               </div>
               {step.visual && (
                 <div className="course-visual">
                   <VisualView visual={step.visual} />
                 </div>
               )}
-              <div className="declic-choices course-choices course-choices--trio">
+              <div
+                className={`declic-choices course-choices ${shortOptions(step.options) ? "course-choices--trio" : ""}`}
+              >
                 {step.options.map((o) => tile(o, !afterAll))}
               </div>
               {afterAll
@@ -355,20 +373,27 @@ export function CoursePlayer({
                 bump={!picked ? undefined : picked.correct ? "correct" : "wrong"}
                 bubbleClassName="course-bubble"
               >
-                <MathText text={say(stepsView.text)} />
+                <MathText text={say(step.question ?? stepsView.text)} />
               </DeclicAsk>
               <div className="course-subject" aria-live="polite">
                 <span className="course-subject-step">
                   Correction {run.stepIndex + 1} / {stepsView.steps.length}
                 </span>
-                <span className="course-subject-value">{step.subject}</span>
+                {step.subject && <span className="course-subject-value">{step.subject}</span>}
+                {step.question && (
+                  <span className="course-subject-caption">
+                    <MathText text={say(stepsView.text)} />
+                  </span>
+                )}
               </div>
               {step.visual && (
                 <div className="course-visual">
                   <VisualView visual={step.visual} />
                 </div>
               )}
-              <div className="declic-choices course-choices course-choices--trio">
+              <div
+                className={`declic-choices course-choices ${shortOptions(step.options) ? "course-choices--trio" : ""}`}
+              >
                 {step.options.map((o) => tile(o, true))}
               </div>
               {feedbackBlock(

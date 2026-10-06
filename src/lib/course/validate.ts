@@ -26,6 +26,8 @@ const MIN_FEEDBACK_CHARS = 24;
 // A picture is drawn in a few centimetres of a phone: past these it is unreadable, not just busy.
 const MAX_LINE_TICKS = 60;
 const MAX_GROUP_ITEMS = 40;
+const BEATS: readonly string[] = ["show", "together", "you", "trap"];
+const VISUAL_TIMINGS: readonly string[] = ["before", "after-answer"];
 
 function textOf(t: Text): string {
   return typeof t === "string" ? t : t.text;
@@ -98,6 +100,13 @@ function validateDeclic(
     if (card.order <= lastOrder) err(at(card.id), "ordre non strictement croissant");
     lastOrder = card.order;
     validateCard(card, d, misconceptionIds, err, at);
+  }
+  // The rhythm of a Déclic: Braise explains, then the student does something. Two explanations in a
+  // row is a lecture, and the student stops playing.
+  for (let i = 1; i < d.cards.length; i++) {
+    if (d.cards[i].type === "reveal" && d.cards[i - 1].type === "reveal") {
+      err(at(d.cards[i].id), "deux cartes d'explication d'affilée : intercaler une question");
+    }
   }
   if (d.cards.length === 0) err(d.id, "aucune carte");
   else if (d.cards[d.cards.length - 1].type !== "declic-summary") {
@@ -271,8 +280,17 @@ function checkVisual(
   } else if (v.kind === "groups") {
     if (!(Number.isInteger(v.total) && v.total >= 1 && v.total <= MAX_GROUP_ITEMS))
       err(where, `groupes : total entier entre 1 et ${MAX_GROUP_ITEMS}`);
-    if (!(Number.isInteger(v.groupSize) && v.groupSize >= 1))
+    const bySize = v.groupSize !== undefined;
+    const byShare = v.shareAmong !== undefined;
+    if (bySize === byShare) {
+      err(where, "groupes : donner soit groupSize (par groupes de), soit shareAmong (entre N)");
+    } else if (bySize && !(Number.isInteger(v.groupSize) && (v.groupSize ?? 0) >= 1)) {
       err(where, "groupes : la taille d'un groupe doit être un entier positif");
+    } else if (byShare) {
+      const among = v.shareAmong ?? 0;
+      if (!(Number.isInteger(among) && among >= 1 && among <= v.total))
+        err(where, "groupes : shareAmong doit être un entier entre 1 et le total");
+    }
   }
 }
 
@@ -301,6 +319,10 @@ function validateCard(
 ) {
   const where = at(card.id);
   if (!textOf(card.text).trim()) err(where, "texte vide");
+  if (card.beat !== undefined && !BEATS.includes(card.beat))
+    err(where, `temps "${card.beat}" inconnu (${BEATS.join(", ")})`);
+  if (card.visualTiming !== undefined && !VISUAL_TIMINGS.includes(card.visualTiming))
+    err(where, `visualTiming "${card.visualTiming}" inconnu (${VISUAL_TIMINGS.join(", ")})`);
   checkVisual(card.visual, where, err);
   switch (card.type) {
     case "choice": {
@@ -313,11 +335,14 @@ function validateCard(
         if (!textOf(v.text).trim()) err(vwhere, "texte vide");
         validateChoices(v.choices, vwhere, misconceptionIds, err);
         checkVisual(v.visual, vwhere, err);
+        if (v.visualTiming !== undefined && !VISUAL_TIMINGS.includes(v.visualTiming))
+          err(vwhere, `visualTiming "${v.visualTiming}" inconnu (${VISUAL_TIMINGS.join(", ")})`);
       }
       break;
     }
     case "reveal":
-      if (!card.continueLabel.trim()) err(where, "libellé du bouton manquant");
+      if (card.continueLabel !== undefined && !card.continueLabel.trim())
+        err(where, "libellé du bouton vide (l'omettre donne « Continuer »)");
       break;
     case "multi-step-choice": {
       if (card.steps.length === 0) err(where, "aucune étape");
@@ -343,6 +368,8 @@ function validateCard(
           stepIds.add(s.id);
           if (!s.id.startsWith(`${d.id}-`))
             err(where, `l'étape "${s.id}" doit commencer par "${d.id}-"`);
+          if (!s.subject?.trim() && !(s.question && textOf(s.question).trim()))
+            err(`${vwhere} › ${s.id}`, "une étape a besoin d'un subject ou d'une question");
           validateChoices(s.options, `${vwhere} › ${s.id}`, misconceptionIds, err);
           checkVisual(s.visual, `${vwhere} › ${s.id}`, err);
           if (s.remediation) checkRemediation(s.remediation, card, d, `${vwhere} › ${s.id}`, err);

@@ -3,7 +3,15 @@
 // the engine and the validator never special-case "a card with variants".
 //
 // Standalone on purpose, like validate.ts: only `import type`, so Node can run it with no build step.
-import type { Choice, ChoiceCard, MultiStepCard, Step, Text, Visual } from "./types.ts";
+import type {
+  Choice,
+  ChoiceCard,
+  MultiStepCard,
+  Step,
+  Text,
+  Visual,
+  VisualTiming,
+} from "./types.ts";
 
 /** The id of the version a card is written with; `variants` hold the others. */
 export const BASE_VARIANT = "v1";
@@ -25,6 +33,7 @@ export type ChoiceContent = {
   text: Text;
   choices: Choice[];
   visual?: Visual;
+  visualTiming?: VisualTiming;
 };
 
 /** What a choice card shows in the given version; an unknown id reads as the base version. A variant
@@ -37,9 +46,16 @@ export function choiceContent(card: ChoiceCard, variantId?: string): ChoiceConte
       text: variant.text,
       choices: variant.choices,
       visual: variant.visual,
+      visualTiming: variant.visualTiming,
     };
   }
-  return { variantId: BASE_VARIANT, text: card.text, choices: card.choices, visual: card.visual };
+  return {
+    variantId: BASE_VARIANT,
+    text: card.text,
+    choices: card.choices,
+    visual: card.visual,
+    visualTiming: card.visualTiming,
+  };
 }
 
 export type StepsContent = { variantId: string; text: Text; steps: Step[] };

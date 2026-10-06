@@ -701,3 +701,70 @@ describe("the validator on versions, retries and pictures", () => {
     expect(groups({ total: 3, groupSize: 5 })).toBe(""); // no complete group, only a rest: allowed
   });
 });
+
+// ---------------------------------------------------------------------------------------------
+describe("the validator on the rhythm, the beats and the new pictures", () => {
+  const clone = (): DeclicDef => JSON.parse(JSON.stringify(d));
+  const problems = (x: DeclicDef) => validateChapter(chapter, [x], [deck]).join("\n");
+  const val = (x: DeclicDef) => x.cards[2] as MultiStepCard;
+
+  it("accepts a reveal without a button label: it says « Continuer »", () => {
+    const a = clone();
+    delete (a.cards[1] as { continueLabel?: string }).continueLabel;
+    expect(problems(a)).toBe("");
+  });
+
+  it("refuses two explanations in a row", () => {
+    const a = clone();
+    a.cards.splice(2, 0, { ...a.cards[1], id: `${ID}-C02B`, order: 2.5 });
+    expect(problems(a)).toMatch(/deux cartes d'explication d'affilée/);
+  });
+
+  it("knows the four beats and refuses any other", () => {
+    for (const beat of ["show", "together", "you", "trap"] as const) {
+      const a = clone();
+      a.cards[0].beat = beat;
+      expect(problems(a), beat).toBe("");
+    }
+    const b = clone();
+    (b.cards[0] as { beat?: string }).beat = "boss";
+    expect(problems(b)).toMatch(/temps "boss" inconnu/);
+  });
+
+  it("knows when a picture appears and refuses any other timing", () => {
+    const a = clone();
+    a.cards[0].visualTiming = "after-answer";
+    expect(problems(a)).toBe("");
+    const b = clone();
+    (b.cards[0] as { visualTiming?: string }).visualTiming = "later";
+    expect(problems(b)).toMatch(/visualTiming "later" inconnu/);
+    const c = clone();
+    (c.cards[0] as ChoiceCard).variants![0].visualTiming = "never" as never;
+    expect(problems(c)).toMatch(/visualTiming "never" inconnu/);
+  });
+
+  it("accepts groups shared among N, and groups cut by size, but not both or neither", () => {
+    const groups = (extra: object) => {
+      const a = clone();
+      a.cards[1].visual = { kind: "groups", ariaLabel: "partage", total: 24, ...extra };
+      return problems(a);
+    };
+    expect(groups({ shareAmong: 5 })).toBe("");
+    expect(groups({ groupSize: 5 })).toBe("");
+    expect(groups({ shareAmong: 5, groupSize: 5 })).toMatch(/soit groupSize.*soit shareAmong/);
+    expect(groups({})).toMatch(/soit groupSize.*soit shareAmong/);
+    expect(groups({ shareAmong: 0 })).toMatch(/shareAmong/);
+    expect(groups({ shareAmong: 30 })).toMatch(/shareAmong/);
+    expect(groups({ shareAmong: 2.5 })).toMatch(/shareAmong/);
+  });
+
+  it("lets a step ask its own question, but needs a subject or a question", () => {
+    const a = clone();
+    const step = val(a).steps[0];
+    delete step.subject;
+    step.question = "Quelle est la bonne phrase ?";
+    expect(problems(a)).toBe("");
+    delete step.question;
+    expect(problems(a)).toMatch(/un subject ou d'une question/);
+  });
+});

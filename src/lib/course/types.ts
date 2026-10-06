@@ -101,13 +101,17 @@ export type NumberLineVisual = {
   bound?: number;
 };
 
-/** `total` items cut into groups of `groupSize`: the complete groups, then what is left over. With
- *  a group size of 2 it is pairs and the one without a partner. */
+/** `total` items, either cut into groups of `groupSize` (the complete groups, then what is left
+ *  over; with a size of 2 it is pairs and the one without a partner), or shared among `shareAmong`
+ *  recipients (each gets the same number, then what is left over). Exactly one of the two. */
 export type GroupsVisual = {
   kind: "groups";
   ariaLabel: string;
   total: number;
-  groupSize: number;
+  /** Cut into groups of this size. */
+  groupSize?: number;
+  /** Share among this many recipients. */
+  shareAmong?: number;
   /** What each item looks like (an emoji, a letter); a dot by default. */
   item?: string;
 };
@@ -128,13 +132,26 @@ export type Choice = {
   visual?: Visual;
 };
 
+/** Where a card sits in the teach-then-hand-over rhythm of a Déclic: Braise shows, you do it
+ *  together, you do it alone, or a trap to avoid. It only changes the label at the top of the
+ *  card; the card plays the same. Without one, the label comes from the kind of card. */
+export type Beat = "show" | "together" | "you" | "trap";
+
+/** When a card's picture appears. "after-answer" keeps it hidden until the student has answered,
+ *  for a picture that would give the answer away. */
+export type VisualTiming = "before" | "after-answer";
+
 type CardBase = {
   id: string;
   order: number;
   /** What this card is for, in teacher's words. Never shown to the student. */
   objective?: string;
+  /** The rhythm label shown at the top of the card (see Beat). */
+  beat?: Beat;
   /** A picture shown with the card's text (a choice may carry its own, see Choice.visual). */
   visual?: Visual;
+  /** When the card's picture appears; "before" by default. */
+  visualTiming?: VisualTiming;
   metadata?: Record<string, unknown>;
 };
 
@@ -145,6 +162,7 @@ export type ChoiceVariant = {
   text: Text;
   choices: Choice[];
   visual?: Visual;
+  visualTiming?: VisualTiming;
 };
 
 export type ChoiceCard = CardBase & {
@@ -163,13 +181,17 @@ export type ChoiceCard = CardBase & {
 export type RevealCard = CardBase & {
   type: "reveal";
   text: Text;
-  continueLabel: string;
+  /** Label of the button that continues; "Continuer" when absent. */
+  continueLabel?: string;
 };
 
 export type Step = {
   id: string;
-  /** What the step shows big ("23", "–9", "2,7"). */
-  subject: string;
+  /** What the step shows big ("23", "–9", "2,7"). Optional when the step has a `question`. */
+  subject?: string;
+  /** The step's own question, shown in Braise's bubble in place of the card's text (which then
+   *  becomes a small caption). A step has a `subject`, a `question`, or both. */
+  question?: Text;
   options: Choice[];
   /** Whether getting it right actually separates the notions being taught (e.g. ℕ from ℤ). */
   discriminating?: boolean;

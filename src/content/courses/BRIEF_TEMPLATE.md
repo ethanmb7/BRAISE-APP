@@ -72,7 +72,31 @@ Conceptions suivies par ce Déclic: <n_starts_at_1, z_only_negatives, …>
 Couvre: <BO26-M2-ARI-CONT-01 (full)>, <BO26-M2-VEL-APP-01 (introduced_and_practised)>
 ```
 
-### B2. Cartes (dans l'ordre, jusqu'au résumé final)
+### B2. Le rythme d'un Déclic : je te montre, on le fait, à toi
+
+Un Déclic enchaîne un ou deux **cycles**, un par idée. Un cycle retire l'aide petit à petit :
+
+1. **Je te montre** (`reveal`, temps `show`) : une situation concrète, expliquée simplement par Braise,
+   avec le mot officiel à la fin (« Traduction prof : … »). Une idée, une quarantaine de mots.
+2. **On le fait ensemble** (`choice`, temps `together`) : même genre de situation, l'élève fait l'étape
+   clé (« 30 = 5 × … ? »), Braise conclut.
+3. **À toi** (`choice`, temps `you`) : même idée sans aide, avec un feedback précis par choix.
+
+Autour : une ou deux questions « essaie » avant la première explication quand la notion est intuitive
+(sans temps, l'étiquette est « Tente »), **le piège** (`trap`) où la mauvaise idée est la tentante, un
+transfert (3 versions), la validation, le résumé. Règles, contrôlées par `npm run course:check` :
+
+- jamais deux cartes d'explication d'affilée : une explication est toujours suivie d'une question ;
+- une question n'a qu'une réponse attendue, chaque choix a son feedback ;
+- une image qui donne la réponse n'apparaît qu'**après** la réponse (`visualTiming: after-answer`).
+
+```
+CARTE <M2-ARI-D02-C05>
+Type: choice
+Temps: <on le fait ensemble>   (je te montre | on le fait ensemble | à toi | le piège ; facultatif)
+```
+
+### B2 bis. Cartes (dans l'ordre, jusqu'au résumé final)
 
 Quatre types de carte. Copier le bloc voulu autant de fois que nécessaire.
 
@@ -125,7 +149,8 @@ Texte:
 Corrections: <après les trois étapes>   (valeur à toujours mettre pour la validation : l'élève répond aux
                                          trois items, puis voit les trois corrections ; sinon « après chaque étape »)
 ÉTAPE 1
-Élément affiché: <23>
+Question: <72 = 8 × 9. Quelle phrase est juste ?>   (ou, à la place, un élément affiché)
+Élément affiché: <23>   (facultatif si la question est donnée)
 Boutons: <ℕ> | <ℤ> | <Aucune>
 Réponse attendue: <ℕ>
 Discriminante: <oui>        (oui = réussir cette étape sépare vraiment les notions enseignées)
@@ -217,7 +242,14 @@ Image: groupes
   ariaLabel: « Treize points en groupes de quatre, il en reste un »
   total: <13>  taille d'un groupe: <4>  (40 objets au plus)
   objet: <🔥>                          (facultatif : une lettre, un emoji ; un point par défaut)
+
+Image: groupes, partagés entre N personnes
+  ariaLabel: « 24 parts de pizza entre 5 potes : 4 chacun, 4 restent sur la table »
+  total: <24>  partagé entre: <5>      (N groupes égaux, puis le reste en pointillés)
 ```
+
+Une image peut n'apparaître qu'après la réponse : `Apparition: après la réponse` (par défaut elle est
+là dès le début de la carte).
 
 Le reste d'une division (ici 1) est toujours dessiné à part, en pointillés : c'est le propos de
 l'image. Des paires avec un seul isolé : `taille d'un groupe: 2`. Si une image manque pour un Déclic
