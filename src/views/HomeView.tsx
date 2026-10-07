@@ -6,6 +6,7 @@ import { sfx } from "@/lib/sound";
 import { COPY } from "@/lib/copy";
 import { useTone } from "@/lib/useTone";
 import { useCourseProgress } from "@/lib/course/useCourseProgress";
+import { useCourseMastery } from "@/lib/course/useCourseMastery";
 import { buildLibrary } from "@/lib/catalog/catalog";
 import { dueInLibrary } from "@/lib/world/resume";
 import type { HubWorld } from "@/components/world/Hub";
@@ -24,7 +25,7 @@ import { TodayStrip } from "@/components/TodayStrip";
 import { ShareAuraModal } from "@/components/ShareAuraModal";
 import { SUBJECTS, FLASHCARDS, SUBJECT_SHORT_NAMES, FIRST_CHAPTER_ID } from "@/data";
 import { dailyPickLine, getAgeGroup } from "@/lib/braiseVoice";
-import { getRankInfo, countMasteredCards } from "@/lib/aura";
+import { getRankInfo, countMasteredCards, countSubjectsSeen } from "@/lib/aura";
 import { getIntoxDismissedCount, setIntoxDismissedCount } from "@/lib/celebrations";
 import type { Level, Subject, Chapter } from "@/types";
 
@@ -127,6 +128,7 @@ export function HomeView() {
   // a refresh. The wording follows where the student stands, never an alarm.
   const { t } = useTone();
   const courseProgress = useCourseProgress();
+  const courseMastery = useCourseMastery();
   const worlds: HubWorld[] = SUBJECTS.map((s) => {
     const library = buildLibrary(s.id, {
       completedChapters: state.completedChapters,
@@ -167,12 +169,8 @@ export function HomeView() {
 
   // Same derivation as ProfilAuraView's own share button — real distinct-subjects-reviewed
   // count from card review history, not a second, possibly-diverging computation.
-  const subjectsCount = new Set(
-    Object.keys(state.cardReviews)
-      .map((id) => FLASHCARDS.find((c) => c.id === id)?.subject)
-      .filter(Boolean),
-  ).size;
-  const masteredCards = countMasteredCards(state.cardReviews);
+  const subjectsCount = countSubjectsSeen(state.cardReviews, courseMastery);
+  const masteredCards = countMasteredCards(state.cardReviews, courseMastery);
   const rank = getRankInfo(state.xp).current;
 
   return (

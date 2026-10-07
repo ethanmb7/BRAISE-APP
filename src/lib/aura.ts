@@ -1,4 +1,5 @@
 import { SUBJECTS, FLASHCARDS } from "@/data";
+import type { CourseMastery } from "@/lib/course/mastery";
 import { MASTERED_AT_REPETITIONS } from "@/lib/progress";
 import type { CardReview } from "@/types";
 
@@ -81,12 +82,21 @@ export type SubjectMastery = {
 // reviewing the easy cards you already knew (one card, mastered once, read as "100%"). Absolute
 // counts against the subject's real total ("3/6 cartes") can't be inflated that way and give
 // the card-stack visual something concrete to fan out, not an abstract fill percentage.
-export function computeSubjectMastery(cardReviews: Record<string, CardReview>): SubjectMastery[] {
+export function computeSubjectMastery(
+  cardReviews: Record<string, CardReview>,
+  course?: CourseMastery,
+): SubjectMastery[] {
+  // The older deck and the cards of the course decks count together: one student, one memory.
+  const reviews = { ...cardReviews, ...course?.reviews };
+  const cards = [
+    ...FLASHCARDS.map((c) => ({ id: c.id, subject: c.subject })),
+    ...(course?.cards ?? []),
+  ];
   return SUBJECTS.map((s) => {
-    const subjectCardIds = FLASHCARDS.filter((c) => c.subject === s.id).map((c) => c.id);
-    const reviewed = subjectCardIds.filter((id) => cardReviews[id]);
+    const subjectCardIds = cards.filter((c) => c.subject === s.id).map((c) => c.id);
+    const reviewed = subjectCardIds.filter((id) => reviews[id]);
     const mastered = subjectCardIds.filter(
-      (id) => cardReviews[id] && cardReviews[id].repetitions >= MASTERED_AT_REPETITIONS,
+      (id) => reviews[id] && reviews[id].repetitions >= MASTERED_AT_REPETITIONS,
     );
     const started = reviewed.length > 0;
     return {
@@ -104,8 +114,24 @@ export function computeSubjectMastery(cardReviews: Record<string, CardReview>): 
 // Total mastered cards across every subject — used by the share card as a fallback stat when
 // the streak is 0 (see ShareAuraModal): a "0 JOURS" chip on a card meant to be shared is a bad
 // look, this is a real number to show instead, never fabricated.
-export function countMasteredCards(cardReviews: Record<string, CardReview>): number {
-  return Object.values(cardReviews).filter((r) => r.repetitions >= MASTERED_AT_REPETITIONS).length;
+export function countMasteredCards(
+  cardReviews: Record<string, CardReview>,
+  course?: CourseMastery,
+): number {
+  return [...Object.values(cardReviews), ...Object.values(course?.reviews ?? {})].filter(
+    (r) => r.repetitions >= MASTERED_AT_REPETITIONS,
+  ).length;
+}
+
+/** How many different subjects the student has reviewed a card of, in either method. */
+export function countSubjectsSeen(
+  cardReviews: Record<string, CardReview>,
+  course?: CourseMastery,
+): number {
+  const seen = new Set<string>();
+  for (const card of FLASHCARDS) if (cardReviews[card.id]) seen.add(card.subject);
+  for (const card of course?.cards ?? []) if (course?.reviews[card.id]) seen.add(card.subject);
+  return seen.size;
 }
 
 export type BraiseInsight =
@@ -138,10 +164,16 @@ const STRONG_SUBJECT_MIN_RATIO = 0.5;
 // time-of-day claim would have to be invented rather than computed.
 export function computeBraiseInsight(
   cardReviews: Record<string, CardReview>,
+  course?: CourseMastery,
 ): BraiseInsight | null {
   let worst: { topic: string; subjectName: string; repetitions: number } | null = null;
-  for (const card of FLASHCARDS) {
-    const review = cardReviews[card.id];
+  const reviews = { ...cardReviews, ...course?.reviews };
+  const cards = [
+    ...FLASHCARDS.map((c) => ({ id: c.id, subject: c.subject, topic: c.topic })),
+    ...(course?.cards ?? []),
+  ];
+  for (const card of cards) {
+    const review = reviews[card.id];
     if (
       !review ||
       review.lastConfidence === "sure" ||
@@ -157,7 +189,7 @@ export function computeBraiseInsight(
 
   let best: SubjectMastery | null = null;
   let bestRatio = 0;
-  for (const s of computeSubjectMastery(cardReviews)) {
+  for (const s of computeSubjectMastery(cardReviews, course)) {
     if (s.totalCount < STRONG_SUBJECT_MIN_CARDS) continue;
     const ratio = s.masteredCount / s.totalCount;
     if (ratio >= STRONG_SUBJECT_MIN_RATIO && ratio > bestRatio) {

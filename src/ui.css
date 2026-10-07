@@ -419,3 +419,16 @@
   text-underline-offset: 4px;
   text-transform: uppercase;
 }
+
+/* the points a Déclic pays, on the button that finishes it (the first time only) */
+.declic-xp {
+  margin-left: 8px;
+  padding: 3px 9px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 99px;
+  background: var(--sun);
+  color: #151821;
+  font:
+    800 0.74rem/1 "IBM Plex Mono",
+    monospace;
+}

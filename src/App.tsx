@@ -10,7 +10,8 @@ import { RankUpCelebration } from "@/components/RankUpCelebration";
 import { ShareAuraModal } from "@/components/ShareAuraModal";
 import { useMilestoneCelebrations } from "@/lib/useMilestoneCelebrations";
 import { rankUpLine, getAgeGroup } from "@/lib/braiseVoice";
-import { getRankInfo, countMasteredCards } from "@/lib/aura";
+import { getRankInfo, countMasteredCards, countSubjectsSeen } from "@/lib/aura";
+import { useCourseMastery } from "@/lib/course/useCourseMastery";
 import { FLASHCARDS } from "@/data";
 import { OnboardingView } from "@/views/OnboardingView";
 import { HomeView } from "@/views/HomeView";
@@ -25,6 +26,7 @@ import { SettingsView } from "@/views/SettingsView";
 
 function Screen() {
   const { state, setTab, loaded } = useApp();
+  const courseMastery = useCourseMastery();
   // Mounted regardless of which view is active — a rank-up or badge unlock can be earned from
   // LessonView or RevisionsView just as easily as from Home, and should be celebrated the moment
   // it happens, not only if the student later happens to reopen Profile.
@@ -132,14 +134,8 @@ function Screen() {
           rank={celebration?.type === "rank" ? celebration.toRank : getRankInfo(state.xp).current}
           streak={state.streak}
           xp={state.xp}
-          subjectsCount={
-            new Set(
-              Object.keys(state.cardReviews)
-                .map((id) => FLASHCARDS.find((c) => c.id === id)?.subject)
-                .filter(Boolean),
-            ).size
-          }
-          masteredCards={countMasteredCards(state.cardReviews)}
+          subjectsCount={countSubjectsSeen(state.cardReviews, courseMastery)}
+          masteredCards={countMasteredCards(state.cardReviews, courseMastery)}
           onClose={() => setShareOpen(false)}
         />
       )}

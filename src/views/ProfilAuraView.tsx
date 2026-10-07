@@ -18,6 +18,7 @@ import {
   RANKS,
   computeSubjectMastery,
   countMasteredCards,
+  countSubjectsSeen,
   computeBraiseInsight,
   computeNextMilestone,
   type Rank,
@@ -27,6 +28,7 @@ import {
 } from "@/lib/aura";
 import { getAgeGroup, progressAdvice, strongSubjectLine } from "@/lib/braiseVoice";
 import { FLASHCARDS } from "@/data";
+import { useCourseMastery } from "@/lib/course/useCourseMastery";
 
 // Diameter of the hero ring frame — the single largest element on the page, on purpose.
 const HERO_SIZE = 180;
@@ -58,17 +60,15 @@ export function ProfilAuraView() {
   const [shareOpen, setShareOpen] = useState(false);
   const { current, next } = getRankInfo(state.xp);
   const dueCount = getDueCards().length;
+  const course = useCourseMastery();
 
-  const stats = useMemo(() => {
-    const reviewedIds = Object.keys(state.cardReviews);
-    const subjectsSeen = new Set(
-      reviewedIds.map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean),
-    );
-    return {
-      subjectsCount: subjectsSeen.size,
-      masteredCards: countMasteredCards(state.cardReviews),
-    };
-  }, [state.cardReviews]);
+  const stats = useMemo(
+    () => ({
+      subjectsCount: countSubjectsSeen(state.cardReviews, course),
+      masteredCards: countMasteredCards(state.cardReviews, course),
+    }),
+    [state.cardReviews, course],
+  );
 
   // Once the rank ladder is maxed, RankRail's own caption has nothing left to say — this keeps
   // it pointing forward on a different, uncapped axis instead of just announcing a dead end. See
@@ -82,7 +82,10 @@ export function ProfilAuraView() {
   // (computeBraiseInsight), phrased through the existing tone system so it matches every other
   // Braise line in the app instead of inventing new copy. null (too little real history yet)
   // renders nothing — see BraiseInsightCard below.
-  const insight = useMemo(() => computeBraiseInsight(state.cardReviews), [state.cardReviews]);
+  const insight = useMemo(
+    () => computeBraiseInsight(state.cardReviews, course),
+    [state.cardReviews, course],
+  );
   const insightLine = useMemo(() => {
     if (!insight) return null;
     const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
@@ -92,8 +95,8 @@ export function ProfilAuraView() {
   }, [insight, state.user.personality, state.user.level]);
 
   const subjectMastery = useMemo(
-    () => computeSubjectMastery(state.cardReviews),
-    [state.cardReviews],
+    () => computeSubjectMastery(state.cardReviews, course),
+    [state.cardReviews, course],
   );
 
   const handleShareOpen = useCallback(() => {

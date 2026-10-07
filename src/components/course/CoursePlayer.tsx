@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Tip } from "@/components/Tip";
+import { useApp } from "@/store";
+import { completionXp } from "@/lib/course/rewards";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { BraiseMascot } from "@/components/BraiseMascot";
@@ -75,6 +77,7 @@ export function CoursePlayer({
   onExit: () => void;
 }) {
   const reducedMotion = useReducedMotion();
+  const { addXp } = useApp();
   const { personality } = useTone();
   // Reading where the student stopped is pure; writing that the Déclic has begun happens in an effect,
   // because saving notifies the chapter list behind this screen, and that must not happen mid-render.
@@ -494,13 +497,22 @@ export function CoursePlayer({
                     onClick={() => {
                       sfx.tap(soundOn);
                       if (action.kind === "complete") {
+                        // Paid once, the first time: the same points an older chapter pays.
+                        const xp = completionXp(courseProgressStore.get().declics[def.id]);
                         setRun(finish(def, run, courseProgressStore));
+                        if (xp > 0) addXp(xp);
                         onExit();
                       } else setRun(openMenu(def, run, courseProgressStore));
                     }}
                   >
                     {action.label}
                     {action.kind === "complete" && <ArrowRight size={18} />}
+                    {action.kind === "complete" &&
+                      completionXp(courseProgressStore.get().declics[def.id]) > 0 && (
+                        <span className="declic-xp">
+                          +{completionXp(courseProgressStore.get().declics[def.id])} XP
+                        </span>
+                      )}
                   </button>
                 ))}
               </div>
