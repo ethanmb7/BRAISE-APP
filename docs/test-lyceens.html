@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BRAISE — Kit de test avec des lycéens</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 14mm 14mm 16mm;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        color: #16161d;
+        font:
+          10pt/1.4 -apple-system,
+          "Helvetica Neue",
+          Arial,
+          sans-serif;
+      }
+      .page {
+        page-break-after: always;
+        break-after: page;
+      }
+      .page:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
+      h1 {
+        margin: 0 0 2mm;
+        font-size: 22pt;
+        line-height: 1.1;
+      }
+      h2 {
+        margin: 5mm 0 2mm;
+        padding-bottom: 1mm;
+        border-bottom: 2px solid #16161d;
+        font-size: 13pt;
+      }
+      h3 {
+        margin: 3mm 0 1mm;
+        font-size: 10.5pt;
+      }
+      p {
+        margin: 0 0 2mm;
+      }
+      ul,
+      ol {
+        margin: 0 0 2mm;
+        padding-left: 5mm;
+      }
+      li {
+        margin-bottom: 0.8mm;
+      }
+      .kicker {
+        margin: 0 0 1mm;
+        color: #c2410c;
+        font:
+          700 8.5pt/1 "Courier New",
+          monospace;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .lead {
+        font-size: 11.5pt;
+      }
+      .box {
+        margin: 3mm 0;
+        padding: 3mm 4mm;
+        border: 1.5px solid #16161d;
+        border-radius: 3mm;
+        background: #fff7ed;
+        break-inside: avoid;
+      }
+      .box--grey {
+        background: #f3f4f6;
+      }
+      .box b:first-child {
+        display: block;
+        margin-bottom: 0.8mm;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 9.5pt;
+      }
+      th,
+      td {
+        padding: 1.6mm 2mm;
+        border: 1px solid #16161d;
+        vertical-align: top;
+        text-align: left;
+      }
+      th {
+        background: #16161d;
+        color: #fff;
+        font-weight: 700;
+      }
+      tr {
+        break-inside: avoid;
+      }
+      .small {
+        font-size: 8.5pt;
+      }
+      .say {
+        font-style: italic;
+      }
+      .t {
+        display: inline-block;
+        min-width: 7mm;
+        padding: 0.4mm 1.6mm;
+        border-radius: 1.5mm;
+        background: #c2410c;
+        color: #fff;
+        font-weight: 700;
+        text-align: center;
+      }
+      .cols {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6mm;
+      }
+      .line {
+        display: block;
+        height: 7mm;
+        border-bottom: 1px solid #9ca3af;
+      }
+      .cell-h {
+        height: 13mm;
+      }
+      .tick {
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ───────────────────────── 1. Cadre ───────────────────────── -->
+    <section class="page">
+      <p class="kicker">BRAISE · Test utilisateurs · 5 à 8 lycéens</p>
+      <h1>Kit de test</h1>
+      <p class="lead">
+        Une séance de 40 minutes par élève, sur téléphone, pour savoir si un lycéen trouve où aller,
+        comprend ce que lui dit l’app, et la trouve « un pote » plutôt qu’« un prof ».
+      </p>
+
+      <h2>1. Ce qu’on veut apprendre</h2>
+      <ol>
+        <li>
+          <b>Se repérer</b> : un élève qui ouvre l’app pour la première fois comprend-il à quoi elle
+          sert et trouve-t-il tout seul où réviser un cours ?
+        </li>
+        <li>
+          <b>Comprendre</b> : après un Déclic, sait-il réexpliquer l’idée avec ses mots ? Et se
+          sent-il capable de la refaire seul ?
+        </li>
+        <li>
+          <b>Se sentir bien</b> : ressent-il du jugement, de la pression, de l’ennui ? Braise
+          passe-t-elle pour un pote, un prof, une mascotte ?
+        </li>
+        <li>
+          <b>Les rappels</b> : accepte-t-il que Braise passe le voir ? À quelle condition ? Le texte
+          du message lui paraît-il lourd, utile, gênant ?
+        </li>
+        <li>
+          <b>Le vocabulaire</b> : Déclic, Aura, XP, Réviser, Braise, « jusqu’à Platine » : qu’est-ce
+          qui est compris, mal compris, ignoré ?
+        </li>
+      </ol>
+
+      <h2>2. Qui, avec quoi</h2>
+      <ul>
+        <li>
+          <b>5 à 8 élèves de seconde</b> (ou qui viennent de la finir). Le seul cours rédigé en
+          Déclics est « Arithmétique » en maths de seconde ; les autres chapitres sont l’ancienne
+          version. Mélanger : un élève à l’aise en maths, un en difficulté, un qui n’aime pas les
+          maths.
+        </li>
+        <li>
+          <b>Deux adultes</b> si possible : un animateur (parle) et un observateur (note, ne parle
+          pas). Sinon, un seul, qui note après chaque tâche.
+        </li>
+        <li>
+          <b>Un téléphone</b> avec l’app ouverte dans le navigateur, <b>profil vierge</b> pour
+          chaque élève (effacer les données du site entre deux élèves : la progression est stockée
+          sur l’appareil). Son activé.
+        </li>
+        <li>Ce kit imprimé : la fiche d’observation (page 5) en un exemplaire par élève.</li>
+      </ul>
+
+      <h2>3. Cadre et consentement</h2>
+      <div class="box">
+        <b>Élèves mineurs : à valider avant la première séance.</b>
+        Obtenir l’accord écrit d’un parent ou représentant légal, et celui de l’élève. Ce kit ne
+        remplace pas l’avis de l’établissement ni d’un juriste ; à faire relire.
+      </div>
+      <ul>
+        <li>
+          L’élève peut <b>arrêter à tout moment</b>, sans donner de raison. On le lui dit au début.
+        </li>
+        <li>
+          Notes <b>sans nom</b> : codes P1 à P8. L’élève utilise un <b>prénom d’emprunt</b> dans
+          l’app. Aucun enregistrement audio ou vidéo sans accord écrit.
+        </li>
+        <li>
+          L’app garde tout sur l’appareil (rien n’est envoyé). On efface les données du site à la
+          fin de chaque séance.
+        </li>
+        <li>On ne note pas les notes de l’élève ni ce qu’il pense de ses profs.</li>
+      </ul>
+      <p class="small">
+        Autorisation type : « J’autorise mon enfant ______ à participer à un test de 40 minutes
+        d’une application de révision. Aucune donnée personnelle n’est conservée ; il peut arrêter à
+        tout moment. » Date, signature du représentant légal, signature de l’élève.
+      </p>
+    </section>
+
+    <!-- ───────────────────────── 2. Déroulé ───────────────────────── -->
+    <section class="page">
+      <p class="kicker">Séance · 40 minutes</p>
+      <h1>Déroulé et règles d’animation</h1>
+
+      <table>
+        <tr>
+          <th style="width: 18mm">Min.</th>
+          <th>Étape</th>
+          <th style="width: 40mm">Ce qui se passe</th>
+        </tr>
+        <tr>
+          <td>0–3</td>
+          <td>Accueil</td>
+          <td>Lire le texte ci-dessous. Poser le téléphone, ne rien montrer de l’app.</td>
+        </tr>
+        <tr>
+          <td>3–7</td>
+          <td><span class="t">T1</span> Premier lancement</td>
+          <td>Onboarding compris. On observe sans aider.</td>
+        </tr>
+        <tr>
+          <td>7–10</td>
+          <td><span class="t">T2</span> Trouver un cours</td>
+          <td>Chrono. Pas d’indice avant 60 s.</td>
+        </tr>
+        <tr>
+          <td>10–19</td>
+          <td><span class="t">T3</span> Faire un Déclic</td>
+          <td>Penser à voix haute. Rappel immédiat à la fin.</td>
+        </tr>
+        <tr>
+          <td>19–22</td>
+          <td><span class="t">T4</span> Réviser</td>
+          <td>Voir si un Déclic revient dans les cartes.</td>
+        </tr>
+        <tr>
+          <td>22–25</td>
+          <td><span class="t">T5</span> Aura</td>
+          <td>Trouver sa progression, lire le palier.</td>
+        </tr>
+        <tr>
+          <td>25–29</td>
+          <td><span class="t">T6</span> Rappels de Braise</td>
+          <td>Seulement le choix et le texte (voir limites).</td>
+        </tr>
+        <tr>
+          <td>29–31</td>
+          <td><span class="t">T7</span> Le ton (facultatif)</td>
+          <td>Chill ou Savage ? Sauter si on manque de temps.</td>
+        </tr>
+        <tr>
+          <td>31–40</td>
+          <td>Entretien</td>
+          <td>Page 4. Les notes de 1 à 5, puis les questions ouvertes.</td>
+        </tr>
+      </table>
+
+      <h2>À dire au début, mot pour mot</h2>
+      <div class="box">
+        <p class="say">
+          « Merci d’être là. On teste une application, pas toi : il n’y a pas de bonne ou de
+          mauvaise réponse, et tu ne peux rien casser. Si quelque chose est confus, c’est l’app qui
+          est mal faite, pas toi. Dis à voix haute ce que tu vois, ce que tu penses, ce que tu
+          cherches, même si ça paraît bête. Je ne pourrai pas t’aider pendant que tu essaies, c’est
+          normal. Tu peux t’arrêter quand tu veux. »
+        </p>
+      </div>
+
+      <h2>Règles d’animation</h2>
+      <ul>
+        <li>
+          <b>Ne pas aider, ne pas expliquer, ne pas défendre l’app.</b> Un silence de 10 secondes
+          est une donnée. Si l’élève est bloqué plus de 60 s : « Qu’est-ce que tu essaierais ensuite
+          ? », puis un indice, noté comme « avec indice ».
+        </li>
+        <li>
+          <b>Ne pas nommer les éléments de l’app</b> avant l’élève (« Aura », « Déclic », « Réviser
+          ») : dire « la page où on voit sa progression ».
+        </li>
+        <li>
+          <b>Questions neutres</b> : « Pourquoi tu as touché ici ? », jamais « tu trouves ça sympa ?
+          ».
+        </li>
+        <li>
+          <b>Noter les mots exacts</b> de l’élève, entre guillemets : c’est ce qui sert le plus
+          ensuite. Ils disent souvent « c’est bien » par politesse : se fier à ce qu’ils font plus
+          qu’à ce qu’ils disent.
+        </li>
+        <li>
+          Si l’app plante : la noter, la relancer, continuer. Ce n’est pas un échec de l’élève.
+        </li>
+      </ul>
+    </section>
+
+    <!-- ───────────────────────── 3. Tâches ───────────────────────── -->
+    <section class="page">
+      <p class="kicker">Les tâches</p>
+      <h1>Consignes à lire, et ce qu’on regarde</h1>
+      <table>
+        <tr>
+          <th style="width: 12mm"></th>
+          <th>Consigne (à lire telle quelle)</th>
+          <th style="width: 62mm">Réussi si… · À observer</th>
+        </tr>
+        <tr>
+          <td><span class="t">T1</span></td>
+          <td class="say">
+            « Tu viens de télécharger cette application. Ouvre-la, regarde, et dis-moi à quoi elle
+            sert d’après toi. Fais ce que tu ferais normalement. »
+          </td>
+          <td>
+            Dit en ses mots qu’elle sert à comprendre / réviser des cours. Termine l’onboarding
+            seul. <br /><i>Noter :</i> ce qu’il lit ou saute, le choix du ton, l’avis sur « rythme
+            ».
+          </td>
+        </tr>
+        <tr>
+          <td><span class="t">T2</span></td>
+          <td class="say">
+            « Tu as un contrôle de maths la semaine prochaine sur les ensembles de nombres, les
+            entiers, les relatifs. Trouve où tu pourrais réviser ça dans l’app. »
+          </td>
+          <td>
+            Arrive au chapitre « Arithmétique » en moins de 60 s sans indice. <br /><i>Noter :</i>
+            par quel chemin (carte « Tes cours » d’Aujourd’hui, onglet, île), les hésitations, le
+            mot qu’il cherche.
+          </td>
+        </tr>
+        <tr>
+          <td><span class="t">T3</span></td>
+          <td class="say">
+            « Lance le premier Déclic. Dis à voix haute ce que tu penses. À la fin, reste sur
+            l’écran final et, sans regarder, explique-moi avec tes mots ce que tu as compris. »
+          </td>
+          <td>
+            Va au bout. Redit l’idée (ℕ, ℤ, « positif ≠ naturel ») sans erreur grave.
+            <br /><i>Noter :</i> « Je bloque un peu », relectures, le choix à la carte « Si tu
+            devais l’expliquer à quelqu’un… », la réaction au « +50 XP ».
+          </td>
+        </tr>
+        <tr>
+          <td><span class="t">T4</span></td>
+          <td class="say">« Maintenant, tu veux revoir ce que tu as appris. Va-y. »</td>
+          <td>
+            Trouve Réviser seul, comprend le geste (glisser ou toucher). Si une carte vient du
+            Déclic : la reconnaît-il ? <br /><i>Attention :</i> ces cartes n’apparaissent que si
+            l’élève a eu du mal en T3. Sinon, écrire « pas de carte Déclic » et ne pas compter.
+          </td>
+        </tr>
+        <tr>
+          <td><span class="t">T5</span></td>
+          <td class="say">
+            « Montre-moi où tu vois ta progression. Tu vises Platine : que faut-il faire d’après toi
+            ? »
+          </td>
+          <td>
+            Trouve la page seul. Lit « X XP jusqu’à Platine » et dit ce que ça demande. <br /><i
+              >Noter :</i
+            >
+            ce qu’il croit que « XP » veut dire ; sensation de comparaison ou de pression.
+          </td>
+        </tr>
+        <tr>
+          <td><span class="t">T6</span></td>
+          <td class="say">
+            « Retourne sur la page d’accueil. Il y a peut-être une proposition de Braise. Qu’est-ce
+            que tu fais ? » Puis : « Choisis l’heure et le rythme que tu accepterais. »
+          </td>
+          <td>
+            L’invitation apparaît après un Déclic terminé. <br /><i>Noter :</i> accepte / refuse /
+            ignore, l’heure et le rythme choisis, et pourquoi. Faire « Essayer un message » (Moi ›
+            Paramètres › Braise passe te voir) puis demander : « Tu le lirais ? »
+          </td>
+        </tr>
+        <tr>
+          <td><span class="t">T7</span></td>
+          <td class="say">
+            « Dans Moi, change le ton de Braise, puis reviens lire quelques phrases. Lequel te parle
+            ? »
+          </td>
+          <td>
+            Choisit sans aide. <br /><i>Noter :</i> choix et raison, un exemple de phrase qui plaît
+            ou agace.
+          </td>
+        </tr>
+      </table>
+
+      <div class="box box--grey">
+        <b>Limite à garder en tête pour T6</b>
+        Dans un navigateur, l’app ne peut pas envoyer de vraie notification quand elle est fermée.
+        Ce test ne mesure donc que : accepte-t-on l’idée, à quelle heure, à quel rythme, et le texte
+        du message. Il ne dit rien du comportement réel face à des notifications reçues.
+      </div>
+    </section>
+
+    <!-- ───────────────────────── 4. Entretien ───────────────────────── -->
+    <section class="page">
+      <p class="kicker">Entretien · 9 minutes</p>
+      <h1>Questions de fin de séance</h1>
+
+      <h2>A. Cinq notes de 1 à 5 (1 = pas du tout, 5 = tout à fait)</h2>
+      <table>
+        <tr>
+          <th>Phrase à lire</th>
+          <th style="width: 50mm">Note</th>
+        </tr>
+        <tr>
+          <td>« Après le Déclic, je pourrais refaire un exercice pareil tout seul. »</td>
+          <td class="tick">☐1 &nbsp;☐2 &nbsp;☐3 &nbsp;☐4 &nbsp;☐5</td>
+        </tr>
+        <tr>
+          <td>« Je savais toujours où aller et quoi faire ensuite. »</td>
+          <td class="tick">☐1 &nbsp;☐2 &nbsp;☐3 &nbsp;☐4 &nbsp;☐5</td>
+        </tr>
+        <tr>
+          <td>« À aucun moment je ne me suis senti jugé. »</td>
+          <td class="tick">☐1 &nbsp;☐2 &nbsp;☐3 &nbsp;☐4 &nbsp;☐5</td>
+        </tr>
+        <tr>
+          <td>« Les points et les niveaux me donnent envie de revenir. »</td>
+          <td class="tick">☐1 &nbsp;☐2 &nbsp;☐3 &nbsp;☐4 &nbsp;☐5</td>
+        </tr>
+        <tr>
+          <td>« Je préfère réviser ici plutôt qu’avec mon cahier ou une vidéo. »</td>
+          <td class="tick">☐1 &nbsp;☐2 &nbsp;☐3 &nbsp;☐4 &nbsp;☐5</td>
+        </tr>
+      </table>
+      <p class="small">
+        Ces notes servent à repérer des écarts, pas à faire une moyenne : avec 5 à 8 élèves elles ne
+        prouvent rien.
+      </p>
+
+      <h2>B. Questions ouvertes (dans cet ordre, sans les reformuler en questions fermées)</h2>
+      <ol>
+        <li>En une phrase, c’est quoi cette app ? Tu la décrirais comment à un copain ?</li>
+        <li>Qu’est-ce qui t’a fait sourire ? Qu’est-ce qui t’a agacé ou ennuyé ?</li>
+        <li>
+          Braise, tu la vois comme quoi ? (un prof, un pote, une mascotte, autre chose.) Pourquoi ?
+        </li>
+        <li>À un moment, tu t’es senti jugé, pressé ou perdu ? Où exactement ?</li>
+        <li>
+          Les points, les niveaux : ça te donne envie ou ça te met la pression ? Tu t’en fiches ?
+        </li>
+        <li>
+          Tu l’ouvrirais la veille d’un contrôle ? Et sans contrôle prévu ? Qu’est-ce qui te ferait
+          revenir dans trois jours ?
+        </li>
+        <li>
+          Quelle appli t’envoie des notifications qui ne te dérangent pas ? Qu’est-ce qui fait la
+          différence ? Et celles que tu coupes tout de suite ?
+        </li>
+        <li>
+          Montre-moi un mot ou un écran que tu n’as pas bien compris. (Parcourir : Déclic, Aura, XP,
+          Réviser, « jusqu’à Platine ».)
+        </li>
+        <li>Qu’est-ce qui manque pour que tu l’utilises vraiment ?</li>
+      </ol>
+
+      <h2>C. Pour finir</h2>
+      <p>
+        Remercier. Rappeler que rien n’est gardé. Demander si l’élève accepte,
+        <b>via son établissement ou son parent</b>, trois questions de 5 minutes dans trois jours
+        (voir page 6). Effacer les données du site.
+      </p>
+    </section>
+
+    <!-- ───────────────────────── 5. Fiche d’observation ───────────────────────── -->
+    <section class="page">
+      <p class="kicker">Fiche d’observation · 1 exemplaire par élève</p>
+      <h1>Élève P__ &nbsp;·&nbsp; Date ______ &nbsp;·&nbsp; Classe ______</h1>
+      <p class="small">
+        Seul = sans indice · Indice = après 60 s ou une question · Échec = abandon ou erreur de
+        compréhension. Écrire les mots exacts entre guillemets.
+      </p>
+      <table>
+        <tr>
+          <th style="width: 11mm"></th>
+          <th style="width: 34mm">Résultat</th>
+          <th style="width: 17mm">Temps</th>
+          <th>Hésitations, citations, chemin pris</th>
+        </tr>
+        <tr class="cell-h">
+          <td><span class="t">T1</span></td>
+          <td class="tick">☐ Seul<br />☐ Indice<br />☐ Échec</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr class="cell-h">
+          <td><span class="t">T2</span></td>
+          <td class="tick">☐ Seul<br />☐ Indice<br />☐ Échec</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr class="cell-h">
+          <td><span class="t">T3</span></td>
+          <td class="tick">☐ Seul<br />☐ Indice<br />☐ Échec</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr class="cell-h">
+          <td><span class="t">T4</span></td>
+          <td class="tick">☐ Seul<br />☐ Indice<br />☐ Échec<br />☐ Pas de carte Déclic</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr class="cell-h">
+          <td><span class="t">T5</span></td>
+          <td class="tick">☐ Seul<br />☐ Indice<br />☐ Échec</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr class="cell-h">
+          <td><span class="t">T6</span></td>
+          <td class="tick">☐ Accepte<br />☐ Refuse<br />☐ Ignore</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr class="cell-h">
+          <td><span class="t">T7</span></td>
+          <td class="tick">☐ Chill<br />☐ Savage<br />☐ Sauté</td>
+          <td></td>
+          <td></td>
+        </tr>
+      </table>
+
+      <div class="cols" style="margin-top: 4mm">
+        <div>
+          <h3>Rappel immédiat (T3) : l’élève redit…</h3>
+          <p class="tick">
+            ☐ ℕ = entiers naturels &nbsp;☐ ℤ = tous les entiers<br />
+            ☐ ℕ ⊂ ℤ &nbsp;☐ « positif ≠ naturel » (2,5)<br />
+            ☐ Erreur grave : ____________
+          </p>
+          <h3>Mots mal compris ou ignorés</h3>
+          <span class="line"></span><span class="line"></span>
+        </div>
+        <div>
+          <h3>Moments de plaisir / d’agacement</h3>
+          <span class="line"></span><span class="line"></span><span class="line"></span>
+          <h3>Notes 1–5 (page 4)</h3>
+          <p>
+            Refaire seul ___ · Savoir où aller ___ · Jugé ___ · Points ___ · Mieux qu’un cahier ___
+          </p>
+        </div>
+      </div>
+      <h3>Citation la plus parlante</h3>
+      <span class="line"></span><span class="line"></span>
+    </section>
+
+    <!-- ───────────────────────── 6. Synthèse ───────────────────────── -->
+    <section class="page">
+      <p class="kicker">Après les séances</p>
+      <h1>Synthèse, seuils, limites</h1>
+
+      <h2>1. Comment dépouiller (30 minutes après la dernière séance)</h2>
+      <ol>
+        <li>Recopier chaque problème observé sur un papier (un problème = un papier).</li>
+        <li>Regrouper les doublons ; compter <b>combien d’élèves</b> l’ont rencontré.</li>
+        <li>
+          Classer : <b>bloquant</b> (n’a pas pu avancer), <b>gênant</b> (a hésité, a mal compris),
+          <b>mineur</b>.
+        </li>
+        <li>
+          Choisir à corriger : tout bloquant vu chez 2 élèves ou plus, tout gênant vu chez 3 ou
+          plus.
+        </li>
+      </ol>
+
+      <h2>2. Seuils de départ (arbitraires)</h2>
+      <div class="box">
+        <b>À lire avant de s’en servir</b>
+        Ces seuils ne viennent d’aucune norme. Ils servent à décider quoi corriger avant le prochain
+        tour de tests. Avec 5 à 8 élèves, aucun chiffre n’est une statistique : on cherche des
+        problèmes qui reviennent, pas des pourcentages.
+      </div>
+      <table>
+        <tr>
+          <th style="width: 12mm"></th>
+          <th>Ce qu’on espère (sur 8 élèves, à ajuster si moins)</th>
+          <th style="width: 50mm">Si ce n’est pas atteint</th>
+        </tr>
+        <tr>
+          <td><span class="t">T1</span></td>
+          <td>6 sur 8 disent à peu près juste à quoi sert l’app, sans aide.</td>
+          <td>Revoir l’accueil et les premiers écrans.</td>
+        </tr>
+        <tr>
+          <td><span class="t">T2</span></td>
+          <td>6 sur 8 atteignent le chapitre en moins de 60 s, sans indice.</td>
+          <td>Le chemin vers les cours reste à rendre évident.</td>
+        </tr>
+        <tr>
+          <td><span class="t">T3</span></td>
+          <td>6 sur 8 finissent le Déclic ; 5 sur 8 redisent l’idée sans erreur grave.</td>
+          <td>Relire les cartes où ça bloque, avant tout autre chantier.</td>
+        </tr>
+        <tr>
+          <td><span class="t">T4</span></td>
+          <td>La moitié de ceux qui voient une carte Déclic comprennent d’où elle vient.</td>
+          <td>Renommer ou expliquer le lien entre Réviser et les cours.</td>
+        </tr>
+        <tr>
+          <td><span class="t">T5</span></td>
+          <td>6 sur 8 trouvent Aura et lisent bien « XP jusqu’à Platine ».</td>
+          <td>Simplifier le vocabulaire ou le glossaire.</td>
+        </tr>
+        <tr>
+          <td><span class="t">T6</span></td>
+          <td>
+            Pas de seuil : on note acceptation, heure, rythme. Alerte si 2 élèves ou plus jugent le
+            texte pesant ou gênant.
+          </td>
+          <td>Réécrire les messages avant toute mise en route réelle.</td>
+        </tr>
+        <tr>
+          <td>Ton</td>
+          <td>Moins de 2 élèves se disent jugés ou pressés.</td>
+          <td>Priorité sur toute autre chose : c’est la promesse de l’app.</td>
+        </tr>
+        <tr>
+          <td>Mots</td>
+          <td>Aucun mot de l’app mal compris par 3 élèves ou plus.</td>
+          <td>Ajouter l’explication ou changer le mot.</td>
+        </tr>
+      </table>
+    </section>
+
+    <section class="page">
+      <p class="kicker">Après les séances · suite</p>
+      <h2>3. Le test qui compte le plus : le rappel à J+3</h2>
+      <p>
+        La métrique principale de BRAISE (PRODUCT_VISION.md, section 8) est de retrouver une notion
+        sans aide quelques jours plus tard. Une séance ne la mesure pas. Si l’élève et son
+        représentant acceptent, trois questions de 5 minutes dans 3 jours (<i
+          >à vérifier contre le contenu actuel du Déclic</i
+        >) :
+      </p>
+      <ol>
+        <li>« −18 appartient-il à ℕ ? à ℤ ? » (non ; oui)</li>
+        <li>« 2,5 est positif. Est-il dans ℕ ? » (non)</li>
+        <li>« Que veut dire le signe ∈ ? » (« appartient à »)</li>
+      </ol>
+      <p class="small">
+        Sans aide, sans l’app. Noter juste ou faux, et si l’élève hésite. Ne pas corriger avant la
+        fin.
+      </p>
+
+      <h2>4. Ce que ces séances ne peuvent pas dire</h2>
+      <ul>
+        <li>
+          <b>Pas représentatif</b> : 5 à 8 volontaires, souvent des élèves plutôt à l’aise avec un
+          adulte. Une règle empirique (Nielsen et Landauer, 1993) dit que quelques utilisateurs
+          révèlent la majorité des problèmes d’usage ; c’est un ordre de grandeur, pas une garantie,
+          et elle ne dit rien de la motivation.
+        </li>
+        <li>
+          <b>Effet de politesse et effet de situation</b> : un élève observé fait plus d’efforts et
+          est plus gentil qu’en vrai.
+        </li>
+        <li>
+          <b>Un seul chapitre en Déclics</b> : on teste la méthode sur « Arithmétique » de seconde,
+          pas la couverture ni la qualité de six matières.
+        </li>
+        <li>
+          <b>Pas de vraies notifications</b> et pas de retour sur sept jours : le modèle de rappels
+          reste une hypothèse (voir NOTIFICATIONS.md).
+        </li>
+        <li>
+          <b>Pas de comparaison</b> avec une autre méthode : pour dire que BRAISE fait mieux qu’un
+          cahier, il faudrait deux groupes.
+        </li>
+      </ul>
+    </section>
+  </body>
+</html>
