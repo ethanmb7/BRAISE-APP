@@ -419,31 +419,3 @@
   text-underline-offset: 4px;
   text-transform: uppercase;
 }
-
-/* the preview of Braise's week, in Paramètres */
-.nt-week {
-  display: grid;
-  gap: 8px;
-  padding: 4px 14px 14px;
-  margin: 0;
-  list-style: none;
-}
-.nt-week li {
-  padding: 10px 12px;
-  border: 2.5px solid var(--neo-ink);
-  border-radius: 14px;
-  background: var(--paper);
-  font-size: 0.86rem;
-  font-weight: 600;
-  line-height: 1.35;
-}
-.nt-week time {
-  display: block;
-  margin-bottom: 2px;
-  color: var(--ink-soft);
-  font:
-    800 0.72rem/1.2 "IBM Plex Mono",
-    monospace;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}

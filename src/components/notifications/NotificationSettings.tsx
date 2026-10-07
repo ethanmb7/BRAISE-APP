@@ -16,11 +16,6 @@ import {
 } from "@/lib/notifications/model";
 import { useNotifState } from "@/lib/notifications/useNotifState";
 
-const dayLabel = (at: number) =>
-  new Date(at).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
-const hourLabel = (at: number) =>
-  formatMinutes(new Date(at).getHours() * 60 + new Date(at).getMinutes());
-
 function momentSummary(prefs: NotifPrefs): string {
   const when =
     prefs.moment === "custom"
@@ -29,15 +24,13 @@ function momentSummary(prefs: NotifPrefs): string {
   return `${when}, rythme ${FREQUENCIES[prefs.frequency].label.toLowerCase()}`;
 }
 
-/** The "Braise passe te voir" group of Paramètres: on and off, the moment and the rhythm, the week she has
- *  in mind (so the student sees what she would send, before she sends it), and a try. */
+/** The "Braise passe te voir" group of Paramètres: on and off, the moment and the rhythm, and a try. */
 export function NotificationSettings() {
   const { state } = useApp();
   const notif = useNotifState();
   const { enable, disable } = useReminders();
   const [sheet, setSheet] = useState(false);
   const [permission, setPermission] = useState<Permission>("default");
-  const [weekOpen, setWeekOpen] = useState(false);
   const [tried, setTried] = useState<string | null>(null);
   const delivery = getDelivery();
 
@@ -122,36 +115,6 @@ export function NotificationSettings() {
                 Voilà à quoi ça ressemble : « {tried} »
               </p>
             )}
-
-            <div className="settings-row">
-              <span className="settings-row-main">La semaine de Braise</span>
-              <button
-                type="button"
-                className="settings-btn"
-                aria-expanded={weekOpen}
-                onClick={() => setWeekOpen((v) => !v)}
-              >
-                {weekOpen ? "Masquer" : "Voir"}
-              </button>
-            </div>
-            {weekOpen &&
-              (notif.plan.length > 0 ? (
-                <ul className="nt-week">
-                  {notif.plan.slice(0, 5).map((p) => (
-                    <li key={p.id}>
-                      <time dateTime={new Date(p.at).toISOString()}>
-                        {dayLabel(p.at)} · {hourLabel(p.at)}
-                      </time>
-                      {p.body}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="nt-note" style={{ padding: "0 14px 14px" }}>
-                  Rien de prévu pour l’instant : Braise ne parle que s’il y a quelque chose de vrai
-                  à dire.
-                </p>
-              ))}
           </>
         )}
       </div>

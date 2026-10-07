@@ -39,8 +39,7 @@ Rien d'autre : pas de « nouveau cours », pas d'invitation à partager, pas de 
   « vite », « urgent » ou nomme une absence.
 - **Mêmes faits dans les deux tons.** Chill et Savage disent la même chose (les mêmes nombres, les mêmes
   noms) ; un test le vérifie.
-- **Transparent.** L'élève voit à l'avance les messages de sa semaine (Paramètres › Braise passe te voir),
-  et peut en tester un.
+- **Transparent.** L'élève peut essayer un message à l'avance (Paramètres › Braise passe te voir).
 
 ## Comment c'est planifié
 
@@ -51,7 +50,7 @@ rappel pour des notions déjà révisées ne part donc jamais.
 ## Ce qui est construit, et ce qui attend
 
 - **Construit et testé** : le modèle (qui, quand, quoi, et les règles ci-dessus), les textes dans les deux
-  tons, le choix du moment et du rythme, l'invitation, le frein automatique, l'aperçu de la semaine.
+  tons, le choix du moment et du rythme, l'invitation, le frein automatique, l'essai d'un message.
 - **Attend l'enveloppe native** : la livraison réelle d'une notification quand l'app est fermée. Dans le
   navigateur, rien ne peut être planifié à l'avance. Le code de livraison (`delivery.ts`) est prêt à
   recevoir les notifications locales d'une enveloppe native ; **à vérifier lors de sa mise en place**
