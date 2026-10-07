@@ -46,10 +46,25 @@ function commit(def: DeclicDef, run: Run, store: ProgressStore, now: number): Ru
   return run;
 }
 
+/** The run a Déclic opens on: where the student stopped, or its start. Reads the store, writes nothing,
+ *  so it is safe to call while a screen renders. */
+export function beginRun(def: DeclicDef, store: ProgressStore): Run {
+  return initRun(def, store.get().declics[def.id]);
+}
+
+/** Records that the Déclic has begun. Writes the store, so it belongs in an effect, never in a render. */
+export function recordOpened(
+  def: DeclicDef,
+  run: Run,
+  store: ProgressStore,
+  now = Date.now(),
+): Run {
+  return commit(def, run, store, now);
+}
+
 /** Opens a Déclic: resumes it where the student stopped, or starts it, and records that it has begun. */
 export function openDeclic(def: DeclicDef, store: ProgressStore, now = Date.now()): Run {
-  const run = initRun(def, store.get().declics[def.id]);
-  return commit(def, run, store, now);
+  return recordOpened(def, beginRun(def, store), store, now);
 }
 
 /** Taps a choice (or a step's option) and saves it. A wrong mental model the choice points at is

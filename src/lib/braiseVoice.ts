@@ -218,7 +218,7 @@ export function rankUpLine(ctx: VoiceCtx, rankName: string, rankId?: string): st
         `Rang ${rankName}. Ton avatar récupère ${avatarUnlock} au passage.`,
       ],
       "savage-lycee": [
-        `Rang ${rankName}. Le classement tremble, et ton avatar aussi — ${avatarUnlock} t'attend.`,
+        `Rang ${rankName}. Ta flamme grandit, et ton avatar aussi — ${avatarUnlock} t'attend.`,
         `${rankName} débloqué. Ton avatar gagne ${avatarUnlock}, le bac recule encore d'un pas.`,
       ],
     });
@@ -237,7 +237,7 @@ export function rankUpLine(ctx: VoiceCtx, rankName: string, rankId?: string): st
       `Rang ${rankName}. Pas mal pour un mardi.`,
     ],
     "savage-lycee": [
-      `Rang ${rankName}. Le classement tremble.`,
+      `Rang ${rankName}. Ta flamme grandit, et ça se voit.`,
       `${rankName} débloqué. Le bac recule encore d'un pas.`,
     ],
   });

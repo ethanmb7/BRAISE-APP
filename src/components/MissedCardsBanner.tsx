@@ -31,7 +31,7 @@ export function MissedCardsBanner({ count, onOpen, onDismiss }: MissedCardsBanne
           type="button"
           onClick={onDismiss}
           aria-label="Masquer les notions à sécuriser"
-          className="flex-shrink-0 rounded-full p-1 transition-transform active:scale-90"
+          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full transition-transform active:scale-90"
         >
           <X size={22} strokeWidth={3} className="text-[#151821]" />
         </button>

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Tip } from "@/components/Tip";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { BraiseMascot } from "@/components/BraiseMascot";
@@ -29,7 +30,8 @@ import {
   endFollowUp,
   finish,
   next,
-  openDeclic,
+  beginRun,
+  recordOpened,
   openMenu,
   pickMenuItem,
 } from "@/lib/course/session";
@@ -74,7 +76,14 @@ export function CoursePlayer({
 }) {
   const reducedMotion = useReducedMotion();
   const { personality } = useTone();
-  const [run, setRun] = useState<Run>(() => openDeclic(def, courseProgressStore));
+  // Reading where the student stopped is pure; writing that the Déclic has begun happens in an effect,
+  // because saving notifies the chapter list behind this screen, and that must not happen mid-render.
+  const [run, setRun] = useState<Run>(() => beginRun(def, courseProgressStore));
+  useEffect(() => {
+    recordOpened(def, run, courseProgressStore);
+    // Once, when the Déclic opens: later changes are saved by each action.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const celebrated = useRef(false);
 
   const card = currentCard(def, run);
@@ -248,6 +257,9 @@ export function CoursePlayer({
         </p>
       )}
 
+      <Tip id="declic">
+        Un Déclic, c’est un mini-cours raconté par Braise. Tu essaies avant qu’on t’explique.
+      </Tip>
       <AnimatePresence mode="wait">
         <motion.div
           key={`${card.id}-${screen}${afterAll ? `-${run.stepIndex}` : ""}`}

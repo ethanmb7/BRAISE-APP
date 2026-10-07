@@ -12,6 +12,7 @@
 @import "./course.css" layer(components);
 @import "./library.css" layer(components);
 @import "./world.css" layer(components);
+@import "./ui.css" layer(components);
 
 @custom-variant dark (&:is(.dark *));
 

@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { ArrowRight } from "lucide-react";
 import { Hub, type HubWorld } from "@/components/world/Hub";
+import { PageHeader } from "@/components/PageHeader";
 import { TopBar } from "@/components/TopBar";
 import { useScrollMemory } from "@/lib/world/useScroll";
 import { SubjectDecks, type SubjectDeckItem } from "@/components/SubjectDecks";
@@ -92,12 +93,7 @@ export function SubjectsView() {
     <div>
       <TopBar title="Matières" onBack={goBack} />
       <div className="view is-active subjects-view">
-        <header className="world-title">
-          <div>
-            <p>{t(COPY.world.kicker)}</p>
-            <h1 className="hub-title">{t(COPY.world.title)}</h1>
-          </div>
-        </header>
+        <PageHeader kicker={t(COPY.world.kicker)} title={t(COPY.world.title)} />
         <Hub
           worlds={worlds}
           braiseMood={!global ? "proud" : reason === "next" ? "eager" : "happy"}

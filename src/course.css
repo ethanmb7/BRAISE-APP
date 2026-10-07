@@ -198,7 +198,7 @@
 }
 .course-chapter-kicker {
   font:
-    800 0.68rem/1 "IBM Plex Mono",
+    800 0.7rem/1 "IBM Plex Mono",
     monospace;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -251,7 +251,7 @@
 }
 .course-item-kicker {
   font:
-    800 0.66rem/1 "IBM Plex Mono",
+    800 0.7rem/1 "IBM Plex Mono",
     monospace;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -289,7 +289,7 @@
   background: var(--paper);
   color: var(--neo-ink);
   font:
-    800 0.64rem/1.1 "IBM Plex Mono",
+    800 0.7rem/1.1 "IBM Plex Mono",
     monospace;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -333,7 +333,7 @@
   display: block;
   margin-top: 2px;
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   color: var(--ink-soft);
 }
 
@@ -347,7 +347,7 @@
 .course-path-title {
   margin: 0;
   font:
-    800 0.68rem/1 "IBM Plex Mono",
+    800 0.7rem/1 "IBM Plex Mono",
     monospace;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -378,7 +378,7 @@
 }
 .course-card-badge {
   font:
-    800 0.66rem/1 "IBM Plex Mono",
+    800 0.7rem/1 "IBM Plex Mono",
     monospace;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -601,7 +601,7 @@
   background: var(--neo-ink);
   color: var(--paper);
   font:
-    800 0.68rem/1.5 "IBM Plex Mono",
+    800 0.7rem/1.5 "IBM Plex Mono",
     monospace;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -745,7 +745,7 @@
 }
 .course-slide-answer-label {
   font:
-    800 0.68rem/1 "IBM Plex Mono",
+    800 0.7rem/1 "IBM Plex Mono",
     monospace;
   letter-spacing: 0.1em;
   text-transform: uppercase;

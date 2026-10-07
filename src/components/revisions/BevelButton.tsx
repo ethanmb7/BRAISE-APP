@@ -56,7 +56,7 @@ export function BevelButton({
       {badge && (
         <span
           aria-hidden="true"
-          className={`absolute -top-2.5 right-2 rounded-md border-2 border-black px-1.5 py-0.5 font-display text-[0.62rem] font-black shadow-[2px_2px_0_#000] ${
+          className={`absolute -top-2.5 right-2 rounded-md border-2 border-black px-1.5 py-0.5 font-display text-[0.7rem] font-black shadow-[2px_2px_0_#000] ${
             badgeTone === "hot" ? "bg-[var(--sun)] text-black" : "bg-white text-black/60"
           }`}
         >

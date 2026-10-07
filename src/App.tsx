@@ -88,7 +88,9 @@ function Screen() {
         </ErrorBoundary>
       </div>
 
-      {showTabBar && <TabBar active={state.tab} onChange={setTab} />}
+      {showTabBar && (
+        <TabBar active={state.tab === "subjects" ? "home" : state.tab} onChange={setTab} />
+      )}
 
       {/* Sits here, not inside HeroPiocheCard/HomeView — it needs to survive the exact unmount
           it's meant to cover. See PiocheRevealVeil for why. */}

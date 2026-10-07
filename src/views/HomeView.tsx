@@ -3,12 +3,18 @@ import { motion } from "framer-motion";
 import { useApp } from "@/store";
 import { computeGoalPct, remainingToGoal, resolveChapters } from "@/lib/progress";
 import { sfx } from "@/lib/sound";
+import { COPY } from "@/lib/copy";
+import { useTone } from "@/lib/useTone";
+import { useCourseProgress } from "@/lib/course/useCourseProgress";
+import { buildLibrary } from "@/lib/catalog/catalog";
+import { dueInLibrary } from "@/lib/world/resume";
+import type { HubWorld } from "@/components/world/Hub";
 import { fireConfetti } from "@/lib/confetti";
 import { LevelSheet } from "@/components/LevelSheet";
 import { HeaderHUD } from "@/components/HeaderHUD";
 import { HeroPiocheCard } from "@/components/HeroPiocheCard";
 import { MissedCardsBanner } from "@/components/MissedCardsBanner";
-import { SubjectDecks } from "@/components/SubjectDecks";
+import { WorldsTeaser } from "@/components/world/WorldsTeaser";
 import { TodayStrip } from "@/components/TodayStrip";
 import { ShareAuraModal } from "@/components/ShareAuraModal";
 import { SUBJECTS, FLASHCARDS, SUBJECT_SHORT_NAMES, FIRST_CHAPTER_ID } from "@/data";
@@ -112,42 +118,35 @@ export function HomeView() {
         )
       : `${state.user.name}, série de ${state.streak} jours. On lâche rien !`;
 
-  // Each card's "Niv." is the current chapter's real position in the subject's own sequence
-  // (no separate per-subject level field exists), and its label is that chapter's own title
-  // with a leading article stripped for brevity — real data, never a generated sentence, and
-  // never truncated with an ellipsis. "Maths" is the only display shortening on the subject
-  // name itself (same subject, casual form) — every other name is the real one, shown in full.
-  //
-  // Today's draw first, then the rest in their fixed order: this grid now does the job that
-  // "Chapitres prioritaires" used to do as a separate carousel — same data (every subject's
-  // current chapter), it was never two different things, just the same list shown twice.
-  const SHORT_SUBJECT_NAME: Record<string, string> = { maths: "Maths" };
-  const stripLeadingArticle = (title: string) => title.replace(/^(les |la |le |l')/i, "");
-  const subjectDecks = SUBJECTS.map((s) => {
-    const chapters = resolveChapters(s.chapters, state.completedChapters);
-    const doneCount = chapters.filter((c) => c.status === "done").length;
-    const pct = Math.round((doneCount / chapters.length) * 100);
-    const currentIndex = chapters.findIndex((c) => c.status === "current");
-    const current = currentIndex >= 0 ? chapters[currentIndex] : null;
+  // The way into the courses: one small world per subject, with a pastille where notions are waiting for
+  // a refresh. The wording follows where the student stands, never an alarm.
+  const { t } = useTone();
+  const courseProgress = useCourseProgress();
+  const worlds: HubWorld[] = SUBJECTS.map((s) => {
+    const library = buildLibrary(s.id, {
+      completedChapters: state.completedChapters,
+      cardReviews: state.cardReviews,
+      course: courseProgress,
+      now: Date.now(),
+    });
     return {
       id: s.id,
-      name: SHORT_SUBJECT_NAME[s.id] ?? s.name,
+      name: s.name,
+      shortName: SUBJECT_SHORT_NAMES[s.id] ?? s.name,
       color: s.color,
-      pct,
-      level: currentIndex >= 0 ? currentIndex + 1 : chapters.length,
-      chapterLabel: current ? stripLeadingArticle(current.title) : s.name,
-      currentChapterId: current?.id,
-      // Same subject the hero card above already names as today's draw — surfacing it first
-      // here too matters most on a fresh account, where all 6 decks look interchangeable and
-      // nothing else says where to start.
-      isDailyPick: s.id === currentSubject?.id,
+      due: library ? dueInLibrary(library) : 0,
+      suggested: false,
     };
-  }).sort((a, b) => Number(b.isDailyPick) - Number(a.isDailyPick));
-
-  const goToChapter = (subjectId: string, chapterId?: string) => {
-    sfx.tap(state.soundOn);
-    openSubject(subjectId, chapterId);
-  };
+  });
+  const dueTotal = worlds.reduce((sum, w) => sum + w.due, 0);
+  const startedAny =
+    state.completedChapters.length > 0 || Object.keys(state.cardReviews).length > 0;
+  const teaserSays =
+    dueTotal > 0
+      ? t(COPY.world.teaserDue(dueTotal))
+      : startedAny
+        ? t(COPY.world.teaserBack)
+        : t(COPY.world.teaserNew);
 
   // Same derivation as ProfilAuraView's own share button — real distinct-subjects-reviewed
   // count from card review history, not a second, possibly-diverging computation.
@@ -235,28 +234,24 @@ export function HomeView() {
           )}
 
           <motion.div variants={staggerItem} className="space-y-3">
-            <div className="flex items-end justify-between gap-3">
-              <div>
-                <span className="font-mono text-[0.62rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">
-                  Accès rapide
-                </span>
-                <h2 className="font-display text-[1.15rem] font-extrabold leading-tight text-[var(--ink)]">
-                  Tes matières
-                </h2>
-              </div>
-              <button
-                type="button"
-                onClick={() => setTab("subjects")}
-                className="text-xs font-black text-[var(--neo-orange)]"
-              >
-                Tout voir →
-              </button>
+            <div>
+              <span className="font-mono text-[0.7rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">
+                Apprendre
+              </span>
+              <h2 className="font-display text-[1.15rem] font-extrabold leading-tight text-[var(--ink)]">
+                Tes cours
+              </h2>
             </div>
-            <SubjectDecks
-              items={subjectDecks.slice(0, 2)}
-              onSelect={(id) => {
-                const deck = subjectDecks.find((d) => d.id === id);
-                goToChapter(id, deck?.currentChapterId);
+            <WorldsTeaser
+              worlds={worlds}
+              says={teaserSays}
+              onOpenAll={() => {
+                sfx.tap(state.soundOn);
+                setTab("subjects");
+              }}
+              onOpenSubject={(id) => {
+                sfx.tap(state.soundOn);
+                openSubject(id);
               }}
             />
           </motion.div>

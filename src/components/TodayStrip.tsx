@@ -47,7 +47,7 @@ export function TodayStrip({
   return (
     <section
       aria-label="Ton rythme du jour"
-      className="rounded-2xl border-2 border-black/15 bg-black/[0.035] px-4 py-3.5"
+      className="rounded-2xl border-[2.5px] border-[var(--neo-ink)] bg-[var(--paper)] px-4 py-3.5 shadow-[3px_3px_0_var(--neo-ink)]"
     >
       <div className="flex items-start gap-3">
         <span
@@ -65,7 +65,7 @@ export function TodayStrip({
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-3">
-            <p className="font-mono text-[0.64rem] font-black uppercase tracking-wide text-black/55">
+            <p className="font-mono text-[0.7rem] font-black uppercase tracking-wide text-[var(--ink-soft)]">
               Ton rythme du jour
             </p>
             <span className="flex-shrink-0 text-xs font-black text-black/70">
@@ -76,7 +76,7 @@ export function TodayStrip({
 
           {!goalMet && (
             <div
-              className="mt-2.5 h-2 overflow-hidden rounded-full border border-black/25 bg-white"
+              className="mt-2.5 h-3 overflow-hidden rounded-full border-2 border-[var(--neo-ink)] bg-white"
               role="progressbar"
               aria-label={progressLabel}
               aria-valuemin={0}

@@ -1,3 +1,4 @@
+import { Tip } from "@/components/Tip";
 import { useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, HelpCircle, Sparkles } from "lucide-react";
@@ -143,6 +144,9 @@ export function DeclicMode({
           />
         </div>
       </div>
+      <Tip id="declic">
+        Un Déclic, c’est un mini-cours raconté par Braise. Tu essaies avant qu’on t’explique.
+      </Tip>
       <AnimatePresence mode="wait">
         {card.kind === "situation" && (
           <motion.div

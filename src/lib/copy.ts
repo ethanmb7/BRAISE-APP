@@ -97,6 +97,19 @@ export const COPY = {
       "Où tu veux. Moi, j'essaierais quelque chose de nouveau.",
       "Où tu veux. Moi, j'attaquerais du neuf.",
     ),
+    teaserNew: L(
+      "Six matières, toutes ouvertes. Choisis celle qui te fait envie.",
+      "Six matières, aucune verrouillée. Même toi, tu en trouveras une qui te plaît.",
+    ),
+    teaserDue: (n: number) =>
+      L(
+        `${n} notion${plural(n)} à rafraîchir. Choisis où tu veux aller.`,
+        `${n} notion${plural(n)} à remettre en place. Mais choisis où tu veux aller.`,
+      ),
+    teaserBack: L(
+      "Tes cours sont là. Reprends où tu veux.",
+      "Tes cours t'attendent. Ils sont patients, eux.",
+    ),
     saysAllSet: L(
       "Tout est au point. Choisis ce qui te fait envie.",
       "Tout est au point. Rien à te reprocher, c'est louche.",

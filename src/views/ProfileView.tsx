@@ -1,13 +1,14 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Settings, ChevronRight, Check, Pencil, X } from "lucide-react";
+import { Settings, ChevronRight, Check, Pencil, X, HelpCircle } from "lucide-react";
+import { GlossarySheet } from "@/components/GlossarySheet";
 import { useApp } from "@/store";
 import { computeUnlockedBadges, countDoneChapters } from "@/lib/progress";
 import { sfx } from "@/lib/sound";
 import { getRankInfo, RANKS } from "@/lib/aura";
 import { useCountUp } from "@/lib/useCountUp";
 import { getAgeGroup, profileReactionLine } from "@/lib/braiseVoice";
-import { TopBar } from "@/components/TopBar";
+import { PageHeader } from "@/components/PageHeader";
 import { RankIcon } from "@/components/RankIcon";
 import { SubjectIcon } from "@/components/SubjectIcon";
 import { BraiseMascot } from "@/components/BraiseMascot";
@@ -46,6 +47,7 @@ const staggerItem = {
 export function ProfileView() {
   const { state, setView, setTab, setPersonality, setUser } = useApp();
   const [editingIdentity, setEditingIdentity] = useState(false);
+  const [lexiconOpen, setLexiconOpen] = useState(false);
   const [draftName, setDraftName] = useState(state.user.name);
   const [draftAvatar, setDraftAvatar] = useState(state.user.avatar);
 
@@ -110,13 +112,13 @@ export function ProfileView() {
 
   return (
     <div>
-      <TopBar title="Profil" onBack={() => setView(state.tab)} />
       <motion.div
         className="view is-active"
         variants={staggerContainer}
         initial="hidden"
         animate="show"
       >
+        <PageHeader kicker="Moi" title="Ton profil" />
         {!editingIdentity ? (
           <motion.div className="profile-hero-card" variants={staggerItem}>
             {/* Le "pass BRAISE" : une vraie carte d'accès plutôt qu'un bandeau décoratif —
@@ -127,7 +129,6 @@ export function ProfileView() {
               style={{ background: `linear-gradient(125deg, ${rank.colorFrom}, ${rank.colorTo})` }}
             >
               <span className="profile-pass-punch" aria-hidden="true" />
-              <span className="profile-hero-overline">Pass BRAISE</span>
               <span className="profile-hero-rank-pill">
                 <RankIcon rankId={rank.id} color="#fff" size={12} />
                 {rank.name}
@@ -397,7 +398,21 @@ export function ProfileView() {
             layer (son, thème, dyslexie), Profil itself only holds identity + the two preferences
             that affect Braise directly (ton, matières). Sharing moved to Aura too — showing off
             what you've accomplished belongs with the page that IS accomplishment, not here. */}
-        <motion.div variants={staggerItem}>
+        <motion.div variants={staggerItem} className="space-y-3">
+          <button
+            type="button"
+            className="profile-settings-link"
+            onClick={() => {
+              sfx.tap(state.soundOn);
+              setLexiconOpen(true);
+            }}
+          >
+            <span className="profile-settings-link-label">
+              <HelpCircle size={18} color="var(--ink-soft)" />
+              Le lexique de Braise
+            </span>
+            <ChevronRight size={18} color="var(--ink-soft)" />
+          </button>
           <button
             type="button"
             className="profile-settings-link"
@@ -414,6 +429,7 @@ export function ProfileView() {
           </button>
         </motion.div>
       </motion.div>
+      {lexiconOpen && <GlossarySheet onClose={() => setLexiconOpen(false)} />}
     </div>
   );
 }

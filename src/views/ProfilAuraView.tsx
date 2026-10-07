@@ -1,5 +1,6 @@
 import { memo, useCallback, useMemo, useState, type CSSProperties } from "react";
 import { motion } from "framer-motion";
+import { PageHeader } from "@/components/PageHeader";
 import { WifiOff, Layers } from "lucide-react";
 import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
@@ -130,7 +131,7 @@ export function ProfilAuraView() {
 
   return (
     <div className="view is-active aura-view aura-hud">
-      <h1 className="aura-view-title">Ton parcours</h1>
+      <PageHeader kicker="Aura" title="Ton parcours" />
 
       {!isOnline && (
         <div className="aura-offline-banner" role="status">
@@ -289,14 +290,6 @@ const AuraHeroScene = memo(function AuraHeroScene({
   );
 });
 
-const EVOLUTION_NAMES: Record<string, string> = {
-  bronze: "Étincelle",
-  argent: "Focus",
-  or: "Impact",
-  platine: "Maîtrise",
-  legende: "Libre",
-};
-
 const BraiseEvolutionLine = memo(function BraiseEvolutionLine({
   currentRankId,
 }: {
@@ -307,7 +300,9 @@ const BraiseEvolutionLine = memo(function BraiseEvolutionLine({
     <section className="braise-evolution-line" aria-label="Les évolutions de Braise">
       <div className="braise-evolution-heading">
         <span>TA BRAISE</span>
-        <strong>{EVOLUTION_NAMES[currentRankId]}</strong>
+        <strong>
+          {currentIdx + 1} sur {RANKS.length}
+        </strong>
       </div>
       <div className="braise-evolution-cast">
         {RANKS.map((rank, index) => {
@@ -324,7 +319,7 @@ const BraiseEvolutionLine = memo(function BraiseEvolutionLine({
                 expression={current ? "proud" : "happy"}
                 labelled={false}
               />
-              <span>{current ? EVOLUTION_NAMES[rank.id] : rank.name}</span>
+              <span>{rank.name}</span>
             </div>
           );
         })}
@@ -495,7 +490,7 @@ function ProfilAuraSkeleton() {
       aria-busy="true"
       aria-label="Chargement de ton parcours"
     >
-      <h1 className="aura-view-title">Ton parcours</h1>
+      <PageHeader kicker="Aura" title="Ton parcours" />
 
       <div className="aura-hero">
         <Skeleton width={HERO_SIZE} height={HERO_SIZE} radius={999} style={{ marginBottom: 10 }} />

@@ -286,7 +286,7 @@ function VocalMode({
           <div
             style={{
               fontFamily: '"IBM Plex Mono", monospace',
-              fontSize: "0.66rem",
+              fontSize: "0.7rem",
               textTransform: "uppercase",
               color: "var(--ink-soft)",
               marginBottom: 8,

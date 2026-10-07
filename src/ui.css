@@ -1,0 +1,272 @@
+/* Small shared pieces of the interface: the bottom sheet, the "?" button, a one-off tip, the primary
+   button. Same grammar as the rest of BRAISE: thick ink outline, hard offset shadow, flat fills. */
+
+.ui-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(15, 20, 40, 0.5);
+}
+.ui-sheet {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 91;
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  max-width: 428px;
+  max-height: 82dvh;
+  overflow-y: auto;
+  padding: 16px 18px calc(20px + env(safe-area-inset-bottom, 0px));
+  border: 3px solid var(--neo-ink);
+  border-bottom: 0;
+  border-radius: 26px 26px 0 0;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 -5px 0 var(--neo-ink);
+  transform: translateX(-50%);
+}
+.ui-sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ui-sheet-head h2 {
+  margin: 0;
+  font: 400 1.25rem/1.1 var(--font-impact);
+}
+.ui-sheet-close {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  margin-left: auto;
+  place-items: center;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 50%;
+  background: var(--paper);
+}
+.ui-terms {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+.ui-term {
+  padding: 12px 14px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--sun) 16%, var(--paper));
+  box-shadow: 3px 3px 0 var(--neo-ink);
+}
+.ui-term dt {
+  font: 800 1.02rem/1.2 var(--font-display);
+}
+.ui-term dd {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.ui-term-long {
+  color: var(--ink-soft);
+}
+.ui-primary {
+  min-height: 52px;
+  border: 3px solid var(--neo-ink);
+  border-radius: 14px;
+  background: var(--neo-orange);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: #fff;
+  font: 400 0.95rem/1 var(--font-impact);
+}
+.ui-primary:active {
+  box-shadow: none;
+  transform: translate(2px, 2px);
+}
+.ui-help {
+  display: inline-grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 50%;
+  color: inherit;
+  opacity: 0.8;
+}
+.ui-help:hover {
+  opacity: 1;
+}
+.ui-help:focus-visible,
+.ui-sheet-close:focus-visible,
+.ui-primary:focus-visible {
+  outline: 3px solid var(--neo-orange);
+  outline-offset: 2px;
+}
+
+/* a one-off tip, in Braise's voice */
+.ui-tip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.ui-tip p {
+  flex: 1;
+  margin: 0;
+}
+.ui-tip button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 12px;
+  background: var(--sun);
+  color: #151821;
+  font:
+    800 0.8rem/1 "IBM Plex Mono",
+    monospace;
+}
+
+/* ===== One dialect =====
+   Every card, row group and control wears the same outfit: a thick ink outline and a hard offset
+   shadow. These rules bring the settings, the preference rows of Moi and the other quiet cards (thin
+   grey outline, soft shadow) into it, so no screen reads as another app. */
+
+.settings-group,
+.uni-card {
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 18px;
+  box-shadow: 3px 3px 0 var(--neo-ink);
+}
+.app-shell.dark .settings-group,
+.app-shell.dark .uni-card {
+  border-color: var(--neo-ink);
+}
+.settings-row {
+  min-height: 64px;
+  border-top: 2px solid color-mix(in srgb, var(--ink) 16%, transparent);
+}
+.uni-row + .uni-row,
+.app-shell.dark .uni-row + .uni-row {
+  border-top: 2px solid color-mix(in srgb, var(--ink) 16%, transparent);
+}
+.settings-row-icon {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--neo-ink);
+  background: color-mix(in srgb, var(--sun) 30%, var(--paper));
+  color: #151821;
+}
+.settings-size {
+  min-width: 44px;
+  height: 44px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 12px;
+}
+.settings-size.is-active {
+  box-shadow: 2px 2px 0 var(--neo-ink);
+}
+.settings-select {
+  min-height: 44px;
+  border: 2.5px solid var(--neo-ink);
+  background: var(--paper);
+  color: var(--ink);
+}
+.settings-btn {
+  min-height: 44px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 12px;
+  box-shadow: 2px 2px 0 var(--neo-ink);
+}
+.settings-btn:active {
+  box-shadow: none;
+  transform: translate(2px, 2px);
+}
+.settings-label {
+  font-size: 0.7rem;
+}
+.switch {
+  width: 54px;
+  height: 32px;
+}
+.slider {
+  border: 2.5px solid var(--neo-ink);
+  background: color-mix(in srgb, var(--ink) 14%, var(--paper));
+}
+.slider::before {
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid var(--neo-ink);
+  background: #fff;
+  box-sizing: border-box;
+}
+.switch input:checked + .slider {
+  background: var(--mint);
+}
+.switch input:checked + .slider::before {
+  transform: translateX(22px);
+}
+.switch input:focus-visible + .slider {
+  outline: 3px solid var(--neo-orange);
+  outline-offset: 2px;
+}
+
+/* ===== Touch targets =====
+   Nothing pressable is smaller than 44 x 44 px. Where the drawing is smaller (a round icon button on a
+   card), the press area is widened around it without changing what it looks like. */
+
+.profile-avatar-option {
+  width: 44px;
+  height: 44px;
+}
+.rev-icon-btn::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+}
+.lib-chip {
+  min-height: 44px;
+}
+.course-item-link {
+  min-height: 44px;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  margin-top: 4px;
+}
+.seg-track {
+  width: 150px;
+}
+.seg-opt {
+  min-height: 44px;
+}
+.profile-subject-chip {
+  min-height: 44px;
+}
+
+/* ===== A Déclic keeps its action under the thumb =====
+   The stage fills the screen: Braise and her bubble stay at the top, and everything the student presses
+   (the answers, "Suite") sits at the bottom, where the thumb already is, instead of floating mid-screen
+   above a blank page. */
+
+.declic-stage {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+}
+.declic-stage > .declic-step {
+  flex: 1 1 auto;
+}
+.declic-stage .declic-ask {
+  margin-bottom: auto;
+}
