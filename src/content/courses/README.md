@@ -29,6 +29,12 @@ Pour **livrer** un nouveau cours (le format à remplir, le prompt à donner à u
 Pour le **processus** (plan du chapitre d'abord, puis les Déclics par lots, corrections, identifiants
 à ne jamais changer), voir `content-briefs/README.md` à la racine du dépôt.
 
+## L'accroche d'un chapitre
+
+`chapter.json` peut porter un champ `hook` : une phrase dans la voix de Braise (« 24 parts, 5 potes : ça
+tombe pile ? »). Elle mène la carte du chapitre dans Matières, le vrai titre passant en petit dessous. Sans
+`hook`, le titre est utilisé seul.
+
 ## Les fichiers
 
 ```
@@ -114,11 +120,11 @@ validateur. Rien ne change dans le moteur.
 
 Trois statuts indépendants par Déclic, pour qu'un Déclic puisse être terminé **et** à renforcer :
 
-| Statut | Valeurs |
-| --- | --- |
-| `completionStatus` | `not_started` · `in_progress` · `completed` |
+| Statut                | Valeurs                                          |
+| --------------------- | ------------------------------------------------ |
+| `completionStatus`    | `not_started` · `in_progress` · `completed`      |
 | `understandingStatus` | `unknown` · `understood` · `needs_reinforcement` |
-| `masteryStatus` | `not_mastered` · `mastered` |
+| `masteryStatus`       | `not_mastered` · `mastered`                      |
 
 - `understood` : au moins `understoodMinScore` sur la carte de validation **et**, si la règle
   l'exige, une étape marquée `discriminating` réussie. Sinon `needs_reinforcement`.

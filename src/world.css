@@ -1,0 +1,497 @@
+/* The two illustrated screens of Matières: "Où on va ?" (one world per subject around Braise) and the
+   archipelago of a subject (one island per course). Same grammar as the rest of BRAISE — thick ink
+   outlines, hard offset shadows, flat saturated fills — drawn in scene units: a scene is 390 units wide
+   whatever the screen, and `--u` turns a unit into a real length (see layout.ts). */
+
+.hub,
+.world {
+  container-type: inline-size;
+}
+.hub-inner,
+.world-inner {
+  --u: calc(100cqw / 390);
+  position: relative;
+}
+
+/* ----- Où on va ? ---------------------------------------------------------------------------- */
+
+.hub {
+  margin-inline: calc(var(--page-gutter) * -1);
+}
+.hub-inner {
+  height: calc(var(--u) * var(--h));
+}
+.hub-ring {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--u) * 232);
+  width: calc(var(--u) * var(--d));
+  aspect-ratio: 1;
+  border: 2.5px dashed color-mix(in srgb, var(--ink) 28%, transparent);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.hub-sun {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--u) * 232);
+  width: calc(var(--u) * 142);
+  aspect-ratio: 1;
+  border: 3px solid var(--neo-ink);
+  border-radius: 50%;
+  background: #ffd84b;
+  box-shadow: 4px 4px 0 var(--neo-ink);
+  transform: translate(-50%, -50%);
+}
+.hub-braise {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--u) * 232);
+  width: calc(var(--u) * 104);
+  transform: translate(-50%, -52%);
+}
+.hub-braise svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.planet {
+  position: absolute;
+  left: calc(var(--u) * var(--x));
+  top: calc(var(--u) * var(--y));
+  width: calc(var(--u) * var(--s));
+  transform: translate(-50%, -50%);
+}
+.planet-ball {
+  position: relative;
+  display: grid;
+  width: 100%;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 3.5px solid var(--neo-ink);
+  border-radius: 50%;
+  background: var(--subject);
+  box-shadow: 4px 4px 0 var(--neo-ink);
+}
+.planet-badge {
+  display: grid;
+  width: 64%;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 3px solid var(--neo-ink);
+  border-radius: 50%;
+  background: #fff;
+}
+.planet-badge svg {
+  display: block;
+  width: 62%;
+  height: auto;
+}
+.planet-halo {
+  position: absolute;
+  inset: -14px;
+  border: 3px solid var(--neo-orange);
+  border-radius: 50%;
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--neo-orange) 20%, transparent);
+  pointer-events: none;
+}
+.planet-due {
+  position: absolute;
+  right: -6px;
+  top: -6px;
+  display: grid;
+  min-width: 26px;
+  height: 26px;
+  place-items: center;
+  padding: 0 6px;
+  border: 3px solid var(--neo-ink);
+  border-radius: 99px;
+  background: var(--coral);
+  color: var(--neo-ink);
+  font:
+    800 0.72rem/1 "IBM Plex Mono",
+    monospace;
+}
+.planet-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-top: 9px;
+  padding: 4px 9px 5px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 9px;
+  background: var(--paper);
+  box-shadow: 2px 2px 0 var(--neo-ink);
+  color: var(--ink);
+  font: 400 0.74rem/1 var(--font-impact);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.planet.is-suggested .planet-label {
+  margin-top: 16px;
+}
+.planet-tag {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-top: 46px;
+  padding: 4px 10px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 9px;
+  background: var(--sun);
+  box-shadow: 2px 2px 0 var(--neo-ink);
+  color: #151821;
+  font:
+    900 0.6rem/1.1 "IBM Plex Mono",
+    monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transform: translateX(-50%) rotate(-3deg);
+  white-space: nowrap;
+}
+
+/* ----- the archipelago ------------------------------------------------------------------------ */
+
+.world {
+  --sky: color-mix(in srgb, var(--subject) 20%, #fff);
+  --sea: var(--subject);
+  --grass: #10b981;
+  --grass-hi: #34d399;
+  --earth: #d9952f;
+  position: relative;
+  background: var(--sky);
+  overflow: clip;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 8%, transparent);
+}
+.app-shell.dark .world {
+  --sky: color-mix(in srgb, var(--subject) 24%, #0f1830);
+}
+.world-head {
+  position: relative;
+  z-index: 4;
+  padding: 14px var(--page-gutter) 0;
+}
+.world-inner {
+  display: flex;
+  height: calc(var(--u) * var(--h));
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.wd-sun {
+  position: absolute;
+  right: calc(var(--u) * 28);
+  top: calc(var(--u) * 104);
+  width: calc(var(--u) * 56);
+  aspect-ratio: 1;
+  border: 4px solid var(--neo-ink);
+  border-radius: 50%;
+  background: #ffd84b;
+}
+.wd-cloud {
+  position: absolute;
+  left: calc(var(--u) * var(--x));
+  top: calc(var(--u) * var(--y));
+  width: calc(var(--u) * var(--w));
+  height: auto;
+  opacity: 0.95;
+}
+.wd-sea {
+  position: absolute;
+  inset: auto 0 0 0;
+  width: 100%;
+  height: calc(var(--u) * 92);
+}
+.wd-braise {
+  position: absolute;
+  left: calc(var(--u) * var(--x));
+  top: calc(var(--u) * var(--y));
+  z-index: 3;
+  width: calc(var(--u) * 56);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.wd-braise svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.isl {
+  position: absolute;
+  left: calc(var(--u) * var(--x));
+  top: calc(var(--u) * (var(--y) - var(--w) * 0.5176));
+  z-index: 2;
+  display: flex;
+  width: calc(var(--u) * var(--w));
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--u) * 2);
+  transform: translateX(-50%);
+}
+.isl-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.isl-label {
+  display: grid;
+  max-width: calc(var(--u) * 170);
+  justify-items: center;
+  gap: 4px;
+  text-align: center;
+}
+.isl-label b {
+  padding: 5px 11px 6px;
+  border: 3px solid var(--neo-ink);
+  border-radius: 12px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: var(--ink);
+  font: 400 0.84rem/1.1 var(--font-impact);
+}
+.isl.is-selected .isl-label b,
+.isl.is-suggested .isl-label b {
+  background: var(--sun);
+  color: #151821;
+}
+.isl-tag {
+  padding: 2px 8px;
+  border: 2px solid var(--neo-ink);
+  border-radius: 99px;
+  background: var(--paper);
+  color: var(--ink);
+  font:
+    800 0.56rem/1.3 "IBM Plex Mono",
+    monospace;
+  font-style: normal;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.isl-tag--due {
+  background: color-mix(in srgb, var(--coral) 60%, var(--paper));
+}
+
+@keyframes isl-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .app-shell:not(.dyslexia-mode) .isl-art {
+    animation: isl-bob 5.5s ease-in-out infinite;
+    animation-delay: calc(var(--i) * -0.9s);
+  }
+}
+
+/* ----- the strip at the bottom of an archipelago ---------------------------------------------- */
+
+.dock {
+  position: sticky;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  z-index: 10;
+  display: flex;
+  margin: 0 14px 14px;
+  padding: 12px 14px;
+  align-items: center;
+  gap: 12px;
+  border: 3px solid var(--neo-ink);
+  border-radius: 20px;
+  background: var(--paper);
+  box-shadow: 4px 4px 0 var(--neo-ink);
+  color: var(--ink);
+}
+.dock-braise {
+  flex: 0 0 auto;
+}
+.dock-main {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 8px;
+}
+.dock-says {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.dock-cta {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 14px;
+  border: 3px solid var(--neo-ink);
+  border-radius: 14px;
+  background: var(--neo-orange);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: #fff;
+  font: 400 0.92rem/1.1 var(--font-impact);
+  text-align: left;
+}
+.dock-cta small {
+  display: block;
+  margin-top: 2px;
+  font:
+    700 0.62rem/1.2 "IBM Plex Mono",
+    monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.92;
+}
+.dock-cta:active {
+  box-shadow: none;
+  transform: translate(2px, 2px);
+}
+.dock--sheet {
+  display: grid;
+  gap: 6px;
+  align-items: start;
+}
+.dock-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+.dock-close {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  margin-left: auto;
+  place-items: center;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 50%;
+  background: var(--paper);
+}
+.dock-due {
+  white-space: nowrap;
+  padding: 2px 8px;
+  border: 2px solid var(--neo-ink);
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--coral) 60%, var(--paper));
+  font:
+    800 0.58rem/1.3 "IBM Plex Mono",
+    monospace;
+  text-transform: uppercase;
+}
+.dock-title {
+  font: 800 1.08rem/1.18 var(--font-display);
+}
+.dock-name {
+  color: var(--ink-soft);
+  font:
+    700 0.62rem/1.3 "IBM Plex Mono",
+    monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.dock--sheet .dock-cta {
+  margin-top: 6px;
+}
+
+/* ----- the Carte / Liste switch --------------------------------------------------------------- */
+
+.wd-seg {
+  display: inline-flex;
+  padding: 3px;
+  border: 3px solid var(--neo-ink);
+  border-radius: 99px;
+  background: var(--paper);
+  box-shadow: 2px 2px 0 var(--neo-ink);
+}
+.wd-seg button {
+  padding: 6px 12px;
+  border-radius: 99px;
+  color: var(--ink);
+  font:
+    800 0.66rem/1 "IBM Plex Mono",
+    monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.wd-seg button[aria-pressed="true"] {
+  background: var(--neo-ink);
+  color: #fff;
+}
+.world-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.world-title p {
+  margin: 0;
+  color: var(--neo-orange);
+  font:
+    800 0.66rem/1.1 "IBM Plex Mono",
+    monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.world-title h2 {
+  margin: 6px 0 0;
+  color: #151821;
+  font: 400 2.1rem/1 var(--font-impact);
+}
+.app-shell.dark .world-title h2 {
+  color: #fff;
+}
+
+/* the "Où on va ?" screen: title and the one button under Braise's line */
+.hub-title {
+  margin: 6px 0 0;
+  color: var(--ink);
+  font: 400 2.1rem/1 var(--font-impact);
+}
+.subjects-view .world-title {
+  margin-bottom: 6px;
+}
+
+/* No tab bar on a subject's pages: nothing to reserve room for under the sea. */
+.app-content:has(.world) {
+  padding-bottom: 0;
+}
+
+/* Keyboard focus: a clear ring on whatever the illustrated screens make pressable. */
+.isl:focus-visible,
+.planet:focus-visible {
+  outline: none;
+}
+.isl:focus-visible .isl-label b,
+.planet:focus-visible .planet-label {
+  outline: 3px solid var(--neo-orange);
+  outline-offset: 3px;
+}
+.planet:focus-visible .planet-ball {
+  box-shadow:
+    0 0 0 4px var(--neo-orange),
+    4px 4px 0 4px var(--neo-ink);
+}
+.wd-seg button:focus-visible,
+.dock-cta:focus-visible,
+.dock-close:focus-visible {
+  outline: 3px solid var(--neo-orange);
+  outline-offset: 2px;
+}
+
+/* "Où on va ?": Braise's line and the one button, in the normal flow under the worlds (a strip pinned
+   over the content would cover a world on a short screen). */
+.dock--hub {
+  position: static;
+  flex-direction: column;
+  align-items: stretch;
+  margin: 18px 2px 14px;
+}
+.dock--hub .dock-says {
+  text-align: center;
+}

@@ -59,6 +59,9 @@ export type ChapterDef = {
   subjectId: string;
   level: "seconde" | "premiere" | "terminale";
   title: string;
+  /** A line in Braise's voice that leads the chapter's card in the library ("24 parts, 5 potes : ça
+   *  tombe pile ?"), the real title going small underneath. Optional; the title is used without it. */
+  hook?: string;
   source: CurriculumSource;
   mappings: CurriculumMapping[];
   misconceptions: Misconception[];

@@ -1,182 +1,203 @@
-import { Check, AlertCircle } from "lucide-react";
+import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { useApp } from "@/store";
-import { chapterMastery, resolveChapters } from "@/lib/progress";
 import { sfx } from "@/lib/sound";
 import { TopBar } from "@/components/TopBar";
 import { BraiseMascot } from "@/components/BraiseMascot";
-import { SUBJECTS } from "@/data";
-import { DECLIC_SCRIPTS } from "@/lib/declic";
-import { StatusChip } from "@/components/course/StatusChip";
-import { aggregateStatus, displayStatus } from "@/lib/course/engine";
-import { courseChaptersOfSubject, declicsOfChapter } from "@/lib/course/registry";
+import { CourseCard } from "@/components/library/CourseCard";
+import { LibraryFilters } from "@/components/library/LibraryFilters";
+import { ResumeBanner } from "@/components/library/ResumeBanner";
+import { Archipelago } from "@/components/world/Archipelago";
+import { Dock } from "@/components/world/Dock";
+import { CONTENT_LEVEL_NOTE, SUBJECTS } from "@/data";
+import { COPY } from "@/lib/copy";
+import { useTone } from "@/lib/useTone";
 import { useCourseProgress } from "@/lib/course/useCourseProgress";
+import {
+  availableFilters,
+  buildLibrary,
+  matchesFilter,
+  type LibraryEntry,
+  type LibraryFilter,
+} from "@/lib/catalog/catalog";
 
-const ROW_JUSTIFY: Record<string, string> = {
-  center: "justify-center",
-  right: "justify-end pr-[10%]",
-  left: "justify-start pl-[10%]",
+type Mode = "map" | "list";
+const MODE_KEY = "braise_subject_view";
+
+function readMode(): Mode {
+  try {
+    return localStorage.getItem(MODE_KEY) === "list" ? "list" : "map";
+  } catch {
+    return "map";
+  }
+}
+
+const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.05 } } };
+const rise = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.28 } },
 };
-const POSITIONS = ["center", "right", "center", "left"];
 
-// Every tap from Home lands here — this was still the pre-redesign soft/pastel skill path
-// (thin grey border, pale circles) while everything upstream had moved to the neobrutalist
-// system: hard black borders, flat saturated fills, pure-black text/icons on colour (verified
-// safe at >=4.7:1 across all 6 subject hues, same finding as SubjectDecks). The zigzag path
-// structure itself was already good — a real Duolingo-style route, not a flat list — so only
-// the visual skin changes here, not the layout.
+/** A subject, two ways to see the same courses: a map (an archipelago, one island per course) and a
+ *  list (cards grouped by theme, with filters). The student picks, and the choice is remembered. Both
+ *  show everything, nothing is locked, and Braise points at one course in each. */
 export function SubjectView() {
   const { state, goBack, openLesson } = useApp();
-  const subject = SUBJECTS.find((s) => s.id === state.currentSubjectId);
+  const { t } = useTone();
   const courseProgress = useCourseProgress();
+  const [mode, setMode] = useState<Mode>(readMode);
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [filter, setFilter] = useState<LibraryFilter>("all");
+  const subject = SUBJECTS.find((s) => s.id === state.currentSubjectId);
 
-  if (!subject) return null;
+  const library = useMemo(
+    () =>
+      subject
+        ? buildLibrary(subject.id, {
+            completedChapters: state.completedChapters,
+            cardReviews: state.cardReviews,
+            course: courseProgress,
+            now: Date.now(),
+          })
+        : null,
+    [subject, state.completedChapters, state.cardReviews, courseProgress],
+  );
 
-  const courseChapters = courseChaptersOfSubject(subject.id);
+  if (!subject || !library) return null;
 
-  const chapters = resolveChapters(subject.chapters, state.completedChapters);
-  const doneCount = chapters.filter((c) => c.status === "done").length;
-  const pct = Math.round((doneCount / chapters.length) * 100);
+  const switchTo = (next: Mode) => {
+    sfx.tap(state.soundOn);
+    setMode(next);
+    try {
+      localStorage.setItem(MODE_KEY, next);
+    } catch {
+      /* the choice just is not remembered */
+    }
+  };
+
+  const open = (entry: LibraryEntry) => {
+    sfx.tap(state.soundOn);
+    openLesson(subject.id, entry.chapterId);
+  };
+
+  const switcher = (
+    <div className="wd-seg" role="group" aria-label="Façon de voir les cours">
+      <button type="button" aria-pressed={mode === "map"} onClick={() => switchTo("map")}>
+        Carte
+      </button>
+      <button type="button" aria-pressed={mode === "list"} onClick={() => switchTo("list")}>
+        Liste
+      </button>
+    </div>
+  );
+
+  if (mode === "map") {
+    const selected = library.entries.find((e) => e.key === selectedKey) ?? null;
+    return (
+      <div>
+        <TopBar title="Matières" onBack={goBack} />
+        <Archipelago
+          color={subject.color}
+          entries={library.entries}
+          suggestedKey={library.resume?.entry.key ?? null}
+          selectedKey={selected?.key ?? null}
+          onSelect={(key) => {
+            sfx.tap(state.soundOn);
+            setSelectedKey((current) => (current === key ? null : key));
+          }}
+          header={
+            <div className="world-title">
+              <div>
+                <p>{subject.name}</p>
+                <h2>L’archipel</h2>
+              </div>
+              {switcher}
+            </div>
+          }
+          dock={
+            <Dock
+              resume={library.resume}
+              selected={selected}
+              onOpen={open}
+              onClose={() => setSelectedKey(null)}
+            />
+          }
+        />
+      </div>
+    );
+  }
+
+  const filters = availableFilters(library.entries);
+  // A filter that no longer exists (the last card of a state just moved on) falls back to "all".
+  const active: LibraryFilter = filters.some((f) => f.filter === filter) ? filter : "all";
+  const themes = library.themes
+    .map((theme) => ({ ...theme, entries: theme.entries.filter((e) => matchesFilter(e, active)) }))
+    .filter((theme) => theme.entries.length > 0);
 
   return (
     <div>
-      <TopBar
-        title={`${subject.emoji} ${subject.name}`}
-        onBack={goBack}
-        right={<span className="font-mono text-xs font-bold text-[var(--ink-soft)]">{pct}%</span>}
-      />
-      <div className="view is-active">
-        <div className="mb-5 h-3 overflow-hidden rounded-full border-2 border-black bg-black/80">
-          <div
-            className="h-full rounded-full transition-[width] duration-500"
-            style={{ width: `${pct}%`, background: subject.color }}
-          />
-        </div>
+      <TopBar title="Matières" onBack={goBack} />
+      <div className="view is-active lib-view">
+        <motion.div variants={stagger} initial="hidden" animate="show" className="lib-stack">
+          <motion.div variants={rise} className="world-title">
+            <div>
+              <p>{subject.name}</p>
+              <h2>Tous les cours</h2>
+            </div>
+            {switcher}
+          </motion.div>
 
-        {courseChapters.length > 0 && (
-          <section className="course-path" aria-label="Cours du programme officiel">
-            <h2 className="course-path-title">Cours du programme</h2>
-            {courseChapters.map((chapter) => {
-              const declics = declicsOfChapter(chapter);
-              const status = aggregateStatus(
-                declics.map((d) => displayStatus(courseProgress.declics[d.id])),
-              );
-              return (
-                <button
-                  key={chapter.id}
-                  type="button"
-                  className="course-card"
-                  style={{ ["--subject-color" as string]: subject.color }}
-                  onClick={() => {
-                    sfx.tap(state.soundOn);
-                    openLesson(subject.id, chapter.id);
-                  }}
-                >
-                  <span className="course-card-top">
-                    <span className="course-card-badge">
-                      {chapter.level === "seconde"
-                        ? "Seconde"
-                        : chapter.level === "premiere"
-                          ? "Première"
-                          : "Terminale"}
-                    </span>
-                    <StatusChip status={status} />
-                  </span>
-                  <b className="course-card-title">{chapter.title}</b>
-                  <span className="course-card-meta">
-                    {declics.length} Déclic{declics.length > 1 ? "s" : ""} · révision incluse
-                  </span>
-                </button>
-              );
-            })}
-          </section>
-        )}
+          <motion.div variants={rise}>
+            {library.resume ? (
+              <ResumeBanner
+                subject={subject}
+                resume={library.resume}
+                onOpen={() => open(library.resume!.entry)}
+              />
+            ) : (
+              <p className="lib-allset">
+                <BraiseMascot size={44} mood="proud" />
+                <span>{t(COPY.library.allSet)}</span>
+              </p>
+            )}
+          </motion.div>
 
-        <div className="relative px-1 pb-3 pt-3">
-          <div
-            aria-hidden="true"
-            className="absolute bottom-10 left-1/2 top-8 w-[3px] -translate-x-1/2"
-            style={{
-              background:
-                "repeating-linear-gradient(to bottom, rgba(22,33,58,0.22) 0 8px, transparent 8px 16px)",
-            }}
-          />
+          {filters.length > 0 && (
+            <motion.div variants={rise}>
+              <LibraryFilters filters={filters} value={active} onChange={setFilter} />
+            </motion.div>
+          )}
 
-          {chapters.map((c, i) => {
-            const isDone = c.status === "done";
-            const isOpen = c.status === "open";
-            const isCurrent = c.status === "current";
-            const pos = POSITIONS[i % POSITIONS.length];
-            // The non-scolaire hook ("Pourquoi ton argent perd de la valeur ?") takes the
-            // primary label's place when a chapter has one — the real name moves to a small
-            // caption underneath instead of disappearing, so the two stay connected.
-            const hook = DECLIC_SCRIPTS[c.id]?.hook;
-            const mastery = chapterMastery(c.id, state.cardReviews);
-
-            const node = (
-              <button
-                className="relative flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border-[2.5px] border-black text-lg font-black transition-transform active:scale-90 disabled:cursor-default"
-                // The suggested chapter and finished ones are filled with the subject's colour;
-                // the other open chapters keep a paper fill, so the path still says "start here"
-                // without ever saying "you can't".
-                style={{
-                  background: isOpen ? "var(--paper)" : subject.color,
-                  boxShadow: "3px 3px 0px 0px #000",
-                }}
-                onClick={() => {
-                  sfx.tap(state.soundOn);
-                  // Open the real narrated lesson (slides + quiz) when one exists for this
-                  // chapter, chat otherwise — previously always forced 'echanger', so even a
-                  // chapter with a full scripted story opened straight into open-ended AI chat,
-                  // with the actual lesson buried one tap away behind the "Vocal Animé" toggle.
-                  openLesson(subject.id, c.id);
-                }}
-              >
-                {isDone ? (
-                  <Check size={24} className="text-black" strokeWidth={3} />
-                ) : (
-                  <span className="text-black">{i + 1}</span>
-                )}
-              </button>
-            );
-
-            return (
-              <div key={c.id} className={`relative z-10 mb-8 flex ${ROW_JUSTIFY[pos]}`}>
-                <div className="relative flex flex-col items-center gap-2">
-                  {isCurrent ? <div className="tw-cta-pulse">{node}</div> : node}
-
-                  {isCurrent && (
-                    <div className="pointer-events-none absolute -right-3 -top-5 z-20">
-                      <BraiseMascot size={34} mood="happy" />
-                    </div>
-                  )}
-
-                  <div className="flex max-w-[9.5rem] flex-col items-center gap-1 text-center">
-                    <b className="block font-display text-sm font-black leading-tight text-[var(--ink)]">
-                      {hook ?? c.title}
-                    </b>
-                    {hook && (
-                      <span className="block font-mono text-[0.65rem] font-bold uppercase tracking-wide text-[var(--ink-soft)]">
-                        {c.title}
-                      </span>
-                    )}
-                    <span className="block text-xs font-semibold text-[var(--ink-soft)]">
-                      {isDone
-                        ? mastery.total > 0
-                          ? `Terminé · ${mastery.mastered}/${mastery.total} acquises`
-                          : "Terminé"
-                        : `${c.duration} min`}
-                    </span>
-                    {isDone && mastery.weak > 0 && (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-black bg-sapie-coral px-2 py-0.5 text-[0.65rem] font-extrabold uppercase text-white">
-                        <AlertCircle size={10} /> À renforcer
-                      </span>
-                    )}
-                  </div>
-                </div>
+          {themes.map((theme) => (
+            <motion.section
+              key={theme.id}
+              variants={rise}
+              className="lib-theme"
+              aria-label={theme.label}
+            >
+              <header className="lib-theme-head">
+                <h3>{theme.label}</h3>
+                <span>{theme.caption}</span>
+              </header>
+              <div className="lib-grid">
+                {theme.entries.map((entry, i) => (
+                  <CourseCard
+                    key={entry.key}
+                    entry={entry}
+                    color={subject.color}
+                    onOpen={() => open(entry)}
+                    wide={i === theme.entries.length - 1 && theme.entries.length % 2 === 1}
+                  />
+                ))}
               </div>
-            );
-          })}
-        </div>
+            </motion.section>
+          ))}
+
+          <motion.p variants={rise} className="lib-more">
+            <b>{t(COPY.library.moreComing)}</b>
+            <span>{CONTENT_LEVEL_NOTE}</span>
+          </motion.p>
+        </motion.div>
       </div>
     </div>
   );

@@ -42,6 +42,67 @@ export const COPY = {
     ),
   },
 
+  /** A subject's library: what Braise says above the one thing it points at, and the small notes. */
+  library: {
+    resumeKicker: {
+      resume: L("Reprendre", "Là où t'as lâché"),
+      reinforce: L("À renforcer", "À reprendre en main"),
+      review: L("À revoir", "À remettre en place"),
+      next: L("Pour toi maintenant", "Ton prochain round"),
+    } as Record<string, Lines>,
+    resumeSays: {
+      resume: L(
+        "On reprend là où tu t'étais arrêté ?",
+        "Tu t'es arrêté en plein vol. On y retourne.",
+      ),
+      reinforce: L(
+        "Deux ou trois points se mélangent encore. On les démêle ensemble ?",
+        "Deux ou trois trucs t'ont résisté. Revanche ?",
+      ),
+      next: L(
+        "Celui-là, je le sens bien pour toi.",
+        "J'ai choisi. Ne discute pas (enfin, si, mais clique).",
+      ),
+    } as Record<string, Lines>,
+    reviewSays: (n: number) =>
+      L(
+        `${n} notion${plural(n)} à rafraîchir, quand tu veux.`,
+        `${n} notion${plural(n)} à remettre en place. Allez, vite fait.`,
+      ),
+    allSet: L(
+      "Tout est acquis ici. Tu peux souffler, ou rejouer pour le plaisir.",
+      "Tout est acquis. Je n'ai plus rien à te reprocher. Étrange.",
+    ),
+    moreComing: L("D'autres cours arrivent bientôt.", "D'autres cours arrivent. Patience."),
+  },
+
+  /** "Où on va ?": what Braise says under the worlds, from what she would suggest. */
+  world: {
+    title: L("Où on va ?", "Alors, on va où ?"),
+    kicker: L("Choisis ton monde", "Choisis ton terrain"),
+    saysResume: L(
+      "Où tu veux. Moi, je reprendrais là où tu en étais.",
+      "Où tu veux. Moi, je finirais ce que tu as commencé.",
+    ),
+    saysReinforce: L(
+      "Où tu veux. Moi, je commencerais par ce qui se mélange encore.",
+      "Où tu veux. Moi, je m'occuperais de ce qui te résiste.",
+    ),
+    saysReview: (n: number) =>
+      L(
+        `Où tu veux. ${n} notion${plural(n)} à rafraîchir, si ça te dit.`,
+        `Où tu veux. ${n} notion${plural(n)} à remettre en place, si tu as le cran.`,
+      ),
+    saysNext: L(
+      "Où tu veux. Moi, j'essaierais quelque chose de nouveau.",
+      "Où tu veux. Moi, j'attaquerais du neuf.",
+    ),
+    saysAllSet: L(
+      "Tout est au point. Choisis ce qui te fait envie.",
+      "Tout est au point. Rien à te reprocher, c'est louche.",
+    ),
+  },
+
   /** The buttons and kickers around a Déclic. The lesson's own text is authored per chapter. */
   declic: {
     stuck: L("Je bloque un peu", "Je sèche"),
