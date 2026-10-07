@@ -24,7 +24,7 @@
 .hub-ring {
   position: absolute;
   left: 50%;
-  top: calc(var(--u) * 232);
+  top: calc(var(--u) * var(--cy));
   width: calc(var(--u) * var(--d));
   aspect-ratio: 1;
   border: 2.5px dashed color-mix(in srgb, var(--ink) 28%, transparent);
@@ -34,7 +34,7 @@
 .hub-sun {
   position: absolute;
   left: 50%;
-  top: calc(var(--u) * 232);
+  top: calc(var(--u) * var(--cy));
   width: calc(var(--u) * 142);
   aspect-ratio: 1;
   border: 3px solid var(--neo-ink);
@@ -46,7 +46,7 @@
 .hub-braise {
   position: absolute;
   left: 50%;
-  top: calc(var(--u) * 232);
+  top: calc(var(--u) * var(--cy));
   width: calc(var(--u) * 104);
   transform: translate(-50%, -52%);
 }
@@ -113,11 +113,23 @@
     800 0.72rem/1 "IBM Plex Mono",
     monospace;
 }
-.planet-label {
+/* The name and, for the world Braise suggests, her tag: stacked in the flow under the ball, so a
+   larger text size pushes them apart instead of laying one over the other. */
+.planet-meta {
   position: absolute;
   top: 100%;
   left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   margin-top: 9px;
+  transform: translateX(-50%);
+}
+.planet.is-suggested .planet-meta {
+  margin-top: 16px;
+}
+.planet-label {
   padding: 4px 9px 5px;
   border: 2.5px solid var(--neo-ink);
   border-radius: 9px;
@@ -127,17 +139,9 @@
   font: 400 0.74rem/1 var(--font-impact);
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  transform: translateX(-50%);
   white-space: nowrap;
 }
-.planet.is-suggested .planet-label {
-  margin-top: 16px;
-}
 .planet-tag {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  margin-top: 46px;
   padding: 4px 10px;
   border: 2.5px solid var(--neo-ink);
   border-radius: 9px;
@@ -149,7 +153,7 @@
     monospace;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  transform: translateX(-50%) rotate(-3deg);
+  transform: rotate(-3deg);
   white-space: nowrap;
 }
 
@@ -365,8 +369,8 @@
 }
 .dock-close {
   display: grid;
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   margin-left: auto;
   place-items: center;
   border: 2.5px solid var(--neo-ink);
@@ -410,7 +414,8 @@
   box-shadow: 2px 2px 0 var(--neo-ink);
 }
 .wd-seg button {
-  padding: 6px 12px;
+  min-height: 36px;
+  padding: 0 14px;
   border-radius: 99px;
   color: var(--ink);
   font:
@@ -425,6 +430,7 @@
 }
 .world-title {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
@@ -441,7 +447,7 @@
 .world-title h2 {
   margin: 6px 0 0;
   color: #151821;
-  font: 400 2.1rem/1 var(--font-impact);
+  font: 400 clamp(1.6rem, 8vw, 2.1rem) / 1 var(--font-impact);
 }
 .app-shell.dark .world-title h2 {
   color: #fff;

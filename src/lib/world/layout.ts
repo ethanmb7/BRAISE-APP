@@ -47,7 +47,8 @@ export function islandSlots(count: number): IslandSlot[] {
   }));
 }
 
-/** Height of the archipelago scene: the header, every island with its label, then the sea. */
+/** Height of the archipelago scene: the header, every island with its label, then room for the strip
+ *  pinned at the bottom (so even the last island can be scrolled clear of it), then the sea. */
 export function archipelagoHeight(count: number): number {
-  return FIRST_Y + Math.max(0, count - 1) * ROW + 330;
+  return FIRST_Y + Math.max(0, count - 1) * ROW + 470;
 }

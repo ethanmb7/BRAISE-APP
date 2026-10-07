@@ -299,6 +299,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         return { ...s, view: s.lessonReturnTo, lessonReturnTo: null };
       }
       if (s.view === "lesson" || s.view === "complete") return { ...s, view: "subject" };
+      // The hub of subjects is reached from Home ("Tout voir"): back goes there.
+      if (s.view === "subjects") return { ...s, view: "home", tab: "home" };
       if (s.view === "subject" || s.view === "settings" || s.view === "share")
         return { ...s, view: s.tab };
       return s;

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
@@ -13,6 +13,8 @@ import { CONTENT_LEVEL_NOTE, SUBJECTS } from "@/data";
 import { COPY } from "@/lib/copy";
 import { useTone } from "@/lib/useTone";
 import { useCourseProgress } from "@/lib/course/useCourseProgress";
+import { scrollMemory } from "@/lib/world/scroll";
+import { useReveal, useScrollMemory } from "@/lib/world/useScroll";
 import {
   availableFilters,
   buildLibrary,
@@ -46,9 +48,12 @@ export function SubjectView() {
   const { t } = useTone();
   const courseProgress = useCourseProgress();
   const [mode, setMode] = useState<Mode>(readMode);
-  const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [filter, setFilter] = useState<LibraryFilter>("all");
   const subject = SUBJECTS.find((s) => s.id === state.currentSubjectId);
+  const scrollKey = subject ? `subject:${subject.id}:${mode}` : null;
+  // Whether this screen has been seen before: if not, it opens on Braise's suggestion, not at the top.
+  const [firstVisit] = useState(() => !scrollKey || !scrollMemory.has(scrollKey));
+  useScrollMemory(scrollKey);
 
   const library = useMemo(
     () =>
@@ -63,7 +68,41 @@ export function SubjectView() {
     [subject, state.completedChapters, state.cardReviews, courseProgress],
   );
 
-  if (!subject || !library) return null;
+  // The island that was open when the student left for a course is open again when they come back
+  // (and the one Home pointed at is open when they arrive from there).
+  const [selectedKey, setSelectedKey] = useState<string | null>(
+    () => library?.entries.find((e) => e.chapterId === state.currentChapterId)?.key ?? null,
+  );
+
+  const suggestedKey = library?.resume?.entry.key ?? null;
+  useReveal(
+    mode === "map" ? (selectedKey ?? (firstVisit ? suggestedKey : null)) : null,
+    (key) => `[data-island="${key.replace(/"/g, '\\"')}"]`,
+  );
+
+  // Escape puts the strip back to Braise's suggestion.
+  useEffect(() => {
+    if (!selectedKey) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelectedKey(null);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [selectedKey]);
+
+  if (!subject || !library) {
+    return (
+      <div>
+        <TopBar title="Matières" onBack={goBack} />
+        <div className="view is-active lib-view">
+          <p className="lib-allset">
+            <BraiseMascot size={44} mood="hesitant" />
+            <span>Je ne trouve pas cette matière. Retourne au choix des matières.</span>
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const switchTo = (next: Mode) => {
     sfx.tap(state.soundOn);
@@ -99,7 +138,7 @@ export function SubjectView() {
         <Archipelago
           color={subject.color}
           entries={library.entries}
-          suggestedKey={library.resume?.entry.key ?? null}
+          suggestedKey={suggestedKey}
           selectedKey={selected?.key ?? null}
           onSelect={(key) => {
             sfx.tap(state.soundOn);

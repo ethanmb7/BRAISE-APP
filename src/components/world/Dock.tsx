@@ -32,7 +32,7 @@ export function Dock({
 
   if (selected) {
     return (
-      <section className="dock dock--sheet" aria-label={selected.title}>
+      <section className="dock dock--sheet" aria-label={selected.title} aria-live="polite">
         <div className="dock-top">
           <StatusChip status={selected.status} />
           <Dots dots={selected.dots} source={selected.source} />
@@ -74,7 +74,7 @@ export function Dock({
       ? t(COPY.library.reviewSays(entry.dueCount))
       : t(COPY.library.resumeSays[reason]);
   return (
-    <section className="dock" aria-label="Braise te suggère">
+    <section className="dock" aria-label="Braise te suggère" aria-live="polite">
       <span className="dock-braise" aria-hidden="true">
         <BraiseMascot size={46} mood={reason === "next" ? "eager" : "happy"} />
       </span>

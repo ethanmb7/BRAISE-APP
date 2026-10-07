@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import { ArrowRight } from "lucide-react";
 import { Hub, type HubWorld } from "@/components/world/Hub";
+import { TopBar } from "@/components/TopBar";
+import { useScrollMemory } from "@/lib/world/useScroll";
 import { SubjectDecks, type SubjectDeckItem } from "@/components/SubjectDecks";
 import { SUBJECT_SHORT_NAMES, SUBJECTS } from "@/data";
 import { sfx } from "@/lib/sound";
@@ -16,9 +18,10 @@ import { dueInLibrary, pickGlobalResume, verbFor } from "@/lib/world/resume";
 /** The voluntary exploration space: Home recommends; "Où on va ?" lets the student choose a subject.
  *  Braise stands in the middle, each subject is a world around her, and nothing is locked. */
 export function SubjectsView() {
-  const { state, openSubject, openLesson } = useApp();
+  const { state, goBack, openSubject, openLesson } = useApp();
   const { t } = useTone();
   const courseProgress = useCourseProgress();
+  useScrollMemory("hub");
 
   const libraries = useMemo(() => {
     const now = Date.now();
@@ -56,8 +59,11 @@ export function SubjectsView() {
       };
     });
     return (
-      <div className="view is-active subjects-view">
-        <SubjectDecks items={decks} onSelect={open} />
+      <div>
+        <TopBar title="Matières" onBack={goBack} />
+        <div className="view is-active subjects-view">
+          <SubjectDecks items={decks} onSelect={open} />
+        </div>
       </div>
     );
   }
@@ -83,36 +89,39 @@ export function SubjectsView() {
           : t(COPY.world.saysNext);
 
   return (
-    <div className="view is-active subjects-view">
-      <header className="world-title">
-        <div>
-          <p>{t(COPY.world.kicker)}</p>
-          <h1 className="hub-title">{t(COPY.world.title)}</h1>
-        </div>
-      </header>
-      <Hub
-        worlds={worlds}
-        braiseMood={!global ? "proud" : reason === "next" ? "eager" : "happy"}
-        onSelect={open}
-      />
-      <section className="dock dock--hub" aria-label="Braise">
-        <p className="dock-says">{says}</p>
-        {global && (
-          <button
-            type="button"
-            className="dock-cta"
-            onClick={() => {
-              sfx.tap(state.soundOn);
-              openLesson(global.subjectId, global.resume.entry.chapterId);
-            }}
-          >
-            <span>
-              {verbFor(global.resume)} <small>{global.resume.entry.title}</small>
-            </span>
-            <ArrowRight size={18} strokeWidth={3} />
-          </button>
-        )}
-      </section>
+    <div>
+      <TopBar title="Matières" onBack={goBack} />
+      <div className="view is-active subjects-view">
+        <header className="world-title">
+          <div>
+            <p>{t(COPY.world.kicker)}</p>
+            <h1 className="hub-title">{t(COPY.world.title)}</h1>
+          </div>
+        </header>
+        <Hub
+          worlds={worlds}
+          braiseMood={!global ? "proud" : reason === "next" ? "eager" : "happy"}
+          onSelect={open}
+        />
+        <section className="dock dock--hub" aria-label="Braise">
+          <p className="dock-says">{says}</p>
+          {global && (
+            <button
+              type="button"
+              className="dock-cta"
+              onClick={() => {
+                sfx.tap(state.soundOn);
+                openLesson(global.subjectId, global.resume.entry.chapterId);
+              }}
+            >
+              <span>
+                {verbFor(global.resume)} <small>{global.resume.entry.title}</small>
+              </span>
+              <ArrowRight size={18} strokeWidth={3} />
+            </button>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

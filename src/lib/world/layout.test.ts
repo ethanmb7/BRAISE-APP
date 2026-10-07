@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { SUBJECTS } from "@/data";
 import { archipelagoHeight, HUB_CAPACITY, hubSlots, islandSlots, SCENE_W } from "./layout";
 import { dueInLibrary, pickGlobalResume } from "./resume";
+import { deltaToReveal, scrollMemory } from "./scroll";
 import type { Library, LibraryEntry } from "@/lib/catalog/catalog";
 
 const entry = (patch: Partial<LibraryEntry>): LibraryEntry => ({
@@ -132,5 +133,42 @@ describe("emblems", () => {
       kinds.forEach((k, i) => i > 0 && expect(k).not.toBe(kinds[i - 1]));
     }
     expect(new Set(NEUTRAL_KINDS).size).toBe(NEUTRAL_KINDS.length);
+  });
+});
+
+describe("deltaToReveal", () => {
+  const band = { top: 64, bottom: 600 };
+
+  it("does nothing for what is already well inside the band", () => {
+    expect(deltaToReveal({ top: 200, bottom: 420 }, band)).toBe(0);
+  });
+
+  it("scrolls down to bring up what hides behind the strip", () => {
+    const delta = deltaToReveal({ top: 793, bottom: 1011 }, band);
+    expect(delta).toBeGreaterThan(0);
+    // After scrolling, the thing is centred in the band.
+    const top = 793 - delta;
+    const bottom = 1011 - delta;
+    expect((top + bottom) / 2).toBeCloseTo((band.top + band.bottom) / 2, 0);
+  });
+
+  it("scrolls up to bring down what is under the top bar", () => {
+    expect(deltaToReveal({ top: 10, bottom: 230 }, band)).toBeLessThan(0);
+  });
+
+  it("aligns to the top when the thing is taller than the band", () => {
+    expect(deltaToReveal({ top: 300, bottom: 900 }, band)).toBe(300 - (band.top + 12));
+  });
+});
+
+describe("scrollMemory", () => {
+  it("remembers a position per screen and forgets nothing else", () => {
+    scrollMemory.clear();
+    expect(scrollMemory.has("a")).toBe(false);
+    scrollMemory.set("a", 120.4);
+    scrollMemory.set("b", -5);
+    expect(scrollMemory.get("a")).toBe(120);
+    expect(scrollMemory.get("b")).toBe(0);
+    expect(scrollMemory.get("c")).toBeUndefined();
   });
 });

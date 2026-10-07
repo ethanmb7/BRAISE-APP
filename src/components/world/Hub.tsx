@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 import { motion } from "framer-motion";
 import { BraiseMascot } from "@/components/BraiseMascot";
 import { SubjectIcon } from "@/components/SubjectIcon";
-import { HUB_HEIGHT, hubSlots } from "@/lib/world/layout";
+import { HUB_CENTER, HUB_HEIGHT, hubSlots } from "@/lib/world/layout";
 
 export type HubWorld = {
   id: string;
@@ -30,7 +30,10 @@ export function Hub({
 
   return (
     <div className="hub">
-      <div className="hub-inner" style={{ ["--h" as string]: HUB_HEIGHT } as CSSProperties}>
+      <div
+        className="hub-inner"
+        style={{ ["--h" as string]: HUB_HEIGHT, ["--cy" as string]: HUB_CENTER.y } as CSSProperties}
+      >
         <i className="hub-ring" style={{ ["--d" as string]: 244 } as CSSProperties} />
         <i className="hub-ring" style={{ ["--d" as string]: 344 } as CSSProperties} />
         <span className="hub-sun" aria-hidden="true" />
@@ -62,8 +65,10 @@ export function Hub({
               </span>
               {w.due > 0 && <span className="planet-due">{w.due}</span>}
             </span>
-            <span className="planet-label">{w.shortName}</span>
-            {w.suggested && <span className="planet-tag">Braise te suggère</span>}
+            <span className="planet-meta">
+              <span className="planet-label">{w.shortName}</span>
+              {w.suggested && <span className="planet-tag">Braise te suggère</span>}
+            </span>
           </motion.button>
         ))}
       </div>

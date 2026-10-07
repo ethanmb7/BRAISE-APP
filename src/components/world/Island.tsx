@@ -102,6 +102,7 @@ export function Island({
           ["--i" as string]: index,
         } as CSSProperties
       }
+      data-island={entry.key}
       onClick={onSelect}
       aria-label={label}
       aria-pressed={selected}
