@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { AppProvider, useApp } from "@/store";
 import { TabBar } from "@/components/TabBar";
 import { useScrollMemory } from "@/lib/world/useScroll";
+import { useNotificationSync } from "@/lib/notifications/useNotificationSync";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { PiocheRevealVeil } from "@/components/PiocheRevealVeil";
 import { BraiseMascot } from "@/components/BraiseMascot";
@@ -36,6 +37,7 @@ function Screen() {
 
   // The floating dock stays through a review session too — it sits under the action row,
   // in its own glass layer, so it never competes with the verdict buttons for the thumb.
+  useNotificationSync();
   const ownsScroll = state.view === "subject" || state.view === "subjects";
   const tabScreen = ["home", "revisions", "progres", "profile"].includes(state.view);
   useScrollMemory(loaded && tabScreen ? `view:${state.view}` : null, !ownsScroll);

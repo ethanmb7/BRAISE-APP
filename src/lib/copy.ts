@@ -116,6 +116,25 @@ export const COPY = {
     ),
   },
 
+  /** Braise asks to come and see the student now and then (see NOTIFICATIONS.md). The reminders' own texts
+   *  are in lib/notifications/copy.ts; these are the screens around them. */
+  notif: {
+    inviteTitle: L("Je peux passer te voir ?", "Je peux passer, ou je reste dans mon coin ?"),
+    inviteBody: L(
+      "Une petite notif, au moment que tu choisis. Jamais la nuit, jamais plus d'une par jour.",
+      "Une notif, pas dix. À l'heure que tu choisis, jamais la nuit, jamais plus d'une par jour.",
+    ),
+    inviteYes: L("Oui, choisir mon moment", "Ok, je choisis l'heure"),
+    inviteNo: L("Pas maintenant", "Plus tard"),
+    brakeTitle: L("Je me suis faite discrète.", "Je me suis calmée."),
+    brakeBody: L(
+      "Mes messages sont restés sans réponse, alors j'ai arrêté. Tu veux que je revienne, moins souvent ?",
+      "Trois messages sans réponse : message reçu. Je reviens si tu veux, mais moins souvent ?",
+    ),
+    brakeYes: L("Oui, moins souvent", "Ok, mais plus rare"),
+    brakeNo: L("Non merci", "Non, laisse-moi tranquille"),
+  },
+
   /** The buttons and kickers around a Déclic. The lesson's own text is authored per chapter. */
   declic: {
     stuck: L("Je bloque un peu", "Je sèche"),

@@ -15,6 +15,11 @@ import { HeaderHUD } from "@/components/HeaderHUD";
 import { HeroPiocheCard } from "@/components/HeroPiocheCard";
 import { MissedCardsBanner } from "@/components/MissedCardsBanner";
 import { WorldsTeaser } from "@/components/world/WorldsTeaser";
+import { BrakeCard, MomentSheet, NotifInvite } from "@/components/notifications/Reminders";
+import { useReminders } from "@/components/notifications/useReminders";
+import { frequencyFromGoal, isBraked } from "@/lib/notifications/model";
+import { shouldInvite } from "@/lib/notifications/store";
+import { useNotifState } from "@/lib/notifications/useNotifState";
 import { TodayStrip } from "@/components/TodayStrip";
 import { ShareAuraModal } from "@/components/ShareAuraModal";
 import { SUBJECTS, FLASHCARDS, SUBJECT_SHORT_NAMES, FIRST_CHAPTER_ID } from "@/data";
@@ -148,6 +153,18 @@ export function HomeView() {
         ? t(COPY.world.teaserBack)
         : t(COPY.world.teaserNew);
 
+  // Braise asks, once the student has had a taste of the app, if she can come and see them; and when her
+  // messages went unanswered three times, she says she went quiet. Never both, never twice in a row.
+  const notif = useNotifState();
+  const { enable } = useReminders();
+  const [momentOpen, setMomentOpen] = useState(false);
+  const tasted =
+    state.completedChapters.length > 0 ||
+    Object.keys(state.cardReviews).length >= 5 ||
+    Object.values(courseProgress.declics).some((d) => d.completionStatus === "completed");
+  const braked = notif.prefs.enabled && isBraked(notif.history, notif.opens, Date.now());
+  const invite = !braked && shouldInvite(notif, tasted, Date.now());
+
   // Same derivation as ProfilAuraView's own share button — real distinct-subjects-reviewed
   // count from card review history, not a second, possibly-diverging computation.
   const subjectsCount = new Set(
@@ -233,6 +250,12 @@ export function HomeView() {
             </motion.div>
           )}
 
+          {(braked || invite) && (
+            <motion.div variants={staggerItem}>
+              {braked ? <BrakeCard /> : <NotifInvite onAccept={() => setMomentOpen(true)} />}
+            </motion.div>
+          )}
+
           <motion.div variants={staggerItem} className="space-y-3">
             <div>
               <span className="font-mono text-[0.7rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">
@@ -257,6 +280,18 @@ export function HomeView() {
           </motion.div>
         </motion.div>
       </div>
+
+      {momentOpen && (
+        <MomentSheet
+          initial={{ ...notif.prefs, frequency: frequencyFromGoal(state.user.goal) }}
+          confirmLabel="Activer les rappels"
+          onClose={() => setMomentOpen(false)}
+          onConfirm={(prefs) => {
+            setMomentOpen(false);
+            void enable(prefs);
+          }}
+        />
+      )}
 
       <LevelSheet
         open={sheetOpen}

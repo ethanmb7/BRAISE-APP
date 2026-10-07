@@ -2,6 +2,7 @@ import { ALargeSmall, Moon, Type, Volume2, Globe } from "lucide-react";
 import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
 import { TopBar } from "@/components/TopBar";
+import { NotificationSettings } from "@/components/notifications/NotificationSettings";
 import { Switch } from "@/components/Switch";
 import { BackupSettings } from "@/components/BackupSettings";
 import { CONTENT_LEVEL_NOTE, LEVELS } from "@/data";
@@ -92,6 +93,8 @@ export function SettingsView() {
             <Switch checked={state.soundOn} onChange={toggleSound} aria-label="Sons" />
           </div>
         </div>
+
+        <NotificationSettings />
 
         {/* Compte */}
         <div className="settings-label">Compte</div>
