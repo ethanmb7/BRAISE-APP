@@ -1504,6 +1504,12 @@ select {
 .rank-rail-caption-rest {
   color: var(--ink);
 }
+/* Inside the "Ta Braise" card: under the five forms, set apart by a dashed line. */
+.braise-evolution-line .rank-rail-caption {
+  margin: 8px 3px 0;
+  padding-top: 9px;
+  border-top: 2px dashed color-mix(in srgb, var(--ink) 22%, transparent);
+}
 
 /* --- The 5-rank ladder rail — season-pass style, every rank visible at once, nothing hidden
    behind a tap/swipe/expand. Used only by RankUpCelebration's RankJourney now (the full-screen

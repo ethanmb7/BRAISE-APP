@@ -151,16 +151,15 @@ export function ProfilAuraView() {
           <AuraHeroScene rank={current} streak={state.streak} freezes={state.freezes} />
         </motion.div>
 
+        {/* Pillar 2 — Contrat de rétention : "Ta Braise" montre les 5 paliers et, dans la même carte, le
+            chiffre qui nourrit la fierté ou l'envie de revenir ("X XP jusqu'à Y"). */}
         <motion.div variants={staggerItem}>
-          <BraiseEvolutionLine currentRankId={current.id} />
-        </motion.div>
-
-        {/* Pillar 2 — Contrat de rétention : le chiffre de progression qui nourrit la fierté ou
-            l'envie de revenir. Portait autrefois aussi un rail des 5 rangs sous ce chiffre, mais
-            "Ta Braise" juste au-dessus montre déjà les 5 mêmes paliers — deux rangées de pastilles
-            identiques l'une sous l'autre ne racontaient rien de plus qu'une seule. */}
-        <motion.div variants={staggerItem}>
-          <RankProgressCaption next={next} xp={state.xp} milestone={milestone} />
+          <BraiseEvolutionLine
+            currentRankId={current.id}
+            next={next}
+            xp={state.xp}
+            milestone={milestone}
+          />
         </motion.div>
 
         {/* "Ce que Braise a remarqué" juste avant la grille qu'elle commente (jamais avant le rail
@@ -292,8 +291,14 @@ const AuraHeroScene = memo(function AuraHeroScene({
 
 const BraiseEvolutionLine = memo(function BraiseEvolutionLine({
   currentRankId,
+  next,
+  xp,
+  milestone,
 }: {
   currentRankId: string;
+  next: Rank | null;
+  xp: number;
+  milestone: NextMilestone;
 }) {
   const currentIdx = RANKS.findIndex((rank) => rank.id === currentRankId);
   return (
@@ -324,6 +329,9 @@ const BraiseEvolutionLine = memo(function BraiseEvolutionLine({
           );
         })}
       </div>
+      {/* The number that goes with the five forms ("804 XP jusqu'à Platine"), inside the same card:
+          the forms say where Braise stands, this says how far the next one is. */}
+      <RankProgressCaption next={next} xp={xp} milestone={milestone} />
     </section>
   );
 });
