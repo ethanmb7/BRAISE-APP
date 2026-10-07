@@ -234,9 +234,6 @@
   position: absolute;
   inset: -6px;
 }
-.lib-chip {
-  min-height: 44px;
-}
 .course-item-link {
   min-height: 44px;
   align-self: flex-start;

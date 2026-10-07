@@ -6,10 +6,8 @@ import { getDeclic } from "@/lib/course/registry";
 import type { CourseProgress, DeclicProgress } from "@/lib/course/types";
 import type { CardReview } from "@/types";
 import {
-  availableFilters,
   buildLibrary,
   LEGACY_THEME_ID,
-  matchesFilter,
   pickResume,
   type LibraryEntry,
   type LibraryState,
@@ -222,29 +220,5 @@ describe("pickResume", () => {
 
   it("is null when everything is remembered for good", () => {
     expect(pickResume([entry({ status: "mastered" })], null)).toBeNull();
-  });
-});
-
-describe("filters", () => {
-  it("offers none when every card is in the same state", () => {
-    expect(availableFilters([entry({}), entry({ key: "y" })])).toEqual([]);
-  });
-
-  it("offers only the filters that change the list, plus Tout", () => {
-    const entries = [
-      entry({ key: "a", status: "mastered" }),
-      entry({ key: "b", status: "needs_reinforcement" }),
-      entry({ key: "c", status: "not_started" }),
-      entry({ key: "d", status: "not_started" }),
-    ];
-    const f = availableFilters(entries);
-    expect(f[0]).toEqual({ filter: "all", count: 4 });
-    expect(f.map((x) => x.filter)).toEqual(["all", "new", "reinforce", "mastered"]);
-    expect(f.find((x) => x.filter === "new")!.count).toBe(2);
-  });
-
-  it("matches a due review as something to pick up again", () => {
-    expect(matchesFilter(entry({ status: "understood", dueCount: 1 }), "todo")).toBe(true);
-    expect(matchesFilter(entry({ status: "understood" }), "todo")).toBe(false);
   });
 });

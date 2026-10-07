@@ -406,31 +406,6 @@
   margin-top: 6px;
 }
 
-/* ----- the Carte / Liste switch --------------------------------------------------------------- */
-
-.wd-seg {
-  display: inline-flex;
-  padding: 3px;
-  border: 3px solid var(--neo-ink);
-  border-radius: 99px;
-  background: var(--paper);
-  box-shadow: 2px 2px 0 var(--neo-ink);
-}
-.wd-seg button {
-  min-height: 44px;
-  padding: 0 14px;
-  border-radius: 99px;
-  color: var(--ink);
-  font:
-    800 0.7rem/1 "IBM Plex Mono",
-    monospace;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.wd-seg button[aria-pressed="true"] {
-  background: var(--neo-ink);
-  color: #fff;
-}
 .world-title {
   display: flex;
   flex-wrap: wrap;
@@ -478,7 +453,6 @@
     0 0 0 4px var(--neo-orange),
     4px 4px 0 4px var(--neo-ink);
 }
-.wd-seg button:focus-visible,
 .dock-cta:focus-visible,
 .dock-close:focus-visible {
   outline: 3px solid var(--neo-orange);

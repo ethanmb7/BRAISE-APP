@@ -42,14 +42,8 @@ export const COPY = {
     ),
   },
 
-  /** A subject's library: what Braise says above the one thing it points at, and the small notes. */
+  /** A subject's library: what Braise says in the strip under the map, at the one course it points at. */
   library: {
-    resumeKicker: {
-      resume: L("Reprendre", "Là où t'as lâché"),
-      reinforce: L("À renforcer", "À reprendre en main"),
-      review: L("À revoir", "À remettre en place"),
-      next: L("Pour toi maintenant", "Ton prochain round"),
-    } as Record<string, Lines>,
     resumeSays: {
       resume: L(
         "On reprend là où tu t'étais arrêté ?",
@@ -73,7 +67,6 @@ export const COPY = {
       "Tout est acquis ici. Tu peux souffler, ou rejouer pour le plaisir.",
       "Tout est acquis. Je n'ai plus rien à te reprocher. Étrange.",
     ),
-    moreComing: L("D'autres cours arrivent bientôt.", "D'autres cours arrivent. Patience."),
   },
 
   /** "Où on va ?": what Braise says under the worlds, from what she would suggest. */
