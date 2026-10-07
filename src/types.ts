@@ -66,6 +66,20 @@ export type Flashcard = {
   /** Chapter this card drills, so "Revoir la notion" can open the exact lesson. */
   chapterId: string;
   level: "easy" | "medium" | "hard";
+  /** Set on a card that comes from a course Déclic rather than the older deck: where it is saved, what
+   *  the student reads after answering, and what the claim's truth is (its own, not a random one). */
+  course?: CourseCardRef;
+};
+
+/** Where a Réviser card taken from a course Déclic lives in the course service. */
+export type CourseCardRef = {
+  declicId: string;
+  deckId: string;
+  /** Whether the claim as the Déclic wrote it is true ("carre") or false ("intox"). */
+  answer: "carre" | "intox";
+  /** The Déclic's own words after a right and after a wrong answer: they explain, never just "faux". */
+  feedbackCorrect: string;
+  feedbackIncorrect: string;
 };
 
 export type Badge = {

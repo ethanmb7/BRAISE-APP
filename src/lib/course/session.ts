@@ -132,17 +132,17 @@ export function finish(def: DeclicDef, run: Run, store: ProgressStore, now = Dat
   return commit(def, completeDeclic(def, run), store, now);
 }
 
-/** One answer on a review card: saved with its schedule, and the Déclic's mastery re-evaluated from
- *  the whole deck. Returns what the answer was worth in points; granting them is the caller's call. */
-export function answerReviewCard(
+/** One answer on a review card, as a verdict: saved with its schedule, and the Déclic's mastery
+ *  re-evaluated from the whole deck. Returns what it was worth in points; granting them is the caller's
+ *  call. Réviser uses this directly, the deck player through `answerReviewCard` below. */
+export function recordCourseReview(
   def: DeclicDef,
   deck: ReviewDeckDef,
   card: ReviewCardDef,
-  given: ReviewAnswer,
+  correct: boolean,
   store: ProgressStore,
   now = Date.now(),
-): { correct: boolean; reward: { xp: number; kind: RewardKind } } {
-  const correct = isCorrect(card, given);
+): { reward: { xp: number; kind: RewardKind } } {
   let reward = { xp: 0, kind: "new" as RewardKind };
   store.update((p) => {
     const previous = p.reviewCards[card.id] ?? newReviewState(card, deck);
@@ -162,5 +162,20 @@ export function answerReviewCard(
     }
     return progress;
   });
+  return { reward };
+}
+
+/** One answer on a review card: saved with its schedule, and the Déclic's mastery re-evaluated from
+ *  the whole deck. Returns what the answer was worth in points; granting them is the caller's call. */
+export function answerReviewCard(
+  def: DeclicDef,
+  deck: ReviewDeckDef,
+  card: ReviewCardDef,
+  given: ReviewAnswer,
+  store: ProgressStore,
+  now = Date.now(),
+): { correct: boolean; reward: { xp: number; kind: RewardKind } } {
+  const correct = isCorrect(card, given);
+  const { reward } = recordCourseReview(def, deck, card, correct, store, now);
   return { correct, reward };
 }

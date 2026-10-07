@@ -305,27 +305,23 @@ export function AnswerCard({
 function TutorialHint() {
   return (
     <motion.div
-      className="mt-4 border-t-2 border-dashed border-black/15 pt-3"
+      className="mt-4 flex items-center justify-between gap-3 border-t-2 border-dashed border-black/15 pt-3"
+      aria-hidden="true"
       exit={{ opacity: 0, y: -4, transition: { duration: 0.16 } }}
     >
-      <div className="flex items-center justify-between gap-3" aria-hidden="true">
-        <span className="rounded-xl border-2 border-black bg-[var(--coral)] px-2.5 py-1 font-display text-[0.75rem] font-black uppercase tracking-wide text-white shadow-[2px_2px_0_#000]">
-          ← Intox
-        </span>
-        <motion.span
-          className="text-2xl leading-none"
-          animate={{ x: [-14, 14, -14], rotate: [-8, 8, -8] }}
-          transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
-        >
-          ✋
-        </motion.span>
-        <span className="rounded-xl border-2 border-black bg-[var(--mint)] px-2.5 py-1 font-display text-[0.75rem] font-black uppercase tracking-wide text-black shadow-[2px_2px_0_#000]">
-          Carré →
-        </span>
-      </div>
-      <p className="mt-2 text-center text-[0.8rem] font-bold text-[var(--ink-soft)]">
-        Carré, c’est vrai. Intox, c’est faux.
-      </p>
+      <span className="rounded-xl border-2 border-black bg-[var(--coral)] px-2.5 py-1 font-display text-[0.72rem] font-black uppercase tracking-wide text-white shadow-[2px_2px_0_#000]">
+        ← Intox
+      </span>
+      <motion.span
+        className="text-2xl leading-none"
+        animate={{ x: [-14, 14, -14], rotate: [-8, 8, -8] }}
+        transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+      >
+        ✋
+      </motion.span>
+      <span className="rounded-xl border-2 border-black bg-[var(--mint)] px-2.5 py-1 font-display text-[0.72rem] font-black uppercase tracking-wide text-black shadow-[2px_2px_0_#000]">
+        Carré →
+      </span>
     </motion.div>
   );
 }

@@ -26,7 +26,19 @@ import {
 import { reportCard } from "@/lib/reports";
 import { MASTERED_AT_REPETITIONS, reviewReward, type RewardKind } from "@/lib/progress";
 import { FLASHCARDS, SUBJECTS, SUBJECT_SHORT_NAMES } from "@/data";
-import type { Flashcard, Confidence } from "@/types";
+import type { Flashcard, Confidence, CardReview } from "@/types";
+import { COURSE_REGISTRY } from "@/lib/course/registry";
+import { courseProgressStore } from "@/lib/course/progressStore";
+import { useCourseProgress } from "@/lib/course/useCourseProgress";
+import { recordCourseReview } from "@/lib/course/session";
+import {
+  claimIsTrue,
+  courseCardToFlashcard,
+  findCourseCard,
+  interleave,
+  pickCourseCards,
+  type CourseSource,
+} from "@/lib/revision/courseCards";
 import { readSnapshot, writeSnapshot, type SessionSnapshot } from "@/lib/revisionSession";
 import { BevelButton } from "@/components/revisions/BevelButton";
 import { SwipeCard, type FlyDir, type Verdict } from "@/components/revisions/SwipeCard";
@@ -42,6 +54,14 @@ const JOKER_SEEN_KEY = "sapie_joker_seen";
 // A daily session is a sprint, not the whole library: ~15 cards, mixed. The deck used to
 // serve every due card (26 on a fresh install) with no cap at all.
 const SESSION_SIZE = 15;
+
+// Réviser meets the Déclics: a handful of cards from the course decks, where the student had trouble,
+// are slipped among the older deck (see lib/revision/courseCards.ts). The look is unchanged.
+const COURSE_SOURCE: CourseSource = {
+  chapters: COURSE_REGISTRY.chapters,
+  declics: COURSE_REGISTRY.declics,
+  decks: COURSE_REGISTRY.decks,
+};
 
 // The joker (×2) has to be earned, not free: available on every card at no cost it strictly
 // dominated CARRÉ (a rational player never pressed CARRÉ again). It charges with the combo —
@@ -83,9 +103,20 @@ export function RevisionsView() {
   const cards = useMemo(() => {
     if (resume) {
       const byId = new Map(FLASHCARDS.map((c) => [c.id, c]));
-      const restored = resume.cardIds.map((id) => byId.get(id)).filter((c): c is Flashcard => !!c);
+      const restored = resume.cardIds
+        .map((id) => {
+          const old = byId.get(id);
+          if (old) return old;
+          const fromCourse = findCourseCard(id, COURSE_SOURCE);
+          return fromCourse ? courseCardToFlashcard(fromCourse) : undefined;
+        })
+        .filter((c): c is Flashcard => !!c);
       if (restored.length === resume.cardIds.length) return restored;
     }
+    // A few cards from the Déclics where the student had trouble, if there are any.
+    const fromCourse = pickCourseCards(COURSE_SOURCE, courseProgressStore.get(), Date.now()).map(
+      courseCardToFlashcard,
+    );
     const dueIds = new Set(getDueCards());
     const chosen = new Set(state.user.subjects);
     const age = getAgeGroup(state.user.level);
@@ -99,15 +130,32 @@ export function RevisionsView() {
     const picked = [...FLASHCARDS]
       .map((c) => ({ c, p: priority(c) }))
       .sort((a, b) => b.p - a.p)
-      .slice(0, SESSION_SIZE)
+      .slice(0, SESSION_SIZE - fromCourse.length)
       .map(({ c }) => c);
     for (let i = picked.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [picked[i], picked[j]] = [picked[j], picked[i]];
     }
-    return picked;
+    return interleave(picked, fromCourse);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionKey, resume]);
+
+  // A card of the older deck is saved with the older schedule; a card from a Déclic is saved in the course
+  // service (its schedule, the Déclic's mastery, the wrong idea it counted) and pays the same points.
+  const { addXp } = useApp();
+  const onReview = (card: Flashcard, confidence: Confidence) => {
+    if (!card.course) return reviewCard(card.id, confidence);
+    const found = findCourseCard(card.id, COURSE_SOURCE);
+    if (!found) return;
+    const { reward } = recordCourseReview(
+      found.def,
+      found.deck,
+      found.card,
+      confidence === "sure",
+      courseProgressStore,
+    );
+    if (confidence === "sure" && reward.xp > 0) addXp(reward.xp);
+  };
 
   return (
     <div className="view is-active rev-view">
@@ -123,7 +171,7 @@ export function RevisionsView() {
           cards={cards}
           resume={resume && resume.cardIds.length === cards.length ? resume : null}
           soundOn={state.soundOn}
-          onReview={reviewCard}
+          onReview={onReview}
           onRestartSession={() => {
             writeSnapshot(null);
             setSessionKey((k) => k + 1);
@@ -144,10 +192,14 @@ function SwipeDeck({
   cards: Flashcard[];
   resume: SessionSnapshot | null;
   soundOn: boolean;
-  onReview: (id: string, c: Confidence) => void;
+  onReview: (card: Flashcard, c: Confidence) => void;
   onRestartSession: () => void;
 }) {
   const { state, addXp, updateBestCombo, setTab, openLesson } = useApp();
+  // The schedule of a card lives with its method: the older store, or the course service.
+  const courseProgress = useCourseProgress();
+  const reviewOf = (c: Flashcard): CardReview | undefined =>
+    c.course ? courseProgress.reviewCards[c.id]?.review : state.cardReviews[c.id];
   const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
   // Confetti isn't a transform MotionConfig can neuter (it's a canvas particle burst, not a
   // framer animation) — gated explicitly. The verdict is still fully communicated without it
@@ -283,7 +335,7 @@ function SwipeDeck({
   const rejectLift = useTransform(x, [-110, -20], [1.08, 1]);
 
   useEffect(() => {
-    setIsTrueAnswer(Math.random() < 0.5);
+    setIsTrueAnswer(claimIsTrue(cards[index] ?? FLASHCARDS[0]));
     setTyping(true);
     setReported(false);
     setArmed(false);
@@ -434,9 +486,9 @@ function SwipeDeck({
   // actually grants once it checks this same card's own mastery.
   // Drives the "Connue" chip on the question card: only a card actually mastered, not one that
   // merely pays half price because it was answered again before it was due.
-  const currentCardMastered =
-    (state.cardReviews[card.id]?.repetitions ?? 0) >= MASTERED_AT_REPETITIONS;
-  const expectedReward = reviewReward(state.cardReviews[card.id]).xp;
+  const currentReview = reviewOf(card);
+  const currentCardMastered = (currentReview?.repetitions ?? 0) >= MASTERED_AT_REPETITIONS;
+  const expectedReward = reviewReward(currentReview).xp;
   const rewardBadge = `+${armed ? expectedReward * 2 : expectedReward}`;
 
   const toggleArm = () => {
@@ -460,7 +512,7 @@ function SwipeDeck({
     setArmed(false);
     if (correctJudgment) {
       sfx.correct(soundOn);
-      const reward = reviewReward(state.cardReviews[card.id]);
+      const reward = reviewReward(currentReview);
       const base = reward.xp;
       // Doubling, not a flat top-up: reviewCard() below already grants this exact base amount
       // for a 'sure' review (same mastered/learning check, same constants), so adding it again
@@ -472,7 +524,7 @@ function SwipeDeck({
       setXpEarned((v) => v + total);
       setFeedback({
         tag: verdictTag(voiceCtx, useSuper ? "super" : "carre"),
-        text: quizCorrect(voiceCtx),
+        text: card.course ? card.course.feedbackCorrect : quizCorrect(voiceCtx),
         xp: total,
         reason: REWARD_REASON[reward.kind],
       });
@@ -502,13 +554,21 @@ function SwipeDeck({
       setWrongCount((w) => w + 1);
       setFeedback(
         isTrueAnswer
-          ? { tag: verdictTag(voiceCtx, "aie"), text: missedTruth(voiceCtx), xp: 0 }
-          : { tag: verdictTag(voiceCtx, "grille"), text: quizWrong(voiceCtx, card.topic), xp: 0 },
+          ? {
+              tag: verdictTag(voiceCtx, "aie"),
+              text: card.course ? card.course.feedbackIncorrect : missedTruth(voiceCtx),
+              xp: 0,
+            }
+          : {
+              tag: verdictTag(voiceCtx, "grille"),
+              text: card.course ? card.course.feedbackIncorrect : quizWrong(voiceCtx, card.topic),
+              xp: 0,
+            },
       );
       setCombo(0);
       setJokerCharge(0);
     }
-    onReview(card.id, correctJudgment ? "sure" : "not-sure");
+    onReview(card, correctJudgment ? "sure" : "not-sure");
     // No auto-advance, on purpose. The dock is pinned in one place, so a timer that swapped
     // "Suivant" for INTOX/CARRÉ under a thumb already reaching for it would turn that tap
     // into a verdict on the next card. The student always moves on themselves: "Suivant",

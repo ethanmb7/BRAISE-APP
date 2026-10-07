@@ -35,6 +35,16 @@ Pour le **processus** (plan du chapitre d'abord, puis les Déclics par lots, cor
 tombe pile ? »). Elle mène la carte du chapitre dans Matières, le vrai titre passant en petit dessous. Sans
 `hook`, le titre est utilisé seul.
 
+## Dans Réviser
+
+Quelques cartes des decks de révision d'un Déclic sont glissées dans une série de Réviser, **trois au plus
+sur une quinzaine**, et seulement là où l'élève a eu du mal : une carte qui teste l'idée fausse qu'il a
+choisie pendant le Déclic (`misconceptionId`), une carte ratée en révision une fois son jour venu, ou une
+carte d'un Déclic qui n'a pas encore pris (« à renforcer »). Une carte répondue il y a peu attend son
+jour. Réviser garde son apparence : la carte y est montrée telle que le Déclic l'a écrite, et le verdict
+affiche l'explication du Déclic. La réponse est enregistrée dans le cours (calendrier de la carte,
+maîtrise du Déclic) et rapporte les mêmes points. La logique est dans `src/lib/revision/courseCards.ts`.
+
 ## Les fichiers
 
 ```
