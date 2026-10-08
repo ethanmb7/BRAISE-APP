@@ -134,6 +134,14 @@ describe("emblems", () => {
     }
     expect(new Set(NEUTRAL_KINDS).size).toBe(NEUTRAL_KINDS.length);
   });
+
+  it("draws its own monument for every chapter that exists, none shared between two chapters", async () => {
+    const { CHAPTER_EMBLEMS } = await import("./emblems");
+    const chapterIds = SUBJECTS.flatMap((s) => s.chapters.map((c) => c.id));
+    for (const id of chapterIds) expect(CHAPTER_EMBLEMS[id], id).toBeDefined();
+    const drawn = chapterIds.map((id) => CHAPTER_EMBLEMS[id]);
+    expect(new Set(drawn).size).toBe(drawn.length);
+  });
 });
 
 describe("deltaToReveal", () => {
