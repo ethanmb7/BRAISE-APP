@@ -210,6 +210,31 @@
   width: 100%;
   height: calc(var(--u) * 92);
 }
+/* What is still to come, under the last island: a dashed note, not another place to go. */
+.wd-soon {
+  position: absolute;
+  left: calc(var(--u) * 195);
+  top: calc(var(--u) * var(--y));
+  z-index: 1;
+  display: grid;
+  gap: 3px;
+  width: calc(var(--u) * 290);
+  margin: 0;
+  padding: 12px 14px;
+  border: 2.5px dashed color-mix(in srgb, var(--neo-ink) 55%, transparent);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--paper) 55%, transparent);
+  color: var(--ink);
+  text-align: center;
+  transform: translateX(-50%);
+}
+.wd-soon b {
+  font-size: 0.86rem;
+}
+.wd-soon span {
+  color: var(--ink-soft);
+  font-size: 0.74rem;
+}
 .wd-braise {
   position: absolute;
   left: calc(var(--u) * var(--x));

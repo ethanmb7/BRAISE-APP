@@ -91,10 +91,3 @@ export function applyDemoRequest(
   }
   return false;
 }
-
-/** The address without the `demo` parameter. */
-export function withoutDemoParam(href: string): string {
-  const url = new URL(href);
-  url.searchParams.delete("demo");
-  return url.pathname + (url.search || "") + url.hash;
-}

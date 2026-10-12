@@ -3,6 +3,7 @@ import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
 import { TopBar } from "@/components/TopBar";
 import { DemoSettings } from "@/components/DemoSettings";
+import { ResetSettings } from "@/components/ResetSettings";
 import { NotificationSettings } from "@/components/notifications/NotificationSettings";
 import { Switch } from "@/components/Switch";
 import { BackupSettings } from "@/components/BackupSettings";
@@ -126,6 +127,8 @@ export function SettingsView() {
         <p className="settings-note">{CONTENT_LEVEL_NOTE}</p>
 
         <BackupSettings />
+
+        <ResetSettings />
 
         <DemoSettings />
 

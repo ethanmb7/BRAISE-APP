@@ -19,7 +19,6 @@ import {
   enterDemo,
   isDemo,
   leaveDemo,
-  withoutDemoParam,
 } from "./demo";
 import { buildDemoData, REVISER_TUTORIAL_KEY } from "./profile";
 
@@ -169,10 +168,5 @@ describe("the address", () => {
     expect(isDemo(s)).toBe(true);
     expect(applyDemoRequest("?demo=off", s, later)).toBe(true);
     expect(isDemo(s)).toBe(false);
-  });
-
-  it("drops the parameter and keeps the rest of the address", () => {
-    expect(withoutDemoParam("https://x.test/?demo")).toBe("/");
-    expect(withoutDemoParam("https://x.test/a/?demo=1&b=2#c")).toBe("/a/?b=2#c");
   });
 });

@@ -67,6 +67,7 @@ export const COPY = {
       "Tout est acquis ici. Tu peux souffler, ou rejouer pour le plaisir.",
       "Tout est acquis. Je n'ai plus rien à te reprocher. Étrange.",
     ),
+    moreComing: L("D'autres cours arrivent bientôt.", "D'autres cours arrivent. Patience."),
   },
 
   /** "Où on va ?": what Braise says under the worlds, from what she would suggest. */

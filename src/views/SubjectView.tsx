@@ -5,7 +5,9 @@ import { TopBar } from "@/components/TopBar";
 import { BraiseMascot } from "@/components/BraiseMascot";
 import { Archipelago } from "@/components/world/Archipelago";
 import { Dock } from "@/components/world/Dock";
-import { SUBJECTS } from "@/data";
+import { CONTENT_LEVEL_NOTE, SUBJECTS } from "@/data";
+import { COPY } from "@/lib/copy";
+import { useTone } from "@/lib/useTone";
 import { useCourseProgress } from "@/lib/course/useCourseProgress";
 import { scrollMemory } from "@/lib/world/scroll";
 import { useReveal, useScrollMemory } from "@/lib/world/useScroll";
@@ -15,6 +17,7 @@ import { buildLibrary, type LibraryEntry } from "@/lib/catalog/catalog";
  *  and Braise points at one course in the strip under the map. */
 export function SubjectView() {
   const { state, goBack, openLesson } = useApp();
+  const { t } = useTone();
   const courseProgress = useCourseProgress();
   const subject = SUBJECTS.find((s) => s.id === state.currentSubjectId);
   const scrollKey = subject ? `subject:${subject.id}` : null;
@@ -96,6 +99,12 @@ export function SubjectView() {
               <h2>L’archipel</h2>
             </div>
           </div>
+        }
+        soon={
+          <>
+            <b>{t(COPY.library.moreComing)}</b>
+            <span>{CONTENT_LEVEL_NOTE}</span>
+          </>
         }
         dock={
           <Dock

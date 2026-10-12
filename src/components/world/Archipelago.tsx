@@ -6,6 +6,8 @@ import { archipelagoHeight, islandSlots } from "@/lib/world/layout";
 import type { LibraryEntry } from "@/lib/catalog/catalog";
 
 const INK = "#151821";
+/** How far under the last island (its centre) the "more to come" line sits: clear of its label. */
+const SOON_OFFSET = 190;
 
 function Cloud({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
   return (
@@ -39,6 +41,7 @@ export function Archipelago({
   onSelect,
   header,
   dock,
+  soon,
 }: {
   color: string;
   entries: LibraryEntry[];
@@ -47,9 +50,12 @@ export function Archipelago({
   onSelect: (key: string) => void;
   header: ReactNode;
   dock: ReactNode;
+  /** A line under the last island: what is still to come. */
+  soon?: ReactNode;
 }) {
   const slots = islandSlots(entries.length);
   const height = archipelagoHeight(entries.length);
+  const lastY = slots.length > 0 ? slots[slots.length - 1].y : 0;
   const suggestedIndex = entries.findIndex((e) => e.key === suggestedKey);
   const braiseSlot = suggestedIndex >= 0 ? slots[suggestedIndex] : null;
   // Braise stands on the rim of the island she suggests, on the side away from its monument.
@@ -64,9 +70,14 @@ export function Archipelago({
       <div className="world-head">{header}</div>
       <div className="world-inner" style={{ ["--h" as string]: height } as CSSProperties}>
         <span className="wd-sun" aria-hidden="true" />
-        {entries.slice(2).map((_, i) => (
-          <Cloud key={i} x={i % 2 === 0 ? 14 : 290} y={150 + i * 260} s={0.7 + (i % 3) * 0.08} />
-        ))}
+        {/* clouds drift between the islands, never down where the "more to come" note stands */}
+        {entries
+          .slice(2)
+          .map((_, i) => i)
+          .filter((i) => 150 + i * 260 < lastY - 40)
+          .map((i) => (
+            <Cloud key={i} x={i % 2 === 0 ? 14 : 290} y={150 + i * 260} s={0.7 + (i % 3) * 0.08} />
+          ))}
         {entries.map((entry, i) => (
           <Island
             key={entry.key}
@@ -89,6 +100,14 @@ export function Archipelago({
           >
             <BraiseMascot size={56} mood="eager" />
           </span>
+        )}
+        {soon && slots.length > 0 && (
+          <p
+            className="wd-soon"
+            style={{ ["--y" as string]: lastY + SOON_OFFSET } as CSSProperties}
+          >
+            {soon}
+          </p>
         )}
         <svg className="wd-sea" viewBox="0 0 390 92" preserveAspectRatio="none" aria-hidden="true">
           <path

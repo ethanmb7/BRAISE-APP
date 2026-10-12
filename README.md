@@ -35,3 +35,11 @@ série de 6, des cartes dans tous les états, un Déclic terminé et un commenc�
 - Le profil est construit à partir des vraies cartes et des vrais Déclics (`src/lib/demo/profile.ts`) et de
   la date du jour : les cartes « à revoir » le sont toujours.
 - Rien n'est envoyé nulle part, comme le reste de l'app.
+
+## Repartir de zéro
+
+Moi › Paramètres › « Tout effacer » (avec confirmation) efface tout ce que l'app garde sur l'appareil. Pour
+enchaîner plusieurs élèves sur le même téléphone, ouvre simplement `?reset` à la fin de l'adresse : l'app
+repart d'un appareil vide. Seule l'identité de l'appareil est conservée. Pendant la démo, le bouton est caché
+(il effacerait aussi la progression mise de côté) ; `?reset` efface tout, démo et progression mise de côté
+comprises.
