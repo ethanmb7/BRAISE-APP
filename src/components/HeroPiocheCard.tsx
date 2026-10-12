@@ -193,7 +193,7 @@ export function HeroPiocheCard({
                 failure), 6.25:1 for dark ink. Three real fonts: font-mono for the eyebrow
                 (same as every other small-caps label app-wide), font-display for the title,
                 font-sans for the stats line. */}
-            <p className="flex items-center gap-1 font-mono text-[0.7rem] font-black uppercase tracking-wide text-[#151821]">
+            <p className="flex flex-wrap items-center gap-x-1 font-mono text-[0.7rem] font-black uppercase tracking-wide text-[#151821]">
               <Sparkles size={12} strokeWidth={3} />{" "}
               {launching ? "Mission trouvée !" : "Pioche du jour"}
               {!launching && (
@@ -208,26 +208,26 @@ export function HeroPiocheCard({
           </div>
         </div>
         <div
-          className="relative mt-4 grid grid-cols-[auto_minmax(0,1fr)_auto] gap-2 max-[380px]:gap-1.5"
+          className="relative mt-4 flex flex-wrap gap-2 max-[380px]:gap-1.5"
           aria-label="Les repères de ta mission"
         >
-          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 max-[380px]:px-1.5 shadow-[2px_2px_0px_0px_#151821]">
+          <div className="flex-none flex items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 max-[380px]:px-1.5 shadow-[2px_2px_0px_0px_#151821]">
             <Clock3 size={15} strokeWidth={3} color="#151821" aria-hidden="true" />
             <span className="whitespace-nowrap font-mono text-[0.7rem] font-black text-[#151821]">
               {duration} MIN
             </span>
           </div>
-          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 max-[380px]:px-1.5 shadow-[2px_2px_0px_0px_#151821]">
+          <div className="order-last min-w-[7.5rem] flex-1 flex items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 max-[380px]:px-1.5 shadow-[2px_2px_0px_0px_#151821]">
             <span
               aria-hidden="true"
               className="h-3 w-3 flex-none rounded-full border-2 border-[#151821]"
               style={{ background: subjectColor ?? "#FDC800" }}
             />
-            <span className="truncate font-mono text-[0.7rem] font-black uppercase text-[#151821]">
+            <span className="min-w-0 font-mono text-[0.7rem] font-black uppercase text-[#151821]">
               {subjectName ?? "Mission"}
             </span>
           </div>
-          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 max-[380px]:px-1.5 shadow-[2px_2px_0px_0px_#151821]">
+          <div className="flex-none flex items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 max-[380px]:px-1.5 shadow-[2px_2px_0px_0px_#151821]">
             <Trophy size={15} strokeWidth={3} color="#151821" aria-hidden="true" />
             <span className="whitespace-nowrap font-mono text-[0.7rem] font-black text-[#151821]">
               +{XP_REWARDS.CHAPTER_COMPLETE} XP

@@ -1,13 +1,10 @@
 import type { CSSProperties, ReactNode } from "react";
-import { BraiseMascot } from "@/components/BraiseMascot";
 import { emblemFor } from "@/lib/world/emblems";
 import { Island } from "@/components/world/Island";
-import { archipelagoHeight, islandSlots } from "@/lib/world/layout";
+import { islandCell } from "@/lib/world/layout";
 import type { LibraryEntry } from "@/lib/catalog/catalog";
 
 const INK = "#151821";
-/** How far under the last island (its centre) the "more to come" line sits: clear of its label. */
-const SOON_OFFSET = 190;
 
 function Cloud({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
   return (
@@ -15,7 +12,11 @@ function Cloud({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
       className="wd-cloud"
       viewBox="-14 -16 108 56"
       style={
-        { ["--x" as string]: x, ["--y" as string]: y, ["--w" as string]: 108 * s } as CSSProperties
+        {
+          ["--x" as string]: `${x}%`,
+          ["--y" as string]: `${y}%`,
+          ["--s" as string]: s,
+        } as CSSProperties
       }
       aria-hidden="true"
     >
@@ -32,7 +33,8 @@ function Cloud({ x, y, s = 1 }: { x: number; y: number; s?: number }) {
 
 /** A subject as a small archipelago: one island per course, zigzagging down a sky and sea tinted with
  *  the subject's colour. Everything is open; the suggested island is a little bigger and Braise stands
- *  by it. The header and the bottom strip are passed in, so the screen decides what they say. */
+ *  on it. The header and the bottom strip are passed in, so the screen decides what they say. The
+ *  islands sit in a two-column path in the page's flow (see `islandCell`), each with its name under it. */
 export function Archipelago({
   color,
   entries,
@@ -53,13 +55,7 @@ export function Archipelago({
   /** A line under the last island: what is still to come. */
   soon?: ReactNode;
 }) {
-  const slots = islandSlots(entries.length);
-  const height = archipelagoHeight(entries.length);
-  const lastY = slots.length > 0 ? slots[slots.length - 1].y : 0;
-  const suggestedIndex = entries.findIndex((e) => e.key === suggestedKey);
-  const braiseSlot = suggestedIndex >= 0 ? slots[suggestedIndex] : null;
-  // Braise stands on the rim of the island she suggests, on the side away from its monument.
-  const braiseX = braiseSlot ? braiseSlot.x + (braiseSlot.x > 195 ? -54 : 56) : 0;
+  const clouds = Math.max(1, Math.floor(entries.length / 3));
 
   return (
     <section
@@ -68,47 +64,46 @@ export function Archipelago({
       aria-label="Carte des cours"
     >
       <div className="world-head">{header}</div>
-      <div className="world-inner" style={{ ["--h" as string]: height } as CSSProperties}>
+      <div className="world-body">
         <span className="wd-sun" aria-hidden="true" />
-        {/* clouds drift between the islands, never down where the "more to come" note stands */}
-        {entries
-          .slice(2)
-          .map((_, i) => i)
-          .filter((i) => 150 + i * 260 < lastY - 40)
-          .map((i) => (
-            <Cloud key={i} x={i % 2 === 0 ? 14 : 290} y={150 + i * 260} s={0.7 + (i % 3) * 0.08} />
-          ))}
-        {entries.map((entry, i) => (
-          <Island
-            key={entry.key}
-            entry={entry}
-            emblem={emblemFor(entry.chapterId, i)}
-            slot={slots[i]}
-            index={i}
-            suggested={entry.key === suggestedKey}
-            selected={entry.key === selectedKey}
-            onSelect={() => onSelect(entry.key)}
+        {Array.from({ length: clouds }, (_, i) => (
+          <Cloud
+            key={i}
+            x={i % 2 === 0 ? -9 : 76}
+            y={22 + i * (60 / clouds)}
+            s={0.7 + (i % 3) * 0.08}
           />
         ))}
-        {braiseSlot && (
-          <span
-            className="wd-braise"
-            style={
-              { ["--x" as string]: braiseX, ["--y" as string]: braiseSlot.y - 6 } as CSSProperties
-            }
-            aria-hidden="true"
-          >
-            <BraiseMascot size={56} mood="eager" />
-          </span>
-        )}
-        {soon && slots.length > 0 && (
-          <p
-            className="wd-soon"
-            style={{ ["--y" as string]: lastY + SOON_OFFSET } as CSSProperties}
-          >
-            {soon}
-          </p>
-        )}
+        <div className="wd-path">
+          {entries.map((entry, i) => {
+            const cell = islandCell(i);
+            return (
+              <div
+                key={entry.key}
+                className="isl-slot"
+                style={
+                  {
+                    ["--col" as string]: cell.column,
+                    ["--row" as string]: cell.row,
+                  } as CSSProperties
+                }
+              >
+                <Island
+                  entry={entry}
+                  emblem={emblemFor(entry.chapterId, i)}
+                  index={i}
+                  suggested={entry.key === suggestedKey}
+                  selected={entry.key === selectedKey}
+                  braise={
+                    entry.key === suggestedKey ? (cell.column === 1 ? "right" : "left") : null
+                  }
+                  onSelect={() => onSelect(entry.key)}
+                />
+              </div>
+            );
+          })}
+        </div>
+        {soon && entries.length > 0 && <p className="wd-soon">{soon}</p>}
         <svg className="wd-sea" viewBox="0 0 390 92" preserveAspectRatio="none" aria-hidden="true">
           <path
             d="M0 26Q20 12 40 26T80 26T120 26T160 26T200 26T240 26T280 26T320 26T360 26T400 26V92H0Z"

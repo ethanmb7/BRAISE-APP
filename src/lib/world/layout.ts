@@ -1,54 +1,42 @@
-// Where things sit in the two illustrated scenes. Positions are in scene units: a scene is 390 units
-// wide whatever the screen, and the components turn units into real sizes with container units, so the
-// same drawing fits a small phone and a wide one. Pure, so it is tested without a screen.
-export const SCENE_W = 390;
+// Where things sit in the two illustrated scenes. Both are built in the page's flow, never at drawn
+// coordinates: the names live in the same boxes as the pictures, so a narrower phone or a bigger text
+// size pushes things apart instead of laying one over another. What is left to decide is only which
+// box each thing goes in, which is pure and tested without a screen.
 
-export type Slot = { x: number; y: number; size: number };
+/** The most worlds the "Où on va ?" screen holds (three above Braise, three below). More subjects than
+ *  that and the screen falls back to a plain grid. */
+export const HUB_CAPACITY = 6;
 
-/** The centre of the "Où on va ?" scene, where Braise stands. */
-export const HUB_CENTER = { x: 195, y: 232 };
-export const HUB_HEIGHT = 500;
+export type HubPlace = { col: 1 | 2 | 3; row: 1 | 2 | 3 | 4 };
 
-// Two rings around Braise. A subject keeps the same place from one visit to the next (a place you
-// can find with your eyes closed), so the slot follows the subject's order, not its state.
-const HUB_SLOTS: { r: number; a: number }[] = [
-  { r: 126, a: 90 },
-  { r: 120, a: 212 },
-  { r: 172, a: -90 },
-  { r: 120, a: 328 },
-  { r: 158, a: 38 },
-  { r: 158, a: 142 },
-];
+// The sun fills the middle column of the two middle rows. The worlds go around it, like a hexagon:
+const TOP: HubPlace = { col: 2, row: 1 };
+const UPPER_RIGHT: HubPlace = { col: 3, row: 2 };
+const LOWER_RIGHT: HubPlace = { col: 3, row: 3 };
+const BOTTOM: HubPlace = { col: 2, row: 4 };
+const LOWER_LEFT: HubPlace = { col: 1, row: 3 };
+const UPPER_LEFT: HubPlace = { col: 1, row: 2 };
 
-/** More subjects than places on the rings: the screen falls back to a plain grid. */
-export const HUB_CAPACITY = HUB_SLOTS.length;
+const HUB_PLACES: Record<number, HubPlace[]> = {
+  1: [TOP],
+  2: [UPPER_LEFT, LOWER_RIGHT],
+  3: [TOP, LOWER_RIGHT, LOWER_LEFT],
+  4: [UPPER_LEFT, UPPER_RIGHT, LOWER_RIGHT, LOWER_LEFT],
+  5: [TOP, UPPER_RIGHT, LOWER_RIGHT, LOWER_LEFT, UPPER_LEFT],
+  6: [TOP, UPPER_RIGHT, LOWER_RIGHT, BOTTOM, LOWER_LEFT, UPPER_LEFT],
+};
 
-export function hubSlots(count: number, suggestedIndex: number | null): Slot[] {
-  return HUB_SLOTS.slice(0, count).map(({ r, a }, i) => ({
-    x: HUB_CENTER.x + r * Math.cos((a * Math.PI) / 180),
-    y: HUB_CENTER.y + r * Math.sin((a * Math.PI) / 180),
-    size: i === suggestedIndex ? 96 : 72,
-  }));
+/** Where each world goes around the sun, in the subject's order (a subject keeps its place from one visit
+ *  to the next, whatever its state). Clockwise from the top. */
+export function hubPlaces(count: number): HubPlace[] {
+  return HUB_PLACES[Math.min(Math.max(count, 0), HUB_CAPACITY)] ?? [];
 }
 
-export type IslandSlot = { x: number; y: number; w: number };
+export type IslandCell = { column: 1 | 2; row: number; span: 2 };
 
-const ROW = 122;
-const FIRST_Y = 124;
-const JITTER = [0, -8, 6, -4, 8, -6];
-
-/** Islands zigzag down the scene, left then right, a little off the grid so it reads as a place and
- *  not as a table. `w` is the island's width; the suggested one is drawn larger by the component. */
-export function islandSlots(count: number): IslandSlot[] {
-  return Array.from({ length: count }, (_, i) => ({
-    x: (i % 2 === 0 ? 108 : 272) + JITTER[i % JITTER.length],
-    y: FIRST_Y + i * ROW,
-    w: 138,
-  }));
-}
-
-/** Height of the archipelago scene: the header, every island with its label, then room for the strip
- *  pinned at the bottom (so even the last island can be scrolled clear of it), then the sea. */
-export function archipelagoHeight(count: number): number {
-  return FIRST_Y + Math.max(0, count - 1) * ROW + 470;
+/** Where an island goes in the two-column path of a subject. Each island takes two grid rows and
+ *  they alternate left and right, shifted by one row: neighbours share some height (so the path
+ *  zigzags and stays short) but never a column, and two in the same column never share a row. */
+export function islandCell(index: number): IslandCell {
+  return { column: index % 2 === 0 ? 1 : 2, row: index + 1, span: 2 };
 }

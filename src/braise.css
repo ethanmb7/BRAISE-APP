@@ -4683,10 +4683,12 @@ select {
 }
 .settings-row {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   min-height: 60px;
-  gap: 14px;
+  /* on a very narrow phone the control drops under its name instead of cutting the name */
+  gap: 8px 14px;
   padding: 10px 14px;
   font-size: 0.9rem;
   font-weight: 650;
@@ -5277,7 +5279,8 @@ select {
   bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   z-index: 40;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  /* four equal tabs, except that none is ever narrower than its own name ("Aujourd'hui" is the longest) */
+  grid-template-columns: repeat(4, minmax(min-content, 1fr));
   align-items: stretch;
   gap: 5px;
   min-height: 68px;
