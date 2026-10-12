@@ -22,7 +22,7 @@ export type EmblemKind =
   | "bubbles"
   // Histoire-Géographie
   | "cap"
-  | "bicorne"
+  | "wreath"
   | "temple"
   | "globe"
   // SVT
@@ -64,7 +64,7 @@ export const CHAPTER_EMBLEMS: Record<string, EmblemKind> = {
   f3: "masks",
   f4: "bubbles",
   h1: "cap",
-  h2: "bicorne",
+  h2: "wreath",
   h3: "temple",
   h4: "globe",
   s1: "lungs",

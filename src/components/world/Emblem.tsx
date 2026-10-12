@@ -218,16 +218,23 @@ function shapes(kind: EmblemKind): ReactNode {
           <circle cx="34" cy="52" r="3.5" fill={SUN} />
         </>
       );
-    case "bicorne":
+    case "wreath":
       return (
-        <g transform="translate(2 12) scale(0.96)">
+        <g transform="translate(0 -8) scale(1)">
+          <path d="M50 88 C20 86 10 56 18 30" strokeWidth={3} />
+          <path d="M50 88 C80 86 90 56 82 30" strokeWidth={3} />
           <path
-            d="M0 74 Q2 34 20 24 Q36 12 50 30 Q64 12 80 24 Q98 34 100 74 Q74 54 50 56 Q26 54 0 74 Z"
-            fill={INK}
+            d="M18 38 Q4 36 6 24 Q18 24 20 34 Z M16 56 Q2 56 2 44 Q16 44 18 52 Z M24 72 Q10 76 8 64 Q22 62 26 68 Z M36 82 Q26 92 16 84 Q22 72 32 76 Z"
+            fill={SUN}
           />
-          <path d="M10 67 Q50 48 90 67" stroke={WHITE} strokeWidth={3} />
-          <circle cx="50" cy="44" r="10" fill={SUN} />
-          <circle cx="50" cy="44" r="4" fill={WHITE} />
+          <path
+            d="M82 38 Q96 36 94 24 Q82 24 80 34 Z M84 56 Q98 56 98 44 Q84 44 82 52 Z M76 72 Q90 76 92 64 Q78 62 74 68 Z M64 82 Q74 92 84 84 Q78 72 68 76 Z"
+            fill={SUN}
+          />
+          <path
+            d="M50 32 L56 44 L68 46 L58 54 L62 66 L50 60 L38 66 L42 54 L32 46 L44 44 Z"
+            fill={WHITE}
+          />
         </g>
       );
     case "temple":
