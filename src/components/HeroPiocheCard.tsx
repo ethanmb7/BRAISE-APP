@@ -208,16 +208,16 @@ export function HeroPiocheCard({
           </div>
         </div>
         <div
-          className="relative mt-4 grid grid-cols-[auto_minmax(0,1fr)_auto] gap-2"
+          className="relative mt-4 grid grid-cols-[auto_minmax(0,1fr)_auto] gap-2 max-[380px]:gap-1.5"
           aria-label="Les repères de ta mission"
         >
-          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
-            <Clock3 size={15} strokeWidth={3} aria-hidden="true" />
+          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 max-[380px]:px-1.5 shadow-[2px_2px_0px_0px_#151821]">
+            <Clock3 size={15} strokeWidth={3} color="#151821" aria-hidden="true" />
             <span className="whitespace-nowrap font-mono text-[0.7rem] font-black text-[#151821]">
               {duration} MIN
             </span>
           </div>
-          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
+          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 max-[380px]:px-1.5 shadow-[2px_2px_0px_0px_#151821]">
             <span
               aria-hidden="true"
               className="h-3 w-3 flex-none rounded-full border-2 border-[#151821]"
@@ -227,8 +227,8 @@ export function HeroPiocheCard({
               {subjectName ?? "Mission"}
             </span>
           </div>
-          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
-            <Trophy size={15} strokeWidth={3} aria-hidden="true" />
+          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 max-[380px]:px-1.5 shadow-[2px_2px_0px_0px_#151821]">
+            <Trophy size={15} strokeWidth={3} color="#151821" aria-hidden="true" />
             <span className="whitespace-nowrap font-mono text-[0.7rem] font-black text-[#151821]">
               +{XP_REWARDS.CHAPTER_COMPLETE} XP
             </span>

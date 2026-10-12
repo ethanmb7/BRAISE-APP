@@ -68,11 +68,11 @@ export function TodayStrip({
             <p className="font-mono text-[0.7rem] font-black uppercase tracking-wide text-[var(--ink-soft)]">
               Ton rythme du jour
             </p>
-            <span className="flex-shrink-0 text-xs font-black text-black/70">
+            <span className="flex-shrink-0 text-xs font-black text-[var(--ink-soft)]">
               {goalMet ? "Validé" : `${goalPct}%`}
             </span>
           </div>
-          <p className="mt-0.5 text-sm font-bold leading-snug text-[#151821]">{rhythmLine}</p>
+          <p className="mt-0.5 text-sm font-bold leading-snug text-[var(--ink)]">{rhythmLine}</p>
 
           {!goalMet && (
             <div

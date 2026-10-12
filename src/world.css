@@ -475,6 +475,7 @@
 
 .teaser {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   padding: 14px;
   border: 3px solid var(--neo-ink);
@@ -500,14 +501,16 @@
 .teaser-row {
   display: flex;
   justify-content: space-between;
-  gap: 6px;
+  gap: 4px;
 }
+/* 48px when there is room, never under 44px (six worlds fit a 360px phone) */
 .teaser-world {
   position: relative;
   display: grid;
   width: 48px;
-  height: 48px;
-  flex: 0 0 auto;
+  min-width: 44px;
+  aspect-ratio: 1;
+  flex: 0 1 48px;
   place-items: center;
   border: 3px solid var(--neo-ink);
   border-radius: 50%;
