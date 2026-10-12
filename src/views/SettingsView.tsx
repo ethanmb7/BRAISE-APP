@@ -2,6 +2,7 @@ import { ALargeSmall, Moon, Type, Volume2, Globe } from "lucide-react";
 import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
 import { TopBar } from "@/components/TopBar";
+import { DemoSettings } from "@/components/DemoSettings";
 import { NotificationSettings } from "@/components/notifications/NotificationSettings";
 import { Switch } from "@/components/Switch";
 import { BackupSettings } from "@/components/BackupSettings";
@@ -125,6 +126,8 @@ export function SettingsView() {
         <p className="settings-note">{CONTENT_LEVEL_NOTE}</p>
 
         <BackupSettings />
+
+        <DemoSettings />
 
         <p
           style={{

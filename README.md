@@ -22,3 +22,16 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+## Profil de démonstration
+
+Pour montrer l'app avec une progression déjà bien remplie (Léa, trois semaines de révisions : rang Or,
+série de 6, des cartes dans tous les états, un Déclic terminé et un commencé), ouvre l'app avec
+`?demo` à la fin de l'adresse, par exemple `http://localhost:8080/?demo`.
+
+- La vraie progression de l'appareil est mise de côté puis **rendue telle quelle** en quittant la démo.
+- Pour quitter : Moi › Paramètres › « Quitter la démo », ou ouvre `?demo=off`.
+- Ouvrir `?demo` pendant la démo la remet à zéro (la vraie progression reste à l'abri).
+- Le profil est construit à partir des vraies cartes et des vrais Déclics (`src/lib/demo/profile.ts`) et de
+  la date du jour : les cartes « à revoir » le sont toujours.
+- Rien n'est envoyé nulle part, comme le reste de l'app.

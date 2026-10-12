@@ -19,6 +19,7 @@ import type {
 import { DEFAULT_USER, FLASHCARDS } from "@/data";
 import { sfx } from "@/lib/sound";
 import { loadProgress, saveProgress, saveCardReview } from "@/lib/persist";
+import { applyDemoRequest, withoutDemoParam } from "@/lib/demo/demo";
 import {
   ensureSession,
   grantXp,
@@ -101,6 +102,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
+    // `?demo` (or `?demo=off`) swaps the stored data before anything reads it: reload without the
+    // parameter so every part of the app starts from the new data.
+    try {
+      if (applyDemoRequest(window.location.search)) {
+        window.location.replace(withoutDemoParam(window.location.href));
+        return;
+      }
+    } catch {
+      /* storage unavailable: carry on as usual */
+    }
     (async () => {
       const saved = await loadProgress();
       if (cancelled) return;
