@@ -17,6 +17,9 @@ const TEXT_SIZES: { id: TextSize; label: string; preview: string }[] = [
   { id: "xlarge", label: "Texte très grand", preview: "19px" },
 ];
 
+// Safari on iPhone has no vibration API: a switch there would do nothing, so it is not shown.
+const CAN_VIBRATE = typeof navigator !== "undefined" && typeof navigator.vibrate === "function";
+
 export function SettingsView() {
   const {
     state,
@@ -103,26 +106,28 @@ export function SettingsView() {
             </span>
             <Switch checked={state.soundOn} onChange={toggleSound} aria-label="Sons" />
           </div>
-          <div className="settings-row">
-            <span className="settings-row-main">
-              <span className="settings-row-icon" aria-hidden="true">
-                <Vibrate size={18} />
+          {CAN_VIBRATE && (
+            <div className="settings-row">
+              <span className="settings-row-main">
+                <span className="settings-row-icon" aria-hidden="true">
+                  <Vibrate size={18} />
+                </span>
+                Vibrations
               </span>
-              Vibrations
-            </span>
-            <Switch
-              checked={state.hapticsOn}
-              onChange={() => {
-                toggleHaptics();
-                // Switching it on gives one small buzz to show what it is (never when switching off).
-                if (!state.hapticsOn) {
-                  setHaptics(true);
-                  sfx.tap(false);
-                }
-              }}
-              aria-label="Vibrations"
-            />
-          </div>
+              <Switch
+                checked={state.hapticsOn}
+                onChange={() => {
+                  toggleHaptics();
+                  // Switching it on gives one small buzz to show what it is (never when switching off).
+                  if (!state.hapticsOn) {
+                    setHaptics(true);
+                    sfx.tap(false);
+                  }
+                }}
+                aria-label="Vibrations"
+              />
+            </div>
+          )}
         </div>
 
         <NotificationSettings />
