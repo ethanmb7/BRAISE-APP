@@ -1,5 +1,5 @@
 import { Tip } from "@/components/Tip";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, HelpCircle, Sparkles } from "lucide-react";
 import { BraiseMascot } from "@/components/BraiseMascot";
@@ -8,7 +8,8 @@ import { fireConfetti } from "@/lib/confetti";
 import { recordDeclicMemory, type DeclicScript } from "@/lib/declic";
 import { DeclicTimeline } from "@/components/declic/DeclicTimeline";
 import { DeclicVisualScene } from "@/components/declic/DeclicVisualScene";
-import { DeclicAsk, DeclicTile } from "@/components/declic/shared";
+import { DeclicAsk, DeclicTile, ThinkingBubble } from "@/components/declic/shared";
+import { useReplyBeat } from "@/components/declic/useReplyBeat";
 import { COPY } from "@/lib/copy";
 import { useTone } from "@/lib/useTone";
 
@@ -16,9 +17,6 @@ const SPRING = { type: "spring", stiffness: 380, damping: 32 } as const;
 // A little bouncier than SPRING and paired with a bigger exit throw — cards should feel like
 // they're being popped in and tossed away, not just cross-fading.
 const CARD_SPRING = { type: "spring", stiffness: 420, damping: 26 } as const;
-// How long the "Braise réfléchit…" beat holds before a choice's reaction appears — long enough
-// to read as a real pause, short enough to never feel like waiting on the app.
-const THINK_MS = 550;
 
 // "Le Déclic" — BRAISE's learning loop (PRODUCT_VISION.md, section 4): situation → choix →
 // réaction → déclic. A notion is a chain of small cards — never more than one tap or one short
@@ -39,7 +37,6 @@ export function DeclicMode({
   const { t, authored } = useTone();
   const [index, setIndex] = useState(0);
   const [pickedId, setPickedId] = useState<string | null>(null);
-  const [thinking, setThinking] = useState(false);
   const [showAlt, setShowAlt] = useState(false);
   const [showNudge, setShowNudge] = useState(false);
   const [reformulation, setReformulation] = useState("");
@@ -48,6 +45,14 @@ export function DeclicMode({
   const pickedOption =
     card.kind === "choice" ? card.options.find((o) => o.id === pickedId) : undefined;
   const progress = ((index + 1) / script.cards.length) * 100;
+  // The tile colours in at once; only Braise's reply waits a beat, like an actual reply would.
+  const thinking = useReplyBeat(pickedId ? `${index}:${pickedId}` : null);
+  // The idea gets its name: a small rising pair, once per card.
+  useEffect(() => {
+    if (card.kind === "reveal") sfx.reveal(soundOn);
+    // Only when the card changes, not when the sound setting does.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index]);
   const beat =
     card.kind === "situation"
       ? "Capte"
@@ -87,13 +92,10 @@ export function DeclicMode({
 
   const pick = (optionId: string, correct: boolean | undefined) => {
     if (pickedId) return;
-    sfx[correct ? "correct" : "wrong"](soundOn);
+    // A Déclic is a conversation: a pick that is not the expected one gets a soft "hm", never the
+    // buzz of a verdict (that one belongs to Réviser).
+    sfx[correct ? "correct" : "soft"](soundOn);
     setPickedId(optionId);
-    // The tile itself colours in immediately (that's the tap's own feedback) — only Braise's
-    // reply waits a beat, like an actual reply would.
-    if (reducedMotion) return;
-    setThinking(true);
-    setTimeout(() => setThinking(false), THINK_MS);
   };
 
   const explainDifferently = () => {
@@ -232,16 +234,13 @@ export function DeclicMode({
             {pickedOption && (
               <>
                 {thinking ? (
-                  <p className="declic-bubble declic-bubble--reaction" aria-live="polite">
-                    <span className="typing-dots">
-                      <span />
-                      <span />
-                      <span />
-                    </span>
-                  </p>
+                  <ThinkingBubble />
                 ) : (
                   <>
-                    <p className="declic-bubble declic-bubble--reaction" aria-live="polite">
+                    <p
+                      className="declic-bubble declic-bubble--reaction declic-reply"
+                      aria-live="polite"
+                    >
                       {authored(pickedOption.reaction, pickedOption.variants)}
                     </p>
                     {showAlt && pickedOption.altExplanation && (
@@ -320,14 +319,15 @@ export function DeclicMode({
             animate={{ opacity: 1, scale: 1 }}
             transition={SPRING}
             onAnimationComplete={() => {
-              sfx.complete(soundOn);
+              sfx.declic(soundOn);
               if (!reducedMotion) fireConfetti();
             }}
           >
             <motion.div
               className="declic-moment-flame"
-              animate={reducedMotion ? {} : { rotate: [-4, 4, -4] }}
-              transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+              // Two slow swings, then she rests: nothing keeps moving next to the line to read.
+              animate={reducedMotion ? {} : { rotate: [0, -4, 4, 0] }}
+              transition={{ duration: 1.6, repeat: 1, ease: "easeInOut" }}
             >
               <BraiseMascot size={104} mood="proud" />
             </motion.div>

@@ -1,7 +1,18 @@
 :root {
   /* Signature — the one true action colour. Every major CTA in the app ("Continuer",
-     "Partager", "Valider", "Terminer") uses --neo-orange, full stop. Nothing else claims it. */
+     "Partager", "Valider", "Terminer") is this orange. Nothing else claims it. The vivid
+     --neo-orange is for shapes, glows and icons; a small label needs more contrast than it gives
+     (3.4:1 with white, 3.2:1 on cream, 4.5:1 is the floor), so words use the two tokens below,
+     the same orange made just dark enough. contrast.test.ts holds the numbers. */
   --neo-orange: #ff4500;
+  /* A button filled with the signature orange and a white label. */
+  --orange-fill: color-mix(in srgb, var(--neo-orange) 80%, #000);
+  /* The label on it. */
+  --on-orange: #fff;
+  /* Orange words on a surface (a kicker, a small heading). Repeated under .dark, where --ink
+     is light: a custom property is resolved where it is declared, not where it is used. The 30%
+     of ink is what lets it clear 4.5:1 on the soft orange glow behind the page headers too. */
+  --orange-text: color-mix(in srgb, var(--neo-orange) 70%, var(--ink) 30%);
   --neo-ink: #151821;
   --neo-blue: #1e3a8a;
 
@@ -68,6 +79,7 @@
 }
 
 .dark {
+  --orange-text: color-mix(in srgb, var(--neo-orange) 70%, var(--ink) 30%);
   --blue-pale: #0f1830;
   --paper: #1a2444;
   --ink: #eaf1ff;
@@ -932,8 +944,8 @@ select {
    "Continuer", CompleteView "Suivant"/"Terminer") — same signature orange and same hard-shadow
    physical press as every other major action button in the app. */
 .btn-block.blue {
-  background: var(--neo-orange);
-  color: #fff;
+  background: var(--orange-fill);
+  color: var(--on-orange);
   border: 2.5px solid #000;
   box-shadow: 3px 3px 0 #000;
 }
@@ -1357,8 +1369,8 @@ select {
 }
 .braise-insight-tab {
   display: inline-block;
-  background: color-mix(in srgb, var(--neo-orange) 80%, #000);
-  color: #fff;
+  background: var(--orange-fill);
+  color: var(--on-orange);
   border: 2px solid #000;
   border-radius: 8px;
   padding: 4px 10px;
@@ -1409,7 +1421,7 @@ select {
 .braise-evolution-heading strong {
   font-family: "Baloo 2", sans-serif;
   font-size: 0.9rem;
-  color: var(--neo-orange);
+  color: var(--orange-text);
 }
 .braise-evolution-cast {
   display: grid;
@@ -1456,7 +1468,7 @@ select {
    each rank's own hue readable, while staying clearly duller than the current stage. */
 .braise-evolution-stage.is-locked {
   filter: grayscale(0.45);
-  opacity: 0.6;
+  opacity: 0.74;
 }
 .braise-mascot .braise-outfit {
   transform-origin: 54px 76px;
@@ -1499,7 +1511,7 @@ select {
    dark mode's already-passing contrast comfortable rather than dragging it down). Verified both
    ways: 4.59:1 in light mode, 5.94:1 in dark. */
 .rank-rail-caption-amount {
-  color: color-mix(in srgb, var(--neo-orange) 80%, var(--ink) 20%);
+  color: var(--orange-text);
 }
 .rank-rail-caption-rest {
   color: var(--ink);
@@ -1612,8 +1624,8 @@ select {
   display: inline-block;
   /* White text on plain --neo-orange measured 3.44:1 — under the 4.5:1 WCAG minimum for text.
      A 20%-darker fill clears it (~5.1:1) without becoming a visibly different colour. */
-  background: color-mix(in srgb, var(--neo-orange) 80%, #000);
-  color: #fff;
+  background: var(--orange-fill);
+  color: var(--on-orange);
   border: 2px solid #000;
   border-radius: 8px;
   padding: 4px 10px;
@@ -1807,8 +1819,8 @@ select {
 .aura-review-cta {
   /* Same fix as .mastery-tab: white text on plain --neo-orange is 3.44:1, under WCAG's 4.5:1
      minimum — on the page's single most important button, no less. 20% darker clears it. */
-  background: color-mix(in srgb, var(--neo-orange) 80%, #000);
-  color: #fff;
+  background: var(--orange-fill);
+  color: var(--on-orange);
   box-shadow: 5px 5px 0 #000;
 }
 .aura-share-cta {
@@ -2451,8 +2463,8 @@ select {
     background 0.2s ease;
 }
 .rev-combo.is-hot {
-  color: #fff;
-  background: var(--neo-orange);
+  color: var(--on-orange);
+  background: var(--orange-fill);
 }
 .rev-combo-shake {
   animation: comboShake 0.4s ease;
@@ -2509,8 +2521,8 @@ select {
   font-weight: 800;
   font-size: 1rem;
   white-space: nowrap;
-  color: #fff;
-  background: var(--neo-orange);
+  color: var(--on-orange);
+  background: var(--orange-fill);
   border: 2.5px solid #000;
   border-radius: 999px;
   padding: 10px 20px;
@@ -2960,9 +2972,9 @@ select {
   padding: 13px 20px;
   border: 2.5px solid var(--neo-ink);
   border-radius: 999px;
-  background: var(--neo-orange);
+  background: var(--orange-fill);
   box-shadow: 3px 3px 0 var(--neo-ink);
-  color: #fff;
+  color: var(--on-orange);
   font-family: "Baloo 2", sans-serif;
   font-size: 0.98rem;
   font-weight: 800;
@@ -4081,7 +4093,6 @@ select {
   color: var(--ink-soft);
   font-size: 0.7rem;
   margin-top: 2px;
-  opacity: 0.8;
 }
 
 /* ===== Hero card — one focal point (bold border, hard shadow, the real per-rank gradient),
@@ -4369,8 +4380,8 @@ select {
   gap: 8px;
   width: 100%;
   text-align: center;
-  background: color-mix(in srgb, var(--neo-orange) 80%, #000);
-  color: #fff;
+  background: var(--orange-fill);
+  color: var(--on-orange);
   border: 2.5px solid var(--neo-ink);
   box-shadow: 3px 3px 0 var(--neo-ink);
   border-radius: 16px;
@@ -4515,8 +4526,8 @@ select {
   color: var(--ink);
 }
 .profile-identity-save {
-  background: var(--neo-orange);
-  color: #fff;
+  background: var(--orange-fill);
+  color: var(--on-orange);
 }
 
 /* Subject chips — real toggles (see ProfileView.tsx), same "act on me" affordance as the
@@ -4620,9 +4631,9 @@ select {
   line-height: 1;
 }
 .settings-size.is-active {
-  background: var(--neo-orange);
+  background: var(--orange-fill);
   border-color: var(--neo-ink);
-  color: #fff;
+  color: var(--on-orange);
 }
 /* Backup panels: an expanded area under the row that opened it. */
 .settings-panel {
@@ -4677,9 +4688,9 @@ select {
   opacity: 0.4;
 }
 .settings-btn--primary {
-  background: var(--neo-orange);
+  background: var(--orange-fill);
   border-color: var(--neo-ink);
-  color: #fff;
+  color: var(--on-orange);
 }
 .settings-row {
   display: flex;
@@ -5224,7 +5235,7 @@ select {
 }
 .subjects-heading p {
   margin: 0 0 1px;
-  color: var(--neo-orange);
+  color: var(--orange-text);
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.7rem;
   font-weight: 800;

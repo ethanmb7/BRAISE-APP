@@ -5,7 +5,8 @@ import { completionXp } from "@/lib/course/rewards";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { BraiseMascot } from "@/components/BraiseMascot";
-import { DeclicAsk, DeclicTile } from "@/components/declic/shared";
+import { DeclicAsk, DeclicTile, ThinkingBubble } from "@/components/declic/shared";
+import { useReplyBeat } from "@/components/declic/useReplyBeat";
 import { MathText } from "@/components/course/MathText";
 import { ReviewPlayer } from "@/components/course/ReviewPlayer";
 import { VisualView } from "@/components/course/VisualView";
@@ -102,9 +103,20 @@ export function CoursePlayer({
   useEffect(() => {
     if (card.type !== "declic-summary" || run.phase !== "asking" || celebrated.current) return;
     celebrated.current = true;
-    sfx.complete(soundOn);
+    sfx.declic(soundOn);
     if (!reducedMotion) fireConfetti();
   }, [card.type, run.phase, soundOn, reducedMotion]);
+
+  // The idea gets its name: a small rising pair, once per card.
+  useEffect(() => {
+    if (card.type === "reveal" && run.phase === "asking") sfx.reveal(soundOn);
+    // Only when the card changes, not when the sound setting does.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [card.id]);
+  // Braise's reply waits a beat after a pick (the tile answers at once).
+  const thinking = useReplyBeat(
+    picked ? `${card.id}:${run.stepIndex}:${run.phase}:${picked.id}` : null,
+  );
 
   const cardMotion = reducedMotion
     ? {
@@ -124,7 +136,9 @@ export function CoursePlayer({
   const focusStep = (el: HTMLElement | null) => el?.focus();
 
   const pick = (choiceId: string, correct: boolean | undefined, graded: boolean) => {
-    if (graded) sfx[correct ? "correct" : "wrong"](soundOn);
+    // A Déclic is a conversation: a pick that is not the expected one gets a soft "hm", never the
+    // buzz of a verdict (that one belongs to Réviser).
+    if (graded) sfx[correct ? "correct" : "soft"](soundOn);
     else sfx.tap(soundOn);
     setRun(choose(def, run, choiceId, courseProgressStore));
   };
@@ -209,16 +223,22 @@ export function CoursePlayer({
   };
 
   const feedbackBlock = (choice: Choice | undefined, ctaLabel: string) =>
-    choice && (
+    choice &&
+    (thinking ? (
+      <ThinkingBubble className="course-bubble" />
+    ) : (
       <>
-        <p className="declic-bubble declic-bubble--reaction course-bubble" aria-live="polite">
+        <p
+          className="declic-bubble declic-bubble--reaction declic-reply course-bubble"
+          aria-live="polite"
+        >
           <MathText text={say(choice.feedback)} />
         </p>
         <button type="button" className="declic-cta" onClick={goNext}>
           {ctaLabel} <ArrowRight size={18} />
         </button>
       </>
-    );
+    ));
 
   const stageKind =
     card.type === "reveal" ? "reveal" : card.type === "declic-summary" ? "declic" : "question";
@@ -495,10 +515,13 @@ export function CoursePlayer({
                     type="button"
                     className={action.kind === "complete" ? "declic-cta" : "declic-link"}
                     onClick={() => {
-                      sfx.tap(soundOn);
+                      // Paid once, the first time: the same points an older chapter pays.
+                      const xp =
+                        action.kind === "complete"
+                          ? completionXp(courseProgressStore.get().declics[def.id])
+                          : 0;
+                      (xp > 0 ? sfx.xp : sfx.tap)(soundOn);
                       if (action.kind === "complete") {
-                        // Paid once, the first time: the same points an older chapter pays.
-                        const xp = completionXp(courseProgressStore.get().declics[def.id]);
                         setRun(finish(def, run, courseProgressStore));
                         if (xp > 0) addXp(xp);
                         onExit();

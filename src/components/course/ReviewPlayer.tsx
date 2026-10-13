@@ -50,7 +50,8 @@ export function ReviewPlayer({
   const answer = (choice: ReviewAnswer) => {
     if (given || !card) return;
     const result = answerReviewCard(def, deck, card, choice, courseProgressStore);
-    sfx[result.correct ? "correct" : "wrong"](soundOn);
+    // Inside a course it is Braise's review, not a verdict: a miss gets the soft "hm".
+    sfx[result.correct ? "correct" : "soft"](soundOn);
     setGiven(choice);
     if (result.correct) setHits((h) => h + 1);
   };

@@ -1,6 +1,6 @@
-import { ALargeSmall, Moon, Type, Volume2, Globe } from "lucide-react";
+import { ALargeSmall, Moon, Type, Vibrate, Volume2, Globe } from "lucide-react";
 import { useApp } from "@/store";
-import { sfx } from "@/lib/sound";
+import { setHaptics, sfx } from "@/lib/sound";
 import { TopBar } from "@/components/TopBar";
 import { DemoSettings } from "@/components/DemoSettings";
 import { ResetSettings } from "@/components/ResetSettings";
@@ -18,7 +18,16 @@ const TEXT_SIZES: { id: TextSize; label: string; preview: string }[] = [
 ];
 
 export function SettingsView() {
-  const { state, goBack, toggleDark, toggleDyslexia, toggleSound, setTextSize, setUser } = useApp();
+  const {
+    state,
+    goBack,
+    toggleDark,
+    toggleDyslexia,
+    toggleSound,
+    toggleHaptics,
+    setTextSize,
+    setUser,
+  } = useApp();
 
   const handleLevel = (l: Level) => {
     sfx.tap(state.soundOn);
@@ -93,6 +102,26 @@ export function SettingsView() {
               Sons et effets
             </span>
             <Switch checked={state.soundOn} onChange={toggleSound} aria-label="Sons" />
+          </div>
+          <div className="settings-row">
+            <span className="settings-row-main">
+              <span className="settings-row-icon" aria-hidden="true">
+                <Vibrate size={18} />
+              </span>
+              Vibrations
+            </span>
+            <Switch
+              checked={state.hapticsOn}
+              onChange={() => {
+                toggleHaptics();
+                // Switching it on gives one small buzz to show what it is (never when switching off).
+                if (!state.hapticsOn) {
+                  setHaptics(true);
+                  sfx.tap(false);
+                }
+              }}
+              aria-label="Vibrations"
+            />
           </div>
         </div>
 

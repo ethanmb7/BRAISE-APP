@@ -408,7 +408,7 @@ export function RankUpCelebration({
               className="absolute inset-0 translate-y-[3px] rounded-2xl border-[2.5px] border-black bg-black/60"
             />
             <span
-              className={`relative flex items-center justify-center rounded-2xl border-[2.5px] border-sapie-neo-ink bg-sapie-neo-orange px-4 font-display text-base font-black text-sapie-paper shadow-[3px_3px_0_var(--color-sapie-neo-ink)] transition-transform duration-100 group-active:translate-y-[3px] group-active:shadow-none ${compact ? "py-2" : "py-3"}`}
+              className={`relative flex items-center justify-center rounded-2xl border-[2.5px] border-sapie-neo-ink bg-[var(--orange-fill)] px-4 font-display text-base font-black text-[var(--on-orange)] shadow-[3px_3px_0_var(--color-sapie-neo-ink)] transition-transform duration-100 group-active:translate-y-[3px] group-active:shadow-none ${compact ? "py-2" : "py-3"}`}
             >
               Continuer
             </span>

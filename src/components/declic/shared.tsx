@@ -7,6 +7,19 @@ import { BraiseMascot } from "@/components/BraiseMascot";
 
 export type Mood = "happy" | "eager" | "hesitant" | "cool" | "proud";
 
+/** Braise's three dots while she "thinks". */
+export function ThinkingBubble({ className }: { className?: string }) {
+  return (
+    <p className={`declic-bubble declic-bubble--reaction ${className ?? ""}`} aria-live="polite">
+      <span className="typing-dots">
+        <span />
+        <span />
+        <span />
+      </span>
+    </p>
+  );
+}
+
 export function DeclicAsk({
   mood,
   bump,

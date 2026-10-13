@@ -163,6 +163,7 @@ export function buildDemoData(now: number): Record<string, string> {
     dyslexiaMode: false,
     textSize: "normal",
     soundOn: false,
+    hapticsOn: false,
     user: {
       name: DEMO_NAME,
       level: "seconde",

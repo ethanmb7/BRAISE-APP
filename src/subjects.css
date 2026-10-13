@@ -23,7 +23,7 @@
 
 .subjects-heading p {
   margin: 0 0 1px;
-  color: var(--neo-orange);
+  color: var(--orange-text);
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.7rem;
   font-weight: 800;

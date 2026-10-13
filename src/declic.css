@@ -52,7 +52,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: var(--neo-orange);
+  color: var(--orange-text);
   font:
     800 0.7rem/1 "IBM Plex Mono",
     monospace;
@@ -256,6 +256,25 @@
   line-height: 1.42;
 }
 
+/* Braise's reply, once her three dots are done: a short rise instead of a jump cut. Off under
+   "reduce motion" (the rule at the end of this file) and in dyslexia mode. */
+@keyframes declic-reply-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.declic-reply {
+  animation: declic-reply-in 0.22s ease-out both;
+}
+.dyslexia-mode .declic-reply {
+  animation: none;
+}
+
 .declic-bubble--reaction {
   margin: 0 0 0 112px;
   border-radius: 12px;
@@ -272,9 +291,9 @@
   min-height: 52px;
   margin-top: 4px;
   border-radius: 12px;
-  background: var(--neo-orange);
+  background: var(--orange-fill);
   box-shadow: 4px 4px 0 var(--neo-ink);
-  color: var(--paper);
+  color: var(--on-orange);
   font-family: var(--font-impact);
   font-size: 0.9rem;
 }
@@ -282,7 +301,7 @@
 .declic-reveal-kicker {
   display: block;
   margin-bottom: 7px;
-  color: var(--neo-orange);
+  color: var(--orange-text);
   font:
     900 0.7rem/1.2 "IBM Plex Mono",
     monospace;

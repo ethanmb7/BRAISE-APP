@@ -543,9 +543,9 @@
   padding: 0 14px;
   border: 3px solid var(--neo-ink);
   border-radius: 14px;
-  background: var(--neo-orange);
+  background: var(--orange-fill);
   box-shadow: 3px 3px 0 var(--neo-ink);
-  color: #fff;
+  color: var(--on-orange);
   font: 400 0.92rem/1.1 var(--font-impact);
   text-align: left;
 }
@@ -619,7 +619,8 @@
 }
 .world-title p {
   margin: 0;
-  color: var(--neo-orange);
+  /* On the subject's own tint (blue, violet, indigo...), which is darker than the cream: more ink. */
+  color: color-mix(in srgb, var(--neo-orange) 55%, var(--ink) 45%);
   font:
     800 0.7rem/1.1 "IBM Plex Mono",
     monospace;
@@ -748,9 +749,9 @@
   padding: 0 16px;
   border: 3px solid var(--neo-ink);
   border-radius: 14px;
-  background: var(--neo-orange);
+  background: var(--orange-fill);
   box-shadow: 3px 3px 0 var(--neo-ink);
-  color: #fff;
+  color: var(--on-orange);
   font: 400 0.95rem/1.1 var(--font-impact);
 }
 .teaser-cta:active {
@@ -774,7 +775,7 @@
 }
 .page-header-kicker {
   margin: 0;
-  color: var(--neo-orange);
+  color: var(--orange-text);
   font:
     800 0.7rem/1.1 "IBM Plex Mono",
     monospace;

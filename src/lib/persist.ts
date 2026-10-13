@@ -26,6 +26,8 @@ type StoredProgress = {
   // Local-only, like sessionXpEarned: device_progress has no matching column.
   textSize?: TextSize;
   soundOn: boolean;
+  // Local-only too (no column in device_progress). A save from before it existed means "on".
+  hapticsOn?: boolean;
   user: UserProfile;
   completedChapters: string[];
   lastSubjectId: string | null;
@@ -111,6 +113,7 @@ function toAppState(p: StoredProgress, cardReviews: Record<string, CardReview>):
     dyslexiaMode: p.dyslexiaMode,
     textSize: p.textSize ?? "normal",
     soundOn: p.soundOn,
+    hapticsOn: p.hapticsOn ?? true,
     user: { ...p.user, personality: p.user?.personality ?? "chill" },
     completedChapters: p.completedChapters ?? [],
     lastSubjectId: p.lastSubjectId ?? null,
@@ -172,6 +175,7 @@ export async function loadProgress(): Promise<Partial<AppState> | null> {
             dyslexiaMode: cloudRow.dyslexia_mode,
             textSize: local?.textSize,
             soundOn: cloudRow.sound_on,
+            hapticsOn: local?.hapticsOn,
             user: cloudRow.profile,
             completedChapters: cloudRow.completed_chapters ?? [],
             lastSubjectId: local?.lastSubjectId ?? null,
@@ -210,6 +214,7 @@ export async function saveProgress(state: AppState): Promise<void> {
     dyslexiaMode: state.dyslexiaMode,
     textSize: state.textSize,
     soundOn: state.soundOn,
+    hapticsOn: state.hapticsOn,
     user: state.user,
     completedChapters: state.completedChapters,
     lastSubjectId: state.lastSubjectId,

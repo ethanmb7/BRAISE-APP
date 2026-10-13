@@ -819,7 +819,7 @@ function SwipeDeck({
                     <BevelButton
                       className="w-full"
                       base="bg-[var(--coral-2)]"
-                      face="bg-[var(--coral)] text-white"
+                      face="bg-[var(--coral)] text-black"
                       onClick={() => judge("reject")}
                       label="Intox — c'est faux"
                       badge={rewardBadge}

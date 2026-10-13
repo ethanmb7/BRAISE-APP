@@ -194,14 +194,21 @@ Ordre obligatoire :
 
 ## 6. Système d'interface
 
-### Trois niveaux de surface
+### Un seul style, trois niveaux de poids
 
-- **Primaire** : une seule surface forte par écran, réservée à l'action principale ;
-- **Secondaire** : papier, bordure légère et contenu complémentaire ;
-- **Discrète** : information sans ombre ni contour lourd.
+Toute surface porte le même habit : contour épais, ombre dure décalée, aplats saturés (le détail et
+les chiffres sont dans `DESIGN_RULES.md`, qui fait foi). Une carte secondaire n'est pas « sans style »,
+elle est **moins lourde**. La hiérarchie vient du poids, pas de l'absence d'habit :
 
-Le néobrutalisme reste une signature, pas une règle appliquée à chaque boîte. Une ombre dure doit
-signifier « tu peux agir », et non simplement décorer.
+- **Primaire** : une seule surface forte par écran, réservée à l'action principale : la plus grande, la
+  seule en couleur pleine (l'orange) ;
+- **Secondaire** : papier, même contour et même ombre, plus petit, sans couleur pleine ;
+- **Discrète** : information sans contour lourd ni ombre (un texte, une légende, un séparateur).
+
+Le néobrutalisme est la signature de toute l'application. Ce qui dit « tu peux agir » n'est pas
+l'ombre seule, mais le geste : un objet qu'on peut toucher s'enfonce de la hauteur de son ombre sous
+le doigt. (Ce paragraphe remplace l'ancien « signature, pas une règle appliquée à chaque boîte »,
+que l'application ne suivait pas et que le porteur du projet a tranché dans l'autre sens.)
 
 ### Règles de densité
 
@@ -209,7 +216,8 @@ signifier « tu peux agir », et non simplement décorer.
 - une seule idée ou consigne par étape ;
 - trois niveaux typographiques maximum sur une carte ;
 - aucune animation continue près d'un texte à lire ;
-- célébrations brèves et réservées aux progrès réels ;
+- célébrations brèves et réservées aux progrès réels ; un son et une vibration disent la même chose
+  que l'écran (voir « Son et vibration » dans `DESIGN_RULES.md`) ;
 - durée, quantité et récompense toujours issues de vraies données.
 
 ### Langage

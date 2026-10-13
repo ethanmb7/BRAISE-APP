@@ -47,6 +47,7 @@ type Ctx = {
   toggleDyslexia: () => void;
   setTextSize: (size: TextSize) => void;
   toggleSound: () => void;
+  toggleHaptics: () => void;
   openSubject: (subjectId: string, chapterId?: string) => void;
   openLesson: (subjectId: string, chapterId: string, returnTo?: ViewId) => void;
   completeChapter: (chapterId: string) => void;
@@ -83,6 +84,7 @@ const INITIAL: AppState = {
   dyslexiaMode: false,
   textSize: "normal",
   soundOn: true,
+  hapticsOn: true,
   currentSubjectId: null,
   currentChapterId: null,
   lastSubjectId: null,
@@ -224,6 +226,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const toggleHaptics = useCallback(() => {
+    setState((s) => ({ ...s, ...ensureSession(s), hapticsOn: !s.hapticsOn }));
+  }, []);
+
   const openSubject = useCallback((subjectId: string, chapterId?: string) => {
     setState((s) => ({
       ...s,
@@ -338,6 +344,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         toggleDyslexia,
         setTextSize,
         toggleSound,
+        toggleHaptics,
         openSubject,
         openLesson,
         completeChapter,

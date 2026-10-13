@@ -46,6 +46,7 @@ function baseState(overrides: Partial<AppState>): AppState {
     dyslexiaMode: false,
     textSize: "normal",
     soundOn: true,
+    hapticsOn: true,
     currentSubjectId: null,
     currentChapterId: null,
     lastSubjectId: null,

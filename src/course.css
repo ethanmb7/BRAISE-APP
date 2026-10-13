@@ -238,6 +238,7 @@
   border: 2.5px solid var(--neo-ink);
   border-radius: 50%;
   background: var(--sun);
+  color: var(--neo-ink);
   font: 900 1.2rem/1 var(--font-impact);
 }
 .course-item--deck .course-item-num {
@@ -295,17 +296,19 @@
   text-transform: uppercase;
   white-space: nowrap;
 }
+/* The label is fixed dark ink, so the chip is a fixed light tint: mixing with --paper would turn it
+   into a dark muddy colour in dark mode and the ink would stop being readable. */
 .course-status--in_progress {
-  background: color-mix(in srgb, var(--sun) 55%, var(--paper));
+  background: color-mix(in srgb, var(--sun) 55%, #fff);
 }
 .course-status--discovered {
-  background: color-mix(in srgb, var(--violet) 22%, var(--paper));
+  background: color-mix(in srgb, var(--violet) 22%, #fff);
 }
 .course-status--understood {
   background: var(--mint);
 }
 .course-status--needs_reinforcement {
-  background: color-mix(in srgb, var(--coral) 50%, var(--paper));
+  background: color-mix(in srgb, var(--coral) 50%, #fff);
 }
 .course-status--mastered {
   background: var(--sun);

@@ -43,3 +43,10 @@ enchaîner plusieurs élèves sur le même téléphone, ouvre simplement `?reset
 repart d'un appareil vide. Seule l'identité de l'appareil est conservée. Pendant la démo, le bouton est caché
 (il effacerait aussi la progression mise de côté) ; `?reset` efface tout, démo et progression mise de côté
 comprises.
+
+## Contrôler le contraste
+
+`npm run audit:contrast` (avec `npm run dev` lancé, et Google Chrome installé) mesure le contraste de tout le
+texte réellement affiché, sur les écrans principaux et à travers un Déclic, en clair et en sombre, et sort en
+erreur s'il reste un texte sous le seuil (4,5:1, 3:1 pour un grand texte). Les règles et les jetons d'orange
+sont dans `DESIGN_RULES.md` (« Contraste »).

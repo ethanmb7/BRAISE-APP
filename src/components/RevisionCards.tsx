@@ -74,7 +74,11 @@ export function QuestionCard({
           {emoji}
         </span>
         <span className="font-display text-[0.92rem] font-extrabold leading-tight text-black">
-          {subjectLabel} <span className="text-black/40">·</span> {topic}
+          {subjectLabel}{" "}
+          <span className="text-black/60" aria-hidden="true">
+            ·
+          </span>{" "}
+          {topic}
         </span>
         {alreadyMastered && (
           <span className="ml-auto flex-shrink-0 rounded-full border-[1.5px] border-black/20 bg-black/[0.05] px-2 py-0.5 font-mono text-[0.7rem] font-bold uppercase tracking-wide text-black/45">

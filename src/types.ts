@@ -149,6 +149,8 @@ export type AppState = {
   /** Root text size for the whole app (every font-size is in rem, so this scales all of it). */
   textSize: TextSize;
   soundOn: boolean;
+  /** The phone's small buzz on taps and rewards. Its own switch, apart from the sound. */
+  hapticsOn: boolean;
   currentSubjectId: string | null;
   currentChapterId: string | null;
   lastSubjectId: string | null;

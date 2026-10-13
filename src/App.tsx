@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { setHaptics } from "@/lib/sound";
 import { AppProvider, useApp } from "@/store";
 import { TabBar } from "@/components/TabBar";
 import { useScrollMemory } from "@/lib/world/useScroll";
@@ -36,6 +37,14 @@ function Screen() {
   useEffect(() => {
     document.documentElement.dataset.textSize = state.textSize;
   }, [state.textSize]);
+  // The buzz follows the student's switch, and stays off when the phone asks for less motion.
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const apply = () => setHaptics(state.hapticsOn !== false && !query.matches);
+    apply();
+    query.addEventListener("change", apply);
+    return () => query.removeEventListener("change", apply);
+  }, [state.hapticsOn]);
 
   // The floating dock stays through a review session too — it sits under the action row,
   // in its own glass layer, so it never competes with the verdict buttons for the thumb.
