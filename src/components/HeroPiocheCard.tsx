@@ -9,10 +9,9 @@ import { getLastPiocheOpenDate, setLastPiocheOpenDate } from "@/lib/celebrations
 import { firePiocheReveal, getPiocheRevealTiming } from "@/lib/piocheTransition";
 
 interface HeroPiocheCardProps {
-  /** Fuller sentence (from `dailyPickLine()`) announced to screen readers only — folds the
-   *  personalised hook, chapter and subject into one flowing sentence, even though none of that
-   *  shows as its own visible line in the card (matches the photo reference: a plain 3-line
-   *  stack, no 4th hook line). */
+  /** Fuller sentence (Braise's reason for this pick, then the chapter, subject and minutes)
+   *  announced to screen readers only — none of that shows as its own visible line in the card
+   *  (matches the photo reference: a plain 3-line stack, no 4th hook line). */
   bubbleLine: string;
   subjectName?: string;
   /** A subject-owned colour used as a small identity signal, never as the CTA colour. */
@@ -23,6 +22,9 @@ interface HeroPiocheCardProps {
   /** Real count of FLASHCARDS tagged with this chapter's id — not a fixed session size; every
    *  chapter has its own real deck. */
   cardCount: number;
+  /** The student is still in a Déclic touched in the last two days: the card says "Reprendre" (their own
+   *  next step), not "Pioche du jour" (a choice of Braise's), and the help for that word goes. */
+  resuming?: boolean;
   soundOn: boolean;
   onStart: () => void;
 }
@@ -47,6 +49,7 @@ export function HeroPiocheCard({
   chapterTitle,
   duration,
   cardCount,
+  resuming = false,
   soundOn,
   onStart,
 }: HeroPiocheCardProps) {
@@ -195,8 +198,8 @@ export function HeroPiocheCard({
                 font-sans for the stats line. */}
             <p className="flex flex-wrap items-center gap-x-1 font-mono text-[0.7rem] font-black uppercase tracking-wide text-[#151821]">
               <Sparkles size={12} strokeWidth={3} />{" "}
-              {launching ? "Mission trouvée !" : "Pioche du jour"}
-              {!launching && (
+              {launching ? "Mission trouvée !" : resuming ? "Reprendre" : "Pioche du jour"}
+              {!launching && !resuming && (
                 <span className="-my-3 -mr-2 text-[#151821]">
                   <GlossaryButton term="pioche" />
                 </span>

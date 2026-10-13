@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { ArrowRight } from "lucide-react";
 import { Hub, type HubWorld } from "@/components/world/Hub";
 import { PageHeader } from "@/components/PageHeader";
-import { TopBar } from "@/components/TopBar";
 import { useScrollMemory } from "@/lib/world/useScroll";
 import { SubjectDecks, type SubjectDeckItem } from "@/components/SubjectDecks";
 import { SUBJECT_SHORT_NAMES, SUBJECTS } from "@/data";
@@ -19,7 +18,7 @@ import { dueInLibrary, pickGlobalResume, verbFor } from "@/lib/world/resume";
 /** The voluntary exploration space: Home recommends; "Où on va ?" lets the student choose a subject.
  *  Braise stands in the middle, each subject is a world around her, and nothing is locked. */
 export function SubjectsView() {
-  const { state, goBack, openSubject, openLesson } = useApp();
+  const { state, openSubject, openLesson } = useApp();
   const { t } = useTone();
   const courseProgress = useCourseProgress();
   useScrollMemory("hub");
@@ -61,8 +60,8 @@ export function SubjectsView() {
     });
     return (
       <div>
-        <TopBar title="Matières" onBack={goBack} />
         <div className="view is-active subjects-view">
+          <PageHeader kicker={t(COPY.world.kicker)} title={t(COPY.world.title)} />
           <SubjectDecks items={decks} onSelect={open} />
         </div>
       </div>
@@ -77,6 +76,9 @@ export function SubjectsView() {
     due: dueInLibrary(libraries[i]),
     suggested: global?.subjectId === s.id,
   }));
+  const dueTotal = worlds.reduce((sum, w) => sum + w.due, 0);
+  // Said before going in, to the students the content does not reach yet.
+  const beyondSeconde = state.user.level === "1ere" || state.user.level === "term";
 
   const reason = global?.resume.reason;
   const says = !global
@@ -89,16 +91,14 @@ export function SubjectsView() {
           ? t(COPY.world.saysReview(global.resume.entry.dueCount))
           : t(COPY.world.saysNext);
 
+  // The page, in the order of a decision: where Braise would go (one button), then the worlds to choose
+  // from. There is no bar with a title or a back button: this is a main screen (see DESIGN_RULES.md), the
+  // tab bar leads back to Aujourd'hui.
   return (
     <div>
-      <TopBar title="Matières" onBack={goBack} />
       <div className="view is-active subjects-view">
         <PageHeader kicker={t(COPY.world.kicker)} title={t(COPY.world.title)} />
-        <Hub
-          worlds={worlds}
-          braiseMood={!global ? "proud" : reason === "next" ? "eager" : "happy"}
-          onSelect={open}
-        />
+        {beyondSeconde && <p className="info-note">{t(COPY.world.levelNote)}</p>}
         <section className="dock dock--hub" aria-label="Braise">
           <p className="dock-says">{says}</p>
           {global && (
@@ -117,6 +117,13 @@ export function SubjectsView() {
             </button>
           )}
         </section>
+        {dueTotal > 0 && <p className="hub-legend">{t(COPY.world.legendDue)}</p>}
+        <Hub
+          worlds={worlds}
+          braiseMood={!global ? "proud" : reason === "next" ? "eager" : "happy"}
+          onSelect={open}
+          onBraise={() => sfx.tap(state.soundOn)}
+        />
       </div>
     </div>
   );

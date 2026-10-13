@@ -48,6 +48,7 @@ export function Dock({
         </b>
         <span className="dock-name">
           {selected.hook ? `${selected.title} · ` : ""}
+          {selected.source === "course" ? "Programme officiel · " : ""}
           {selected.levelLabel} · {selected.minutes} min
         </span>
         <button type="button" className="dock-cta" onClick={() => onOpen(selected)}>

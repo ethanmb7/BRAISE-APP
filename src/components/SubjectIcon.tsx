@@ -120,9 +120,9 @@ export function SubjectIcon({ subjectId, color, size = 20 }: SubjectIconProps) {
           />
           <text
             x="12"
-            y="12.5"
+            y="13.2"
             textAnchor="middle"
-            fontSize="8"
+            fontSize="10"
             fontWeight="800"
             fill="#151821"
             fontFamily="sans-serif"

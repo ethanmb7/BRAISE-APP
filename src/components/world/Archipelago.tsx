@@ -1,7 +1,9 @@
-import type { CSSProperties, ReactNode } from "react";
+import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { emblemFor } from "@/lib/world/emblems";
 import { Island } from "@/components/world/Island";
 import { islandCell } from "@/lib/world/layout";
+import { StateKey } from "@/components/world/StateKey";
+import { trailPath, type Pt } from "@/lib/world/trail";
 import type { LibraryEntry } from "@/lib/catalog/catalog";
 
 const INK = "#151821";
@@ -56,6 +58,30 @@ export function Archipelago({
   soon?: ReactNode;
 }) {
   const clouds = Math.max(1, Math.floor(entries.length / 3));
+  const path = useRef<HTMLDivElement>(null);
+  const [trail, setTrail] = useState<{ d: string; w: number; h: number } | null>(null);
+
+  // The dotted trail from one island to the next, drawn through where the islands ended up (measured, as
+  // the orbit of "Où on va ?"), so it follows them whatever the phone or the text size moved. It says
+  // "here is an order", not "you must follow it": nothing is locked.
+  useLayoutEffect(() => {
+    const el = path.current;
+    if (!el) return;
+    const measure = () => {
+      const box = el.getBoundingClientRect();
+      if (box.width === 0) return;
+      const points: Pt[] = [...el.querySelectorAll(".isl-stage")].map((s) => {
+        const r = s.getBoundingClientRect();
+        return { x: r.left + r.width / 2 - box.left, y: r.top + r.height * 0.5 - box.top };
+      });
+      setTrail(points.length > 1 ? { d: trailPath(points), w: box.width, h: box.height } : null);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    void document.fonts?.ready.then(measure);
+    return () => observer.disconnect();
+  }, [entries.length]);
 
   return (
     <section
@@ -63,7 +89,10 @@ export function Archipelago({
       style={{ ["--subject" as string]: color } as CSSProperties}
       aria-label="Carte des cours"
     >
-      <div className="world-head">{header}</div>
+      <div className="world-head">
+        {header}
+        <StateKey entries={entries} />
+      </div>
       <div className="world-body">
         <span className="wd-sun" aria-hidden="true" />
         {Array.from({ length: clouds }, (_, i) => (
@@ -74,7 +103,18 @@ export function Archipelago({
             s={0.7 + (i % 3) * 0.08}
           />
         ))}
-        <div className="wd-path">
+        <div className="wd-path" ref={path}>
+          {trail && (
+            <svg
+              className="wd-trail"
+              width={trail.w}
+              height={trail.h}
+              viewBox={`0 0 ${trail.w} ${trail.h}`}
+              aria-hidden="true"
+            >
+              <path d={trail.d} />
+            </svg>
+          )}
           {entries.map((entry, i) => {
             const cell = islandCell(i);
             return (

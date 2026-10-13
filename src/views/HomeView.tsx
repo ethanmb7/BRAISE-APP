@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useApp } from "@/store";
-import { computeGoalPct, remainingToGoal, resolveChapters } from "@/lib/progress";
+import { computeGoalPct, remainingToGoal } from "@/lib/progress";
 import { sfx } from "@/lib/sound";
 import { COPY } from "@/lib/copy";
 import { useTone } from "@/lib/useTone";
 import { useCourseProgress } from "@/lib/course/useCourseProgress";
 import { useCourseMastery } from "@/lib/course/useCourseMastery";
-import { buildLibrary } from "@/lib/catalog/catalog";
-import { dueInLibrary } from "@/lib/world/resume";
+import { buildLibrary, type Library } from "@/lib/catalog/catalog";
+import { dueInLibrary, pickGlobalResume } from "@/lib/world/resume";
 import type { HubWorld } from "@/components/world/Hub";
 import { fireConfetti } from "@/lib/confetti";
 import { LevelSheet } from "@/components/LevelSheet";
@@ -23,11 +23,10 @@ import { shouldInvite } from "@/lib/notifications/store";
 import { useNotifState } from "@/lib/notifications/useNotifState";
 import { TodayStrip } from "@/components/TodayStrip";
 import { ShareAuraModal } from "@/components/ShareAuraModal";
-import { SUBJECTS, FLASHCARDS, SUBJECT_SHORT_NAMES, FIRST_CHAPTER_ID } from "@/data";
-import { dailyPickLine, getAgeGroup } from "@/lib/braiseVoice";
+import { SUBJECTS, SUBJECT_SHORT_NAMES } from "@/data";
 import { getRankInfo, countMasteredCards, countSubjectsSeen } from "@/lib/aura";
 import { getIntoxDismissedCount, setIntoxDismissedCount } from "@/lib/celebrations";
-import type { Level, Subject, Chapter } from "@/types";
+import type { Level } from "@/types";
 
 // Same choreography language as Ton Aura: a calm stagger fade for each block.
 const staggerContainer = {
@@ -61,43 +60,28 @@ export function HomeView() {
     setSheetOpen(false);
   };
 
-  // Every subject's in-progress chapter — the pool today's Pioche is drawn from. No exam-date
-  // field exists anywhere in the data model, so this deliberately isn't a fabricated "DS dans
-  // 2 jours" countdown. (It used to be sorted by a per-chapter `mastery` that was always 0 for
-  // an in-progress chapter, so the sort never did anything.)
-  const priorityChapters: { subject: Subject; chapter: Chapter }[] = SUBJECTS.map((s) => {
-    const chapter = resolveChapters(s.chapters, state.completedChapters).find(
-      (c) => c.status === "current",
-    );
-    return chapter ? { subject: s, chapter } : null;
-  }).filter((x): x is { subject: Subject; chapter: Chapter } => x !== null);
+  // The way into the courses: one small world per subject, with a pastille where notions are waiting for
+  // a refresh. The wording follows where the student stands, never an alarm.
+  const { t } = useTone();
+  const courseProgress = useCourseProgress();
+  const courseMastery = useCourseMastery();
+  const libraries = SUBJECTS.map((s) =>
+    buildLibrary(s.id, {
+      completedChapters: state.completedChapters,
+      cardReviews: state.cardReviews,
+      course: courseProgress,
+      now: Date.now(),
+    }),
+  ).filter((l): l is Library => l !== null);
 
-  // "Pioche du jour" — a real daily random draw across every subject's in-progress chapter,
-  // not a "continue where you left off" shortcut: the same pool as "Chapitres prioritaires"
-  // above, indexed by a hash of today's date so the pick is stable all day and changes
-  // tomorrow. (The previous version just replayed state.lastSubjectId/lastChapterId, which is
-  // a "continue" feature, not a draw — it's still tracked in the store for other uses, just no
-  // longer what drives this card, since the product is explicitly framed as a daily draw.)
-  const todaySeed = new Date().toISOString().slice(0, 10);
-  let hash = 0;
-  for (let i = 0; i < todaySeed.length; i++) hash = (hash * 31 + todaySeed.charCodeAt(i)) >>> 0;
-  // Day zero is not a draw: a student who has done nothing yet starts on the same, well-chosen
-  // chapter, instead of possibly landing on whichever subject the date hash happens to select.
-  const isFirstSession =
-    state.completedChapters.length === 0 && Object.keys(state.cardReviews).length === 0;
-  const firstPick = isFirstSession
-    ? priorityChapters.find((p) => p.chapter.id === FIRST_CHAPTER_ID)
-    : undefined;
-  const dailyPick =
-    firstPick ??
-    (priorityChapters.length > 0 ? priorityChapters[hash % priorityChapters.length] : null);
-  const currentSubject = dailyPick?.subject;
-  const currentChapter = dailyPick?.chapter;
-  // Real per-chapter deck size (FLASHCARDS filtered by chapterId) — the card used to show a
-  // fixed "10 cartes" for every chapter; every chapter actually has its own real count.
-  const currentChapterCardCount = currentChapter
-    ? FLASHCARDS.filter((c) => c.chapterId === currentChapter.id).length
-    : 0;
+  // Today's mission is what Braise would point at in "Où on va ?": the same ladder, the same function,
+  // so the two screens never give different advice (a Déclic touched in the last two days, a review
+  // that has come due, a point that mixes up, an older Déclic, then something new). Nothing is drawn
+  // at random any more; on day zero the ladder lands on the first chapter of the first subject.
+  const pick = pickGlobalResume(libraries, state.lastSubjectId);
+  const currentSubject = pick ? SUBJECTS.find((s) => s.id === pick.subjectId) : undefined;
+  const currentEntry = pick?.resume.entry;
+  const resuming = pick?.resume.reason === "resume" && pick.resume.fresh === true;
   // Real count of cards whose last swipe-judge verdict was wrong — reviewCard() writes
   // 'not-sure' on an incorrect judgment (RevisionsView), never anything invented here.
   const missedCardsCount = Object.values(state.cardReviews).filter(
@@ -112,30 +96,21 @@ export function HomeView() {
     setIntoxDismissedCountState(missedCardsCount);
   };
 
-  const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
+  // Read to screen readers only, for now: why Braise points here, in the words she uses in "Où on va ?".
+  const reason = pick?.resume.reason;
+  const says =
+    !pick || !reason
+      ? t(COPY.library.allSet)
+      : reason === "review"
+        ? t(COPY.library.reviewSays(pick.resume.entry.dueCount))
+        : t(COPY.library.resumeSays[reason]);
   const bubbleLine =
-    currentSubject && currentChapter
-      ? dailyPickLine(
-          voiceCtx,
-          state.user.name,
-          currentSubject.name,
-          currentChapter.title,
-          currentChapter.duration,
-        )
-      : `${state.user.name}, série de ${state.streak} jours. On lâche rien !`;
+    currentSubject && currentEntry
+      ? `${says} ${currentEntry.title}, ${currentSubject.name}, ${currentEntry.minutes} minutes.`
+      : says;
 
-  // The way into the courses: one small world per subject, with a pastille where notions are waiting for
-  // a refresh. The wording follows where the student stands, never an alarm.
-  const { t } = useTone();
-  const courseProgress = useCourseProgress();
-  const courseMastery = useCourseMastery();
   const worlds: HubWorld[] = SUBJECTS.map((s) => {
-    const library = buildLibrary(s.id, {
-      completedChapters: state.completedChapters,
-      cardReviews: state.cardReviews,
-      course: courseProgress,
-      now: Date.now(),
-    });
+    const library = libraries.find((l) => l.subjectId === s.id);
     return {
       id: s.id,
       name: s.name,
@@ -205,13 +180,14 @@ export function HomeView() {
               bubbleLine={bubbleLine}
               subjectName={currentSubject ? SUBJECT_SHORT_NAMES[currentSubject.id] : undefined}
               subjectColor={currentSubject?.color}
-              chapterTitle={currentChapter?.title ?? "Leçon du jour"}
-              duration={currentChapter?.duration ?? 0}
-              cardCount={currentChapterCardCount}
+              chapterTitle={currentEntry?.title ?? "Leçon du jour"}
+              duration={currentEntry?.minutes ?? 0}
+              cardCount={currentEntry?.cards ?? 0}
+              resuming={resuming}
               soundOn={state.soundOn}
               onStart={() => {
-                if (currentSubject && currentChapter)
-                  openLesson(currentSubject.id, currentChapter.id);
+                if (currentSubject && currentEntry)
+                  openLesson(currentSubject.id, currentEntry.chapterId);
               }}
             />
           </motion.div>

@@ -1,9 +1,8 @@
 // Which subject Braise points at first, from the libraries of every subject. The same ladder as inside
-// a subject (something started, a point that mixes up, a review coming due, then something new),
-// compared across subjects; the subject the student was last in wins a tie, then the usual order.
-import type { Library, Resume, ResumeReason } from "@/lib/catalog/catalog";
-
-const RANK: Record<ResumeReason, number> = { resume: 0, reinforce: 1, review: 2, next: 3 };
+// a subject (see `resumeRank`: a Déclic touched in the last two days, a review coming due, a point that
+// mixes up, an older Déclic, then something new), compared across subjects; the subject the student was
+// last in wins a tie, then the usual order.
+import { resumeRank, type Library, type Resume } from "@/lib/catalog/catalog";
 
 export type GlobalResume = { subjectId: string; resume: Resume };
 
@@ -19,8 +18,8 @@ export function pickGlobalResume(
       best = candidate;
       continue;
     }
-    const a = RANK[candidate.resume.reason];
-    const b = RANK[best.resume.reason];
+    const a = resumeRank(candidate.resume);
+    const b = resumeRank(best.resume);
     if (
       a < b ||
       (a === b && candidate.subjectId === lastSubjectId && best.subjectId !== lastSubjectId)

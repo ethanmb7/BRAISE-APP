@@ -63,7 +63,7 @@ export function SubjectView() {
   if (!subject || !library) {
     return (
       <div>
-        <TopBar title="Matières" onBack={goBack} />
+        <TopBar title={t(COPY.world.title)} onBack={goBack} />
         <div className="view is-active lib-view">
           <p className="lib-allset">
             <BraiseMascot size={44} mood="hesitant" />
@@ -82,7 +82,8 @@ export function SubjectView() {
   const selected = library.entries.find((e) => e.key === selectedKey) ?? null;
   return (
     <div>
-      <TopBar title="Matières" onBack={goBack} />
+      {/* The bar says where the back button goes ("Où on va ?"); the page says where we are. */}
+      <TopBar title={t(COPY.world.title)} onBack={goBack} />
       <Archipelago
         color={subject.color}
         entries={library.entries}
@@ -95,8 +96,8 @@ export function SubjectView() {
         header={
           <div className="world-title">
             <div>
-              <p>{subject.name}</p>
-              <h2>L’archipel</h2>
+              <p>L’archipel</p>
+              <h2>{subject.name}</h2>
             </div>
           </div>
         }

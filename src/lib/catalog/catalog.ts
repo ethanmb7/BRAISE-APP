@@ -37,6 +37,8 @@ export type LibraryEntry = {
   dots: DotState[];
   /** Cards the student has already seen whose review date has come. */
   dueCount: number;
+  /** How many cards of review the chapter has, seen or not. */
+  cards: number;
   /** Most recent activity, to resume the right thing; 0 if never touched. */
   updatedAt: number;
 };
@@ -53,7 +55,25 @@ export type LibraryTheme = {
 /** Why Braise points at one entry. */
 export type ResumeReason = "resume" | "reinforce" | "review" | "next";
 
-export type Resume = { entry: LibraryEntry; reason: ResumeReason };
+/** `fresh` is for a "resume" only: the Déclic was touched less than `FRESH_MS` ago, so the student is
+ *  still in it and Braise says "Reprendre"; an older one is just one more thing to come back to. */
+export type Resume = { entry: LibraryEntry; reason: ResumeReason; fresh?: boolean };
+
+/** A Déclic touched less than this long ago is where the student is. Two days is a first guess, not a
+ *  measure: no study compares "pick up where you were" with "retrieve first", so it is one number to
+ *  change after a test with real students. */
+export const FRESH_MS = 2 * 24 * 60 * 60 * 1000;
+
+/** The ladder, as a number (lower goes first): what the student is in the middle of, then what is
+ *  due to be remembered (the promise of the app: understood, then retrieved days later), then a point
+ *  that mixes up, then an older Déclic left open, then something new. Hub, maps and Pioche all use it,
+ *  so the app never gives two different pieces of advice. */
+export function resumeRank({ reason, fresh }: Pick<Resume, "reason" | "fresh">): number {
+  if (reason === "resume") return fresh ? 0 : 3;
+  if (reason === "review") return 1;
+  if (reason === "reinforce") return 2;
+  return 4;
+}
 
 export type LibraryCounts = {
   total: number;
@@ -106,6 +126,7 @@ function courseEntry(chapter: ChapterDef, state: LibraryState): LibraryEntry {
       dueSeen(state.course.reviewCards[c.id]?.review, state.now),
     ).length;
   }
+  const cards = declics.reduce((sum, d) => sum + (getDeck(d.deckId)?.cards.length ?? 0), 0);
   const dots = statuses.map<DotState>((s) =>
     s === "mastered"
       ? "gold"
@@ -130,6 +151,7 @@ function courseEntry(chapter: ChapterDef, state: LibraryState): LibraryEntry {
     status: aggregateStatus(statuses),
     dots,
     dueCount,
+    cards,
     updatedAt,
   };
 }
@@ -181,26 +203,35 @@ function legacyEntry(
     status,
     dots: [done ? "full" : "empty", ...cardDots],
     dueCount,
+    cards: cards.length,
     // Real chapters carry no timestamp of their own: the first one not yet done is the suggestion,
     // which `resume` takes care of, so "never touched" is the honest value here.
     updatedAt: 0,
   };
 }
 
-/** Which entry Braise points at, in order: something started and not finished, a point that mixes
- *  up, a review that has come due, then the next thing to discover. Null when everything is
- *  remembered for good. */
-export function pickResume(entries: LibraryEntry[], suggestedKey: string | null): Resume | null {
-  const inProgress = entries
+/** Which entry Braise points at, in the order of `resumeRank`: a Déclic touched in the last two days,
+ *  a review that has come due, a point that mixes up, an older Déclic left open, then the next thing
+ *  to discover. Null when everything is remembered for good. An older chapter carries no date of its
+ *  own (`updatedAt` is 0), so it is never "fresh": at best it is the fourth rung. */
+export function pickResume(
+  entries: LibraryEntry[],
+  suggestedKey: string | null,
+  now: number,
+): Resume | null {
+  const open = entries
     .filter((e) => e.status === "in_progress")
-    .sort((a, b) => b.updatedAt - a.updatedAt)[0];
-  if (inProgress) return { entry: inProgress, reason: "resume" };
+    .sort((a, b) => b.updatedAt - a.updatedAt);
+  const recent = open.find((e) => e.updatedAt > 0 && now - e.updatedAt < FRESH_MS);
+  if (recent) return { entry: recent, reason: "resume", fresh: true };
+
+  const review = entries.filter((e) => e.dueCount > 0).sort((a, b) => b.dueCount - a.dueCount)[0];
+  if (review) return { entry: review, reason: "review" };
 
   const reinforce = entries.find((e) => e.status === "needs_reinforcement");
   if (reinforce) return { entry: reinforce, reason: "reinforce" };
 
-  const review = entries.filter((e) => e.dueCount > 0).sort((a, b) => b.dueCount - a.dueCount)[0];
-  if (review) return { entry: review, reason: "review" };
+  if (open[0]) return { entry: open[0], reason: "resume", fresh: false };
 
   const suggested = suggestedKey ? entries.find((e) => e.key === suggestedKey) : undefined;
   const next =
@@ -262,7 +293,7 @@ export function buildLibrary(subjectId: string, state: LibraryState): Library | 
     subjectId,
     themes,
     entries,
-    resume: pickResume(entries, current ? `legacy:${current.id}` : null),
+    resume: pickResume(entries, current ? `legacy:${current.id}` : null, state.now),
     counts,
   };
 }

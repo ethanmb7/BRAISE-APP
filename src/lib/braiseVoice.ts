@@ -157,7 +157,7 @@ export function lessonComplete(ctx: VoiceCtx, name: string): string {
 }
 
 /** Short, visible hookline for the hero card — the chapter title and subject already have their
- *  own slots there, so unlike `dailyPickLine` this never repeats them; it only has to carry the
+ *  own slots there, so it never repeats them; it only has to carry the
  *  personality/age tone in a few words. Onboarding's own first question justifies asking for a
  *  first name with "Braise a besoin d'un prénom pour te parler comme un vrai pote" — it was never
  *  actually used anywhere on Home, so that promise went unkept on the one screen seen the most.
@@ -299,29 +299,6 @@ export function verdictTag(ctx: VoiceCtx, kind: "carre" | "super" | "aie" | "gri
     },
   };
   return byCombo(ctx, tables[kind]);
-}
-
-export function dailyPickLine(
-  ctx: VoiceCtx,
-  userName: string,
-  subjectName: string,
-  chapterTitle: string,
-  duration: number,
-): string {
-  return byCombo(ctx, {
-    "chill-college": [
-      `Salut ${userName} ! Aujourd'hui, Braise a pioché "${chapterTitle}" (${subjectName}) pour toi. ${duration} min, zéro pression.`,
-    ],
-    "chill-lycee": [
-      `${userName}, pioche du jour : "${chapterTitle}" en ${subjectName}. ${duration} minutes, tranquille.`,
-    ],
-    "savage-college": [
-      `${userName}, le sort en a décidé : "${chapterTitle}" (${subjectName}). Tu peux pas fuir, désolé.`,
-    ],
-    "savage-lycee": [
-      `${userName}, tirage au sort du jour : "${chapterTitle}" en ${subjectName}. Le hasard ne négocie pas.`,
-    ],
-  });
 }
 
 export function duelIntro(ctx: VoiceCtx): string {

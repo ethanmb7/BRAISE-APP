@@ -7,6 +7,7 @@ import type { CourseProgress, DeclicProgress } from "@/lib/course/types";
 import type { CardReview } from "@/types";
 import {
   buildLibrary,
+  FRESH_MS,
   LEGACY_THEME_ID,
   pickResume,
   type LibraryEntry,
@@ -47,6 +48,7 @@ const entry = (patch: Partial<LibraryEntry>): LibraryEntry => ({
   status: "not_started",
   dots: ["empty"],
   dueCount: 0,
+  cards: 0,
   updatedAt: 0,
   ...patch,
 });
@@ -180,45 +182,69 @@ describe("buildLibrary", () => {
 });
 
 describe("pickResume", () => {
-  it("prefers what is in progress, the most recent first", () => {
+  const touched = (ago: number) => NOW - ago;
+
+  it("starts with a Déclic touched in the last two days, the most recent first", () => {
     const resume = pickResume(
       [
-        entry({ key: "a", status: "in_progress", updatedAt: 1 }),
-        entry({ key: "b", status: "in_progress", updatedAt: 5 }),
-        entry({ key: "c", status: "needs_reinforcement" }),
+        entry({ key: "a", status: "in_progress", updatedAt: touched(DAY) }),
+        entry({ key: "b", status: "in_progress", updatedAt: touched(2 * 60 * 60 * 1000) }),
+        entry({ key: "c", status: "understood", dueCount: 4 }),
       ],
       null,
+      NOW,
     );
-    expect(resume).toMatchObject({ reason: "resume", entry: { key: "b" } });
+    expect(resume).toMatchObject({ reason: "resume", fresh: true, entry: { key: "b" } });
   });
 
-  it("then a point that mixes up, then a due review, then the suggestion", () => {
+  it("puts a review that has come due before a point that mixes up, and both before an old Déclic", () => {
     const entries = [
-      entry({ key: "a", status: "understood", dueCount: 2 }),
-      entry({ key: "b", status: "needs_reinforcement" }),
-      entry({ key: "c", status: "not_started" }),
+      entry({ key: "old", status: "in_progress", updatedAt: touched(5 * DAY) }),
+      entry({ key: "mix", status: "needs_reinforcement" }),
+      entry({ key: "due", status: "understood", dueCount: 2 }),
+      entry({ key: "new", status: "not_started" }),
     ];
-    expect(pickResume(entries, "legacy:c")).toMatchObject({ reason: "reinforce" });
-    expect(
-      pickResume(
-        entries.filter((e) => e.key !== "b"),
-        "c",
-      ),
-    ).toMatchObject({
+    expect(pickResume(entries, "legacy:new", NOW)).toMatchObject({
       reason: "review",
-      entry: { key: "a" },
+      entry: { key: "due" },
     });
     expect(
       pickResume(
-        entries.filter((e) => e.key === "c"),
-        "c",
+        entries.filter((e) => e.key !== "due"),
+        "legacy:new",
+        NOW,
       ),
-    ).toMatchObject({
-      reason: "next",
-    });
+    ).toMatchObject({ reason: "reinforce", entry: { key: "mix" } });
+    expect(
+      pickResume(
+        entries.filter((e) => e.key === "old" || e.key === "new"),
+        "legacy:new",
+        NOW,
+      ),
+    ).toMatchObject({ reason: "resume", fresh: false, entry: { key: "old" } });
+    expect(
+      pickResume(
+        entries.filter((e) => e.key === "new"),
+        "legacy:new",
+        NOW,
+      ),
+    ).toMatchObject({ reason: "next" });
+  });
+
+  it("calls a Déclic fresh for just under two days, and not after", () => {
+    const at = (ago: number) =>
+      pickResume([entry({ key: "a", status: "in_progress", updatedAt: touched(ago) })], null, NOW);
+    expect(at(FRESH_MS - 1)).toMatchObject({ fresh: true });
+    expect(at(FRESH_MS)).toMatchObject({ fresh: false });
+  });
+
+  it("never calls an older chapter fresh: it has no date, so it is only an open Déclic", () => {
+    expect(
+      pickResume([entry({ key: "a", status: "in_progress", updatedAt: 0 })], null, NOW),
+    ).toMatchObject({ reason: "resume", fresh: false });
   });
 
   it("is null when everything is remembered for good", () => {
-    expect(pickResume([entry({ status: "mastered" })], null)).toBeNull();
+    expect(pickResume([entry({ status: "mastered" })], null, NOW)).toBeNull();
   });
 });

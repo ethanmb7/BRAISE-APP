@@ -17,6 +17,7 @@ const entry = (patch: Partial<LibraryEntry>): LibraryEntry => ({
   status: "not_started",
   dots: ["empty"],
   dueCount: 0,
+  cards: 0,
   updatedAt: 0,
   ...patch,
 });
@@ -146,20 +147,28 @@ describe("islandCell", () => {
 describe("pickGlobalResume", () => {
   const next = { entry: entry({ key: "n" }), reason: "next" as const };
   const review = { entry: entry({ key: "r", dueCount: 2 }), reason: "review" as const };
-  const inProgress = {
-    entry: entry({ key: "p", status: "in_progress" }),
-    reason: "resume" as const,
+  const mixed = {
+    entry: entry({ key: "m", status: "needs_reinforcement" }),
+    reason: "reinforce" as const,
   };
+  const open = {
+    entry: entry({ key: "o", status: "in_progress" }),
+    reason: "resume" as const,
+    fresh: false,
+  };
+  const justNow = { ...open, entry: entry({ key: "j", status: "in_progress" }), fresh: true };
 
-  it("prefers something started over a review, over something new", () => {
-    expect(
-      pickGlobalResume([lib("a", next), lib("b", review), lib("c", inProgress)], null),
-    ).toMatchObject({
-      subjectId: "c",
-    });
-    expect(pickGlobalResume([lib("a", next), lib("b", review)], null)).toMatchObject({
-      subjectId: "b",
-    });
+  it("follows the ladder: a Déclic touched lately, a review, a point that mixes up, an old Déclic, then something new", () => {
+    const pick = (...rungs: Library["resume"][]) =>
+      pickGlobalResume(
+        rungs.map((r, i) => lib(String.fromCharCode(97 + i), r)),
+        null,
+      )?.resume.entry.key;
+    expect(pick(next, open, mixed, review, justNow)).toBe("j");
+    expect(pick(next, open, mixed, review)).toBe("r");
+    expect(pick(next, open, mixed)).toBe("m");
+    expect(pick(next, open)).toBe("o");
+    expect(pick(next)).toBe("n");
   });
 
   it("breaks a tie with the subject the student was last in, then the usual order", () => {

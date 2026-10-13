@@ -65,7 +65,7 @@ export const COPY = {
       ),
     allSet: L(
       "Tout est acquis ici. Tu peux souffler, ou rejouer pour le plaisir.",
-      "Tout est acquis. Je n'ai plus rien à te reprocher. Étrange.",
+      "Tout est acquis. Je n'ai plus rien à redire. Étonnant.",
     ),
     moreComing: L("D'autres cours arrivent bientôt.", "D'autres cours arrivent. Patience."),
   },
@@ -85,7 +85,7 @@ export const COPY = {
     saysReview: (n: number) =>
       L(
         `Où tu veux. ${n} notion${plural(n)} à rafraîchir, si ça te dit.`,
-        `Où tu veux. ${n} notion${plural(n)} à remettre en place, si tu as le cran.`,
+        `Où tu veux. ${n} notion${plural(n)} à remettre en place. Je suis chaud quand tu l'es.`,
       ),
     saysNext: L(
       "Où tu veux. Moi, j'essaierais quelque chose de nouveau.",
@@ -106,7 +106,17 @@ export const COPY = {
     ),
     saysAllSet: L(
       "Tout est au point. Choisis ce qui te fait envie.",
-      "Tout est au point. Rien à te reprocher, c'est louche.",
+      "Tout est au point. Je n'ai rien à redire. Étonnant.",
+    ),
+    /** What the red number on a world means, said once under Braise's line (only when there is one). */
+    legendDue: L(
+      "Le chiffre sur un monde, ce sont des notions à rafraîchir. Quand tu veux.",
+      "Le chiffre sur un monde, ce sont des notions à remettre en place. Quand tu veux.",
+    ),
+    /** For a student in Première or Terminale, before they go in: what BRAISE covers today. */
+    levelNote: L(
+      "Pour l'instant, BRAISE couvre les bases de la 2nde. La suite arrive. D'ici là, ces bases font un bon point de départ.",
+      "Pour l'instant, BRAISE couvre les bases de la 2nde. Le reste arrive. D'ici là, les bases ne te feront pas de mal.",
     ),
   },
 

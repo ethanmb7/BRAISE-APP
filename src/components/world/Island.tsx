@@ -4,19 +4,10 @@ import { BraiseMascot } from "@/components/BraiseMascot";
 import { Emblem } from "@/components/world/Emblem";
 import type { EmblemKind } from "@/lib/world/emblems";
 import { STATUS_LABEL } from "@/lib/course/statusLabels";
+import { FLAG } from "@/components/world/flags";
 import type { LibraryEntry } from "@/lib/catalog/catalog";
 
 const INK = "#151821";
-
-// What the flag on an island says, in one colour: gold is remembered for good, blue understood, pale
-// seen, coral a point that mixes up. No flag at all on an island not visited yet.
-const FLAG: Partial<Record<LibraryEntry["status"], string>> = {
-  mastered: "#f6b21b",
-  understood: "#3b82f6",
-  discovered: "#bfd7fd",
-  in_progress: "#bfd7fd",
-  needs_reinforcement: "#ff6f59",
-};
 
 function Flag({ color }: { color: string }) {
   return (
@@ -78,7 +69,6 @@ export function Island({
   onSelect: () => void;
 }) {
   const flag = FLAG[entry.status];
-  const unseen = entry.status === "not_started";
   const flame = entry.status === "needs_reinforcement" || entry.dueCount > 0;
   const label = [
     entry.title,
@@ -162,9 +152,9 @@ export function Island({
         <b>{entry.title}</b>
         {entry.dueCount > 0 ? (
           <i className="isl-tag isl-tag--due">{entry.dueCount} à rafraîchir</i>
-        ) : unseen ? (
-          <i className="isl-tag">à découvrir</i>
-        ) : null}
+        ) : (
+          <i className={`isl-tag isl-tag--${entry.status}`}>{STATUS_LABEL[entry.status]}</i>
+        )}
       </span>
     </motion.button>
   );
