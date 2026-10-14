@@ -25,17 +25,12 @@ export const COPY = {
       `Objectif validé, +${XP_REWARDS.DAILY_CHEST} XP de bonus. Je m'incline (un peu).`,
     ),
     rhythmRemaining: (xp: number) =>
-      L(`Encore ${xp} XP pour boucler ta journée.`, `Encore ${xp} XP. C'est pas la mer à boire.`),
-    reviewDue: (n: number) =>
-      L(`Revoir ${n} notion${plural(n)}`, `Remettre ${n} notion${plural(n)} en place`),
+      L(`Encore ${xp} XP pour ta journée.`, `Encore ${xp} XP. Pas la mer à boire.`),
     keepMoment: L("Garder ce moment", "Immortaliser ça"),
-    /** Banner for cards last judged wrong. */
-    missedTitle: L("À sécuriser", "Elles t'ont eu"),
-    missedSub: (n: number) =>
-      L(
-        `Revoir ${n} notion${plural(n)}, sans pression.`,
-        `${n} notion${plural(n)} ${n > 1 ? "t'ont" : "t'a"} échappé. Revanche ?`,
-      ),
+    /** The card that says what waits for a refresh (the sum of the pastilles on the worlds). */
+    dueTitle: L("À rafraîchir", "Elles t'attendent"),
+    dueSub: (n: number) =>
+      L(`${n} notion${plural(n)}, sans pression.`, `${n} notion${plural(n)} à remettre en place.`),
     subjectsIntro: L(
       "Choisis ce que tu veux comprendre aujourd’hui.",
       "Choisis ton terrain. Je ne décide pas à ta place (pour une fois).",
@@ -77,11 +72,11 @@ export const COPY = {
       "Six matières, toutes ouvertes. Choisis celle qui te fait envie.",
       "Six matières, aucune verrouillée. Même toi, tu en trouveras une qui te plaît.",
     ),
-    teaserDue: (n: number) =>
-      L(
-        `${n} notion${plural(n)} à rafraîchir. Choisis où tu veux aller.`,
-        `${n} notion${plural(n)} à remettre en place. Mais choisis où tu veux aller.`,
-      ),
+    /** Under "Tes cours" when notions wait: what the number on a world means, said once. */
+    teaserDue: L(
+      "Le chiffre sur un monde : ses notions à rafraîchir.",
+      "Le chiffre sur un monde : ce qui est à remettre en place.",
+    ),
     teaserBack: L(
       "Tes cours sont là. Reprends où tu veux.",
       "Tes cours t'attendent. Ils sont patients, eux.",

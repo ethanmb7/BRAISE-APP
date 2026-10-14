@@ -14,7 +14,7 @@ import { fireConfetti } from "@/lib/confetti";
 import { LevelSheet } from "@/components/LevelSheet";
 import { HeaderHUD } from "@/components/HeaderHUD";
 import { HeroPiocheCard } from "@/components/HeroPiocheCard";
-import { MissedCardsBanner } from "@/components/MissedCardsBanner";
+import { DueCard } from "@/components/DueCard";
 import { BrakeCard, MomentSheet, NotifInvite } from "@/components/notifications/Reminders";
 import { useReminders } from "@/components/notifications/useReminders";
 import { frequencyFromGoal, isBraked } from "@/lib/notifications/model";
@@ -38,7 +38,7 @@ const staggerItem = {
 };
 
 export function HomeView() {
-  const { state, setTab, setView, openSubject, openLesson, setUser, getDueCards } = useApp();
+  const { state, setTab, setView, openSubject, openLesson, setUser } = useApp();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [intoxDismissedCount, setIntoxDismissedCountState] = useState(getIntoxDismissedCount);
@@ -50,8 +50,6 @@ export function HomeView() {
     }
     prevGoalMet.current = state.dailyGoalMet;
   }, [state.dailyGoalMet]);
-
-  const dueCount = getDueCards().length;
 
   const handleLevel = (l: Level) => {
     sfx.tap(state.soundOn);
@@ -81,20 +79,6 @@ export function HomeView() {
   const currentSubject = pick ? SUBJECTS.find((s) => s.id === pick.subjectId) : undefined;
   const currentEntry = pick?.resume.entry;
   const resuming = pick?.resume.reason === "resume" && pick.resume.fresh === true;
-  // Real count of cards whose last swipe-judge verdict was wrong — reviewCard() writes
-  // 'not-sure' on an incorrect judgment (RevisionsView), never anything invented here.
-  const missedCardsCount = Object.values(state.cardReviews).filter(
-    (r) => r.lastConfidence === "not-sure",
-  ).length;
-  // Dismissing the banner hides it at the count it was dismissed at — it reappears the moment a
-  // NEW card gets missed and the real count climbs past that, not gone for good.
-  const showIntoxBanner = missedCardsCount > intoxDismissedCount;
-  const handleDismissIntox = () => {
-    sfx.tap(state.soundOn);
-    setIntoxDismissedCount(missedCardsCount);
-    setIntoxDismissedCountState(missedCardsCount);
-  };
-
   // Read to screen readers only, for now: why Braise points here, in the words she uses in "Où on va ?".
   const reason = pick?.resume.reason;
   const says =
@@ -122,12 +106,22 @@ export function HomeView() {
           : undefined,
     };
   });
+  // One number for what is waiting: the sum of the pastilles on the worlds. The card under the rhythm, the
+  // caption of the worlds and the strip all say this same number, so the page never gives two.
   const dueTotal = worlds.reduce((sum, w) => sum + w.due, 0);
+  // Dismissing the card hides it at the count it was dismissed at: it comes back when more notions are
+  // waiting than then, not gone for good.
+  const showDueCard = dueTotal > intoxDismissedCount;
+  const handleDismissDue = () => {
+    sfx.tap(state.soundOn);
+    setIntoxDismissedCount(dueTotal);
+    setIntoxDismissedCountState(dueTotal);
+  };
   const startedAny =
     state.completedChapters.length > 0 || Object.keys(state.cardReviews).length > 0;
   const teaserSays =
     dueTotal > 0
-      ? t(COPY.world.teaserDue(dueTotal))
+      ? t(COPY.world.teaserDue)
       : startedAny
         ? t(COPY.world.teaserBack)
         : t(COPY.world.teaserNew);
@@ -194,6 +188,34 @@ export function HomeView() {
             />
           </motion.div>
 
+          <motion.div variants={staggerItem}>
+            <TodayStrip
+              streak={state.streak}
+              dailyGoalMet={state.dailyGoalMet}
+              remaining={remainingToGoal(state)}
+              goalPct={computeGoalPct(state)}
+              dueCount={dueTotal}
+              onShare={() => {
+                sfx.tap(state.soundOn);
+                if (navigator.vibrate) navigator.vibrate(10);
+                setShareOpen(true);
+              }}
+            />
+          </motion.div>
+
+          {showDueCard && (
+            <motion.div variants={staggerItem}>
+              <DueCard
+                count={dueTotal}
+                onOpen={() => {
+                  sfx.tap(state.soundOn);
+                  setTab("revisions");
+                }}
+                onDismiss={handleDismissDue}
+              />
+            </motion.div>
+          )}
+
           <motion.div variants={staggerItem} className="space-y-3">
             <div>
               <span className="font-mono text-[0.7rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">
@@ -202,6 +224,7 @@ export function HomeView() {
               <h2 className="font-display text-[1.15rem] font-extrabold leading-tight text-[var(--ink)]">
                 Tes cours
               </h2>
+              <p className="hub-caption">{teaserSays}</p>
             </div>
             <Hub
               worlds={worlds}
@@ -212,40 +235,7 @@ export function HomeView() {
                 openSubject(id);
               }}
             />
-            <p className="hub-caption">{teaserSays}</p>
           </motion.div>
-
-          <motion.div variants={staggerItem}>
-            <TodayStrip
-              streak={state.streak}
-              dailyGoalMet={state.dailyGoalMet}
-              remaining={remainingToGoal(state)}
-              goalPct={computeGoalPct(state)}
-              dueCount={dueCount}
-              onContinue={() => {
-                sfx.tap(state.soundOn);
-                setTab("revisions");
-              }}
-              onShare={() => {
-                sfx.tap(state.soundOn);
-                if (navigator.vibrate) navigator.vibrate(10);
-                setShareOpen(true);
-              }}
-            />
-          </motion.div>
-
-          {showIntoxBanner && (
-            <motion.div variants={staggerItem}>
-              <MissedCardsBanner
-                count={missedCardsCount}
-                onOpen={() => {
-                  sfx.tap(state.soundOn);
-                  setTab("revisions");
-                }}
-                onDismiss={handleDismissIntox}
-              />
-            </motion.div>
-          )}
 
           {(braked || invite) && (
             <motion.div variants={staggerItem}>

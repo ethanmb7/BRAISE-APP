@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Backpack, Bus, Clock3, Moon, X } from "lucide-react";
 import { BraiseMascot } from "@/components/BraiseMascot";
+import { StreakFlameIcon } from "@/components/StreakFlameIcon";
 import { COPY } from "@/lib/copy";
 import { useTone } from "@/lib/useTone";
 import {
@@ -150,7 +151,7 @@ export function NotifInvite({ onAccept }: { onAccept: () => void }) {
     <section className="nt-card" aria-label="Les rappels de Braise">
       <div className="nt-card-top">
         <span aria-hidden="true">
-          <BraiseMascot size={52} mood="eager" />
+          <StreakFlameIcon size={44} />
         </span>
         <div>
           <b>{t(COPY.notif.inviteTitle)}</b>
@@ -178,7 +179,7 @@ export function BrakeCard() {
     <section className="nt-card" aria-label="Braise s'est faite discrète">
       <div className="nt-card-top">
         <span aria-hidden="true">
-          <BraiseMascot size={52} mood="hesitant" />
+          <StreakFlameIcon size={44} />
         </span>
         <div>
           <b>{t(COPY.notif.brakeTitle)}</b>

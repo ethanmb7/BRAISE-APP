@@ -1,4 +1,4 @@
-import { ArrowRight, Check, Flame, Sparkles } from "lucide-react";
+import { Check, Flame, Sparkles } from "lucide-react";
 import { COPY } from "@/lib/copy";
 import { useTone } from "@/lib/useTone";
 
@@ -10,9 +10,8 @@ interface TodayStripProps {
   /** Real XP remaining to hit today's goal — same unit as the header badge. */
   remaining: number;
   goalPct: number;
-  /** Real spaced-repetition cards currently due. */
+  /** Notions waiting for a refresh (the same number as the card under the strip). */
   dueCount: number;
-  onContinue: () => void;
   onShare: () => void;
 }
 
@@ -29,7 +28,6 @@ export function TodayStrip({
   remaining,
   goalPct,
   dueCount,
-  onContinue,
   onShare,
 }: TodayStripProps) {
   const { t } = useTone();
@@ -47,12 +45,12 @@ export function TodayStrip({
   return (
     <section
       aria-label="Ton rythme du jour"
-      className="rounded-2xl border-[2.5px] border-[var(--neo-ink)] bg-[var(--paper)] px-4 py-3.5 shadow-[3px_3px_0_var(--neo-ink)]"
+      className="rounded-2xl border-[2.5px] border-[var(--neo-ink)] bg-[var(--paper)] px-4 py-3 shadow-[3px_3px_0_var(--neo-ink)]"
     >
       <div className="flex items-start gap-3">
         <span
           aria-hidden="true"
-          className={`mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border-2 border-black ${
+          className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border-2 border-black ${
             goalMet ? "bg-emerald-300" : "bg-[#FFE08A]"
           }`}
         >
@@ -64,19 +62,16 @@ export function TodayStrip({
         </span>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-3">
-            <p className="font-mono text-[0.7rem] font-black uppercase tracking-wide text-[var(--ink-soft)]">
-              Ton rythme du jour
-            </p>
+          <div className="flex items-start justify-between gap-3">
+            <p className="text-sm font-bold leading-snug text-[var(--ink)]">{rhythmLine}</p>
             <span className="flex-shrink-0 text-xs font-black text-[var(--ink-soft)]">
               {goalMet ? "Validé" : `${goalPct}%`}
             </span>
           </div>
-          <p className="mt-0.5 text-sm font-bold leading-snug text-[var(--ink)]">{rhythmLine}</p>
 
           {!goalMet && (
             <div
-              className="mt-2.5 h-3 overflow-hidden rounded-full border-2 border-[var(--neo-ink)] bg-white"
+              className="mt-2 h-3 overflow-hidden rounded-full border-2 border-[var(--neo-ink)] bg-white"
               role="progressbar"
               aria-label={progressLabel}
               aria-valuemin={0}
@@ -88,18 +83,6 @@ export function TodayStrip({
                 style={{ width: `${goalPct}%` }}
               />
             </div>
-          )}
-
-          {goalMet && dueCount > 0 && (
-            <button
-              type="button"
-              onClick={onContinue}
-              className="mt-3 inline-flex min-h-10 items-center gap-1.5 rounded-xl border-2 border-black bg-white px-3 py-2 text-sm font-black text-black shadow-[2px_2px_0px_0px_#000] transition-transform active:translate-y-[2px] active:shadow-none"
-            >
-              <Sparkles size={15} />
-              {t(COPY.home.reviewDue(dueCount))}
-              <ArrowRight size={15} />
-            </button>
           )}
 
           {allDone && (

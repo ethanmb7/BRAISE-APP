@@ -127,6 +127,10 @@ ni un compte à rebours.
 - **Les mondes ont tous la même taille** ; seul le monde conseillé est plus grand : une taille dit une
   importance, jamais un hasard. Le placement est piloté par la liste des matières, **jusqu'à dix** (`hubPlaces`,
   testé).
+- **Aujourd'hui : un seul chiffre pour ce qui attend.** « À rafraîchir » est la somme des pastilles des mondes ;
+  la carte de révision, la phrase sous « Tes cours » et le rythme disent ce même nombre. Ordre : la Pioche,
+  le rythme (il la situe), la carte « À rafraîchir » (le chemin vers Réviser, où « Réviser » est le bon mot),
+  puis « Tes cours ». Une seule Braise : celle de la Pioche ; les cartes de rappels prennent la flamme.
 - **Tout est construit dans le flux** (jamais à des coordonnées dessinées) : un nom vit dans la même boîte que
   son image, donc de 320 à 430 px et en texte très grand rien ne se chevauche.
 
