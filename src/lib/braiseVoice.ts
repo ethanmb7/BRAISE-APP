@@ -450,13 +450,13 @@ export function strongSubjectLine(
 ): string {
   return byCombo(ctx, {
     "chill-college": [
-      `En ${subjectName}, t'es solide : ${masteredCount}/${totalCount} cartes maîtrisées. Ça se voit que ça rentre.`,
+      `En ${subjectName}, t'es solide : ${masteredCount}/${totalCount} cartes dans la poche. Ça se voit que ça rentre.`,
     ],
     "chill-lycee": [
-      `${subjectName} : ${masteredCount}/${totalCount} cartes maîtrisées. Cette matière-là, tu la tiens.`,
+      `${subjectName} : ${masteredCount}/${totalCount} cartes dans la poche. Cette matière-là, tu la tiens.`,
     ],
     "savage-college": [
-      `${masteredCount}/${totalCount} cartes maîtrisées en ${subjectName}. Ok, là je suis obligé d'admettre que tu gères.`,
+      `${masteredCount}/${totalCount} cartes dans la poche en ${subjectName}. Ok, là je suis obligé d'admettre que tu gères.`,
     ],
     "savage-lycee": [
       `${subjectName}, ${masteredCount}/${totalCount} cartes. C'est le genre de matière où tu peux plus jouer la modestie.`,

@@ -37,7 +37,7 @@ export function Dock({
           <StatusChip status={selected.status} />
           <Dots dots={selected.dots} source={selected.source} />
           {selected.dueCount > 0 && (
-            <span className="dock-due">{selected.dueCount} à rafraîchir</span>
+            <span className="dock-due">{selected.dueCount} à rallumer</span>
           )}
           <button type="button" className="dock-close" onClick={onClose} aria-label="Fermer">
             <X size={18} strokeWidth={3} />
@@ -48,7 +48,6 @@ export function Dock({
         </b>
         <span className="dock-name">
           {selected.hook ? `${selected.title} · ` : ""}
-          {selected.source === "course" ? "Programme officiel · " : ""}
           {selected.levelLabel} · {selected.minutes} min
         </span>
         <button type="button" className="dock-cta" onClick={() => onOpen(selected)}>

@@ -147,9 +147,7 @@ export function HomeView() {
   return (
     <>
       <div className="view is-active home-view pt-3">
-        {!state.user.level && (
-          <div className="setup-banner">Configure ton niveau pour des leçons sur mesure.</div>
-        )}
+        {!state.user.level && <div className="setup-banner">Dis-moi ton niveau, je m'adapte.</div>}
 
         <motion.div
           variants={staggerContainer}
@@ -176,7 +174,7 @@ export function HomeView() {
               bubbleLine={bubbleLine}
               subjectName={currentSubject ? SUBJECT_SHORT_NAMES[currentSubject.id] : undefined}
               subjectColor={currentSubject?.color}
-              chapterTitle={currentEntry?.title ?? "Leçon du jour"}
+              chapterTitle={currentEntry?.hook ?? currentEntry?.title ?? "Ta mission du jour"}
               duration={currentEntry?.minutes ?? 0}
               cardCount={currentEntry?.cards ?? 0}
               resuming={resuming}
@@ -219,10 +217,10 @@ export function HomeView() {
           <motion.div variants={staggerItem} className="space-y-3">
             <div>
               <span className="font-mono text-[0.7rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">
-                Apprendre
+                Explorer
               </span>
               <h2 className="font-display text-[1.15rem] font-extrabold leading-tight text-[var(--ink)]">
-                Tes cours
+                Tes mondes
               </h2>
               <p className="hub-caption">{teaserSays}</p>
             </div>

@@ -82,7 +82,7 @@ function Planet({
         } as CSSProperties
       }
       onClick={() => onSelect(world.id)}
-      aria-label={`${world.name}${world.due > 0 ? `, ${world.due} notion${world.due > 1 ? "s" : ""} à rafraîchir` : ""}${suggestion ? `, Braise te conseille : ${suggestion.verb.toLowerCase()} ${suggestion.chapter}` : ""}`}
+      aria-label={`${world.name}${world.due > 0 ? `, ${world.due} à rallumer` : ""}${suggestion ? `, Braise te conseille : ${suggestion.verb.toLowerCase()} ${suggestion.chapter}` : ""}`}
       // The worlds arrive one after the other, once; a press then sinks them a little.
       initial={still ? false : { opacity: 0, scale: 0.8 }}
       animate={{

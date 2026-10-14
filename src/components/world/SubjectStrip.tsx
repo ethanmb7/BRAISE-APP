@@ -27,7 +27,7 @@ export function SubjectStrip({
             style={{ ["--subject" as string]: w.color } as CSSProperties}
             onClick={() => !current && onSelect(w.id)}
             aria-current={current ? "page" : undefined}
-            aria-label={`${w.name}${w.due > 0 ? `, ${w.due} notion${w.due > 1 ? "s" : ""} à rafraîchir` : ""}`}
+            aria-label={`${w.name}${w.due > 0 ? `, ${w.due} à rallumer` : ""}`}
             whileTap={current ? undefined : { scale: 0.92 }}
             transition={{ type: "spring", stiffness: 500, damping: 22 }}
           >

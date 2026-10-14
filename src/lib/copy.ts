@@ -28,9 +28,9 @@ export const COPY = {
       L(`Encore ${xp} XP pour ta journée.`, `Encore ${xp} XP. Pas la mer à boire.`),
     keepMoment: L("Garder ce moment", "Immortaliser ça"),
     /** The card that says what waits for a refresh (the sum of the pastilles on the worlds). */
-    dueTitle: L("À rafraîchir", "Elles t'attendent"),
+    dueTitle: L("À rallumer", "Elles t'attendent"),
     dueSub: (n: number) =>
-      L(`${n} notion${plural(n)}, sans pression.`, `${n} notion${plural(n)} à remettre en place.`),
+      L(`${n} truc${plural(n)}, sans pression.`, `${n} truc${plural(n)} à remettre en place.`),
     subjectsIntro: L(
       "Choisis ce que tu veux comprendre aujourd’hui.",
       "Choisis ton terrain. Je ne décide pas à ta place (pour une fois).",
@@ -55,11 +55,11 @@ export const COPY = {
     } as Record<string, Lines>,
     reviewSays: (n: number) =>
       L(
-        `${n} notion${plural(n)} à rafraîchir, quand tu veux.`,
-        `${n} notion${plural(n)} à remettre en place. Je t'attends.`,
+        `${n} truc${plural(n)} à rallumer, quand tu veux.`,
+        `${n} truc${plural(n)} à remettre en place. Je t'attends.`,
       ),
     allSet: L(
-      "Tout est acquis ici. Tu peux souffler, ou rejouer pour le plaisir.",
+      "Tout est dans la poche ici. Tu peux souffler, ou rejouer pour le plaisir.",
       "Tout est acquis. Je n'ai plus rien à redire. Étonnant.",
     ),
     moreComing: L("D'autres cours arrivent bientôt.", "D'autres cours arrivent. Patience."),
@@ -74,12 +74,12 @@ export const COPY = {
     ),
     /** Under "Tes cours" when notions wait: what the number on a world means, said once. */
     teaserDue: L(
-      "Le chiffre sur un monde : ses notions à rafraîchir.",
+      "Le chiffre sur un monde : ce qu'il y a à rallumer.",
       "Le chiffre sur un monde : ce qui est à remettre en place.",
     ),
     teaserBack: L(
-      "Tes cours sont là. Reprends où tu veux.",
-      "Tes cours t'attendent. Ils sont patients, eux.",
+      "Tes mondes sont là. Reprends où tu veux.",
+      "Tes mondes t'attendent. Ils sont patients, eux.",
     ),
   },
 

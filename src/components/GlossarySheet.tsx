@@ -41,7 +41,7 @@ export function GlossarySheet({ term, onClose }: { term?: TermId; onClose: () =>
           ))}
         </dl>
         <button type="button" className="ui-primary" onClick={onClose}>
-          Compris
+          Capté
         </button>
       </section>
     </>

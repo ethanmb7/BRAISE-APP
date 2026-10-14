@@ -383,7 +383,7 @@ const RankProgressCaption = memo(function RankProgressCaption({
   const milestoneGoal =
     milestone.kind === "streak"
       ? `${milestone.target} jours de série`
-      : `${milestone.target} cartes maîtrisées`;
+      : `${milestone.target} cartes dans la poche`;
   return (
     <div className="rank-rail-caption">
       {next ? (
@@ -432,7 +432,7 @@ const SubjectMasteryGrid = memo(function SubjectMasteryGrid({
   return (
     <div className="mastery-section-wrap">
       <div className="mastery-section">
-        <span className="mastery-tab">Maîtrise par matière</span>
+        <span className="mastery-tab">Ce que t’as en poche</span>
         <div className="mastery-grid" role="list">
           {subjects.map((s) => {
             const filled = s.totalCount > 0 ? Math.round((s.masteredCount / s.totalCount) * 4) : 0;
@@ -467,7 +467,7 @@ const SubjectMasteryGrid = memo(function SubjectMasteryGrid({
                 </span>
                 <span className="mastery-name">{SHORT_SUBJECT_NAME[s.id] ?? s.name}</span>
                 <span className="mastery-count">
-                  {s.masteredCount}/{s.totalCount} cartes
+                  {s.masteredCount}/{s.totalCount} en poche
                 </span>
               </button>
             );

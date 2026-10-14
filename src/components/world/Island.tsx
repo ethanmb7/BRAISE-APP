@@ -74,7 +74,7 @@ export function Island({
     entry.title,
     STATUS_LABEL[entry.status],
     `${entry.minutes} minutes`,
-    entry.dueCount > 0 ? `${entry.dueCount} à rafraîchir` : null,
+    entry.dueCount > 0 ? `${entry.dueCount} à rallumer` : null,
     suggested ? "suggéré par Braise" : null,
   ]
     .filter(Boolean)
@@ -151,7 +151,7 @@ export function Island({
       <span className="isl-label">
         <b>{entry.title}</b>
         {entry.dueCount > 0 ? (
-          <i className="isl-tag isl-tag--due">{entry.dueCount} à rafraîchir</i>
+          <i className="isl-tag isl-tag--due">{entry.dueCount} à rallumer</i>
         ) : (
           <i className={`isl-tag isl-tag--${entry.status}`}>{STATUS_LABEL[entry.status]}</i>
         )}

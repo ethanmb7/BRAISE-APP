@@ -7,9 +7,9 @@ type Status = LibraryEntry["status"];
 // "Vu" share a flag (pale), so they share a line.
 const ROWS: { statuses: Status[]; label: string; color: string }[] = [
   { statuses: ["in_progress", "discovered"], label: "Vu", color: FLAG.discovered! },
-  { statuses: ["understood"], label: "Compris", color: FLAG.understood! },
-  { statuses: ["mastered"], label: "Acquis", color: FLAG.mastered! },
-  { statuses: ["needs_reinforcement"], label: "À renforcer", color: FLAG.needs_reinforcement! },
+  { statuses: ["understood"], label: "Capté", color: FLAG.understood! },
+  { statuses: ["mastered"], label: "Dans la poche", color: FLAG.mastered! },
+  { statuses: ["needs_reinforcement"], label: "Fragile", color: FLAG.needs_reinforcement! },
 ];
 
 /** The key to the flags and the flame of a map, drawn with the same colours as the islands. It lists
@@ -47,7 +47,7 @@ export function StateKey({ entries }: { entries: LibraryEntry[] }) {
               strokeLinejoin="round"
             />
           </svg>
-          À rafraîchir
+          À rallumer
         </li>
       )}
     </ul>

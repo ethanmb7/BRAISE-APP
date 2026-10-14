@@ -26,12 +26,12 @@ type Pools = Record<Personality, string[]>;
 export const POOLS: Record<string, Pools> = {
   rappel: {
     chill: [
-      "{n} notions à rafraîchir : {min} min, quand tu veux.",
+      "{n} trucs à rallumer : {min} min, quand tu veux.",
       "Petit rappel de Braise sur {topic}. {min} min, juste avant que ça s’efface.",
-      "{name}, {n} notions n’attendent que toi, sans pression.",
+      "{name}, {n} trucs n’attendent que toi, sans pression.",
     ],
     savage: [
-      "{n} notions commencent à t’échapper. {min} min et c’est réglé.",
+      "{n} trucs commencent à t’échapper. {min} min et c’est réglé.",
       "Ta mémoire m’a chargée de te parler de {topic}. {min} min, pas plus.",
       "{name}, {n} cartes te font de l’œil. Tu craques ?",
     ],

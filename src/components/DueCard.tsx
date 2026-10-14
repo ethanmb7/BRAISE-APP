@@ -18,7 +18,7 @@ export function DueCard({
   const { t } = useTone();
   return (
     <section
-      aria-label="Notions à rafraîchir"
+      aria-label="À rallumer"
       className="flex w-full items-center gap-1 rounded-2xl border-[2.5px] border-black bg-[#FFE08A] py-1.5 pl-4 pr-1 shadow-[3px_3px_0px_0px_#000]"
     >
       <button
@@ -42,7 +42,7 @@ export function DueCard({
       <button
         type="button"
         onClick={onDismiss}
-        aria-label="Masquer les notions à rafraîchir"
+        aria-label="Masquer ce qui est à rallumer"
         className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full transition-transform active:scale-90"
       >
         <X size={20} strokeWidth={3} className="text-[#151821]" />

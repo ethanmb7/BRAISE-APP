@@ -34,9 +34,9 @@ export const GLOSSARY: Term[] = [
   },
   {
     id: "rafraichir",
-    label: "À rafraîchir",
-    short: "Une notion qui revient avant que tu l’oublies.",
-    long: "Revoir une notion juste avant de l’oublier, c’est ce qui l’ancre le mieux. Braise te la remontre au bon moment, jamais pour te mettre la pression.",
+    label: "À rallumer",
+    short: "Un truc qui revient avant que tu l’oublies.",
+    long: "Revoir un truc juste avant de l’oublier, c’est ce qui l’ancre le mieux. Braise te le remontre au bon moment, jamais pour te mettre la pression.",
   },
   {
     id: "aura",

@@ -90,7 +90,19 @@ Règles, tenues par `sound.test.ts` :
 | Déclic         | un mini-cours raconté par Braise                                                       |
 | Pioche du jour | la révision du jour choisie par Braise                                                 |
 | Carré ou Intox | vrai ou faux, en un swipe                                                              |
-| À rafraîchir   | une notion qui revient avant d'être oubliée                                            |
+| À rallumer     | un truc qui revient avant d'être oublié (la flamme de Braise qui s'éteint)             |
+
+**L'échelle d'une notion** a trois affirmations distinctes, dites avec nos mots et jamais avec ceux d'un
+bulletin (`src/lib/course/statusLabels.ts`) : **Vu** (j'ai fini la leçon), **Capté** (j'ai compris, c'est la
+validation), **Dans la poche** (je le retrouve sans aide quelques jours après : le seul palier qui compte).
+À côté : **Fragile** (il a glissé) et **À rallumer** (il va s'éteindre). Si on change un de ces mots, les trois
+affirmations restent distinctes. Pas de « Acquis », « Compris », « À renforcer », « Programme officiel » dans
+ce que lit l'élève ; ces mots restent pour l'adulte (page de programme, dossier).
+
+**Parler comme un pote, c'est la structure avant l'argot :** court, un peu moqueur, jamais une leçon, la
+chose amusante avant l'étiquette (le titre accroche d'un chapitre passe avant son nom de programme). On met peu
+de mots à nous, toujours les mêmes, dans un seul endroit. L'argot de mème vieillit en quelques mois et fait un
+adulte déguisé : on n'en met que de durable, et la liste se valide avec de vrais lycéens.
 
 Chaque mot est expliqué dans `src/lib/glossary.ts`, ouvert depuis le « ? » de la Pioche, depuis Moi
 (« Le lexique de Braise ») et par une astuce au premier Déclic. Un seul mot par chose : pas de « Pass
