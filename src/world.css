@@ -300,11 +300,6 @@
 .app-shell.dark .world {
   --sky: color-mix(in srgb, var(--subject) 24%, #0f1830);
 }
-.world-head {
-  position: relative;
-  z-index: 4;
-  padding: 14px var(--page-gutter) 0;
-}
 .world-body {
   position: relative;
   display: flex;
@@ -638,34 +633,6 @@
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
-.world-title {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-}
-.world-title p {
-  margin: 0;
-  /* On the subject's own tint (blue, violet, indigo...), which is darker than the cream: more ink. */
-  color: color-mix(in srgb, var(--neo-orange) 55%, var(--ink) 45%);
-  font:
-    800 0.7rem/1.1 "IBM Plex Mono",
-    monospace;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.world-title h2 {
-  margin: 6px 0 0;
-  color: #151821;
-  font: 400 clamp(1.6rem, 8vw, 2.1rem) / 1 var(--font-impact);
-}
-.app-shell.dark .world-title h2 {
-  color: #fff;
-}
-
-/* the "Où on va ?" screen: title and the one button under Braise's line */
-
 /* No tab bar on a subject's pages: nothing to reserve room for under the sea. */
 .app-content:has(.world) {
   padding-bottom: 0;
@@ -825,13 +792,6 @@
   height: 22px;
   padding: 0 4px;
   font-size: 0.7rem;
-}
-.hub-caption {
-  margin: 2px 0 0;
-  color: var(--ink-soft);
-  font-size: 0.85rem;
-  font-weight: 700;
-  line-height: 1.3;
 }
 
 /* the key to the flags sits under the islands: each island already says its state in a word */

@@ -30,11 +30,7 @@ export const COPY = {
     /** The card that says what waits for a refresh (the sum of the pastilles on the worlds). */
     dueTitle: L("À rallumer", "Elles t'attendent"),
     dueSub: (n: number) =>
-      L(`${n} truc${plural(n)}, sans pression.`, `${n} truc${plural(n)} à remettre en place.`),
-    subjectsIntro: L(
-      "Choisis ce que tu veux comprendre aujourd’hui.",
-      "Choisis ton terrain. Je ne décide pas à ta place (pour une fois).",
-    ),
+      L(`${n} truc${plural(n)}.`, `${n} truc${plural(n)} à remettre en place.`),
   },
 
   /** A subject's library: what Braise says in the strip under the map, at the one course it points at. */
@@ -60,27 +56,9 @@ export const COPY = {
       ),
     allSet: L(
       "Tout est dans la poche ici. Tu peux souffler, ou rejouer pour le plaisir.",
-      "Tout est acquis. Je n'ai plus rien à redire. Étonnant.",
+      "Tout est dans la poche. Je n'ai plus rien à redire. Étonnant.",
     ),
     moreComing: L("D'autres cours arrivent bientôt.", "D'autres cours arrivent. Patience."),
-  },
-
-  /** "Où on va ?": the title of an archipelago, and the line under the worlds on Aujourd'hui. */
-  world: {
-    title: L("Où on va ?", "Alors, on va où ?"),
-    teaserNew: L(
-      "Six matières, toutes ouvertes. Choisis celle qui te fait envie.",
-      "Six matières, aucune verrouillée. Même toi, tu en trouveras une qui te plaît.",
-    ),
-    /** Under "Tes cours" when notions wait: what the number on a world means, said once. */
-    teaserDue: L(
-      "Le chiffre sur un monde : ce qu'il y a à rallumer.",
-      "Le chiffre sur un monde : ce qui est à remettre en place.",
-    ),
-    teaserBack: L(
-      "Tes mondes sont là. Reprends où tu veux.",
-      "Tes mondes t'attendent. Ils sont patients, eux.",
-    ),
   },
 
   /** Braise asks to come and see the student now and then (see NOTIFICATIONS.md). The reminders' own texts

@@ -166,8 +166,8 @@ export function buildDemoData(now: number): Record<string, string> {
     hapticsOn: false,
     user: {
       name: DEMO_NAME,
-      level: "seconde",
-      levelLabel: "Seconde",
+      level: "2nde",
+      levelLabel: "2nde",
       goal: "regulier",
       subjects: ["maths", "francais", "svt"],
       avatar: "flambe",

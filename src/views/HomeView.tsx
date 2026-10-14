@@ -117,15 +117,6 @@ export function HomeView() {
     setIntoxDismissedCount(dueTotal);
     setIntoxDismissedCountState(dueTotal);
   };
-  const startedAny =
-    state.completedChapters.length > 0 || Object.keys(state.cardReviews).length > 0;
-  const teaserSays =
-    dueTotal > 0
-      ? t(COPY.world.teaserDue)
-      : startedAny
-        ? t(COPY.world.teaserBack)
-        : t(COPY.world.teaserNew);
-
   // Braise asks, once the student has had a taste of the app, if she can come and see them; and when her
   // messages went unanswered three times, she says she went quiet. Never both, never twice in a row.
   const notif = useNotifState();
@@ -201,7 +192,10 @@ export function HomeView() {
             />
           </motion.div>
 
-          {showDueCard && (
+          {/* One secondary block at a time: Braise's request is rare and passes (it has its own cooldown),
+              the due card is there almost every day: so the request takes the card's place while it is open,
+              otherwise it would never be seen. */}
+          {showDueCard && !(braked || invite) && (
             <motion.div variants={staggerItem}>
               <DueCard
                 count={dueTotal}
@@ -216,13 +210,9 @@ export function HomeView() {
 
           <motion.div variants={staggerItem} className="space-y-3">
             <div>
-              <span className="font-mono text-[0.7rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">
-                Explorer
-              </span>
               <h2 className="font-display text-[1.15rem] font-extrabold leading-tight text-[var(--ink)]">
                 Tes mondes
               </h2>
-              <p className="hub-caption">{teaserSays}</p>
             </div>
             <Hub
               worlds={worlds}

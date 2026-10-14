@@ -72,11 +72,11 @@ function Archipel() {
   if (!subject || !library) {
     return (
       <div>
-        <TopBar title={t(COPY.world.title)} onBack={goBack} />
+        <TopBar title="Oups" onBack={goBack} />
         <div className="view is-active lib-view">
           <p className="lib-allset">
             <BraiseMascot size={44} mood="hesitant" />
-            <span>Je ne trouve pas cette matière. Retourne au choix des matières.</span>
+            <span>Je ne trouve pas cette matière. Retourne à l’accueil.</span>
           </p>
         </div>
       </div>
@@ -103,12 +103,15 @@ function Archipel() {
     ),
   }));
 
+  // Said only to the students the content does not reach yet (Première, Terminale).
+  const beyondContent = state.user.level === "1ere" || state.user.level === "term";
+
   const selected = library.entries.find((e) => e.key === selectedKey) ?? null;
   return (
     <div>
-      {/* The bar holds the way to any other subject; the page says where we are. */}
+      {/* The bar names the subject and holds the way to any other one: nothing else repeats it. */}
       <TopBar
-        title={t(COPY.world.title)}
+        title={subject.name}
         onBack={goBack}
         below={
           <SubjectStrip
@@ -130,17 +133,10 @@ function Archipel() {
           sfx.tap(state.soundOn);
           setSelectedKey((current) => (current === key ? null : key));
         }}
-        header={
-          <div className="world-title">
-            <div>
-              <h2>{subject.name}</h2>
-            </div>
-          </div>
-        }
         soon={
           <>
             <b>{t(COPY.library.moreComing)}</b>
-            <span>{CONTENT_LEVEL_NOTE}</span>
+            {beyondContent && <span>{CONTENT_LEVEL_NOTE}</span>}
           </>
         }
         dock={

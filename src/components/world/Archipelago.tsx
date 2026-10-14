@@ -43,7 +43,6 @@ export function Archipelago({
   suggestedKey,
   selectedKey,
   onSelect,
-  header,
   dock,
   soon,
 }: {
@@ -52,7 +51,6 @@ export function Archipelago({
   suggestedKey: string | null;
   selectedKey: string | null;
   onSelect: (key: string) => void;
-  header: ReactNode;
   dock: ReactNode;
   /** A line under the last island: what is still to come. */
   soon?: ReactNode;
@@ -89,7 +87,6 @@ export function Archipelago({
       style={{ ["--subject" as string]: color } as CSSProperties}
       aria-label="Carte des cours"
     >
-      <div className="world-head">{header}</div>
       <div className="world-body">
         <span className="wd-sun" aria-hidden="true" />
         {Array.from({ length: clouds }, (_, i) => (

@@ -266,15 +266,15 @@ sont pas des preuves d'apprentissage.
 Principe : **on paye le comportement qui fait retenir, pas le temps passé.** Jamais de perte de
 points ni de ton culpabilisant ; rien à farmer ; chaque gain a une raison visible.
 
-| Action | XP | Condition |
-| --- | --- | --- |
-| Chapitre Déclic terminé | 50 | première fois seulement |
-| Carte nouvelle | 10 | première fois qu'on la voit |
-| **Carte retrouvée** | 15 | juste, une fois le délai de la répétition espacée écoulé |
-| Revanche | +5 (20 au total) | juste, sur une carte ratée la fois d'avant |
-| Revue rapide | 3 | carte revue avant son échéance : de l'entraînement, pas une preuve |
-| Joker ×2 | double le gain | après 2 bonnes réponses d'affilée |
-| Coffre du jour | +20 | une fois par jour, au moment où l'objectif est atteint |
+| Action                  | XP               | Condition                                                          |
+| ----------------------- | ---------------- | ------------------------------------------------------------------ |
+| Chapitre Déclic terminé | 50               | première fois seulement                                            |
+| Carte nouvelle          | 10               | première fois qu'on la voit                                        |
+| **Carte retrouvée**     | 15               | juste, une fois le délai de la répétition espacée écoulé           |
+| Revanche                | +5 (20 au total) | juste, sur une carte ratée la fois d'avant                         |
+| Revue rapide            | 3                | carte revue avant son échéance : de l'entraînement, pas une preuve |
+| Joker ×2                | double le gain   | après 2 bonnes réponses d'affilée                                  |
+| Coffre du jour          | +20              | une fois par jour, au moment où l'objectif est atteint             |
 
 - **Objectif du jour** : Tranquille 40, Régulier 80, À fond 150 XP — de quoi faire un Déclic et
   quelques cartes. Le gain de Réviser affiche sa raison sur la carte (« Retrouvée ! », « Revanche ! »).
@@ -318,19 +318,19 @@ au reste sans répéter les mêmes informations.
 
 ### Placement de chaque fonction
 
-| Fonction | Lieu principal | Rappel autorisé sur Aujourd'hui |
-| --- | --- | --- |
-| Activité en cours | Matière ou activité | Carte prioritaire « Reprendre » |
-| Pioche du Jour | Aujourd'hui | Carte compacte si rien n'est en cours |
-| Objectif quotidien | Aujourd'hui | Ligne de progression légère |
-| Notions dues | Réviser | Une relance « À consolider » si nécessaire |
-| Matières et chapitres | Aujourd'hui (aperçu) | Aperçu limité et accès « Tout voir » |
-| Série | Aura | Compteur compact dans l'en-tête |
-| Aura et rang | Aura | Destination principale, jamais un sous-écran de Moi |
-| Joker de série | Moi > Série | Seulement lorsqu'il est consommé ou nécessaire |
-| Badges et apparences | Moi | Célébration au déblocage |
-| Préférences et accessibilité | Moi > Mon confort | Aucun raccourci permanent sur l'accueil |
-| Partage | Résultat ou Moi | Jamais comme action concurrente sur l'accueil |
+| Fonction                     | Lieu principal      | Rappel autorisé sur Aujourd'hui                                                                                    |
+| ---------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Activité en cours            | Matière ou activité | Carte prioritaire « Reprendre »                                                                                    |
+| Pioche du Jour               | Aujourd'hui         | Carte compacte si rien n'est en cours                                                                              |
+| Objectif quotidien           | Aujourd'hui         | Ligne de progression légère                                                                                        |
+| Notions dues                 | Réviser             | Une carte « À rallumer » (le même nombre que sur les mondes), masquable                                            |
+| Matières et chapitres        | Aujourd'hui         | « Tes mondes » : un tap sur un monde ouvre l'archipel de la matière ; une bande de six disques y change de matière |
+| Série                        | Aura                | Compteur compact dans l'en-tête                                                                                    |
+| Aura et rang                 | Aura                | Destination principale, jamais un sous-écran de Moi                                                                |
+| Joker de série               | Moi > Série         | Seulement lorsqu'il est consommé ou nécessaire                                                                     |
+| Badges et apparences         | Moi                 | Célébration au déblocage                                                                                           |
+| Préférences et accessibilité | Moi > Mon confort   | Aucun raccourci permanent sur l'accueil                                                                            |
+| Partage                      | Résultat ou Moi     | Jamais comme action concurrente sur l'accueil                                                                      |
 
 ### Priorité contextuelle d'Aujourd'hui
 

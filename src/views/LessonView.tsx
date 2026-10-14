@@ -76,7 +76,7 @@ function ScriptLessonView() {
 
         {storyData && (
           <div style={{ marginTop: 24 }}>
-            <div className="section-title">Vérifie tes acquis</div>
+            <div className="section-title">Vérifie que t’as capté</div>
             <Quiz questions={storyData.quiz} soundOn={state.soundOn} onComplete={handleComplete} />
           </div>
         )}

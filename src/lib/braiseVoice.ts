@@ -369,8 +369,8 @@ export function profileReactionLine(
         `Série de ${streak} jour${streak > 1 ? "s" : ""} en cours, rang ${rankName}. J'suis fan de la régularité.`,
       ],
       "chill-lycee": [
-        `Rang ${rankName}, ${streak} jour${streak > 1 ? "s" : ""} d'affilée. La régularité paie, continue.`,
-        `${badgesUnlocked}/${badgesTotal} badges, série de ${streak}. Beau parcours jusqu'ici.`,
+        `Rang ${rankName}, ${streak} jour${streak > 1 ? "s" : ""} d'affilée. Ça tient.`,
+        `${badgesUnlocked}/${badgesTotal} badges, série de ${streak}. Ça se remplit.`,
       ],
       "savage-college": [
         `${streak} jour${streak > 1 ? "s" : ""} de suite et rang ${rankName}. Ok, je suis un peu impressionné.`,

@@ -3,9 +3,9 @@ import type { DotState, EntrySource } from "@/lib/catalog/catalog";
 const DOT_LABEL: Record<DotState, string> = {
   empty: "pas encore",
   half: "commencé",
-  full: "compris",
-  gold: "acquis",
-  warn: "à renforcer",
+  full: "capté",
+  gold: "dans la poche",
+  warn: "fragile",
 };
 
 /** One pastille per step of a course: a Déclic for a chapter of the programme, or the lesson then
