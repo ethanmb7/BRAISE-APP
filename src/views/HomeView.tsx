@@ -8,14 +8,13 @@ import { useTone } from "@/lib/useTone";
 import { useCourseProgress } from "@/lib/course/useCourseProgress";
 import { useCourseMastery } from "@/lib/course/useCourseMastery";
 import { buildLibrary, type Library } from "@/lib/catalog/catalog";
-import { dueInLibrary, pickGlobalResume } from "@/lib/world/resume";
-import type { HubWorld } from "@/components/world/Hub";
+import { dueInLibrary, pickGlobalResume, verbFor } from "@/lib/world/resume";
+import { Hub, type HubWorld } from "@/components/world/Hub";
 import { fireConfetti } from "@/lib/confetti";
 import { LevelSheet } from "@/components/LevelSheet";
 import { HeaderHUD } from "@/components/HeaderHUD";
 import { HeroPiocheCard } from "@/components/HeroPiocheCard";
 import { MissedCardsBanner } from "@/components/MissedCardsBanner";
-import { WorldsTeaser } from "@/components/world/WorldsTeaser";
 import { BrakeCard, MomentSheet, NotifInvite } from "@/components/notifications/Reminders";
 import { useReminders } from "@/components/notifications/useReminders";
 import { frequencyFromGoal, isBraked } from "@/lib/notifications/model";
@@ -117,7 +116,10 @@ export function HomeView() {
       shortName: SUBJECT_SHORT_NAMES[s.id] ?? s.name,
       color: s.color,
       due: library ? dueInLibrary(library) : 0,
-      suggested: false,
+      suggestion:
+        pick?.subjectId === s.id && pick.resume
+          ? { verb: verbFor(pick.resume), chapter: pick.resume.entry.title }
+          : undefined,
     };
   });
   const dueTotal = worlds.reduce((sum, w) => sum + w.due, 0);
@@ -239,18 +241,16 @@ export function HomeView() {
                 Tes cours
               </h2>
             </div>
-            <WorldsTeaser
+            <Hub
               worlds={worlds}
-              says={teaserSays}
-              onOpenAll={() => {
-                sfx.tap(state.soundOn);
-                setTab("subjects");
-              }}
-              onOpenSubject={(id) => {
+              braiseMood="happy"
+              compact
+              onSelect={(id) => {
                 sfx.tap(state.soundOn);
                 openSubject(id);
               }}
             />
+            <p className="hub-caption">{teaserSays}</p>
           </motion.div>
         </motion.div>
       </div>

@@ -37,16 +37,7 @@ describe("world.css: written things stay in the flow", () => {
     ".dock-says",
     ".state-key",
     ".state-key li",
-    ".sheet-head",
-    ".sheet-title",
-    ".sheet-says",
-    ".sheet-list",
-    ".sheet-row",
-    ".sheet-text",
-    ".sheet-all",
     ".planet-tag",
-    ".info-note",
-    ".hub-legend",
   ])("%s is not absolutely positioned", (selector) => {
     expect(ruleOf(selector)).not.toMatch(/position\s*:\s*absolute/);
   });

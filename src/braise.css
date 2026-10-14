@@ -453,6 +453,14 @@ select {
   -webkit-backdrop-filter: blur(16px) saturate(1.15);
   z-index: 30;
 }
+.topbar:has(.topbar-below) {
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+.topbar-below {
+  flex: 1 1 100%;
+  min-width: 0;
+}
 .topbar h1 {
   font-size: 1.28rem;
   font-weight: 800;

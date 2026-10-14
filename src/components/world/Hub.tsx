@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { BraiseMascot } from "@/components/BraiseMascot";
+import { StreakFlameIcon } from "@/components/StreakFlameIcon";
 import { SubjectIcon } from "@/components/SubjectIcon";
 import { hubPlaces } from "@/lib/world/layout";
 import { fitOrbit, type Orbit } from "@/lib/world/orbit";
@@ -81,7 +82,6 @@ function Planet({
         } as CSSProperties
       }
       onClick={() => onSelect(world.id)}
-      aria-haspopup="dialog"
       aria-label={`${world.name}${world.due > 0 ? `, ${world.due} notion${world.due > 1 ? "s" : ""} à rafraîchir` : ""}${suggestion ? `, Braise te conseille : ${suggestion.verb.toLowerCase()} ${suggestion.chapter}` : ""}`}
       // The worlds arrive one after the other, once; a press then sinks them a little.
       initial={still ? false : { opacity: 0, scale: 0.8 }}
@@ -118,20 +118,23 @@ function Planet({
   );
 }
 
-/** "Où on va ?" as a small solar system: the worlds go around the sun (a hexagon of places, then the
- *  corners, see `hubPlaces`) on a dashed orbit that passes through the first six. A world is the button:
- *  touching it opens its chapters. Braise is the sun, always there with the student; the world she
- *  suggests is bigger, ringed, has a moon, and carries the verb she would use ("Reprendre →"). A
- *  pastille counts what waits for a refresh. Built in the flow (a
- *  grid whose cells hold a world and its name), so no phone size or text size can lay a name over
- *  another world: the orbit is drawn afterwards, through where the worlds actually ended up. */
+/** The worlds as a small solar system, on Aujourd'hui: the subjects go around the sun (a hexagon of places,
+ *  then the corners, see `hubPlaces`) on a dashed orbit that passes through the first six. A world is the
+ *  button: touching it opens its archipelago. The one Braise suggests is bigger, ringed, has a moon, and
+ *  carries the verb she would use ("Reprendre →"). A pastille counts what waits for a refresh. Built in
+ *  the flow (a grid whose cells hold a world and its name), so no phone size or text size can lay a name
+ *  over another world: the orbit is drawn afterwards, through where the worlds actually ended up. */
 export function Hub({
   worlds,
   braiseMood,
+  compact = false,
   onSelect,
 }: {
   worlds: HubWorld[];
   braiseMood: "happy" | "eager" | "proud" | "hesitant";
+  /** The small version on Aujourd'hui: smaller worlds, and the sun is a flame (Braise is already in the
+   *  Pioche card: one Braise per screen), and the screen does not scroll by itself. */
+  compact?: boolean;
   onSelect: (id: string) => void;
 }) {
   const places = hubPlaces(worlds.length);
@@ -142,7 +145,7 @@ export function Hub({
 
   // On a short phone the suggested world can be under the tab bar: bring it into view once, on arrival.
   useEffect(() => {
-    if (!suggestedId) return;
+    if (!suggestedId || compact) return;
     const frame = requestAnimationFrame(() => {
       const scroller = document.querySelector<HTMLElement>(".app-content");
       const target = stage.current?.querySelector<HTMLElement>(".planet.is-suggested");
@@ -183,7 +186,7 @@ export function Hub({
   }, [worlds.length]);
 
   return (
-    <div className="hub">
+    <div className={`hub${compact ? " hub--compact" : ""}`}>
       <div className="hub-stage" ref={stage}>
         {STARS.map((star, i) => (
           <Sparkle key={i} {...star} />
@@ -215,9 +218,15 @@ export function Hub({
         <div className="hub-center" aria-hidden="true">
           <i className="hub-rays" />
           <span className="hub-sun" />
-          <span className="hub-braise">
-            <BraiseMascot size={104} mood={braiseMood} />
-          </span>
+          {compact ? (
+            <span className="hub-flame">
+              <StreakFlameIcon size={44} />
+            </span>
+          ) : (
+            <span className="hub-braise">
+              <BraiseMascot size={104} mood={braiseMood} />
+            </span>
+          )}
         </div>
         {worlds.map((w, i) => (
           <Planet

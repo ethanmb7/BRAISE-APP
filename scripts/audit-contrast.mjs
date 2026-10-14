@@ -29,34 +29,24 @@ const EMOJI_ONLY = /^[\p{Extended_Pictographic}\p{Emoji_Presentation}✦·\s]+$/
 
 const SCREENS = [
   ["home", { view: "home", tab: "home" }],
-  ["hub", { view: "subjects", tab: "subjects" }],
-  // the chapters of the world Braise suggests, opened by touching it
-  [
-    "hub, volet",
-    { view: "subjects", tab: "subjects" },
-    `document.querySelector(".planet.is-suggested")?.click()`,
-  ],
   ["revisions", { view: "revisions", tab: "revisions" }],
   ["aura", { view: "progres", tab: "progres" }],
   ["moi", { view: "profile", tab: "profile" }],
   ["settings", { view: "settings", tab: "profile" }],
-  ["matiere", { view: "subject", tab: "subjects", currentSubjectId: "maths" }],
+  ["matiere", { view: "subject", tab: "home", currentSubjectId: "maths" }],
 ];
 const DECLICS = [
   [
     "declic",
     {
       view: "lesson",
-      tab: "subjects",
+      tab: "home",
       currentSubjectId: "histoire-geo",
       currentChapterId: "h3",
       completedChapters: [],
     },
   ],
-  [
-    "cours",
-    { view: "lesson", tab: "subjects", currentSubjectId: "maths", currentChapterId: "M2-ARI" },
-  ],
+  ["cours", { view: "lesson", tab: "home", currentSubjectId: "maths", currentChapterId: "M2-ARI" }],
 ];
 
 const PAGE_AUDIT = `(() => {

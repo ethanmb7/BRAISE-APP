@@ -692,244 +692,16 @@
   outline-offset: 2px;
 }
 
-/* What the number on a world means, said once. */
-.hub-legend {
-  margin: 0 8px 2px;
-  color: var(--ink-soft);
-  font-size: 0.78rem;
-  font-weight: 700;
-  line-height: 1.35;
-  text-align: center;
-  text-wrap: balance;
-}
-/* A dashed note: something to know, not another place to go (as .wd-soon under the last island). */
-.info-note {
-  margin: 0 2px 12px;
-  padding: 11px 14px;
-  border: 2.5px dashed color-mix(in srgb, var(--neo-ink) 55%, transparent);
-  border-radius: 18px;
-  background: color-mix(in srgb, var(--paper) 55%, transparent);
-  color: var(--ink);
-  font-size: 0.8rem;
-  font-weight: 700;
-  line-height: 1.4;
-  text-align: center;
-  text-wrap: balance;
-}
+/* ----- the subject strip, under the top bar of an archipelago ------------------------------- */
 
-/* ----- the chapters of a world, opened by touching it on "Où on va ?" -------------------------- */
-
-.world-veil {
-  position: absolute;
-  inset: 0;
-  z-index: 55;
-  background: color-mix(in srgb, var(--bg) 62%, transparent);
-}
-.world-sheet {
-  position: absolute;
-  inset-inline: 10px;
-  z-index: 60;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  overflow-y: auto;
-  padding: 12px 14px 14px;
-  border: 3px solid var(--neo-ink);
-  border-radius: 20px;
-  background: var(--paper);
-  box-shadow: 4px 4px 0 var(--neo-ink);
-  color: var(--ink);
-  outline: none;
-}
-.sheet-top {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.sheet-dot {
-  display: grid;
-  flex: 0 0 auto;
-  width: 40px;
-  height: 40px;
-  place-items: center;
-  border: 3px solid var(--neo-ink);
-  border-radius: 50%;
-  background: var(--subject);
-  box-shadow: 2px 2px 0 var(--neo-ink);
-}
-.sheet-dot svg {
-  width: 22px;
-  height: 22px;
-  padding: 2px;
-  border-radius: 50%;
-  background: #fff;
-  box-sizing: content-box;
-}
-.sheet-head {
-  display: grid;
-  min-width: 0;
-  flex: 1;
-  justify-items: start;
-  gap: 4px;
-}
-.sheet-title {
-  min-width: 0;
-  margin: 0;
-  font: 400 1.15rem/1.05 var(--font-impact);
-  overflow-wrap: anywhere;
-}
-.sheet-due {
-  white-space: nowrap;
-}
-.sheet-close {
-  display: grid;
-  flex: 0 0 auto;
-  width: 44px;
-  height: 44px;
-  place-items: center;
-  border: 2.5px solid var(--neo-ink);
-  border-radius: 50%;
-  background: var(--paper);
-}
-/* Braise's line, for the world she suggests: a dashed note (as .info-note), with her flame, not a second Braise. */
-.sheet-says {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 0;
-  padding: 9px 11px;
-  border: 2.5px dashed var(--neo-ink);
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--sun) 30%, var(--paper));
-  font-size: 0.82rem;
-  font-weight: 700;
-  line-height: 1.3;
-}
-.sheet-flame {
-  flex: 0 0 auto;
-  width: 20px;
-  height: 20px;
-}
-.sheet-list {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.sheet-row {
-  display: flex;
-  width: 100%;
-  min-height: 54px;
-  align-items: center;
-  gap: 9px;
-  padding: 6px 10px;
-  border: 2.5px solid var(--neo-ink);
-  border-radius: 12px;
-  background: var(--paper);
-  box-shadow: 2px 2px 0 var(--neo-ink);
-  color: var(--ink);
-  text-align: left;
-}
-.sheet-row.is-resume {
-  background: color-mix(in srgb, var(--sun) 28%, var(--paper));
-}
-.sheet-row:active {
-  box-shadow: none;
-  transform: translate(2px, 2px);
-}
-.sheet-text {
-  display: grid;
-  min-width: 0;
-  flex: 1;
-  gap: 1px;
-}
-.sheet-text b {
-  font-size: 0.9rem;
-  line-height: 1.2;
-}
-/* The hook goes on two lines rather than being cut. */
-.sheet-text small {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  color: var(--ink-soft);
-  font-size: 0.76rem;
-  font-weight: 600;
-  line-height: 1.3;
-}
-.sheet-row .isl-tag {
-  flex: 0 0 auto;
-  white-space: nowrap;
-}
-.sheet-all {
-  min-height: 44px;
-  color: var(--ink-soft);
-  font:
-    800 0.74rem/1 "IBM Plex Mono",
-    monospace;
-  letter-spacing: 0.04em;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  text-transform: uppercase;
-}
-.sheet-row:focus-visible,
-.sheet-close:focus-visible,
-.sheet-all:focus-visible {
-  outline: 3px solid var(--neo-orange);
-  outline-offset: 2px;
-}
-@keyframes sheet-in {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .app-shell:not(.dyslexia-mode) .world-sheet {
-    animation: sheet-in 0.22s ease-out both;
-  }
-}
-
-/* ----- the way into the courses, on Aujourd'hui ------------------------------------------------ */
-
-.teaser {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 12px;
-  padding: 14px;
-  border: 3px solid var(--neo-ink);
-  border-radius: 20px;
-  background: var(--paper);
-  box-shadow: 4px 4px 0 var(--neo-ink);
-  color: var(--ink);
-}
-.teaser-top {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.teaser-braise {
-  flex: 0 0 auto;
-}
-.teaser-says {
-  margin: 0;
-  font-size: 0.88rem;
-  font-weight: 700;
-  line-height: 1.3;
-}
-.teaser-row {
+.strip {
   display: flex;
   justify-content: space-between;
   gap: 4px;
+  padding-block: 2px 4px;
 }
-/* 48px when there is room, never under 44px (six worlds fit a 360px phone) */
-.teaser-world {
+/* 44px at least (six fit a 320px phone), 48px when there is room */
+.strip-disc {
   position: relative;
   display: grid;
   width: 48px;
@@ -942,7 +714,7 @@
   background: var(--subject);
   box-shadow: 2px 2px 0 var(--neo-ink);
 }
-.teaser-world svg {
+.strip-disc svg {
   width: 24px;
   height: 24px;
   padding: 3px;
@@ -950,7 +722,13 @@
   background: #fff;
   box-sizing: content-box;
 }
-.teaser-due {
+/* the subject you are in: pressed in, ringed */
+.strip-disc.is-current {
+  box-shadow:
+    0 0 0 3px var(--paper),
+    0 0 0 6px var(--neo-ink);
+}
+.strip-due {
   position: absolute;
   right: -3px;
   top: -3px;
@@ -960,28 +738,9 @@
   border-radius: 50%;
   background: var(--coral);
 }
-.teaser-cta {
-  display: flex;
-  min-height: 52px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 0 16px;
-  border: 3px solid var(--neo-ink);
-  border-radius: 14px;
-  background: var(--orange-fill);
-  box-shadow: 3px 3px 0 var(--neo-ink);
-  color: var(--on-orange);
-  font: 400 0.95rem/1.1 var(--font-impact);
-}
-.teaser-cta:active {
-  box-shadow: none;
-  transform: translate(2px, 2px);
-}
-.teaser-world:focus-visible,
-.teaser-cta:focus-visible {
+.strip-disc:focus-visible {
   outline: 3px solid var(--neo-orange);
-  outline-offset: 3px;
+  outline-offset: 5px;
 }
 
 /* ----- the header of a main screen ------------------------------------------------------------- */
@@ -1006,4 +765,65 @@
   margin: 6px 0 0;
   color: var(--ink);
   font: 400 clamp(1.6rem, 8vw, 2.1rem) / 1 var(--font-impact);
+}
+
+/* ----- the solar system on Aujourd'hui (the compact Hub) --------------------------------------- */
+/* The same worlds, smaller, in a card like the others. The sun is a flame (Braise is in the Pioche card
+   above: one Braise per screen). A world opens its archipelago straight away. */
+
+.hub.hub--compact {
+  margin-inline: 0;
+}
+.hub--compact .hub-stage {
+  row-gap: 8px;
+  padding: 6px 6px 8px;
+  border: 3px solid var(--neo-ink);
+  border-radius: 20px;
+  background: color-mix(in srgb, #7c8cff 14%, var(--paper));
+  box-shadow: 4px 4px 0 var(--neo-ink);
+}
+.hub--compact .hub-center {
+  max-width: 96px;
+}
+.hub-flame {
+  position: relative;
+  display: grid;
+  width: 40%;
+  place-items: center;
+}
+.hub-flame svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.hub--compact .planet-ball {
+  width: clamp(44px, 14.5cqw, 58px);
+}
+.hub--compact .planet.is-suggested .planet-ball {
+  width: clamp(52px, 17cqw, 68px);
+}
+.hub--compact .planet-label {
+  padding: 2px 6px 3px;
+  font-size: 0.7rem;
+  box-shadow: 1.5px 1.5px 0 var(--neo-ink);
+}
+.hub--compact .planet-meta {
+  gap: 5px;
+}
+.hub--compact .planet-tag {
+  padding: 3px 8px 4px;
+  font-size: 0.7rem;
+}
+.hub--compact .planet-due {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 4px;
+  font-size: 0.7rem;
+}
+.hub-caption {
+  margin: 8px 2px 0;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.3;
 }

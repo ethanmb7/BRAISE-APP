@@ -17,7 +17,7 @@ est le geste : un objet qu'on touche s'enfonce de la hauteur de son ombre.
 
 ## Un seul en-tête par écran principal
 
-Un écran principal (Aura, Moi, « Où on va ? ») s'ouvre sur `PageHeader` : le nom de l'espace en petites
+Un écran principal (Aura, Moi) s'ouvre sur `PageHeader` : le nom de l'espace en petites
 lettres orange, puis le titre de la page. **Pas de bouton retour** : il n'y a nulle part où retourner. Un
 écran ouvert depuis un autre (Paramètres, une matière, un cours) utilise `TopBar` avec son retour.
 
@@ -101,44 +101,36 @@ BRAISE » ni de noms de formes qui doublent les rangs. Jamais de « classement �
 Une notion « à rafraîchir » n'est jamais « en retard ». Un rappel est une invitation, jamais une alarme
 ni un compte à rebours.
 
-## Matières : « Où on va ? » et l'archipel d'une matière
+## Matières : le système solaire de l'accueil et l'archipel d'une matière
 
-- **Deux écrans, deux en-têtes.** « Où on va ? » est un écran principal : `PageHeader`, ni barre ni retour
-  (l'onglet Aujourd'hui ramène). L'archipel d'une matière est un écran ouvert depuis lui : `TopBar` dont le
-  titre dit où va le retour (« Où on va ? »), pendant que la page dit où l'on est (« L'archipel »,
-  « Mathématiques »). Le mot « Matières » n'apparaît plus : l'app dit « mondes ».
-- **Le travail de la page : l'élève choisit lui-même sa matière et son chapitre, vite.** Elle ne recommande
-  pas : la recommandation est la Pioche de l'accueil. Aucune carte de conseil, aucun bouton : **les mondes
-  sont les seules commandes.** Toucher un monde ouvre la liste de ses chapitres (`WorldSheet`), et la ligne
-  d'un chapitre le lance : deux taps depuis les mondes. « Voir tout l'archipel » garde la promenade.
-- **Braise est le soleil,** toujours là avec l'élève ; elle n'est pas un bouton. Le monde qu'elle conseille
-  est marqué dans la scène : plus grand, cerclé, avec sa lune, et un **verbe** (« Reprendre → », « Commencer
-  → ») collé au monde. Sa phrase attend dans le volet de ce monde, avec une flamme sur le chapitre qu'elle
-  reprendrait. Jamais de seconde Braise sur la page.
-- **Le verbe dit ce qui se passe.** Il ouvre le chapitre, donc : Reprendre, Renforcer, Retrouver, Commencer,
-  Continuer. **Jamais « Réviser »** : c'est le nom d'un onglet (la session de cartes). Un mot, un sens.
-- **Un seul avis.** Le hub, l'archipel et la Pioche de l'accueil lisent la même fonction (`pickResume`,
-  `pickGlobalResume`, `resumeRank`) : un Déclic touché depuis moins de deux jours (« Reprendre »), des notions
-  à retrouver, un point qui se mélange, un ancien Déclic, puis du nouveau. Aucun tirage au hasard.
-- **Au repos, deux choses bougent au plus.** Hub : la lente dérive des mondes et la lune du monde conseillé.
+- **Pas de page de choix.** Choisir une matière ne passe pas par un écran à part : un élève qui veut aller
+  quelque part y arrive en **un tap** depuis l'accueil. Le système solaire vit sur Aujourd'hui, sous la
+  Pioche (`Hub` en mode `compact`) ; toucher un monde ouvre **directement l'archipel** de la matière.
+- **Un seul avis.** La Pioche, le monde marqué « Reprendre → » sur l'accueil et l'île conseillée de l'archipel
+  lisent la même fonction (`pickResume`, `pickGlobalResume`, `resumeRank`) : un Déclic touché depuis moins de
+  deux jours (« Reprendre »), des notions à retrouver, un point qui se mélange, un ancien Déclic, puis du
+  nouveau. Aucun tirage au hasard.
+- **Une seule Braise par écran.** Sur l'accueil elle est dans la Pioche : le soleil du système est une flamme.
+  Le monde qu'elle conseille est plus grand, cerclé, avec sa lune, et un **verbe** collé au monde. Le verbe
+  dit ce qui se passe (Reprendre, Renforcer, Retrouver, Commencer, Continuer) : **jamais « Réviser »**, nom d'un
+  onglet (la session de cartes).
+- **La bande de matières** (`SubjectStrip`) est dans la barre du haut de l'archipel, donc collée à l'écran :
+  six disques, celui où l'on est cerclé, une pastille sur les autres qui ont des notions à rafraîchir. Toucher
+  un autre disque ouvre son archipel sans repasser par l'accueil. Mêmes disques, même ordre que sur l'accueil.
+  44 px au minimum (six tiennent à 320 px).
+- **Jamais la couleur seule.** Chaque île dit son état en un mot, teinté comme le drapeau ; la légende des
+  drapeaux, en haut de la carte, liste ce qu'il y a sur cette carte.
+- **Au repos, deux choses bougent au plus.** Accueil : la lente dérive des mondes et la lune du monde conseillé.
   Archipel : seule l'île conseillée flotte. Ni rayons qui tournent, ni étoiles qui scintillent, ni orbite qui
-  défile. La vie vient de l'arrivée (les mondes entrent l'un après l'autre, une fois) et du toucher (le volet
-  monte en 0,22 s). Rien de tout cela sous « réduire les animations » ni en mode dyslexie.
+  défile. La vie vient de l'arrivée (les mondes entrent l'un après l'autre, une fois) et du toucher. Rien de
+  tout cela sous « réduire les animations » ni en mode dyslexie.
 - **Les mondes ont tous la même taille** ; seul le monde conseillé est plus grand : une taille dit une
-  importance, jamais un hasard. Le placement est piloté par la liste des matières, **jusqu'à dix** : l'hexagone
-  autour du soleil, puis les quatre coins libres (`hubPlaces`, testé) ; au-delà, la grille de cartes.
-- **Jamais la couleur seule.** Chaque île et chaque ligne du volet disent leur état en un mot, teinté comme le
-  drapeau ; la légende des drapeaux, en haut d'une carte, liste ce qu'il y a sur cette carte. Le chiffre rouge
-  d'un monde est expliqué une fois, sous le titre.
-- **Le volet** est une fenêtre de dialogue : le focus y entre, reste dedans (Tab), Échap ou un toucher à
-  côté le ferme, et le focus revient au monde. Il se pose au-dessus de la barre d'onglets, jamais plus haut
-  que la place disponible, et défile à l'intérieur sur un petit écran ou en texte très grand.
-- **Dire ce que BRAISE couvre avant d'entrer.** Un élève de 1ère ou de Terminale le lit en haut du hub ; tout
-  le monde le relit sous la dernière île.
-- **Pas de recherche** tant que la carte tient en une vingtaine de chapitres : elle ne ferait que répondre
-  « rien » (à réévaluer quand le catalogue grandit).
+  importance, jamais un hasard. Le placement est piloté par la liste des matières, **jusqu'à dix** (`hubPlaces`,
+  testé).
+- **Tout est construit dans le flux** (jamais à des coordonnées dessinées) : un nom vit dans la même boîte que
+  son image, donc de 320 à 430 px et en texte très grand rien ne se chevauche.
 
 ## La navigation
 
 Quatre espaces (Aujourd'hui, Réviser, Aura, Moi), décision du porteur du projet (voir
-`PRODUCT_VISION.md`). Les cours sont atteints depuis Aujourd'hui par « Tes cours » puis « Où on va ? ».
+`PRODUCT_VISION.md`). Les cours sont atteints depuis Aujourd'hui : un tap sur un monde de « Tes cours » ouvre l'archipel de la matière.

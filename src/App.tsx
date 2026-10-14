@@ -16,7 +16,6 @@ import { useCourseMastery } from "@/lib/course/useCourseMastery";
 import { FLASHCARDS } from "@/data";
 import { OnboardingView } from "@/views/OnboardingView";
 import { HomeView } from "@/views/HomeView";
-import { SubjectsView } from "@/views/SubjectsView";
 import { RevisionsView } from "@/views/RevisionsView";
 import { ProfilAuraView } from "@/views/ProfilAuraView";
 import { SubjectView } from "@/views/SubjectView";
@@ -49,11 +48,11 @@ function Screen() {
   // The floating dock stays through a review session too — it sits under the action row,
   // in its own glass layer, so it never competes with the verdict buttons for the thumb.
   useNotificationSync();
-  const ownsScroll = state.view === "subject" || state.view === "subjects";
+  const ownsScroll = state.view === "subject";
   const tabScreen = ["home", "revisions", "progres", "profile"].includes(state.view);
   useScrollMemory(loaded && tabScreen ? `view:${state.view}` : null, !ownsScroll);
 
-  const showTabBar = ["home", "subjects", "revisions", "progres", "profile"].includes(state.view);
+  const showTabBar = ["home", "revisions", "progres", "profile"].includes(state.view);
 
   if (!loaded) {
     return (
@@ -90,7 +89,6 @@ function Screen() {
         <ErrorBoundary key={state.view} onGoHome={() => setTab("home")}>
           {state.view === "onboarding" && <OnboardingView />}
           {state.view === "home" && <HomeView />}
-          {state.view === "subjects" && <SubjectsView />}
           {state.view === "revisions" && <RevisionsView />}
           {state.view === "progres" && <ProfilAuraView />}
           {state.view === "subject" && <SubjectView />}
@@ -101,9 +99,7 @@ function Screen() {
         </ErrorBoundary>
       </div>
 
-      {showTabBar && (
-        <TabBar active={state.tab === "subjects" ? "home" : state.tab} onChange={setTab} />
-      )}
+      {showTabBar && <TabBar active={state.tab} onChange={setTab} />}
 
       {/* Sits here, not inside HeroPiocheCard/HomeView — it needs to survive the exact unmount
           it's meant to cover. See PiocheRevealVeil for why. */}

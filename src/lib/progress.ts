@@ -140,13 +140,7 @@ export function resolveRestoredView(saved: Partial<AppState>): ViewId {
       return "home";
     return view;
   }
-  if (
-    view === "subjects" ||
-    view === "revisions" ||
-    view === "progres" ||
-    view === "profile" ||
-    view === "settings"
-  )
+  if (view === "revisions" || view === "progres" || view === "profile" || view === "settings")
     return view;
   return "home";
 }
@@ -155,7 +149,7 @@ export function resolveRestoredView(saved: Partial<AppState>): ViewId {
 // use it to know which tab "back" returns to — see goBack below), so it needs restoring too, not
 // just `view` — otherwise resuming into e.g. Revisions would show the right screen with the wrong
 // tab lit up, and a subsequent "back" from Subject/Settings would return to the wrong place.
-const TAB_IDS: readonly TabId[] = ["home", "subjects", "revisions", "progres", "profile"];
+const TAB_IDS: readonly TabId[] = ["home", "revisions", "progres", "profile"];
 const isTab = (v: string | undefined): v is TabId => TAB_IDS.includes(v as TabId);
 
 // Aura ('progres') is its own tab again — it used to be folded into Moi, and this used to send

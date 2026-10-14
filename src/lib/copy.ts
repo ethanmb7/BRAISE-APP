@@ -70,11 +70,9 @@ export const COPY = {
     moreComing: L("D'autres cours arrivent bientôt.", "D'autres cours arrivent. Patience."),
   },
 
-  /** "Où on va ?": the page itself. Braise's advice is not a card: the world she suggests is marked in the
-   *  scene, and her line waits in that world's sheet (`COPY.library.resumeSays` / `reviewSays`). */
+  /** "Où on va ?": the title of an archipelago, and the line under the worlds on Aujourd'hui. */
   world: {
     title: L("Où on va ?", "Alors, on va où ?"),
-    kicker: L("Choisis ton monde", "Choisis ton terrain"),
     teaserNew: L(
       "Six matières, toutes ouvertes. Choisis celle qui te fait envie.",
       "Six matières, aucune verrouillée. Même toi, tu en trouveras une qui te plaît.",
@@ -87,20 +85,6 @@ export const COPY = {
     teaserBack: L(
       "Tes cours sont là. Reprends où tu veux.",
       "Tes cours t'attendent. Ils sont patients, eux.",
-    ),
-    saysAllSet: L(
-      "Tout est au point. Choisis ce qui te fait envie.",
-      "Tout est au point. Je n'ai rien à redire. Étonnant.",
-    ),
-    /** What the red number on a world means, said once under Braise's line (only when there is one). */
-    legendDue: L(
-      "Le chiffre sur un monde, ce sont des notions à rafraîchir. Quand tu veux.",
-      "Le chiffre sur un monde, ce sont des notions à remettre en place. Quand tu veux.",
-    ),
-    /** For a student in Première or Terminale, before they go in: what BRAISE covers today. */
-    levelNote: L(
-      "Pour l'instant, BRAISE couvre les bases de la 2nde. La suite arrive. D'ici là, ces bases font un bon point de départ.",
-      "Pour l'instant, BRAISE couvre les bases de la 2nde. Le reste arrive. D'ici là, les bases ne te feront pas de mal.",
     ),
   },
 
