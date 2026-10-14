@@ -133,7 +133,6 @@ function Archipel() {
         header={
           <div className="world-title">
             <div>
-              <p>L’archipel</p>
               <h2>{subject.name}</h2>
             </div>
           </div>

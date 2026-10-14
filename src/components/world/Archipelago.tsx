@@ -89,10 +89,7 @@ export function Archipelago({
       style={{ ["--subject" as string]: color } as CSSProperties}
       aria-label="Carte des cours"
     >
-      <div className="world-head">
-        {header}
-        <StateKey entries={entries} />
-      </div>
+      <div className="world-head">{header}</div>
       <div className="world-body">
         <span className="wd-sun" aria-hidden="true" />
         {Array.from({ length: clouds }, (_, i) => (
@@ -142,6 +139,9 @@ export function Archipelago({
               </div>
             );
           })}
+        </div>
+        <div className="wd-key">
+          <StateKey entries={entries} />
         </div>
         {soon && entries.length > 0 && <p className="wd-soon">{soon}</p>}
         <svg className="wd-sea" viewBox="0 0 390 92" preserveAspectRatio="none" aria-hidden="true">

@@ -194,6 +194,27 @@ export function HomeView() {
             />
           </motion.div>
 
+          <motion.div variants={staggerItem} className="space-y-3">
+            <div>
+              <span className="font-mono text-[0.7rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">
+                Apprendre
+              </span>
+              <h2 className="font-display text-[1.15rem] font-extrabold leading-tight text-[var(--ink)]">
+                Tes cours
+              </h2>
+            </div>
+            <Hub
+              worlds={worlds}
+              braiseMood="happy"
+              compact
+              onSelect={(id) => {
+                sfx.tap(state.soundOn);
+                openSubject(id);
+              }}
+            />
+            <p className="hub-caption">{teaserSays}</p>
+          </motion.div>
+
           <motion.div variants={staggerItem}>
             <TodayStrip
               streak={state.streak}
@@ -231,27 +252,6 @@ export function HomeView() {
               {braked ? <BrakeCard /> : <NotifInvite onAccept={() => setMomentOpen(true)} />}
             </motion.div>
           )}
-
-          <motion.div variants={staggerItem} className="space-y-3">
-            <div>
-              <span className="font-mono text-[0.7rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">
-                Apprendre
-              </span>
-              <h2 className="font-display text-[1.15rem] font-extrabold leading-tight text-[var(--ink)]">
-                Tes cours
-              </h2>
-            </div>
-            <Hub
-              worlds={worlds}
-              braiseMood="happy"
-              compact
-              onSelect={(id) => {
-                sfx.tap(state.soundOn);
-                openSubject(id);
-              }}
-            />
-            <p className="hub-caption">{teaserSays}</p>
-          </motion.div>
         </motion.div>
       </div>
 

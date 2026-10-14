@@ -726,7 +726,7 @@
 .strip-disc.is-current {
   box-shadow:
     0 0 0 3px var(--paper),
-    0 0 0 6px var(--neo-ink);
+    0 0 0 6px var(--ink);
 }
 .strip-due {
   position: absolute;
@@ -775,7 +775,7 @@
   margin-inline: 0;
 }
 .hub--compact .hub-stage {
-  row-gap: 8px;
+  row-gap: 2px;
   padding: 6px 6px 8px;
   border: 3px solid var(--neo-ink);
   border-radius: 20px;
@@ -808,7 +808,13 @@
   box-shadow: 1.5px 1.5px 0 var(--neo-ink);
 }
 .hub--compact .planet-meta {
-  gap: 5px;
+  gap: 4px;
+}
+.hub--compact .planet {
+  gap: 3px;
+}
+.hub--compact .planet.is-suggested {
+  padding-block: 8px;
 }
 .hub--compact .planet-tag {
   padding: 3px 8px 4px;
@@ -826,4 +832,11 @@
   font-size: 0.85rem;
   font-weight: 700;
   line-height: 1.3;
+}
+
+/* the key to the flags sits under the islands: each island already says its state in a word */
+.wd-key {
+  position: relative;
+  z-index: 3;
+  padding: 0 var(--page-gutter);
 }

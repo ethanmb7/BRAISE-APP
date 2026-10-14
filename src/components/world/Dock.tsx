@@ -1,5 +1,5 @@
 import { ArrowRight, X } from "lucide-react";
-import { BraiseMascot } from "@/components/BraiseMascot";
+import { StreakFlameIcon } from "@/components/StreakFlameIcon";
 import { Dots } from "@/components/library/Dots";
 import { StatusChip } from "@/components/course/StatusChip";
 import { MathText } from "@/components/course/MathText";
@@ -16,7 +16,7 @@ const startVerb = (entry: LibraryEntry) =>
       : "Reprendre";
 
 /** The strip pinned to the bottom of an archipelago. By default it is Braise's suggestion with the one
- *  button to press; once an island is picked it becomes that course's sheet, with what to do. */
+ *  button to press (her flame, not a second Braise: she is already on the suggested island); once an island is picked it becomes that course's sheet, with what to do. */
 export function Dock({
   resume,
   selected,
@@ -62,7 +62,7 @@ export function Dock({
     return (
       <section className="dock" aria-label="Braise">
         <span className="dock-braise" aria-hidden="true">
-          <BraiseMascot size={46} mood="proud" />
+          <StreakFlameIcon size={34} />
         </span>
         <p className="dock-says">{t(COPY.library.allSet)}</p>
       </section>
@@ -77,7 +77,7 @@ export function Dock({
   return (
     <section className="dock" aria-label="Braise te suggère" aria-live="polite">
       <span className="dock-braise" aria-hidden="true">
-        <BraiseMascot size={46} mood={reason === "next" ? "eager" : "happy"} />
+        <StreakFlameIcon size={34} />
       </span>
       <div className="dock-main">
         <p className="dock-says">{says}</p>
