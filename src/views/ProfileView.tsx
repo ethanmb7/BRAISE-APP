@@ -19,7 +19,7 @@ import type { Personality } from "@/types";
 
 const PERSONAS: { id: Personality; title: string; sub: string }[] = [
   { id: "chill", title: "Pote Chill", sub: "Encourageant, doux, zéro pression." },
-  { id: "savage", title: "Pote Savage", sub: "Second degré, piques amicales assumées." },
+  { id: "savage", title: "Coach énergie", sub: "Second degré, piques amicales assumées." },
 ];
 
 // Same rank-index comparison RankRail already uses (ProfilAuraView.tsx) — a rank-gated avatar

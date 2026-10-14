@@ -45,7 +45,7 @@ export function quizCorrect(ctx: VoiceCtx): string {
       "Ok là je suis bluffé, avoue.",
     ],
     "savage-lycee": [
-      "Tiens, un neurone qui bosse. Respect.",
+      "Là, ça carbure. Respect.",
       "Correct. Le bac te dit merci.",
       "Bon ok, t'as le droit d'être fier de toi.",
     ],
@@ -118,7 +118,7 @@ export function quizWrong(ctx: VoiceCtx, topic?: string): string {
       "Aucun stress, c'est comme ça qu'on progresse.",
     ],
     "chill-lycee": [
-      `Raté${t}, mais c'est un classique. On décortique.`,
+      `Piégé${t}, mais c'est un classique. On décortique.`,
       "Pas de souci, c'est exactement le genre de piège à repérer.",
       "Ok, petite erreur — regardons ce qui a coincé.",
     ],
@@ -128,9 +128,9 @@ export function quizWrong(ctx: VoiceCtx, topic?: string): string {
       "Areuh. Même Braise a mal pour toi là.",
     ],
     "savage-lycee": [
-      `Sérieux${t}, tu m'as fait mal au cœur là...`,
-      "Alors ça, c'est ce qu'on appelle un classique du contrôle raté.",
-      "Le correcteur du bac aurait pleuré. On corrige, vite.",
+      `Piège réussi${t}. Il en attrape plein : on le démonte ?`,
+      "Celui-là, le contrôle l'adore. Autant le démonter maintenant.",
+      "Le bac aussi le pose chaque année. On le règle, vite.",
     ],
   });
 }
@@ -147,7 +147,7 @@ export function lessonComplete(ctx: VoiceCtx, name: string): string {
     ],
     "savage-college": [
       `"${name}" terminée. J'avoue, j'suis fier (un peu).`,
-      `Ok t'as survécu à "${name}". Pas si nul finalement.`,
+      `"${name}" derrière toi. Même moi, j'avoue : bien joué.`,
     ],
     "savage-lycee": [
       `"${name}" pliée. Le bac recule d'un pas, terrifié.`,
@@ -272,12 +272,7 @@ export function verdictTag(ctx: VoiceCtx, kind: "carre" | "super" | "aie" | "gri
         "😎 Pas mal du tout",
         "🔥 Ça envoie",
       ],
-      "savage-lycee": [
-        "💯 C'est carré",
-        "🎯 Dans le mille",
-        "😏 Pas si nul finalement",
-        "🔥 Ça poutre",
-      ],
+      "savage-lycee": ["💯 C'est carré", "🎯 Dans le mille", "😏 Rien à redire", "🔥 Ça poutre"],
     },
     super: {
       "chill-college": ["⚡ Super Braise", "⚡ Double ou rien, gagné", "⚡ Boum, ×2"],
@@ -294,8 +289,8 @@ export function verdictTag(ctx: VoiceCtx, kind: "carre" | "super" | "aie" | "gri
     grille: {
       "chill-college": ["💀 Grillé", "🎭 Dans le panneau", "🙃 Roulé"],
       "chill-lycee": ["💀 Grillé", "🎭 Piégé en beauté", "🙃 Roulé dans la farine"],
-      "savage-college": ["💀 Grillé", "🎭 Direct dans le panneau", "😵 Piégé comme un débutant"],
-      "savage-lycee": ["💀 Grillé", "🎭 Tombé dans le panneau", "😵 Roulé sans forcer"],
+      "savage-college": ["💀 Grillé", "🎭 Direct dans le panneau", "😵 Piège bien posé"],
+      "savage-lycee": ["💀 Grillé", "🎭 Tombé dans le panneau", "😵 Piège bien posé"],
     },
   };
   return byCombo(ctx, tables[kind]);
@@ -345,11 +340,11 @@ export function duelResult(ctx: VoiceCtx, won: boolean): string {
     ],
     "savage-college": [
       "J'ai gagné. Sans surprise, mais gg quand même.",
-      "Perdu ! Bon, c'était couru d'avance.",
+      "Celle-là est pour moi. Revanche ?",
     ],
     "savage-lycee": [
       "Victoire de Braise. La machine ne dort jamais.",
-      "Perdu. Le café ce soir, tu le mérites pas.",
+      "Celle-là est pour moi. Revanche quand tu veux.",
     ],
   });
 }
@@ -432,9 +427,7 @@ export function progressAdvice(ctx: VoiceCtx, weakSubject?: string, weakTopic?: 
     ],
     "chill-lycee": ["Rien à signaler côté points faibles — belle régularité, garde le rythme."],
     "savage-college": ["Aucun point faible pour l'instant. Je note, j'ai les yeux ouverts."],
-    "savage-lycee": [
-      "Zéro point faible détecté. Impressionnant — ou alors t'as pas encore essayé les trucs durs.",
-    ],
+    "savage-lycee": ["Zéro point faible pour l'instant. Je garde un œil sur les trucs durs."],
   });
 }
 

@@ -54,7 +54,7 @@ const TONES: { id: Personality; title: string; desc: string; sample: string; moo
   },
   {
     id: "savage",
-    title: "Pote Savage",
+    title: "Coach énergie",
     desc: "Direct, énergique, second degré.",
     sample: "Ce piège-là attrape tout le monde. Pas toi, cette fois.",
     mood: "cool",
