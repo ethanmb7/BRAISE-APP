@@ -9,6 +9,7 @@
 @import "./braise.css" layer(components);
 @import "./subjects.css" layer(components);
 @import "./declic.css" layer(components);
+@import "./revision-feedback.css" layer(components);
 @import "./course.css" layer(components);
 @import "./library.css" layer(components);
 @import "./world.css" layer(components);

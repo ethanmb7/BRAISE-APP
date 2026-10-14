@@ -10,6 +10,32 @@ export function getAgeGroup(levelId: string | null | undefined): AgeGroup {
 
 export type VoiceCtx = { personality: Personality; age: AgeGroup };
 
+export function revisionReaction(
+  ctx: VoiceCtx,
+  facts: { correct: boolean; wasLie: boolean; doubled: boolean },
+): string {
+  const direct = ctx.personality === "savage";
+  if (facts.correct && facts.doubled)
+    return direct
+      ? "J’aime ce coup-là. Tu as joué ton joker, et tu avais raison."
+      : "J’avoue, joli coup ! Ton joker a doublé les XP de cette carte.";
+  if (facts.correct && facts.wasLie)
+    return direct
+      ? "Bon, tu m’as grillé. Je garde un œil sur toi."
+      : "Tu m’as démasqué ! J’aime quand tu ne me crois pas sur parole.";
+  if (facts.correct)
+    return direct
+      ? "OK, on est d’accord. Cette fois, je ne bluffais pas."
+      : "Oui, je disais vrai. Bien vu de m’avoir fait confiance ici.";
+  if (facts.wasLie)
+    return direct
+      ? "Mon bluff est passé. Mais je préfère qu’on garde la vraie réponse."
+      : "Je t’ai eu avec celle-là. Viens, on garde la bonne version ensemble.";
+  return direct
+    ? "Tu m’as soupçonné, j’aime l’esprit critique. Mais ici, je disais vrai."
+    : "Je comprends ton doute. Cette fois, pas de bluff : ma réponse était vraie.";
+}
+
 function pick(list: string[]): string {
   return list[Math.floor(Math.random() * list.length)];
 }

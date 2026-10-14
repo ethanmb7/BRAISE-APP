@@ -15,14 +15,7 @@ import { speak, stopSpeaking } from "@/lib/speech";
 import { BraiseRecap } from "@/components/BraiseRecap";
 import { BraiseMascot } from "@/components/BraiseMascot";
 import { CardStack, QuestionCard, AnswerCard } from "@/components/RevisionCards";
-import {
-  getAgeGroup,
-  judgePrompt,
-  missedTruth,
-  quizCorrect,
-  quizWrong,
-  verdictTag,
-} from "@/lib/braiseVoice";
+import { getAgeGroup, judgePrompt, revisionReaction, verdictTag } from "@/lib/braiseVoice";
 import { reportCard } from "@/lib/reports";
 import { MASTERED_AT_REPETITIONS, reviewReward, type RewardKind } from "@/lib/progress";
 import { FLASHCARDS, SUBJECTS, SUBJECT_SHORT_NAMES } from "@/data";
@@ -528,7 +521,9 @@ function SwipeDeck({
       setXpEarned((v) => v + total);
       setFeedback({
         tag: verdictTag(voiceCtx, useSuper ? "super" : "carre"),
-        text: card.course ? card.course.feedbackCorrect : quizCorrect(voiceCtx),
+        text: card.course
+          ? card.course.feedbackCorrect
+          : revisionReaction(voiceCtx, { correct: true, wasLie: !isTrueAnswer, doubled: useSuper }),
         xp: total,
         reason: REWARD_REASON[reward.kind],
       });
@@ -560,12 +555,16 @@ function SwipeDeck({
         isTrueAnswer
           ? {
               tag: verdictTag(voiceCtx, "aie"),
-              text: card.course ? card.course.feedbackIncorrect : missedTruth(voiceCtx),
+              text: card.course
+                ? card.course.feedbackIncorrect
+                : revisionReaction(voiceCtx, { correct: false, wasLie: false, doubled: false }),
               xp: 0,
             }
           : {
               tag: verdictTag(voiceCtx, "grille"),
-              text: card.course ? card.course.feedbackIncorrect : quizWrong(voiceCtx, card.topic),
+              text: card.course
+                ? card.course.feedbackIncorrect
+                : revisionReaction(voiceCtx, { correct: false, wasLie: true, doubled: false }),
               xp: 0,
             },
       );
@@ -748,7 +747,10 @@ function SwipeDeck({
           onDragStart={() => setTutorialDismissed(true)}
           onTap={judged ? skipToNext : undefined}
         >
-          <div className="fc-scroll">
+          <div
+            className="fc-scroll"
+            onClick={judged ? (event) => event.stopPropagation() : undefined}
+          >
             {/* A giant watermark of the subject's own emoji, faint behind the cards — fills
                 the vertical space between header and dock with texture instead of empty
                 colour, without competing with the cards sitting on top of it (z-index below
@@ -762,7 +764,7 @@ function SwipeDeck({
             <motion.div
               className="relative flex w-full flex-1 flex-col"
               layout
-              animate={judged && wasCorrect ? { x: [0, -5, 5, -3, 3, 0] } : { x: 0 }}
+              animate={{ x: 0 }}
               transition={{ duration: 0.42, ease: "easeOut" }}
             >
               <CardStack>
@@ -932,8 +934,8 @@ function SwipeDeck({
                   >
                     <BevelButton
                       className="w-full"
-                      base="bg-[#b98a00]"
-                      face="bg-gradient-to-b from-[#FFE066] to-[#FDC800] text-black"
+                      base="bg-sapie-orange-ink"
+                      face="bg-[var(--orange-fill)] text-[var(--on-orange)]"
                       onClick={skipToNext}
                       label="Carte suivante"
                     >

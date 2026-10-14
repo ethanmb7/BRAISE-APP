@@ -1,0 +1,190 @@
+:root {
+  --rev-feedback-ink: var(--neo-ink);
+  --rev-feedback-success: var(--mint-text);
+  --rev-feedback-miss: var(--coral-2);
+  --rev-feedback-reward: oklch(0.9 0.16 92);
+  --rev-feedback-rule: color-mix(in oklab, var(--neo-ink) 16%, transparent);
+  --rev-feedback-shadow: 4px 4px 0 var(--neo-ink);
+}
+.rev-answer-compact {
+  width: 100%;
+  overflow: hidden;
+  padding: 0;
+  border: 2.5px solid var(--rev-feedback-ink);
+  border-radius: 24px;
+  background: var(--rev-paper);
+  color: var(--rev-feedback-ink);
+  box-shadow: var(--rev-feedback-shadow);
+}
+.rev-result-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-bottom: 2.5px solid var(--rev-feedback-ink);
+  background: var(--rev-feedback-success);
+  color: var(--rev-paper);
+}
+.rev-result-heading.is-miss {
+  background: var(--rev-feedback-miss);
+}
+.rev-result-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+.rev-result-symbol {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border: 2px solid var(--rev-feedback-ink);
+  border-radius: 8px;
+  background: var(--rev-paper);
+  color: var(--rev-feedback-success);
+}
+.is-miss .rev-result-symbol {
+  color: var(--rev-feedback-miss);
+}
+.rev-result-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.rev-result-xp {
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.rev-feedback-listen {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 2px solid var(--rev-feedback-ink);
+  border-radius: 10px;
+  background: var(--rev-paper);
+  color: var(--rev-feedback-ink);
+  box-shadow: 2px 2px 0 var(--rev-feedback-ink);
+  cursor: pointer;
+}
+.rev-feedback-listen[aria-pressed="true"] {
+  background: var(--rev-feedback-reward);
+}
+.rev-feedback-listen:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+.rev-feedback-listen:focus-visible {
+  outline: 3px solid var(--rev-paper);
+  outline-offset: 3px;
+}
+.rev-answer-body {
+  padding: 16px;
+}
+.rev-answer-body p {
+  font-size: 1.05rem;
+  line-height: 1.5;
+  font-weight: 600;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.rev-truth-label {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--rev-feedback-miss);
+}
+.rev-answer-body .math-inline {
+  max-width: 100%;
+}
+.rev-answer-body .katex-display {
+  margin: 0.6em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 2px;
+}
+.flashcard.is-judged {
+  touch-action: pan-y;
+}
+.flashcard.is-judged .fc-scroll {
+  touch-action: pan-y;
+  mask-image: none;
+  -webkit-mask-image: none;
+  padding: 0 16px 10px;
+  scrollbar-width: thin;
+}
+.flashcard.is-judged .fc-watermark {
+  display: none;
+}
+.flashcard.is-judged .fc-scroll > div {
+  flex: 0 0 auto !important;
+  margin-block: auto !important;
+  padding-block: 12px;
+}
+.flashcard.is-judged .fc-scroll > div > div {
+  margin-block: 0 !important;
+  gap: 14px !important;
+}
+.flashcard.is-judged .rev-question-card {
+  border-color: var(--rev-feedback-ink);
+  border-radius: 24px;
+  box-shadow: var(--rev-feedback-shadow);
+  padding: 12px 14px !important;
+}
+.flashcard.is-judged .rev-question-card > div {
+  gap: 8px;
+}
+.flashcard.is-judged .rev-question-card > div > span:first-child {
+  width: 28px !important;
+  height: 28px !important;
+}
+.flashcard.is-judged .rev-question-card > div > span:last-child {
+  min-width: 0;
+  font-size: 0.8rem !important;
+}
+.flashcard.is-judged .rev-question-card p {
+  margin-top: 8px !important;
+  font-size: 1rem !important;
+  line-height: 1.35 !important;
+}
+@media (max-height: 640px) {
+  .flashcard.is-judged .fc-scroll > div > div {
+    gap: 10px !important;
+  }
+  .flashcard.is-judged .rev-question-card {
+    padding: 10px 12px !important;
+  }
+  .flashcard.is-judged .rev-question-card > div {
+    display: none !important;
+  }
+  .flashcard.is-judged .rev-question-card p {
+    margin-top: 0 !important;
+  }
+  .rev-result-heading {
+    padding: 8px 12px;
+  }
+  .rev-result-status {
+    font-size: 1rem;
+  }
+  .rev-answer-body {
+    padding: 12px;
+  }
+  .rev-answer-body p {
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+}
