@@ -126,6 +126,11 @@ ni un compte à rebours.
   Le monde qu'elle conseille est plus grand, cerclé, avec sa lune, et un **verbe** collé au monde. Le verbe
   dit ce qui se passe (Reprendre, Renforcer, Retrouver, Commencer, Continuer) : **jamais « Réviser »**, nom d'un
   onglet (la session de cartes).
+- **« Un truc important bientôt ? »** (bouton calendrier dans la barre de la matière, feuille à **trois taps** :
+  Demain / Cette semaine / La semaine prochaine). Pas de calendrier à saisir. **Jamais de décompte, jamais de
+  couleur d'urgence, aucune relance** : la date ne sert qu'à ce que Braise mette en avant (la Pioche choisit
+  dans cette matière, Réviser en tire plus de cartes) et elle s'oublie un jour après (`lib/world/soon.ts`).
+  Stockée sur l'appareil. L'adaptation fine de l'espacement à l'échéance n'est pas faite.
 - **Le nom de la matière n'est écrit qu'une fois :** dans la barre du haut de l'archipel (pas de second grand
   titre, pas de « Où on va ? »). Le texte qui répète ce que l'écran dit déjà est retiré : pas de légende sous le
   titre de « Tes mondes », pas de note de niveau pour un élève de 2nde (elle ne s'adresse qu'à Première et

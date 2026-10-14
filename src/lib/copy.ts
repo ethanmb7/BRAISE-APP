@@ -72,6 +72,19 @@ export const COPY = {
     moreComing: L("D'autres cours arrivent bientôt.", "D'autres cours arrivent. Patience."),
   },
 
+  /** "Un truc important bientôt ?": said to a friend, never as a deadline. No countdown, no urgency. */
+  soon: {
+    title: L("Un truc important bientôt ?", "Un truc qui compte arrive ?"),
+    ask: (subject: string) =>
+      L(
+        `Un contrôle, un oral en ${subject} ? Dis-moi quand, je m'en occupe.`,
+        `Un contrôle, un oral en ${subject} ? Dis-moi quand. Je m'en occupe.`,
+      ),
+    set: (subject: string) =>
+      L(`On prépare ${subject} ensemble.`, `${subject}, on s'y met ensemble. Sans panique.`),
+    clear: L("Plus besoin", "Laisse tomber"),
+  },
+
   /** Braise asks to come and see the student now and then (see NOTIFICATIONS.md). The reminders' own texts
    *  are in lib/notifications/copy.ts; these are the screens around them. */
   notif: {

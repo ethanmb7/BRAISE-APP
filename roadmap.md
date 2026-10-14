@@ -32,7 +32,7 @@
 ## Qualité produit
 
 - [ ] Remplacer toutes les formulations humiliantes du ton `savage` par « Coach énergie »
-- [ ] Déplacer l'appel IA côté serveur et ajouter limites, modération et journalisation minimale
+- [ ] ~~Déplacer l'appel IA côté serveur et ajouter limites, modération et journalisation minimale~~ _(reporté : pas d'IA pour l'instant, décision du 14 oct.)_
 - [ ] Ajouter tests unitaires, parcours end-to-end et contrôles d'accessibilité
 - [ ] Instrumenter la compréhension différée plutôt que le seul engagement
 - [ ] Tester performances, hors-ligne, audio et reprise sur de vrais téléphones

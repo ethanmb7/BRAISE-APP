@@ -305,7 +305,10 @@ interprétation de l'équipe, à corriger si elle est fausse.
 | Des points qui récompensent le temps ou qu'on peut farmer ; des données inventées.                                                  | Cela détourne de ce qu'on mesure : retrouver sans aide.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | _projet_                                                                                           |
 | Un cinquième onglet, un réseau social, plusieurs monnaies.                                                                          | Focus du prototype.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | _projet_                                                                                           |
 
-**Si Braise répond un jour par écrit (un chat), elle aide à trouver, elle ne rend pas la réponse :** un indice, une
+**Décision (14 oct.) : pas d'IA pour l'instant**, trop complexe à mettre en place. Aucun chat, aucun appel à un
+modèle ; on ne reprend pas les tiroirs IA arrivés par la synchronisation Lovable.
+
+**Le jour où Braise répondrait par écrit (un chat), elle aiderait à trouver, elle ne rendrait pas la réponse :** un indice, une
 question en retour, l'élève essaie d'abord. Une IA sans garde-fous a fait baisser les résultats au test sans
 IA (Bastani et al., PNAS 2025 : -17 % contre +48 % à l'exercice), alors qu'un tuteur à indices annulait la
 perte. Cela suppose un serveur, donc attend la fin de la décision « local seulement ».
@@ -379,7 +382,7 @@ plusieurs grandes cartes concurrentes.
 - **Recherche** : retrouver une notion, un chapitre ou une matière ;
 - **Mon confort** : texte, audio, mouvement, contraste, durée et ton de Braise ;
 - **Mon activité** : historique utile des acquis et prochaines consolidations ;
-- **Échéances** : préparer un contrôle uniquement lorsque de vraies dates sont renseignées.
+- **Échéances** : préparer un contrôle uniquement lorsque de vraies dates sont renseignées. _Construit en version minimale (« Un truc important bientôt ? », trois taps, sans décompte) : Braise met la matière en avant ; l'espacement n'est pas encore adapté à la date._
 
 ### Accueil validé pour la prochaine itération
 

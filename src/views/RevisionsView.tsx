@@ -28,6 +28,7 @@ import { MASTERED_AT_REPETITIONS, reviewReward, type RewardKind } from "@/lib/pr
 import { FLASHCARDS, SUBJECTS, SUBJECT_SHORT_NAMES } from "@/data";
 import type { Flashcard, Confidence, CardReview } from "@/types";
 import { COURSE_REGISTRY } from "@/lib/course/registry";
+import { focusSubjectId } from "@/lib/world/soon";
 import { courseProgressStore } from "@/lib/course/progressStore";
 import { useCourseProgress } from "@/lib/course/useCourseProgress";
 import { recordCourseReview } from "@/lib/course/session";
@@ -119,11 +120,14 @@ export function RevisionsView() {
     );
     const dueIds = new Set(getDueCards());
     const chosen = new Set(state.user.subjects);
+    // Something matters soon in this subject (see lib/world/soon.ts): it gets more of the session.
+    const focus = focusSubjectId(state.soonBy, Date.now());
     const age = getAgeGroup(state.user.level);
     const priority = (c: Flashcard) => {
       let p = Math.random();
       if (dueIds.has(c.id)) p += 2;
       if (chosen.has(c.subject)) p += 0.7;
+      if (c.subject === focus) p += 1.2;
       if (age === "college" ? c.level === "easy" : c.level === "hard") p += 0.3;
       return p;
     };

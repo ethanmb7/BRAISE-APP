@@ -381,6 +381,62 @@
   outline-offset: 2px;
 }
 
+/* "Un truc important bientôt ?": three big taps in a column, no calendar. */
+.soon-says {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.soon-choices {
+  display: grid;
+  gap: 10px;
+}
+.soon-choice {
+  min-height: 52px;
+  padding: 0 16px;
+  border: 3px solid var(--neo-ink);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--sun) 22%, var(--paper));
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: var(--ink);
+  font: 400 0.98rem/1.1 var(--font-impact);
+  text-align: left;
+}
+.soon-choice:active {
+  box-shadow: none;
+  transform: translate(2px, 2px);
+}
+.soon-choice:focus-visible {
+  outline: 3px solid var(--neo-orange);
+  outline-offset: 2px;
+}
+.soon-btn {
+  position: relative;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+}
+.soon-btn i {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 13px;
+  height: 13px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 50%;
+  background: var(--neo-orange);
+}
+.soon-btn:focus-visible {
+  outline: 3px solid var(--neo-orange);
+  outline-offset: 3px;
+}
+
 .nt-card {
   display: grid;
   gap: 10px;

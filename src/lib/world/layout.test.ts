@@ -202,6 +202,18 @@ describe("pickGlobalResume", () => {
   it("is null when nothing is left to do", () => {
     expect(pickGlobalResume([lib("a", null), lib("b", null)], null)).toBeNull();
   });
+
+  it("leans on the subject that matters soon, even over a fresher Déclic elsewhere", () => {
+    const libs = [lib("a", justNow), lib("b", next)];
+    expect(pickGlobalResume(libs, null)?.subjectId).toBe("a");
+    expect(pickGlobalResume(libs, null, "b")?.subjectId).toBe("b");
+  });
+
+  it("falls back to the usual ladder when the subject that matters has nothing to offer", () => {
+    const libs = [lib("a", justNow), lib("b", null)];
+    expect(pickGlobalResume(libs, null, "b")?.subjectId).toBe("a");
+    expect(pickGlobalResume(libs, null, "zzz")?.subjectId).toBe("a");
+  });
 });
 
 describe("dueInLibrary", () => {

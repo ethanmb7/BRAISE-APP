@@ -9,6 +9,7 @@ import { useCourseProgress } from "@/lib/course/useCourseProgress";
 import { useCourseMastery } from "@/lib/course/useCourseMastery";
 import { buildLibrary, type Library } from "@/lib/catalog/catalog";
 import { dueInLibrary, pickGlobalResume, verbFor } from "@/lib/world/resume";
+import { focusSubjectId } from "@/lib/world/soon";
 import { Hub, type HubWorld } from "@/components/world/Hub";
 import { fireConfetti } from "@/lib/confetti";
 import { LevelSheet } from "@/components/LevelSheet";
@@ -75,7 +76,11 @@ export function HomeView() {
   // so the two screens never give different advice (a Déclic touched in the last two days, a review
   // that has come due, a point that mixes up, an older Déclic, then something new). Nothing is drawn
   // at random any more; on day zero the ladder lands on the first chapter of the first subject.
-  const pick = pickGlobalResume(libraries, state.lastSubjectId);
+  const pick = pickGlobalResume(
+    libraries,
+    state.lastSubjectId,
+    focusSubjectId(state.soonBy, Date.now()),
+  );
   const currentSubject = pick ? SUBJECTS.find((s) => s.id === pick.subjectId) : undefined;
   const currentEntry = pick?.resume.entry;
   const resuming = pick?.resume.reason === "resume" && pick.resume.fresh === true;

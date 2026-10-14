@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { CalendarClock } from "lucide-react";
 import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
 import { TopBar } from "@/components/TopBar";
@@ -6,6 +7,8 @@ import { BraiseMascot } from "@/components/BraiseMascot";
 import { Archipelago } from "@/components/world/Archipelago";
 import { Dock } from "@/components/world/Dock";
 import { SubjectStrip } from "@/components/world/SubjectStrip";
+import { SoonSheet } from "@/components/SoonSheet";
+import { activeSoon } from "@/lib/world/soon";
 import type { HubWorld } from "@/components/world/Hub";
 import { CONTENT_LEVEL_NOTE, SUBJECTS, SUBJECT_SHORT_NAMES } from "@/data";
 import { COPY } from "@/lib/copy";
@@ -25,7 +28,8 @@ export function SubjectView() {
 }
 
 function Archipel() {
-  const { state, goBack, openLesson, openSubject } = useApp();
+  const { state, goBack, openLesson, openSubject, setSoon } = useApp();
+  const [soonOpen, setSoonOpen] = useState(false);
   const { t } = useTone();
   const courseProgress = useCourseProgress();
   const subject = SUBJECTS.find((s) => s.id === state.currentSubjectId);
@@ -106,6 +110,7 @@ function Archipel() {
   // Said only to the students the content does not reach yet (Première, Terminale).
   const beyondContent = state.user.level === "1ere" || state.user.level === "term";
 
+  const soonActive = subject.id in activeSoon(state.soonBy, Date.now());
   const selected = library.entries.find((e) => e.key === selectedKey) ?? null;
   return (
     <div>
@@ -113,6 +118,23 @@ function Archipel() {
       <TopBar
         title={subject.name}
         onBack={goBack}
+        right={
+          <button
+            type="button"
+            className="soon-btn"
+            onClick={() => {
+              sfx.tap(state.soundOn);
+              setSoonOpen(true);
+            }}
+            aria-label={
+              soonActive ? "Un truc important bientôt : prévu" : "Un truc important bientôt ?"
+            }
+            aria-haspopup="dialog"
+          >
+            <CalendarClock size={20} strokeWidth={2.6} aria-hidden="true" />
+            {soonActive && <i aria-hidden="true" />}
+          </button>
+        }
         below={
           <SubjectStrip
             worlds={worlds}
@@ -148,6 +170,23 @@ function Archipel() {
           />
         }
       />
+      {soonOpen && (
+        <SoonSheet
+          subjectName={subject.name}
+          active={soonActive}
+          onChoose={(days) => {
+            sfx.tap(state.soundOn);
+            setSoon(subject.id, days);
+            setSoonOpen(false);
+          }}
+          onClear={() => {
+            sfx.tap(state.soundOn);
+            setSoon(subject.id, null);
+            setSoonOpen(false);
+          }}
+          onClose={() => setSoonOpen(false)}
+        />
+      )}
     </div>
   );
 }

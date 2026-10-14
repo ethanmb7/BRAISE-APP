@@ -126,6 +126,9 @@ export type ChapterCompletion = {
 };
 
 export type AppState = {
+  /** subject id -> when something important happens in it (see lib/world/soon.ts). Braise leans on that
+   *  subject until the day has passed. Kept on the device. */
+  soonBy: Record<string, number>;
   view: ViewId;
   tab: TabId;
   user: UserProfile;

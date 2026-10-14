@@ -19,6 +19,7 @@ import type {
 import { DEFAULT_USER, FLASHCARDS } from "@/data";
 import { sfx } from "@/lib/sound";
 import { loadProgress, saveProgress, saveCardReview } from "@/lib/persist";
+import { activeSoon } from "@/lib/world/soon";
 import { applyStartupRequests } from "@/lib/startup";
 import {
   ensureSession,
@@ -48,6 +49,8 @@ type Ctx = {
   setTextSize: (size: TextSize) => void;
   toggleSound: () => void;
   toggleHaptics: () => void;
+  /** Something important soon in a subject (days from now), or nothing (`null`). See lib/world/soon.ts. */
+  setSoon: (subjectId: string, days: number | null) => void;
   openSubject: (subjectId: string, chapterId?: string) => void;
   openLesson: (subjectId: string, chapterId: string, returnTo?: ViewId) => void;
   completeChapter: (chapterId: string) => void;
@@ -87,6 +90,7 @@ const INITIAL: AppState = {
   hapticsOn: true,
   currentSubjectId: null,
   currentChapterId: null,
+  soonBy: {},
   lastSubjectId: null,
   lastChapterId: null,
   completedChapters: [],
@@ -230,6 +234,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, ...ensureSession(s), hapticsOn: !s.hapticsOn }));
   }, []);
 
+  const setSoon = useCallback((subjectId: string, days: number | null) => {
+    setState((s) => {
+      const next = { ...activeSoon(s.soonBy, Date.now()) };
+      if (days === null) delete next[subjectId];
+      else next[subjectId] = Date.now() + days * 24 * 60 * 60 * 1000;
+      return { ...s, soonBy: next };
+    });
+  }, []);
+
   const openSubject = useCallback((subjectId: string, chapterId?: string) => {
     setState((s) => ({
       ...s,
@@ -343,6 +356,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setTextSize,
         toggleSound,
         toggleHaptics,
+        setSoon,
         openSubject,
         openLesson,
         completeChapter,

@@ -57,6 +57,7 @@ function baseState(overrides: Partial<AppState>): AppState {
     cardReviews: {},
     sessionDate: new Date().toDateString(),
     sessionXpEarned: 30,
+    soonBy: {},
     ...overrides,
   };
 }
