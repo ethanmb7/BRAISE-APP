@@ -126,6 +126,11 @@ ni un compte à rebours.
   Le monde qu'elle conseille est plus grand, cerclé, avec sa lune, et un **verbe** collé au monde. Le verbe
   dit ce qui se passe (Reprendre, Renforcer, Retrouver, Commencer, Continuer) : **jamais « Réviser »**, nom d'un
   onglet (la session de cartes).
+- **Le nom de la matière n'est écrit qu'une fois :** dans la barre du haut de l'archipel (pas de second grand
+  titre, pas de « Où on va ? »). Le texte qui répète ce que l'écran dit déjà est retiré : pas de légende sous le
+  titre de « Tes mondes », pas de note de niveau pour un élève de 2nde (elle ne s'adresse qu'à Première et
+  Terminale). Une demande de Braise (rappels) prend la place de la carte « À rafraîchir » tant qu'elle est
+  ouverte : un seul bloc secondaire à la fois.
 - **La bande de matières** (`SubjectStrip`) est dans la barre du haut de l'archipel, donc collée à l'écran :
   six disques, celui où l'on est cerclé, une pastille sur les autres qui ont des notions à rafraîchir. Toucher
   un autre disque ouvre son archipel sans repasser par l'accueil. Mêmes disques, même ordre que sur l'accueil.
@@ -149,4 +154,4 @@ ni un compte à rebours.
 ## La navigation
 
 Quatre espaces (Aujourd'hui, Réviser, Aura, Moi), décision du porteur du projet (voir
-`PRODUCT_VISION.md`). Les cours sont atteints depuis Aujourd'hui : un tap sur un monde de « Tes cours » ouvre l'archipel de la matière.
+`PRODUCT_VISION.md`). Les cours sont atteints depuis Aujourd'hui : un tap sur un monde de « Tes mondes » ouvre l'archipel de la matière.
