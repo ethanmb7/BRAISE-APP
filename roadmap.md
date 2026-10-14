@@ -3,7 +3,7 @@
 ## Cap produit
 
 - [x] Formaliser la promesse, l'architecture cible et la boucle propriétaire dans `PRODUCT_VISION.md`
-- [ ] Tester la promesse et l'architecture « Aujourd'hui / Réviser / Aura / Moi » avec 8 à 12 élèves
+- [ ] Tester la promesse et l'architecture « Aujourd'hui / Réviser / Aura / Moi » avec 8 à 12 élèves _(protocole prêt : `propositions-braise/protocole-test-lyceens.md`)_
 - [ ] Prototyper une conversation « Capte » complète sur une seule notion
 - [ ] Faire valider le prototype par des élèves dyslexiques/TDAH et un expert pédagogique
 
@@ -20,7 +20,7 @@
 
 - [x] Remplacer le HUD-tableau de bord par un en-tête compact centré sur l'identité
 - [x] Compacter la Pioche sans réduire Braise et rapprocher contenu, repères et CTA
-- [ ] Aujourd'hui : une action principale, une Pioche compacte et un rythme discret
+- [x] Aujourd'hui : une action principale, une Pioche compacte et un rythme discret
 - [ ] Réviser : erreurs, notions dues et choix de matière (lobby avec plusieurs modes de session)
 - [ ] Aura : progression, rang et badges — destination principale, jamais un sous-écran de Moi
 - [ ] Moi : profil, préférences et accessibilité
@@ -28,6 +28,12 @@
 - [x] Refaire Matières et les parcours de cours en decks collector BRAISE pour les lycéens
 - [x] Faire du Déclic une expérience vivante et complice, inspirée des usages lycéens sans imitation artificielle
 - [x] Faire de Braise l’acteur central du Déclic avec gestes, réactions et transitions contextuelles
+
+## Prochaine étape (réunion du 14 oct.)
+
+- [ ] **Réconcilier le commit « Sync from Lovable » (`4a35b94`) avec la branche `ou-on-va-directement` : garder nos jetons de contraste, nos sons et le contenu, ne pas reprendre les tiroirs IA, trier le vrai travail de Lovable (carte de retour de Réviser, `revisionReaction`, scripts du Déclic). Jamais de force-push.**
+- [ ] Faire le test avec 8 à 12 lycéens (dont un DYS/TDAH) et le retour à J+3, puis trancher mots, « +3 », écran de fin
+- [ ] Après les preuves seulement : adapter l'espacement à la date « un truc important bientôt »
 
 ## Qualité produit
 
