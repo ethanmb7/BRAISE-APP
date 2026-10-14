@@ -158,16 +158,18 @@ export function NotifInvite({ onAccept }: { onAccept: () => void }) {
           <p>{t(COPY.notif.inviteBody)}</p>
         </div>
       </div>
-      <button type="button" className="ui-primary" onClick={onAccept}>
-        {t(COPY.notif.inviteYes)}
-      </button>
-      <button
-        type="button"
-        className="nt-link"
-        onClick={() => notifStore.update((s) => dismissInvite(s, Date.now()))}
-      >
-        {t(COPY.notif.inviteNo)}
-      </button>
+      <div className="nt-actions">
+        <button type="button" className="ui-primary" onClick={onAccept}>
+          {t(COPY.notif.inviteYes)}
+        </button>
+        <button
+          type="button"
+          className="nt-link"
+          onClick={() => notifStore.update((s) => dismissInvite(s, Date.now()))}
+        >
+          {t(COPY.notif.inviteNo)}
+        </button>
+      </div>
     </section>
   );
 }
@@ -186,20 +188,22 @@ export function BrakeCard() {
           <p>{t(COPY.notif.brakeBody)}</p>
         </div>
       </div>
-      <button
-        type="button"
-        className="ui-primary"
-        onClick={() => notifStore.update((s) => answerBrake(s, true))}
-      >
-        {t(COPY.notif.brakeYes)}
-      </button>
-      <button
-        type="button"
-        className="nt-link"
-        onClick={() => notifStore.update((s) => answerBrake(s, false))}
-      >
-        {t(COPY.notif.brakeNo)}
-      </button>
+      <div className="nt-actions">
+        <button
+          type="button"
+          className="ui-primary"
+          onClick={() => notifStore.update((s) => answerBrake(s, true))}
+        >
+          {t(COPY.notif.brakeYes)}
+        </button>
+        <button
+          type="button"
+          className="nt-link"
+          onClick={() => notifStore.update((s) => answerBrake(s, false))}
+        >
+          {t(COPY.notif.brakeNo)}
+        </button>
+      </div>
     </section>
   );
 }

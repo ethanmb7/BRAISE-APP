@@ -383,7 +383,7 @@
 
 .nt-card {
   display: grid;
-  gap: 12px;
+  gap: 10px;
   padding: 14px;
   border: 3px solid var(--neo-ink);
   border-radius: 20px;
@@ -405,6 +405,23 @@
   font-size: 0.86rem;
   font-weight: 600;
   line-height: 1.35;
+}
+/* the request is quiet: the yes and the no side by side, the no on its own line only when it has to */
+.nt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+.nt-actions .ui-primary {
+  min-height: 44px;
+  flex: 1 1 12rem;
+  padding-inline: 14px;
+}
+.nt-actions .nt-link {
+  flex: 0 1 auto;
+  padding-inline: 4px;
 }
 .nt-link {
   min-height: 44px;

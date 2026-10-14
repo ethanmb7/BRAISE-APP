@@ -45,58 +45,50 @@ export function TodayStrip({
   return (
     <section
       aria-label="Ton rythme du jour"
-      className="rounded-2xl border-[2.5px] border-[var(--neo-ink)] bg-[var(--paper)] px-4 py-3 shadow-[3px_3px_0_var(--neo-ink)]"
+      className="rounded-2xl border-[2.5px] border-[var(--neo-ink)] bg-[var(--paper)] px-3.5 py-2 shadow-[3px_3px_0_var(--neo-ink)]"
     >
-      <div className="flex items-start gap-3">
-        <span
-          aria-hidden="true"
-          className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border-2 border-black ${
-            goalMet ? "bg-emerald-300" : "bg-[#FFE08A]"
-          }`}
-        >
+      <div className="flex items-center gap-2.5">
+        <span aria-hidden="true" className="flex h-6 w-6 flex-shrink-0 items-center justify-center">
           {goalMet ? (
-            <Check size={19} strokeWidth={3} />
+            <Check size={20} strokeWidth={3} className="text-emerald-600" />
           ) : (
-            <Flame size={19} fill="#FF6B35" color="#151821" strokeWidth={2.5} />
+            <Flame size={20} fill="#FF6B35" color="#151821" strokeWidth={2.5} />
           )}
         </span>
-
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-3">
-            <p className="text-sm font-bold leading-snug text-[var(--ink)]">{rhythmLine}</p>
-            <span className="flex-shrink-0 text-xs font-black text-[var(--ink-soft)]">
-              {goalMet ? "Validé" : `${goalPct}%`}
-            </span>
-          </div>
-
-          {!goalMet && (
-            <div
-              className="mt-2 h-3 overflow-hidden rounded-full border-2 border-[var(--neo-ink)] bg-white"
-              role="progressbar"
-              aria-label={progressLabel}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={goalPct}
-            >
-              <div
-                className="h-full rounded-full bg-[#FF6B35] transition-[width] duration-500"
-                style={{ width: `${goalPct}%` }}
-              />
-            </div>
-          )}
-
-          {allDone && (
-            <button
-              type="button"
-              onClick={onShare}
-              className="mt-3 inline-flex min-h-10 items-center gap-1.5 rounded-xl border-2 border-black bg-white px-3 py-2 text-sm font-black text-black shadow-[2px_2px_0px_0px_#000] transition-transform active:translate-y-[2px] active:shadow-none"
-            >
-              <Sparkles size={15} />
-              {t(COPY.home.keepMoment)}
-            </button>
-          )}
-        </div>
+        <p className="min-w-0 flex-1 text-sm font-bold leading-snug text-[var(--ink)]">
+          {rhythmLine}
+        </p>
+        <span className="flex-shrink-0 text-xs font-black text-[var(--ink-soft)]">
+          {goalMet ? "Validé" : `${goalPct}%`}
+        </span>
       </div>
+
+      {!goalMet && (
+        <div
+          className="mt-1.5 h-2 overflow-hidden rounded-full border-2 border-[var(--neo-ink)] bg-white"
+          role="progressbar"
+          aria-label={progressLabel}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={goalPct}
+        >
+          <div
+            className="h-full rounded-full bg-[#FF6B35] transition-[width] duration-500"
+            style={{ width: `${goalPct}%` }}
+          />
+        </div>
+      )}
+
+      {allDone && (
+        <button
+          type="button"
+          onClick={onShare}
+          className="mt-2.5 inline-flex min-h-11 items-center gap-1.5 rounded-xl border-2 border-black bg-white px-3 py-2 text-sm font-black text-black shadow-[2px_2px_0px_0px_#000] transition-transform active:translate-y-[2px] active:shadow-none"
+        >
+          <Sparkles size={15} />
+          {t(COPY.home.keepMoment)}
+        </button>
+      )}
     </section>
   );
 }
