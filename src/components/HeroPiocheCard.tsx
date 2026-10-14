@@ -205,7 +205,7 @@ export function HeroPiocheCard({
                 </span>
               )}
             </p>
-            <h2 className="line-clamp-3 font-display text-xl font-black leading-tight text-[#151821]">
+            <h2 className="line-clamp-2 font-display text-xl font-black leading-tight text-[#151821]">
               {chapterTitle}
             </h2>
           </div>

@@ -170,7 +170,7 @@ export function HomeView() {
               bubbleLine={bubbleLine}
               subjectName={currentSubject ? SUBJECT_SHORT_NAMES[currentSubject.id] : undefined}
               subjectColor={currentSubject?.color}
-              chapterTitle={currentEntry?.hook ?? currentEntry?.title ?? "Ta mission du jour"}
+              chapterTitle={currentEntry?.title ?? "Ta mission du jour"}
               duration={currentEntry?.minutes ?? 0}
               cardCount={currentEntry?.cards ?? 0}
               resuming={resuming}

@@ -100,7 +100,9 @@ affirmations restent distinctes. Pas de « Acquis », « Compris », « À renfo
 ce que lit l'élève ; ces mots restent pour l'adulte (page de programme, dossier).
 
 **Parler comme un pote, c'est la structure avant l'argot :** court, un peu moqueur, jamais une leçon, la
-chose amusante avant l'étiquette (le titre accroche d'un chapitre passe avant son nom de programme). On met peu
+voix avant le jargon. **Le nom d'un cours est son vrai nom** (« Arithmétique »), sur la Pioche comme partout : décision
+du porteur, 14 oct. L'accroche amusante (« 24 parts, 5 potes : ça tombe pile ? ») vit dans le bandeau de la
+matière, pas à la place du nom. On met peu
 de mots à nous, toujours les mêmes, dans un seul endroit. L'argot de mème vieillit en quelques mois et fait un
 adulte déguisé : on n'en met que de durable, et la liste se valide avec de vrais lycéens.
 
