@@ -1,12 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useApp } from "@/store";
-import { computeGoalPct, remainingToGoal } from "@/lib/progress";
 import { sfx } from "@/lib/sound";
 import { COPY } from "@/lib/copy";
 import { useTone } from "@/lib/useTone";
 import { useCourseProgress } from "@/lib/course/useCourseProgress";
-import { useCourseMastery } from "@/lib/course/useCourseMastery";
 import { buildLibrary, type Library } from "@/lib/catalog/catalog";
 import { dueInLibrary, pickGlobalResume, verbFor } from "@/lib/world/resume";
 import { focusSubjectId } from "@/lib/world/soon";
@@ -21,10 +19,9 @@ import { useReminders } from "@/components/notifications/useReminders";
 import { frequencyFromGoal, isBraked } from "@/lib/notifications/model";
 import { shouldInvite } from "@/lib/notifications/store";
 import { useNotifState } from "@/lib/notifications/useNotifState";
-import { TodayStrip } from "@/components/TodayStrip";
-import { ShareAuraModal } from "@/components/ShareAuraModal";
+import { PrepareCard } from "@/components/PrepareCard";
+import { PrepareSheet } from "@/components/PrepareSheet";
 import { SUBJECTS, SUBJECT_SHORT_NAMES } from "@/data";
-import { getRankInfo, countMasteredCards, countSubjectsSeen } from "@/lib/aura";
 import { getIntoxDismissedCount, setIntoxDismissedCount } from "@/lib/celebrations";
 import type { Level } from "@/types";
 
@@ -39,9 +36,9 @@ const staggerItem = {
 };
 
 export function HomeView() {
-  const { state, setTab, setView, openSubject, openLesson, setUser } = useApp();
+  const { state, setTab, setView, openSubject, openLesson, setUser, setSoon } = useApp();
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [shareOpen, setShareOpen] = useState(false);
+  const [prepareOpen, setPrepareOpen] = useState(false);
   const [intoxDismissedCount, setIntoxDismissedCountState] = useState(getIntoxDismissedCount);
   const prevGoalMet = useRef(state.dailyGoalMet);
 
@@ -62,7 +59,6 @@ export function HomeView() {
   // a refresh. The wording follows where the student stands, never an alarm.
   const { t } = useTone();
   const courseProgress = useCourseProgress();
-  const courseMastery = useCourseMastery();
   const libraries = SUBJECTS.map((s) =>
     buildLibrary(s.id, {
       completedChapters: state.completedChapters,
@@ -76,11 +72,10 @@ export function HomeView() {
   // so the two screens never give different advice (a Déclic touched in the last two days, a review
   // that has come due, a point that mixes up, an older Déclic, then something new). Nothing is drawn
   // at random any more; on day zero the ladder lands on the first chapter of the first subject.
-  const pick = pickGlobalResume(
-    libraries,
-    state.lastSubjectId,
-    focusSubjectId(state.soonBy, Date.now()),
-  );
+  // The subject a test is coming in, if the student said so (the one whose date is first).
+  const focusId = focusSubjectId(state.soonBy, Date.now());
+  const prepSubject = SUBJECTS.find((s) => s.id === focusId) ?? null;
+  const pick = pickGlobalResume(libraries, state.lastSubjectId, focusId);
   const currentSubject = pick ? SUBJECTS.find((s) => s.id === pick.subjectId) : undefined;
   const currentEntry = pick?.resume.entry;
   const resuming = pick?.resume.reason === "resume" && pick.resume.fresh === true;
@@ -134,12 +129,6 @@ export function HomeView() {
   const braked = notif.prefs.enabled && isBraked(notif.history, notif.opens, Date.now());
   const invite = !braked && shouldInvite(notif, tasted, Date.now());
 
-  // Same derivation as ProfilAuraView's own share button — real distinct-subjects-reviewed
-  // count from card review history, not a second, possibly-diverging computation.
-  const subjectsCount = countSubjectsSeen(state.cardReviews, courseMastery);
-  const masteredCards = countMasteredCards(state.cardReviews, courseMastery);
-  const rank = getRankInfo(state.xp).current;
-
   return (
     <>
       <div className="view is-active home-view pt-3">
@@ -183,16 +172,19 @@ export function HomeView() {
           </motion.div>
 
           <motion.div variants={staggerItem}>
-            <TodayStrip
-              streak={state.streak}
-              dailyGoalMet={state.dailyGoalMet}
-              remaining={remainingToGoal(state)}
-              goalPct={computeGoalPct(state)}
-              dueCount={dueTotal}
-              onShare={() => {
+            <PrepareCard
+              subject={prepSubject}
+              onAsk={() => {
                 sfx.tap(state.soundOn);
-                if (navigator.vibrate) navigator.vibrate(10);
-                setShareOpen(true);
+                setPrepareOpen(true);
+              }}
+              onPrepare={() => {
+                sfx.tap(state.soundOn);
+                if (prepSubject) openSubject(prepSubject.id);
+              }}
+              onClear={() => {
+                sfx.tap(state.soundOn);
+                if (prepSubject) setSoon(prepSubject.id, null);
               }}
             />
           </motion.div>
@@ -257,14 +249,14 @@ export function HomeView() {
         onClose={() => setSheetOpen(false)}
       />
 
-      {shareOpen && (
-        <ShareAuraModal
-          rank={rank}
-          streak={state.streak}
-          xp={state.xp}
-          subjectsCount={subjectsCount}
-          masteredCards={masteredCards}
-          onClose={() => setShareOpen(false)}
+      {prepareOpen && (
+        <PrepareSheet
+          onChoose={(subjectId, days) => {
+            sfx.tap(state.soundOn);
+            setSoon(subjectId, days);
+            setPrepareOpen(false);
+          }}
+          onClose={() => setPrepareOpen(false)}
         />
       )}
     </>

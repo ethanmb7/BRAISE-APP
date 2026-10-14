@@ -305,11 +305,13 @@ interprétation de l'équipe, à corriger si elle est fausse.
 | Des points qui récompensent le temps ou qu'on peut farmer ; des données inventées.                                                  | Cela détourne de ce qu'on mesure : retrouver sans aide.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | _projet_                                                                                           |
 | Un cinquième onglet, un réseau social, plusieurs monnaies.                                                                          | Focus du prototype.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | _projet_                                                                                           |
 
-**La flamme du jour** (la ligne sous la Pioche) **dit ce qui se remplit, elle ne raconte pas ce qui reste :** « Ta flamme
-du jour » avec sa barre ; quand l'objectif est atteint, la flamme s'allume (« Flamme allumée, +20 XP. À demain. ») et
-la journée a une **fin**, comme une grille qu'on termine. **La série ne dépend pas de l'objectif :** une activité,
-même légère, la garde ; l'objectif n'ouvre que le bonus (un objectif exigeant ne doit pas devenir un obstacle à
-l'habitude). Récompense immédiate, jamais de minuteur, jamais de tirage au hasard.
+**L'espace entre la Pioche et Tes mondes sert à préparer un contrôle** (décision du porteur, 14 oct. : « préparer un
+contrôle »). Rien de prévu : « Un contrôle bientôt ? Dis-moi quand, je m'en occupe. » et un bouton « Je prépare ».
+Deux taps (la matière, puis demain / cette semaine / la semaine prochaine), pas de calendrier. Une fois dit : « SVT :
+on prépare ensemble. », un bouton « Préparer » qui ouvre la matière, et « Plus besoin ». La Pioche et Réviser
+s'alignent sur cette matière. **Jamais de date ni de décompte affichés.** La « flamme du jour » (l'objectif et son
+bonus de +20 XP) n'a plus de place visible sur l'accueil : le mécanisme existe encore, à décider (le retirer ou le
+montrer ailleurs). La série ne dépend toujours pas de l'objectif.
 
 **Les chiffres : ce qu'on possède, jamais ce par quoi on est jugé.** On montre ce qui s'accumule (« 10 en poche »,
 une barre qui avance, une série, des badges) ; on ne montre pas de note (pas de « précision 87 % », pas de
