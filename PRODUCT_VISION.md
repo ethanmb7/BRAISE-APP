@@ -305,6 +305,13 @@ interprétation de l'équipe, à corriger si elle est fausse.
 | Des points qui récompensent le temps ou qu'on peut farmer ; des données inventées.                                                  | Cela détourne de ce qu'on mesure : retrouver sans aide.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | _projet_                                                                                           |
 | Un cinquième onglet, un réseau social, plusieurs monnaies.                                                                          | Focus du prototype.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | _projet_                                                                                           |
 
+**Les chiffres : ce qu'on possède, jamais ce par quoi on est jugé.** On montre ce qui s'accumule (« 10 en poche »,
+une barre qui avance, une série, des badges) ; on ne montre pas de note (pas de « précision 87 % », pas de
+« 3 erreurs », pas de « 29 % du programme », pas de « x/34 », pas de « 25 % » ni de « 1/15 » : la barre suffit).
+Un chiffre qui dit « voilà ce que tu vaux » détourne l'attention de la tâche vers soi (Kluger et DeNisi, 1996).
+À observer avec de vrais élèves : « +3 » avant la réponse, « XP jusqu'au rang », le nombre de « trucs à
+rallumer » qui peut grossir comme un arriéré.
+
 **Décision (14 oct.) : pas d'IA pour l'instant**, trop complexe à mettre en place. Aucun chat, aucun appel à un
 modèle ; on ne reprend pas les tiroirs IA arrivés par la synchronisation Lovable.
 

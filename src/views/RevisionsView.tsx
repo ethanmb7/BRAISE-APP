@@ -659,8 +659,10 @@ function SwipeDeck({
             when a streak starts or breaks) · report · quit. Report lives up here now, styled
             as a sibling of the quit button, off the card's reading area. */}
         <div className="rev-top-row">
-          <span className="rev-count">
-            {index + 1}/{cards.length}
+          {/* The length of the session is told by the bar; the number would turn it into a list of
+              things left to do. Still read out loud. */}
+          <span className="sr-only">
+            Carte {index + 1} sur {cards.length}
           </span>
           <div className="rev-progress-track">
             {/* Persistent element (no remount key) — a spring needs a previous value to

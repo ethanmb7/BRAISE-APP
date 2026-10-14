@@ -29,6 +29,12 @@ describe("the voice", () => {
     expect(hits).toEqual([]);
   });
 
+  it("never gives the student a mark: no precision percentage, no count of mistakes", () => {
+    const BAD = /Précision|ERREUR\$\{|\{precision\}/;
+    const hits = files.filter((f) => BAD.test(code(f)));
+    expect(hits).toEqual([]);
+  });
+
   it("calls the app BRAISE, not by its old name", () => {
     const hits = files.filter((f) => /\bSAPIE\b/.test(code(f).replace(/sapie_\w+/g, "")));
     expect(hits).toEqual([]);

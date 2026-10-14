@@ -443,7 +443,7 @@ const SubjectMasteryGrid = memo(function SubjectMasteryGrid({
                 className="mastery-tile"
                 role="listitem"
                 onClick={() => onSelect(s.id)}
-                aria-label={`${s.name} : ${s.masteredCount} carte${s.masteredCount > 1 ? "s" : ""} maîtrisée${s.masteredCount > 1 ? "s" : ""} sur ${s.totalCount} — réviser cette matière`}
+                aria-label={`${s.name} : ${s.masteredCount} carte${s.masteredCount > 1 ? "s" : ""} dans la poche, réviser cette matière`}
               >
                 <span className="mastery-stack">
                   {[0, 1, 2, 3].map((i) => {
@@ -466,9 +466,7 @@ const SubjectMasteryGrid = memo(function SubjectMasteryGrid({
                   })}
                 </span>
                 <span className="mastery-name">{SHORT_SUBJECT_NAME[s.id] ?? s.name}</span>
-                <span className="mastery-count">
-                  {s.masteredCount}/{s.totalCount} en poche
-                </span>
+                <span className="mastery-count">{s.masteredCount} en poche</span>
               </button>
             );
           })}

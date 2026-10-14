@@ -58,9 +58,9 @@ export function TodayStrip({
         <p className="min-w-0 flex-1 text-sm font-bold leading-snug text-[var(--ink)]">
           {rhythmLine}
         </p>
-        <span className="flex-shrink-0 text-xs font-black text-[var(--ink-soft)]">
-          {goalMet ? "Validé" : `${goalPct}%`}
-        </span>
+        {goalMet && (
+          <span className="flex-shrink-0 text-xs font-black text-[var(--ink-soft)]">Validé</span>
+        )}
       </div>
 
       {!goalMet && (

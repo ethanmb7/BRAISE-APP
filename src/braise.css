@@ -2282,9 +2282,6 @@ select {
 .recap-stat-chip.combo {
   background: #ffd166;
 }
-.recap-stat-chip.precision {
-  background: #a7f3d0;
-}
 .recap-stat-icon {
   font-size: 1.1rem;
 }
@@ -2448,7 +2445,6 @@ select {
       0 0 0 0 rgba(16, 185, 129, 0);
   }
 }
-.rev-count,
 .rev-combo {
   flex-shrink: 0;
   height: 32px;

@@ -47,7 +47,9 @@ export function BraiseRecap({
     {
       key: "cards",
       bg: "ink",
-      title: `${reviewed} CARTE${reviewed > 1 ? "S" : ""}. ${wrongCount === 0 ? "0 ERREUR." : `${wrongCount} ERREUR${wrongCount > 1 ? "S" : ""}.`}`,
+      // What was done, never a count of mistakes: that is a mark, and Braise's line below reacts to
+      // the session in her own words.
+      title: `${reviewed} CARTE${reviewed > 1 ? "S" : ""}.`,
       sub: recapCardsLine(voiceCtx, wrongCount),
     },
     ...(maxCombo >= 2
@@ -68,7 +70,6 @@ export function BraiseRecap({
   const slide = slides[i];
   const isLast = i === slides.length - 1;
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const precision = reviewed > 0 ? Math.round(((reviewed - wrongCount) / reviewed) * 100) : 0;
 
   // The session's own payoff moment — the biggest celebration in the whole screen — played no
   // sound at all: every other "you finished something" beat in the app (a lesson, onboarding)
@@ -141,11 +142,6 @@ export function BraiseRecap({
                 <span className="recap-stat-icon">🔥</span>
                 <span className="recap-stat-value">×{maxCombo}</span>
                 <span className="recap-stat-label">Combo max</span>
-              </div>
-              <div className="recap-stat-chip precision">
-                <span className="recap-stat-icon">🎯</span>
-                <span className="recap-stat-value">{precision}%</span>
-                <span className="recap-stat-label">Précision</span>
               </div>
             </div>
             <button className="btn-block recap-btn" onClick={onRestart}>
