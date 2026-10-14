@@ -30,6 +30,12 @@ const EMOJI_ONLY = /^[\p{Extended_Pictographic}\p{Emoji_Presentation}✦·\s]+$/
 const SCREENS = [
   ["home", { view: "home", tab: "home" }],
   ["hub", { view: "subjects", tab: "subjects" }],
+  // the chapters of the world Braise suggests, opened by touching it
+  [
+    "hub, volet",
+    { view: "subjects", tab: "subjects" },
+    `document.querySelector(".planet.is-suggested")?.click()`,
+  ],
   ["revisions", { view: "revisions", tab: "revisions" }],
   ["aura", { view: "progres", tab: "progres" }],
   ["moi", { view: "profile", tab: "profile" }],
@@ -193,8 +199,12 @@ try {
   await app.open("/?demo");
   for (const dark of [false, true]) {
     const theme = dark ? "sombre" : "clair";
-    for (const [name, state] of SCREENS) {
+    for (const [name, state, action] of SCREENS) {
       await app.load({ ...state, darkMode: dark });
+      if (action) {
+        await app.ev(action);
+        await sleep(700);
+      }
       for (const f of await app.ev(PAGE_AUDIT)) found.push({ where: `${name} (${theme})`, ...f });
     }
     for (const [name, state] of DECLICS) {

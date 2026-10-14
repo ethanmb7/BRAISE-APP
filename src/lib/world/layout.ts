@@ -3,9 +3,10 @@
 // size pushes things apart instead of laying one over another. What is left to decide is only which
 // box each thing goes in, which is pure and tested without a screen.
 
-/** The most worlds the "Où on va ?" screen holds (three above Braise, three below). More subjects than
- *  that and the screen falls back to a plain grid. */
-export const HUB_CAPACITY = 6;
+/** The most worlds the "Où on va ?" screen holds: the six places of the hexagon around the sun, and the
+ *  four corners of the grid that it leaves free. More subjects than that and the screen falls back to a
+ *  plain grid. */
+export const HUB_CAPACITY = 10;
 
 export type HubPlace = { col: 1 | 2 | 3; row: 1 | 2 | 3 | 4 };
 
@@ -16,6 +17,11 @@ const LOWER_RIGHT: HubPlace = { col: 3, row: 3 };
 const BOTTOM: HubPlace = { col: 2, row: 4 };
 const LOWER_LEFT: HubPlace = { col: 1, row: 3 };
 const UPPER_LEFT: HubPlace = { col: 1, row: 2 };
+// The corners: past the sixth world, they take the next ones, clockwise from the top left.
+const TOP_LEFT: HubPlace = { col: 1, row: 1 };
+const TOP_RIGHT: HubPlace = { col: 3, row: 1 };
+const BOTTOM_RIGHT: HubPlace = { col: 3, row: 4 };
+const BOTTOM_LEFT: HubPlace = { col: 1, row: 4 };
 
 const HUB_PLACES: Record<number, HubPlace[]> = {
   1: [TOP],
@@ -24,10 +30,36 @@ const HUB_PLACES: Record<number, HubPlace[]> = {
   4: [UPPER_LEFT, UPPER_RIGHT, LOWER_RIGHT, LOWER_LEFT],
   5: [TOP, UPPER_RIGHT, LOWER_RIGHT, LOWER_LEFT, UPPER_LEFT],
   6: [TOP, UPPER_RIGHT, LOWER_RIGHT, BOTTOM, LOWER_LEFT, UPPER_LEFT],
+  7: [TOP, UPPER_RIGHT, LOWER_RIGHT, BOTTOM, LOWER_LEFT, UPPER_LEFT, TOP_LEFT],
+  8: [TOP, UPPER_RIGHT, LOWER_RIGHT, BOTTOM, LOWER_LEFT, UPPER_LEFT, TOP_LEFT, TOP_RIGHT],
+  9: [
+    TOP,
+    UPPER_RIGHT,
+    LOWER_RIGHT,
+    BOTTOM,
+    LOWER_LEFT,
+    UPPER_LEFT,
+    TOP_LEFT,
+    TOP_RIGHT,
+    BOTTOM_RIGHT,
+  ],
+  10: [
+    TOP,
+    UPPER_RIGHT,
+    LOWER_RIGHT,
+    BOTTOM,
+    LOWER_LEFT,
+    UPPER_LEFT,
+    TOP_LEFT,
+    TOP_RIGHT,
+    BOTTOM_RIGHT,
+    BOTTOM_LEFT,
+  ],
 };
 
 /** Where each world goes around the sun, in the subject's order (a subject keeps its place from one visit
- *  to the next, whatever its state). Clockwise from the top. */
+ *  to the next, whatever its state, and one more subject never moves the others). The first six go
+ *  clockwise from the top; the next ones take the corners. */
 export function hubPlaces(count: number): HubPlace[] {
   return HUB_PLACES[Math.min(Math.max(count, 0), HUB_CAPACITY)] ?? [];
 }

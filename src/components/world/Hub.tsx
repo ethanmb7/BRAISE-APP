@@ -4,6 +4,11 @@ import { BraiseMascot } from "@/components/BraiseMascot";
 import { SubjectIcon } from "@/components/SubjectIcon";
 import { hubPlaces } from "@/lib/world/layout";
 import { fitOrbit, type Orbit } from "@/lib/world/orbit";
+import { deltaToReveal } from "@/lib/world/scroll";
+
+/** How many worlds the dashed orbit goes through: the hexagon. The corners (a seventh world and more)
+ *  sit outside it. */
+const ORBIT_WORLDS = 6;
 
 export type HubWorld = {
   id: string;
@@ -12,7 +17,8 @@ export type HubWorld = {
   color: string;
   /** Cards waiting for a refresh in this world. */
   due: number;
-  suggested: boolean;
+  /** Set on the one world Braise suggests: what she would do there, said as a verb and a chapter. */
+  suggestion?: { verb: string; chapter: string };
 };
 
 // A few sparkles scattered in the sky: where and how big. They stay still: at rest only the worlds'
@@ -49,23 +55,22 @@ function Planet({
   world,
   index,
   place,
-  pointed,
   still,
   onSelect,
 }: {
   world: HubWorld;
   index: number;
   place: { col: number; row: number };
-  /** Braise has just pointed at this world: a ring says so for a moment. */
-  pointed: boolean;
   /** No entrance, for those who ask for less motion. */
   still: boolean;
   onSelect: (id: string) => void;
 }) {
+  const { suggestion } = world;
   return (
     <motion.button
       type="button"
-      className={`planet${world.suggested ? " is-suggested" : ""}${pointed ? " is-pointed" : ""}`}
+      className={`planet${suggestion ? " is-suggested" : ""}`}
+      data-world={world.id}
       data-edge={place.row === 1 ? "top" : undefined}
       style={
         {
@@ -76,7 +81,8 @@ function Planet({
         } as CSSProperties
       }
       onClick={() => onSelect(world.id)}
-      aria-label={`${world.name}${world.due > 0 ? `, ${world.due} notion${world.due > 1 ? "s" : ""} à rafraîchir` : ""}${world.suggested ? ", suggéré par Braise" : ""}`}
+      aria-haspopup="dialog"
+      aria-label={`${world.name}${world.due > 0 ? `, ${world.due} notion${world.due > 1 ? "s" : ""} à rafraîchir` : ""}${suggestion ? `, Braise te conseille : ${suggestion.verb.toLowerCase()} ${suggestion.chapter}` : ""}`}
       // The worlds arrive one after the other, once; a press then sinks them a little.
       initial={still ? false : { opacity: 0, scale: 0.8 }}
       animate={{
@@ -93,11 +99,10 @@ function Planet({
       transition={{ type: "spring", stiffness: 500, damping: 22 }}
     >
       <span className="planet-ball">
-        {world.suggested && (
+        {suggestion && (
           <>
             <i className="planet-halo" />
             <i className="planet-moon" />
-            {pointed && <i className="planet-ping" />}
           </>
         )}
         <span className="planet-badge">
@@ -107,53 +112,50 @@ function Planet({
       </span>
       <span className="planet-meta">
         <span className="planet-label">{world.shortName}</span>
-        {world.suggested && <span className="planet-tag">Braise te suggère</span>}
+        {suggestion && <span className="planet-tag">{suggestion.verb} →</span>}
       </span>
     </motion.button>
   );
 }
 
-/** "Où on va ?" as a small solar system: Braise is the sun, the worlds go around her (a hexagon of
- *  places, see `hubPlaces`) on a dashed orbit that passes through all of them. A world is a button into
- *  that subject; the one Braise suggests is bigger, ringed and has a moon; a pastille counts what waits
- *  for a refresh. Braise answers a touch: she hops and points at the world she suggests (it is ringed
- *  for a moment, and brought into view if it was off screen). Built in the flow (a grid whose cells hold
- *  a world and its name), so no phone size or text size can lay a name over another world: the orbit is
- *  drawn afterwards, through where the worlds actually ended up. */
+/** "Où on va ?" as a small solar system: the worlds go around the sun (a hexagon of places, then the
+ *  corners, see `hubPlaces`) on a dashed orbit that passes through the first six. A world is the button:
+ *  touching it opens its chapters. Braise is the sun, always there with the student; the world she
+ *  suggests is bigger, ringed, has a moon, and carries the verb she would use ("Reprendre →"). A
+ *  pastille counts what waits for a refresh. Built in the flow (a
+ *  grid whose cells hold a world and its name), so no phone size or text size can lay a name over
+ *  another world: the orbit is drawn afterwards, through where the worlds actually ended up. */
 export function Hub({
   worlds,
   braiseMood,
   onSelect,
-  onBraise,
 }: {
   worlds: HubWorld[];
   braiseMood: "happy" | "eager" | "proud" | "hesitant";
   onSelect: (id: string) => void;
-  /** Braise was pressed (the screen plays the sound). */
-  onBraise: () => void;
 }) {
   const places = hubPlaces(worlds.length);
   const stage = useRef<HTMLDivElement>(null);
   const [orbit, setOrbit] = useState<(Orbit & { w: number; h: number }) | null>(null);
   const reduced = useReducedMotion() ?? false;
-  const [hop, setHop] = useState(0);
-  const [pointed, setPointed] = useState(false);
-  const suggested = worlds.find((w) => w.suggested);
+  const suggestedId = worlds.find((w) => w.suggestion)?.id ?? null;
 
+  // On a short phone the suggested world can be under the tab bar: bring it into view once, on arrival.
   useEffect(() => {
-    if (!pointed) return;
-    const timer = window.setTimeout(() => setPointed(false), 1400);
-    return () => window.clearTimeout(timer);
-  }, [pointed, hop]);
-
-  const point = () => {
-    onBraise();
-    setHop((h) => h + 1);
-    const target = stage.current?.querySelector<HTMLElement>(".planet.is-suggested");
-    if (!target) return;
-    target.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" });
-    setPointed(true);
-  };
+    if (!suggestedId) return;
+    const frame = requestAnimationFrame(() => {
+      const scroller = document.querySelector<HTMLElement>(".app-content");
+      const target = stage.current?.querySelector<HTMLElement>(".planet.is-suggested");
+      if (!scroller || !target) return;
+      const bar = document.querySelector<HTMLElement>(".braise-tabbar");
+      const bottom = bar ? bar.getBoundingClientRect().top : window.innerHeight;
+      const delta = deltaToReveal(target.getBoundingClientRect(), { top: 0, bottom });
+      if (delta > 0) scroller.scrollBy({ top: delta, behavior: reduced ? "auto" : "smooth" });
+    });
+    return () => cancelAnimationFrame(frame);
+    // Once per suggested world, not whenever the screen re-renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [suggestedId]);
 
   useLayoutEffect(() => {
     const el = stage.current;
@@ -166,9 +168,9 @@ export function Hub({
         x: r.left + r.width / 2 - box.left,
         y: r.top + r.height / 2 - box.top,
       });
-      const balls = [...el.querySelectorAll(".planet-ball")].map((b) =>
-        centre(b.getBoundingClientRect()),
-      );
+      const balls = [...el.querySelectorAll(".planet-ball")]
+        .slice(0, ORBIT_WORLDS)
+        .map((b) => centre(b.getBoundingClientRect()));
       const fit = fitOrbit(centre(sun), balls);
       setOrbit(fit ? { ...fit, w: box.width, h: box.height } : null);
     };
@@ -210,25 +212,12 @@ export function Hub({
             />
           </svg>
         )}
-        <div className="hub-center">
-          <i className="hub-rays" aria-hidden="true" />
-          <span className="hub-sun" aria-hidden="true" />
-          <button
-            type="button"
-            className="hub-braise"
-            onClick={point}
-            aria-label={suggested ? `Braise te montre ${suggested.name}` : "Braise"}
-          >
-            <motion.span
-              key={hop}
-              className="hub-braise-hop"
-              initial={hop === 0 || reduced ? false : { y: 0, rotate: 0 }}
-              animate={hop === 0 || reduced ? undefined : { y: [0, -14, 0], rotate: [0, -5, 5, 0] }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-            >
-              <BraiseMascot size={104} mood={braiseMood} />
-            </motion.span>
-          </button>
+        <div className="hub-center" aria-hidden="true">
+          <i className="hub-rays" />
+          <span className="hub-sun" />
+          <span className="hub-braise">
+            <BraiseMascot size={104} mood={braiseMood} />
+          </span>
         </div>
         {worlds.map((w, i) => (
           <Planet
@@ -236,7 +225,6 @@ export function Hub({
             world={w}
             index={i}
             place={places[i]}
-            pointed={pointed && w.suggested}
             still={reduced}
             onSelect={onSelect}
           />

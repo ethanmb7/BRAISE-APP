@@ -1,6 +1,6 @@
-import { useMemo } from "react";
-import { ArrowRight } from "lucide-react";
+import { useMemo, useState } from "react";
 import { Hub, type HubWorld } from "@/components/world/Hub";
+import { WorldSheet } from "@/components/world/WorldSheet";
 import { PageHeader } from "@/components/PageHeader";
 import { useScrollMemory } from "@/lib/world/useScroll";
 import { SubjectDecks, type SubjectDeckItem } from "@/components/SubjectDecks";
@@ -14,14 +14,19 @@ import { useCourseProgress } from "@/lib/course/useCourseProgress";
 import { buildLibrary, type Library } from "@/lib/catalog/catalog";
 import { HUB_CAPACITY } from "@/lib/world/layout";
 import { dueInLibrary, pickGlobalResume, verbFor } from "@/lib/world/resume";
+import { sheetRows } from "@/lib/world/sheet";
 
-/** The voluntary exploration space: Home recommends; "Où on va ?" lets the student choose a subject.
- *  Braise stands in the middle, each subject is a world around her, and nothing is locked. */
+/** The voluntary choice: Home recommends (the Pioche); "Où on va ?" lets the student choose a subject and
+ *  a chapter. Each subject is a world, nothing is locked, and there is no button here but the worlds:
+ *  touching one opens its chapters, and the line of a chapter launches it. Braise does not give her
+ *  advice in a card: she waits on the world she suggests, with the verb she would use, and her line is
+ *  in that world's sheet. */
 export function SubjectsView() {
   const { state, openSubject, openLesson } = useApp();
   const { t } = useTone();
   const courseProgress = useCourseProgress();
   useScrollMemory("hub");
+  const [openId, setOpenId] = useState<string | null>(null);
 
   const libraries = useMemo(() => {
     const now = Date.now();
@@ -74,57 +79,68 @@ export function SubjectsView() {
     shortName: SUBJECT_SHORT_NAMES[s.id] ?? s.name,
     color: s.color,
     due: dueInLibrary(libraries[i]),
-    suggested: global?.subjectId === s.id,
+    suggestion:
+      global?.subjectId === s.id
+        ? { verb: verbFor(global.resume), chapter: global.resume.entry.title }
+        : undefined,
   }));
   const dueTotal = worlds.reduce((sum, w) => sum + w.due, 0);
   // Said before going in, to the students the content does not reach yet.
   const beyondSeconde = state.user.level === "1ere" || state.user.level === "term";
 
   const reason = global?.resume.reason;
-  const says = !global
-    ? t(COPY.world.saysAllSet)
-    : reason === "resume"
-      ? t(COPY.world.saysResume)
-      : reason === "reinforce"
-        ? t(COPY.world.saysReinforce)
-        : reason === "review"
-          ? t(COPY.world.saysReview(global.resume.entry.dueCount))
-          : t(COPY.world.saysNext);
+  const braiseMood = !global ? "proud" : reason === "next" ? "eager" : "happy";
 
-  // The page, in the order of a decision: where Braise would go (one button), then the worlds to choose
-  // from. There is no bar with a title or a back button: this is a main screen (see DESIGN_RULES.md), the
-  // tab bar leads back to Aujourd'hui.
+  // The sheet of the world that was touched: its chapters, and Braise's line if it is the one she suggests.
+  const index = SUBJECTS.findIndex((s) => s.id === openId);
+  const openWorld = index >= 0 ? worlds[index] : null;
+  const suggestedHere = !!openWorld && global?.subjectId === openWorld.id;
+  const says =
+    suggestedHere && global
+      ? global.resume.reason === "review"
+        ? t(COPY.library.reviewSays(global.resume.entry.dueCount))
+        : t(COPY.library.resumeSays[global.resume.reason])
+      : null;
+
+  // The page: one title, one line that says what the number on a world means (or that all is set), and
+  // the worlds. There is no bar with a title or a back button: this is a main screen (see
+  // DESIGN_RULES.md), the tab bar leads back to Aujourd'hui.
   return (
     <div>
       <div className="view is-active subjects-view">
         <PageHeader kicker={t(COPY.world.kicker)} title={t(COPY.world.title)} />
         {beyondSeconde && <p className="info-note">{t(COPY.world.levelNote)}</p>}
-        <section className="dock dock--hub" aria-label="Braise">
-          <p className="dock-says">{says}</p>
-          {global && (
-            <button
-              type="button"
-              className="dock-cta"
-              onClick={() => {
-                sfx.tap(state.soundOn);
-                openLesson(global.subjectId, global.resume.entry.chapterId);
-              }}
-            >
-              <span>
-                {verbFor(global.resume)} <small>{global.resume.entry.title}</small>
-              </span>
-              <ArrowRight size={18} strokeWidth={3} />
-            </button>
-          )}
-        </section>
-        {dueTotal > 0 && <p className="hub-legend">{t(COPY.world.legendDue)}</p>}
+        {dueTotal > 0 ? (
+          <p className="hub-legend">{t(COPY.world.legendDue)}</p>
+        ) : !global ? (
+          <p className="hub-legend">{t(COPY.world.saysAllSet)}</p>
+        ) : null}
         <Hub
           worlds={worlds}
-          braiseMood={!global ? "proud" : reason === "next" ? "eager" : "happy"}
-          onSelect={open}
-          onBraise={() => sfx.tap(state.soundOn)}
+          braiseMood={braiseMood}
+          onSelect={(id) => {
+            sfx.tap(state.soundOn);
+            setOpenId(id);
+          }}
         />
       </div>
+      {openWorld && (
+        <WorldSheet
+          key={openWorld.id}
+          name={openWorld.name}
+          subjectId={openWorld.id}
+          color={openWorld.color}
+          due={openWorld.due}
+          says={says}
+          rows={sheetRows(libraries[index], suggestedHere ? global!.resume.entry.key : null)}
+          onOpenChapter={(row) => {
+            sfx.tap(state.soundOn);
+            openLesson(openWorld.id, row.entry.chapterId);
+          }}
+          onOpenAll={() => open(openWorld.id)}
+          onClose={() => setOpenId(null)}
+        />
+      )}
     </div>
   );
 }

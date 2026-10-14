@@ -35,10 +35,11 @@ export function dueInLibrary(library: Library): number {
   return library.entries.reduce((sum, e) => sum + e.dueCount, 0);
 }
 
-/** The verb on the button for a suggestion. */
+/** The verb for a suggestion. It says what really happens: the chapter opens. "Réviser" is not used: it
+ *  is the name of a tab, where the cards are swiped (one word, one meaning). */
 export function verbFor({ entry, reason }: Resume): string {
   if (reason === "resume") return "Reprendre";
   if (reason === "reinforce") return "Renforcer";
-  if (reason === "review") return "Réviser";
+  if (reason === "review") return "Retrouver";
   return entry.status === "not_started" ? "Commencer" : "Continuer";
 }

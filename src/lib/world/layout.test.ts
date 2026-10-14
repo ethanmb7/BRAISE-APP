@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { SUBJECTS } from "@/data";
 import { HUB_CAPACITY, hubPlaces, islandCell } from "./layout";
 import { fitOrbit } from "./orbit";
-import { dueInLibrary, pickGlobalResume } from "./resume";
+import { dueInLibrary, pickGlobalResume, verbFor } from "./resume";
 import { deltaToReveal, scrollMemory } from "./scroll";
 import type { Library, LibraryEntry } from "@/lib/catalog/catalog";
 
@@ -66,8 +66,27 @@ describe("hubPlaces", () => {
     ]);
   });
 
+  it("holds ten worlds: the hexagon, then the four corners the sun leaves free", () => {
+    expect(HUB_CAPACITY).toBe(10);
+    expect(
+      hubPlaces(10)
+        .slice(6)
+        .map((p) => `${p.col}/${p.row}`),
+    ).toEqual(["1/1", "3/1", "3/4", "1/4"]);
+  });
+
+  it("keeps the hexagon where it is when more worlds come: the first six never move from seven on", () => {
+    for (let n = 7; n <= HUB_CAPACITY; n++) {
+      expect(hubPlaces(n).slice(0, 6)).toEqual(hubPlaces(6));
+    }
+    // and each extra world takes the next corner, so none of the others moves
+    for (let n = 7; n < HUB_CAPACITY; n++) {
+      expect(hubPlaces(n + 1).slice(0, n)).toEqual(hubPlaces(n));
+    }
+  });
+
   it("clamps to the places there are", () => {
-    expect(hubPlaces(9)).toHaveLength(HUB_CAPACITY);
+    expect(hubPlaces(12)).toHaveLength(HUB_CAPACITY);
     expect(hubPlaces(-1)).toEqual([]);
   });
 });
@@ -247,5 +266,20 @@ describe("scrollMemory", () => {
     expect(scrollMemory.get("a")).toBe(120);
     expect(scrollMemory.get("b")).toBe(0);
     expect(scrollMemory.get("c")).toBeUndefined();
+  });
+});
+
+describe("verbFor", () => {
+  const e = (patch: Partial<LibraryEntry> = {}) => entry(patch);
+
+  it("says what really happens, and never uses the name of a tab", () => {
+    expect(verbFor({ entry: e(), reason: "resume", fresh: true })).toBe("Reprendre");
+    expect(verbFor({ entry: e(), reason: "reinforce" })).toBe("Renforcer");
+    expect(verbFor({ entry: e({ dueCount: 2 }), reason: "review" })).toBe("Retrouver");
+    expect(verbFor({ entry: e({ status: "not_started" }), reason: "next" })).toBe("Commencer");
+    expect(verbFor({ entry: e({ status: "understood" }), reason: "next" })).toBe("Continuer");
+    for (const reason of ["resume", "reinforce", "review", "next"] as const) {
+      expect(verbFor({ entry: e(), reason })).not.toBe("Réviser");
+    }
   });
 });

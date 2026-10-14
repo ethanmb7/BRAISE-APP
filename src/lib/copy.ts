@@ -61,7 +61,7 @@ export const COPY = {
     reviewSays: (n: number) =>
       L(
         `${n} notion${plural(n)} à rafraîchir, quand tu veux.`,
-        `${n} notion${plural(n)} à remettre en place. Allez, vite fait.`,
+        `${n} notion${plural(n)} à remettre en place. Je t'attends.`,
       ),
     allSet: L(
       "Tout est acquis ici. Tu peux souffler, ou rejouer pour le plaisir.",
@@ -70,27 +70,11 @@ export const COPY = {
     moreComing: L("D'autres cours arrivent bientôt.", "D'autres cours arrivent. Patience."),
   },
 
-  /** "Où on va ?": what Braise says under the worlds, from what she would suggest. */
+  /** "Où on va ?": the page itself. Braise's advice is not a card: the world she suggests is marked in the
+   *  scene, and her line waits in that world's sheet (`COPY.library.resumeSays` / `reviewSays`). */
   world: {
     title: L("Où on va ?", "Alors, on va où ?"),
     kicker: L("Choisis ton monde", "Choisis ton terrain"),
-    saysResume: L(
-      "Où tu veux. Moi, je reprendrais là où tu en étais.",
-      "Où tu veux. Moi, je finirais ce que tu as commencé.",
-    ),
-    saysReinforce: L(
-      "Où tu veux. Moi, je commencerais par ce qui se mélange encore.",
-      "Où tu veux. Moi, je m'occuperais de ce qui te résiste.",
-    ),
-    saysReview: (n: number) =>
-      L(
-        `Où tu veux. ${n} notion${plural(n)} à rafraîchir, si ça te dit.`,
-        `Où tu veux. ${n} notion${plural(n)} à remettre en place. Je suis chaud quand tu l'es.`,
-      ),
-    saysNext: L(
-      "Où tu veux. Moi, j'essaierais quelque chose de nouveau.",
-      "Où tu veux. Moi, j'attaquerais du neuf.",
-    ),
     teaserNew: L(
       "Six matières, toutes ouvertes. Choisis celle qui te fait envie.",
       "Six matières, aucune verrouillée. Même toi, tu en trouveras une qui te plaît.",
