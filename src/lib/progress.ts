@@ -292,8 +292,11 @@ export function ensureSession(s: AppState): Partial<AppState> {
     return { ...reset, streak: 0, freezeArmed: false };
   }
 
-  if (s.dailyGoalMet) {
-    // Met the goal yesterday. A freeze armed defensively for a day that turned out fine was
+  if (s.dailyGoalMet || s.sessionXpEarned > 0) {
+    // Yesterday had some activity, whether the goal was met or not: a Déclic or a few cards keep the streak.
+    // The goal only opens the day's bonus. Coupling the two made a high goal a barrier to the habit it
+    // was meant to build (Duolingo's own A/B: separating them gave +3.3 % at day 14).
+    // A freeze armed defensively for a day that turned out fine was
     // never actually spent — hand it back instead of quietly keeping it consumed.
     return s.freezeArmed
       ? { ...reset, streak: s.streak + 1, freezeArmed: false, freezes: s.freezes + 1 }

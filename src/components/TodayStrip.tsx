@@ -1,4 +1,4 @@
-import { Check, Flame, Sparkles } from "lucide-react";
+import { Flame, Sparkles } from "lucide-react";
 import { COPY } from "@/lib/copy";
 import { useTone } from "@/lib/useTone";
 
@@ -34,13 +34,7 @@ export function TodayStrip({
   const goalMet = dailyGoalMet || remaining === 0;
   const allDone = goalMet && dueCount === 0;
   const progressLabel = goalMet ? "Objectif du jour validé" : `${goalPct}% de ton objectif du jour`;
-  const rhythmLine = t(
-    goalMet
-      ? streak > 0
-        ? COPY.home.rhythmMetWithStreak
-        : COPY.home.rhythmMet
-      : COPY.home.rhythmRemaining(remaining),
-  );
+  const rhythmLine = t(goalMet ? COPY.home.flameLit : COPY.home.flame);
 
   return (
     <section
@@ -49,18 +43,17 @@ export function TodayStrip({
     >
       <div className="flex items-center gap-2.5">
         <span aria-hidden="true" className="flex h-6 w-6 flex-shrink-0 items-center justify-center">
-          {goalMet ? (
-            <Check size={20} strokeWidth={3} className="text-emerald-600" />
-          ) : (
-            <Flame size={20} fill="#FF6B35" color="#151821" strokeWidth={2.5} />
-          )}
+          {/* The flame is pale until the day's goal is reached, then lit. */}
+          <Flame
+            size={22}
+            fill={goalMet ? "#FF6B35" : "#FFD9C7"}
+            color="#151821"
+            strokeWidth={2.5}
+          />
         </span>
         <p className="min-w-0 flex-1 text-sm font-bold leading-snug text-[var(--ink)]">
           {rhythmLine}
         </p>
-        {goalMet && (
-          <span className="flex-shrink-0 text-xs font-black text-[var(--ink-soft)]">Validé</span>
-        )}
       </div>
 
       {!goalMet && (

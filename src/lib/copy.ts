@@ -15,28 +15,14 @@ const plural = (n: number) => (n > 1 ? "s" : "");
 
 export const COPY = {
   home: {
-    /** Daily-goal strip: the goal is met and the streak is alive. */
-    rhythmMetWithStreak: L(
-      `Belle régularité : ta série continue. +${XP_REWARDS.DAILY_CHEST} XP de bonus.`,
-      `Série intacte, +${XP_REWARDS.DAILY_CHEST} XP de bonus. Tu deviens fréquentable.`,
+    /** The day's flame (the strip under the Pioche). It names what fills; it does not narrate what is left:
+     *  the bar says that, and a number or an "encore" would turn it into a quota. When the goal is reached
+     *  the day has an end ("À demain"), as a puzzle you finish. The streak does not depend on it. */
+    flame: L("Ta flamme du jour", "Ta flamme du jour. Elle attend."),
+    flameLit: L(
+      `Flamme allumée, +${XP_REWARDS.DAILY_CHEST} XP. À demain.`,
+      `Flamme allumée. +${XP_REWARDS.DAILY_CHEST} XP. Reviens demain.`,
     ),
-    rhythmMet: L(
-      `Objectif du jour validé : +${XP_REWARDS.DAILY_CHEST} XP de bonus.`,
-      `Objectif validé, +${XP_REWARDS.DAILY_CHEST} XP de bonus. Je m'incline (un peu).`,
-    ),
-    // What is left of the day, said as what to do and not as a number of points: the amounts follow the
-    // reward table (a Déclic is 50, a card found again 15, a new one 10), so "un Déclic" is always enough.
-    rhythmRemaining: (xp: number) => {
-      const left =
-        xp <= 15
-          ? "une carte"
-          : xp <= 30
-            ? "des cartes"
-            : xp <= 50
-              ? "un Déclic"
-              : "un Déclic et des cartes";
-      return L(`Encore ${left}.`, `Encore ${left}. Allez.`);
-    },
     keepMoment: L("Garder ce moment", "Immortaliser ça"),
     /** The card that says what waits for a refresh (the sum of the pastilles on the worlds). */
     dueTitle: L("À rallumer", "Elles t'attendent"),

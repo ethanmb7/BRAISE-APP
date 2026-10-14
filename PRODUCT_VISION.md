@@ -266,15 +266,15 @@ sont pas des preuves d'apprentissage.
 Principe : **on paye le comportement qui fait retenir, pas le temps passé.** Jamais de perte de
 points ni de ton culpabilisant ; rien à farmer ; chaque gain a une raison visible.
 
-| Action                  | XP               | Condition                                                          |
-| ----------------------- | ---------------- | ------------------------------------------------------------------ |
-| Chapitre Déclic terminé | 50               | première fois seulement                                            |
-| Carte nouvelle          | 10               | première fois qu'on la voit                                        |
-| **Carte retrouvée**     | 15               | juste, une fois le délai de la répétition espacée écoulé           |
-| Revanche                | +5 (20 au total) | juste, sur une carte ratée la fois d'avant                         |
-| Revue rapide            | 3                | carte revue avant son échéance : de l'entraînement, pas une preuve |
-| Joker ×2                | double le gain   | après 2 bonnes réponses d'affilée                                  |
-| Coffre du jour          | +20              | une fois par jour, au moment où l'objectif est atteint             |
+| Action                  | XP               | Condition                                                                      |
+| ----------------------- | ---------------- | ------------------------------------------------------------------------------ |
+| Chapitre Déclic terminé | 50               | première fois seulement                                                        |
+| Carte nouvelle          | 10               | première fois qu'on la voit                                                    |
+| **Carte retrouvée**     | 15               | juste, une fois le délai de la répétition espacée écoulé                       |
+| Revanche                | +5 (20 au total) | juste, sur une carte ratée la fois d'avant                                     |
+| Revue rapide            | 3                | carte revue avant son échéance : de l'entraînement, pas une preuve             |
+| Joker ×2                | double le gain   | après 2 bonnes réponses d'affilée                                              |
+| Flamme du jour          | +20              | une fois par jour, au moment où l'objectif est atteint (ex-« coffre du jour ») |
 
 - **Objectif du jour** : Tranquille 40, Régulier 80, À fond 150 XP — de quoi faire un Déclic et
   quelques cartes. Le gain de Réviser affiche sa raison sur la carte (« Retrouvée ! », « Revanche ! »).
@@ -304,6 +304,12 @@ interprétation de l'équipe, à corriger si elle est fausse.
 | Un écran qui « fait trop » (deux Braise, rayons qui tournent, cartes empilées).                                                     | L'œil ne sait plus où aller.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | _dit_ (« fait trop »)                                                                              |
 | Des points qui récompensent le temps ou qu'on peut farmer ; des données inventées.                                                  | Cela détourne de ce qu'on mesure : retrouver sans aide.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | _projet_                                                                                           |
 | Un cinquième onglet, un réseau social, plusieurs monnaies.                                                                          | Focus du prototype.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | _projet_                                                                                           |
+
+**La flamme du jour** (la ligne sous la Pioche) **dit ce qui se remplit, elle ne raconte pas ce qui reste :** « Ta flamme
+du jour » avec sa barre ; quand l'objectif est atteint, la flamme s'allume (« Flamme allumée, +20 XP. À demain. ») et
+la journée a une **fin**, comme une grille qu'on termine. **La série ne dépend pas de l'objectif :** une activité,
+même légère, la garde ; l'objectif n'ouvre que le bonus (un objectif exigeant ne doit pas devenir un obstacle à
+l'habitude). Récompense immédiate, jamais de minuteur, jamais de tirage au hasard.
 
 **Les chiffres : ce qu'on possède, jamais ce par quoi on est jugé.** On montre ce qui s'accumule (« 10 en poche »,
 une barre qui avance, une série, des badges) ; on ne montre pas de note (pas de « précision 87 % », pas de

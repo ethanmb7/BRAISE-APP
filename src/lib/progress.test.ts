@@ -78,10 +78,21 @@ describe("ensureSession", () => {
     expect(result.dailyGoalMet).toBe(false);
   });
 
-  it("resets the streak when yesterday's goal was missed with no freeze armed", () => {
+  it("keeps the streak going on a light day: some activity is enough, the goal only opens the bonus", () => {
     const s = baseState({
       sessionDate: daysAgo(1),
       dailyGoalMet: false,
+      sessionXpEarned: 10,
+      streak: 4,
+    });
+    expect(ensureSession(s).streak).toBe(5);
+  });
+
+  it("resets the streak when yesterday had no activity at all and no freeze was armed", () => {
+    const s = baseState({
+      sessionDate: daysAgo(1),
+      dailyGoalMet: false,
+      sessionXpEarned: 0,
       freezeArmed: false,
       streak: 6,
     });
@@ -92,6 +103,7 @@ describe("ensureSession", () => {
     const s = baseState({
       sessionDate: daysAgo(1),
       dailyGoalMet: false,
+      sessionXpEarned: 0,
       freezeArmed: true,
       freezes: 1,
       streak: 6,
