@@ -1,12 +1,10 @@
 import type { Level, Subject, Flashcard, Badge, UserProfile } from "./types";
 
-// Chapter `status` below is only the fresh-install baseline (chapter 0 of each subject is the
-// suggested one, the rest are open — nothing is ever locked) — same logic as
-// `INITIAL.streak/xp = 0` in store.tsx: a real new user hasn't done anything yet, so nothing here
-// claims otherwise. Real progression is computed at render time by
-// `resolveChapters()` in lib/progress.ts from the device's actual `completedChapters`, and real
-// mastery by `chapterMastery()` from its card-review history — which is what both HomeView and
-// SubjectView read.
+// Chapter `status`/`mastery` below are only the fresh-install baseline (chapter 0 of each
+// subject open at 0%, the rest locked) — same logic as `INITIAL.streak/xp = 0` in store.tsx: a
+// real new user hasn't done anything yet, so nothing here claims otherwise. Real progression is
+// computed at render time by `resolveChapters()` in store.tsx from the device's actual
+// `completedChapters`, which is what both HomeView and SubjectView now read.
 
 // BRAISE is for lycéens only.
 export const LEVELS: Level[] = [
@@ -14,28 +12,6 @@ export const LEVELS: Level[] = [
   { id: "1ere", label: "1ère", group: "Lycée" },
   { id: "term", label: "Terminale", group: "Lycée" },
 ];
-
-// The one level the chapters and cards are actually written for. The level a student picks only
-// changes Braise's voice, never the content, so every screen that shows the level says this out
-// loud instead of letting a Terminale student assume the chapters are theirs.
-export const CONTENT_LEVEL_ID = "2nde";
-export const CONTENT_LEVEL_NOTE = "BRAISE couvre pour l'instant les bases de la 2nde.";
-
-// The short form for tight spots (a chip on the Pioche card, the tag on a review card), where
-// "Physique-Chimie" would be cut off with an ellipsis.
-export const SUBJECT_SHORT_NAMES: Record<string, string> = {
-  maths: "Maths",
-  francais: "Français",
-  "histoire-geo": "Histoire-Géo",
-  svt: "SVT",
-  physique: "Physique",
-  anglais: "Anglais",
-};
-
-// What a brand-new student's very first Pioche offers instead of a random draw. Fractions and the
-// pizzas: three minutes, no prior knowledge needed, and the Déclic opens on an everyday image —
-// the best first impression of the method the app has.
-export const FIRST_CHAPTER_ID = "m1";
 
 export const SUBJECTS: Subject[] = [
   {
@@ -45,16 +21,18 @@ export const SUBJECTS: Subject[] = [
     color: "#3B82F6",
     bg: "#EFF6FF",
     chapters: [
-      { id: "m1", title: "Les fractions", status: "current", duration: 3 },
-      { id: "m2", title: "Théorème de Pythagore", status: "open", duration: 4 },
+      { id: "m1", title: "Les fractions", status: "current", mastery: 0, duration: 3 },
+      { id: "m2", title: "Théorème de Pythagore", status: "locked", mastery: 0, duration: 4 },
       {
         id: "m3",
         title: "Les équations",
-        status: "open",
+        status: "locked",
+        mastery: 0,
+        reinforce: true,
         duration: 3,
       },
-      { id: "m4", title: "Fonctions affines", status: "open", duration: 5 },
-      { id: "m5", title: "Statistiques", status: "open", duration: 4 },
+      { id: "m4", title: "Fonctions affines", status: "locked", mastery: 0, duration: 5 },
+      { id: "m5", title: "Statistiques", status: "locked", mastery: 0, duration: 4 },
     ],
   },
   {
@@ -64,10 +42,10 @@ export const SUBJECTS: Subject[] = [
     color: "#8B5CF6",
     bg: "#F5F3FF",
     chapters: [
-      { id: "f1", title: "Le roman et le récit", status: "current", duration: 5 },
-      { id: "f2", title: "La poésie", status: "open", duration: 3 },
-      { id: "f3", title: "Le théâtre", status: "open", duration: 4 },
-      { id: "f4", title: "L'argumentation", status: "open", duration: 5 },
+      { id: "f1", title: "Le roman et le récit", status: "current", mastery: 0, duration: 5 },
+      { id: "f2", title: "La poésie", status: "locked", mastery: 0, duration: 3 },
+      { id: "f3", title: "Le théâtre", status: "locked", mastery: 0, duration: 4 },
+      { id: "f4", title: "L'argumentation", status: "locked", mastery: 0, duration: 5 },
     ],
   },
   {
@@ -77,10 +55,10 @@ export const SUBJECTS: Subject[] = [
     color: "#F59E0B",
     bg: "#FFFBEB",
     chapters: [
-      { id: "h1", title: "La Révolution française", status: "current", duration: 4 },
-      { id: "h2", title: "L'Empire et Napoléon", status: "open", duration: 5 },
-      { id: "h3", title: "Les régimes politiques", status: "open", duration: 3 },
-      { id: "h4", title: "La mondialisation", status: "open", duration: 4 },
+      { id: "h1", title: "La Révolution française", status: "current", mastery: 0, duration: 4 },
+      { id: "h2", title: "L'Empire et Napoléon", status: "locked", mastery: 0, duration: 5 },
+      { id: "h3", title: "Les régimes politiques", status: "locked", mastery: 0, duration: 3 },
+      { id: "h4", title: "La mondialisation", status: "locked", mastery: 0, duration: 4 },
     ],
   },
   {
@@ -90,10 +68,10 @@ export const SUBJECTS: Subject[] = [
     color: "#10B981",
     bg: "#ECFDF5",
     chapters: [
-      { id: "s1", title: "La respiration", status: "current", duration: 3 },
-      { id: "s2", title: "La digestion", status: "open", duration: 4 },
-      { id: "s3", title: "La génétique", status: "open", duration: 5 },
-      { id: "s4", title: "L'écosystème", status: "open", duration: 3 },
+      { id: "s1", title: "La respiration", status: "current", mastery: 0, duration: 3 },
+      { id: "s2", title: "La digestion", status: "locked", mastery: 0, duration: 4 },
+      { id: "s3", title: "La génétique", status: "locked", mastery: 0, skip: true, duration: 5 },
+      { id: "s4", title: "L'écosystème", status: "locked", mastery: 0, duration: 3 },
     ],
   },
   {
@@ -103,15 +81,17 @@ export const SUBJECTS: Subject[] = [
     color: "#06B6D4",
     bg: "#ECFEFF",
     chapters: [
-      { id: "p1", title: "L'atome et la matière", status: "current", duration: 4 },
+      { id: "p1", title: "L'atome et la matière", status: "current", mastery: 0, duration: 4 },
       {
         id: "p2",
         title: "Les réactions chimiques",
-        status: "open",
+        status: "locked",
+        mastery: 0,
+        reinforce: true,
         duration: 5,
       },
-      { id: "p3", title: "L'électricité", status: "open", duration: 3 },
-      { id: "p4", title: "L'énergie", status: "open", duration: 4 },
+      { id: "p3", title: "L'électricité", status: "locked", mastery: 0, duration: 3 },
+      { id: "p4", title: "L'énergie", status: "locked", mastery: 0, duration: 4 },
     ],
   },
   {
@@ -125,10 +105,10 @@ export const SUBJECTS: Subject[] = [
       // review (5 real cards tagged chapterId 'a1' below, ~25s each) ≈ 220s, rounded to 4 min —
       // was 3 with only 1 real card behind it (Pioche du jour showed "3 min · 1 carte", a mismatch
       // between the two numbers). Recalculate this if fc25/fc27-30 below ever change.
-      { id: "a1", title: "Present simple", status: "current", duration: 4 },
-      { id: "a2", title: "Past simple", status: "open", duration: 3 },
-      { id: "a3", title: "Present perfect", status: "open", duration: 4 },
-      { id: "a4", title: "Modals & advice", status: "open", duration: 4 },
+      { id: "a1", title: "Present simple", status: "current", mastery: 0, duration: 4 },
+      { id: "a2", title: "Past simple", status: "locked", mastery: 0, duration: 3 },
+      { id: "a3", title: "Present perfect", status: "locked", mastery: 0, duration: 4 },
+      { id: "a4", title: "Modals & advice", status: "locked", mastery: 0, duration: 4 },
     ],
   },
 ];
@@ -319,7 +299,7 @@ export const FLASHCARDS: Flashcard[] = [
   {
     id: "fc19",
     q: "Qu'est-ce qu'un allèle ?",
-    a: "Une des ==versions== possibles d'un même gène. On en reçoit **deux** par gène : une de chaque parent.",
+    a: "Une des ==deux versions== d'un même gène, une **héritée de chaque parent**.",
     wrongA: "Un organe responsable à lui seul de la transmission des caractères physiques.",
     subject: "svt",
     topic: "Génétique",
@@ -439,724 +419,6 @@ export const FLASHCARDS: Flashcard[] = [
     topic: "Present simple",
     chapterId: "a1",
     level: "hard",
-  },
-
-  // fc31-fc56: Maths and Français batch — three or four cards per chapter (was one), so spaced
-  // repetition has a real deck to space. Same fields and markup as the cards above.
-  {
-    id: "fc31",
-    q: "Que vaut $\\frac{3}{4} + \\frac{1}{4}$ ?",
-    a: "Même dénominateur : on **additionne les numérateurs** et on garde le dénominateur. $\\frac{3}{4} + \\frac{1}{4} = \\frac{4}{4} = 1$.",
-    wrongA: "On additionne aussi les dénominateurs : $\\frac{3}{4} + \\frac{1}{4} = \\frac{4}{8}$.",
-    subject: "maths",
-    topic: "Fractions",
-    chapterId: "m1",
-    level: "easy",
-  },
-  {
-    id: "fc32",
-    q: "Comment simplifie-t-on $\\frac{12}{18}$ au maximum ?",
-    a: "On divise le haut **et** le bas par leur ==plus grand diviseur commun== (6) : $\\frac{12}{18} = \\frac{2}{3}$.",
-    wrongA: "On divise seulement le numérateur par 6 : $\\frac{12}{18} = \\frac{2}{18}$.",
-    subject: "maths",
-    topic: "Fractions",
-    chapterId: "m1",
-    level: "medium",
-  },
-  {
-    id: "fc33",
-    q: "Comment multiplie-t-on deux fractions, par exemple $\\frac{2}{3} \\times \\frac{4}{5}$ ?",
-    a: "On multiplie **les numérateurs entre eux** et **les dénominateurs entre eux** : $\\frac{2 \\times 4}{3 \\times 5} = \\frac{8}{15}$.",
-    wrongA:
-      "On additionne les numérateurs et les dénominateurs : $\\frac{2 + 4}{3 + 5} = \\frac{6}{8}$.",
-    subject: "maths",
-    topic: "Fractions",
-    chapterId: "m1",
-    level: "medium",
-  },
-  {
-    id: "fc34",
-    q: "Dans quels triangles peut-on utiliser le théorème de Pythagore ?",
-    a: "Uniquement dans les triangles ==rectangles== (ceux qui ont un angle droit).",
-    wrongA: "Dans n'importe quel triangle, à condition de connaître deux côtés.",
-    subject: "maths",
-    topic: "Pythagore",
-    chapterId: "m2",
-    level: "easy",
-  },
-  {
-    id: "fc35",
-    q: "Un triangle rectangle a des côtés de 3 cm et 4 cm de part et d'autre de l'angle droit. Combien mesure l'hypoténuse ?",
-    a: "$c^2 = 3^2 + 4^2 = 9 + 16 = 25$, donc $c = \\sqrt{25} = 5$ cm : il faut ==prendre la racine carrée== à la fin.",
-    wrongA: "$c^2 = 25$, donc l'hypoténuse mesure 25 cm.",
-    subject: "maths",
-    topic: "Pythagore",
-    chapterId: "m2",
-    level: "medium",
-  },
-  {
-    id: "fc36",
-    q: "Comment calcule-t-on un côté de l'angle droit quand on connaît l'hypoténuse et l'autre côté ?",
-    a: "On **soustrait** les carrés : $a^2 = c^2 - b^2$. Pour $c = 13$ et $b = 5$ : $a^2 = 169 - 25 = 144$, donc $a = 12$.",
-    wrongA: "On additionne encore les carrés : $a^2 = c^2 + b^2$.",
-    subject: "maths",
-    topic: "Pythagore",
-    chapterId: "m2",
-    level: "hard",
-  },
-  {
-    id: "fc37",
-    q: "Comment isoler $x$ dans $x + 7 = 12$ ?",
-    a: "On **retire 7 des deux côtés** : $x = 12 - 7 = 5$.",
-    wrongA: "On ajoute 7 des deux côtés : $x = 12 + 7 = 19$.",
-    subject: "maths",
-    topic: "Équations",
-    chapterId: "m3",
-    level: "easy",
-  },
-  {
-    id: "fc38",
-    q: "Résous $3x = 21$.",
-    a: "On **divise les deux côtés par 3** : $x = \\frac{21}{3} = 7$.",
-    wrongA: "On retire 3 des deux côtés : $x = 21 - 3 = 18$.",
-    subject: "maths",
-    topic: "Équations",
-    chapterId: "m3",
-    level: "easy",
-  },
-  {
-    id: "fc39",
-    q: "Comment vérifie-t-on qu'une solution d'équation est correcte ?",
-    a: "On ==remplace $x$== par la valeur trouvée dans l'équation de départ : les deux côtés doivent donner le même résultat. Ex. : $2 \\times 4 + 3 = 11$ ✓.",
-    wrongA: "On refait exactement les mêmes étapes de calcul, sans jamais remplacer $x$.",
-    subject: "maths",
-    topic: "Équations",
-    chapterId: "m3",
-    level: "medium",
-  },
-  {
-    id: "fc40",
-    q: "Dans $f(x) = ax + b$, que représente $b$ ?",
-    a: "La **valeur de départ** : $f(0) = b$, c'est-à-dire l'endroit où la droite coupe l'==axe vertical==.",
-    wrongA: "La pente de la droite : de combien $f(x)$ augmente quand $x$ augmente de 1.",
-    subject: "maths",
-    topic: "Fonctions affines",
-    chapterId: "m4",
-    level: "medium",
-  },
-  {
-    id: "fc41",
-    q: "Que représente le coefficient directeur $a$ d'une fonction affine ?",
-    a: "De combien $f(x)$ **varie quand $x$ augmente de 1** : si $a > 0$ la droite ==monte==, si $a < 0$ elle ==descend==.",
-    wrongA: "La valeur de $x$ pour laquelle $f(x) = 0$.",
-    subject: "maths",
-    topic: "Fonctions affines",
-    chapterId: "m4",
-    level: "medium",
-  },
-  {
-    id: "fc42",
-    q: "Quelle est la représentation graphique d'une fonction affine ?",
-    a: "Une **droite**. Elle passe par l'origine seulement quand $b = 0$ : on parle alors de fonction ==linéaire==.",
-    wrongA: "Une parabole, dont la courbure dépend de $a$.",
-    subject: "maths",
-    topic: "Fonctions affines",
-    chapterId: "m4",
-    level: "easy",
-  },
-  {
-    id: "fc43",
-    q: "Que devient la moyenne d'une série quand une valeur est très extrême ?",
-    a: "La **moyenne** est ==tirée== vers cette valeur extrême, alors que la médiane ne bouge presque pas.",
-    wrongA: "La médiane est la plus influencée, et la moyenne reste stable.",
-    subject: "maths",
-    topic: "Statistiques",
-    chapterId: "m5",
-    level: "medium",
-  },
-  {
-    id: "fc44",
-    q: "Comment trouve-t-on la médiane d'une série qui a un nombre pair de valeurs ?",
-    a: "On range les valeurs, puis on fait la ==moyenne des deux valeurs du milieu==. Pour 2, 4, 6, 10 : $\\frac{4 + 6}{2} = 5$.",
-    wrongA: "On prend la plus petite des deux valeurs du milieu, soit 4 pour 2, 4, 6, 10.",
-    subject: "maths",
-    topic: "Statistiques",
-    chapterId: "m5",
-    level: "hard",
-  },
-  {
-    id: "fc45",
-    q: "Quelle est la différence entre un narrateur interne et un narrateur externe ?",
-    a: "**Interne** : le narrateur est un personnage de l'histoire et raconte en « je ». **Externe** : il reste ==en dehors== de l'histoire et raconte en « il / elle ».",
-    wrongA: "Interne : il raconte en « il », externe : il raconte en « je ».",
-    subject: "francais",
-    topic: "Roman et récit",
-    chapterId: "f1",
-    level: "medium",
-  },
-  {
-    id: "fc46",
-    q: "Qu'est-ce que le schéma narratif d'un récit ?",
-    a: "Les étapes du récit : ==situation initiale==, élément perturbateur, péripéties, élément de résolution, situation finale.",
-    wrongA: "Le plan d'un roman : la liste de ses chapitres, titres et sous-titres.",
-    subject: "francais",
-    topic: "Roman et récit",
-    chapterId: "f1",
-    level: "easy",
-  },
-  {
-    id: "fc47",
-    q: "Qu'est-ce qu'un point de vue omniscient ?",
-    a: "Le narrateur ==sait tout== : il connaît les pensées de tous les personnages, leur passé comme leur avenir.",
-    wrongA:
-      "Le narrateur ne connaît que ce qu'il voit et entend, sans jamais accéder aux pensées d'un personnage.",
-    subject: "francais",
-    topic: "Roman et récit",
-    chapterId: "f1",
-    level: "medium",
-  },
-  {
-    id: "fc48",
-    q: "Qu'est-ce qu'une strophe ?",
-    a: "Un **groupe de vers** séparé des autres par un blanc : un quatrain en a ==4==, un tercet ==3==.",
-    wrongA: "Une seule ligne du poème, dont on compte les syllabes.",
-    subject: "francais",
-    topic: "Poésie",
-    chapterId: "f2",
-    level: "easy",
-  },
-  {
-    id: "fc49",
-    q: "Comment appelle-t-on la répétition d'un même son à la fin de deux vers ?",
-    a: "La **rime** : par exemple « amour » et « toujours ».",
-    wrongA: "L'allitération, qui désigne la répétition d'un même son à la fin des vers.",
-    subject: "francais",
-    topic: "Poésie",
-    chapterId: "f2",
-    level: "easy",
-  },
-  {
-    id: "fc50",
-    q: "Qu'est-ce qu'une métaphore ?",
-    a: "Une comparaison **sans outil de comparaison** : « Cette fille est une rose ». Avec « comme », ce serait une ==comparaison==.",
-    wrongA: "Une comparaison avec « comme » ou « tel » : « Ses yeux brillent comme des étoiles ».",
-    subject: "francais",
-    topic: "Poésie",
-    chapterId: "f2",
-    level: "medium",
-  },
-  {
-    id: "fc51",
-    q: "Qu'est-ce qu'une réplique au théâtre ?",
-    a: "Ce que dit un personnage **à voix haute**, précédé de ==son nom== dans le texte.",
-    wrongA: "Une indication de mise en scène écrite en italique par l'auteur.",
-    subject: "francais",
-    topic: "Théâtre",
-    chapterId: "f3",
-    level: "easy",
-  },
-  {
-    id: "fc52",
-    q: "Qu'est-ce qu'un monologue ?",
-    a: "Un personnage parle ==seul== sur scène (ou comme s'il l'était) pour exprimer ses pensées.",
-    wrongA: "Un échange très rapide où deux personnages se répondent vers par vers.",
-    subject: "francais",
-    topic: "Théâtre",
-    chapterId: "f3",
-    level: "medium",
-  },
-  {
-    id: "fc53",
-    q: "Qu'appelle-t-on la « double énonciation » au théâtre ?",
-    a: "Les personnages se parlent entre eux, mais ==le public écoute aussi== : l'auteur s'adresse à lui à travers leurs répliques.",
-    wrongA: "Une réplique prononcée en même temps par deux acteurs.",
-    subject: "francais",
-    topic: "Théâtre",
-    chapterId: "f3",
-    level: "hard",
-  },
-  {
-    id: "fc54",
-    q: "Quelle est la différence entre une thèse et un argument ?",
-    a: "La **thèse** est l'opinion défendue ; l'==argument== est une raison qui la soutient.",
-    wrongA: "Aucune : une thèse est simplement un argument plus long.",
-    subject: "francais",
-    topic: "Argumentation",
-    chapterId: "f4",
-    level: "easy",
-  },
-  {
-    id: "fc55",
-    q: "Qu'est-ce qu'un connecteur logique ?",
-    a: "Un mot qui **relie deux idées** en marquant le lien entre elles : « car », « donc », ==« en effet »==, « pourtant ».",
-    wrongA: "Un mot qui indique le lieu où se passe une scène : « ici », « là-bas ».",
-    subject: "francais",
-    topic: "Argumentation",
-    chapterId: "f4",
-    level: "easy",
-  },
-  {
-    id: "fc56",
-    q: "Qu'est-ce qu'un contre-argument ?",
-    a: "Une raison qui va dans le ==sens opposé== à la thèse, qu'on présente pour mieux la réfuter ensuite.",
-    wrongA: "Un deuxième argument qui défend aussi la thèse, placé en dernier.",
-    subject: "francais",
-    topic: "Argumentation",
-    chapterId: "f4",
-    level: "medium",
-  },
-  // fc57-fc101: Histoire-Géo, SVT, Physique-Chimie and Anglais batch, same goal as fc31-fc56:
-  // three cards per chapter on top of the existing one, so every chapter has a real deck.
-  {
-    id: "fc57",
-    q: "Quel texte proclame, en août 1789, les droits fondamentaux des citoyens ?",
-    a: "La **Déclaration des droits de l'homme et du citoyen** (26 août 1789) : ==liberté==, égalité devant la loi, propriété, sûreté.",
-    wrongA: "Le Code civil, rédigé quelques mois plus tard par Napoléon.",
-    subject: "histoire-geo",
-    topic: "Révolution",
-    chapterId: "h1",
-    level: "easy",
-  },
-  {
-    id: "fc58",
-    q: "Que se passe-t-il dans la nuit du 4 août 1789 ?",
-    a: "Les députés ==abolissent les privilèges== de la noblesse et du clergé : c'est la fin de la société d'ordres.",
-    wrongA: "Le roi Louis XVI est guillotiné.",
-    subject: "histoire-geo",
-    topic: "Révolution",
-    chapterId: "h1",
-    level: "medium",
-  },
-  {
-    id: "fc59",
-    q: "Quand la monarchie est-elle abolie et la Première République proclamée ?",
-    a: "En ==septembre 1792==. Louis XVI sera guillotiné ensuite, en janvier 1793.",
-    wrongA: "En juillet 1789, juste après la prise de la Bastille.",
-    subject: "histoire-geo",
-    topic: "Révolution",
-    chapterId: "h1",
-    level: "hard",
-  },
-  {
-    id: "fc60",
-    q: "En quelle année Napoléon est-il sacré empereur des Français ?",
-    a: "En ==1804==, lors d'une cérémonie à Notre-Dame de Paris.",
-    wrongA: "En 1789, au tout début de la Révolution.",
-    subject: "histoire-geo",
-    topic: "Napoléon",
-    chapterId: "h2",
-    level: "easy",
-  },
-  {
-    id: "fc61",
-    q: "Quelle bataille met fin à l'Empire de Napoléon en 1815 ?",
-    a: "**Waterloo** (18 juin 1815), en Belgique. Napoléon est ensuite exilé à ==Sainte-Hélène==.",
-    wrongA: "Austerlitz, où il est définitivement vaincu par les armées britannique et prussienne.",
-    subject: "histoire-geo",
-    topic: "Napoléon",
-    chapterId: "h2",
-    level: "medium",
-  },
-  {
-    id: "fc62",
-    q: "Quelles institutions durables Napoléon crée-t-il pour organiser l'État ?",
-    a: "Entre autres les **lycées**, la **Banque de France** et les ==préfets==, qui centralisent l'administration.",
-    wrongA: "L'Assemblée nationale et le suffrage universel pour tous.",
-    subject: "histoire-geo",
-    topic: "Napoléon",
-    chapterId: "h2",
-    level: "medium",
-  },
-  {
-    id: "fc63",
-    q: "Quelle est la différence entre une monarchie absolue et une monarchie constitutionnelle ?",
-    a: "**Absolue** : le roi a tous les pouvoirs. **Constitutionnelle** : une ==constitution et un parlement== limitent son pouvoir.",
-    wrongA:
-      "Absolue : le roi est élu par le peuple. Constitutionnelle : le roi est choisi par le parlement.",
-    subject: "histoire-geo",
-    topic: "Régimes politiques",
-    chapterId: "h3",
-    level: "medium",
-  },
-  {
-    id: "fc64",
-    q: "Qu'est-ce qu'une république ?",
-    a: "Un régime où le chef de l'État ==n'est pas un monarque== : le pouvoir ne se transmet pas par hérédité royale.",
-    wrongA: "Un régime où le pouvoir appartient obligatoirement à une seule famille.",
-    subject: "histoire-geo",
-    topic: "Régimes politiques",
-    chapterId: "h3",
-    level: "easy",
-  },
-  {
-    id: "fc65",
-    q: "Qu'est-ce qui caractérise une dictature ?",
-    a: "Un pouvoir ==concentré== entre les mains d'une personne ou d'un groupe, **sans contre-pouvoirs** et avec peu ou pas de libertés.",
-    wrongA: "Un pouvoir partagé entre le peuple et un roi grâce à une constitution.",
-    subject: "histoire-geo",
-    topic: "Régimes politiques",
-    chapterId: "h3",
-    level: "medium",
-  },
-  {
-    id: "fc66",
-    q: "Qu'est-ce qu'une firme multinationale (FMN) ?",
-    a: "Une entreprise qui ==produit et vend dans plusieurs pays==, avec des filiales à l'étranger.",
-    wrongA: "Une entreprise publique gérée ensemble par plusieurs États.",
-    subject: "histoire-geo",
-    topic: "Mondialisation",
-    chapterId: "h4",
-    level: "easy",
-  },
-  {
-    id: "fc67",
-    q: "Qu'appelle-t-on une délocalisation ?",
-    a: "Le ==transfert d'une production== vers un autre pays, souvent pour réduire les coûts (salaires, taxes).",
-    wrongA: "L'ouverture d'un magasin dans un pays voisin pour vendre davantage.",
-    subject: "histoire-geo",
-    topic: "Mondialisation",
-    chapterId: "h4",
-    level: "medium",
-  },
-  {
-    id: "fc68",
-    q: "Quels progrès ont rendu la mondialisation possible ?",
-    a: "La baisse du coût des ==transports== (porte-conteneurs, avion) et le développement d'**internet** et des télécommunications.",
-    wrongA: "Uniquement la hausse des droits de douane entre les pays.",
-    subject: "histoire-geo",
-    topic: "Mondialisation",
-    chapterId: "h4",
-    level: "medium",
-  },
-  {
-    id: "fc69",
-    q: "Où se font les échanges de gaz entre l'air et le sang ?",
-    a: "Dans les ==alvéoles pulmonaires==, de minuscules sacs au bout des bronches.",
-    wrongA: "Dans la trachée, le plus gros conduit de l'air.",
-    subject: "svt",
-    topic: "Respiration",
-    chapterId: "s1",
-    level: "easy",
-  },
-  {
-    id: "fc70",
-    q: "À quoi sert le dioxygène dans nos cellules ?",
-    a: "À ==libérer l'énergie== des nutriments (comme le glucose) : c'est la respiration cellulaire.",
-    wrongA: "À fabriquer directement de nouveaux muscles.",
-    subject: "svt",
-    topic: "Respiration",
-    chapterId: "s1",
-    level: "medium",
-  },
-  {
-    id: "fc71",
-    q: "Pourquoi le cœur et la respiration s'accélèrent-ils pendant un effort ?",
-    a: "Les muscles ont besoin de **plus d'énergie**, donc de plus de ==dioxygène et de nutriments==, et ils produisent plus de CO₂ à évacuer.",
-    wrongA: "Uniquement pour refroidir le corps en expirant plus d'air chaud.",
-    subject: "svt",
-    topic: "Respiration",
-    chapterId: "s1",
-    level: "medium",
-  },
-  {
-    id: "fc72",
-    q: "À quoi sert la digestion ?",
-    a: "À transformer les aliments en ==nutriments== assez petits pour passer dans le sang.",
-    wrongA: "À supprimer les aliments inutiles pour ne garder que l'eau.",
-    subject: "svt",
-    topic: "Digestion",
-    chapterId: "s2",
-    level: "easy",
-  },
-  {
-    id: "fc73",
-    q: "Que sont les enzymes digestives ?",
-    a: "Des molécules qui ==découpent les aliments== en nutriments : la salive contient par exemple l'amylase, qui s'attaque à l'amidon.",
-    wrongA: "Des bactéries qui avalent les aliments dans l'estomac.",
-    subject: "svt",
-    topic: "Digestion",
-    chapterId: "s2",
-    level: "medium",
-  },
-  {
-    id: "fc74",
-    q: "Que devient ce qui n'est pas absorbé par l'intestin grêle ?",
-    a: "Cela passe dans le ==gros intestin==, qui récupère l'eau. Le reste est éliminé sous forme de selles.",
-    wrongA: "Cela retourne dans l'estomac pour être digéré une seconde fois.",
-    subject: "svt",
-    topic: "Digestion",
-    chapterId: "s2",
-    level: "medium",
-  },
-  {
-    id: "fc75",
-    q: "Qu'est-ce que l'ADN ?",
-    a: "La **molécule** présente dans le noyau de nos cellules qui porte l'==information génétique== sous forme de gènes.",
-    wrongA: "Une protéine fabriquée par le cœur pour transporter l'oxygène.",
-    subject: "svt",
-    topic: "Génétique",
-    chapterId: "s3",
-    level: "easy",
-  },
-  {
-    id: "fc76",
-    q: "Qu'est-ce qu'un gène ?",
-    a: "Une ==portion d'ADN== qui contient l'information pour un caractère (ou pour fabriquer une protéine).",
-    wrongA: "Un chromosome entier, c'est-à-dire tout l'ADN d'une cellule.",
-    subject: "svt",
-    topic: "Génétique",
-    chapterId: "s3",
-    level: "medium",
-  },
-  {
-    id: "fc77",
-    q: "Combien de chromosomes l'espèce humaine a-t-elle dans une cellule ordinaire ?",
-    a: "==46== chromosomes, soit **23 paires** : une moitié vient de chaque parent.",
-    wrongA: "23 chromosomes, tous hérités de la mère.",
-    subject: "svt",
-    topic: "Génétique",
-    chapterId: "s3",
-    level: "medium",
-  },
-  {
-    id: "fc78",
-    q: "Qu'est-ce que le biotope d'un écosystème ?",
-    a: "Le **milieu physique** (eau, sol, climat, lumière) où vivent les êtres vivants.",
-    wrongA: "L'ensemble des êtres vivants (animaux et plantes) qui y vivent.",
-    subject: "svt",
-    topic: "Écosystème",
-    chapterId: "s4",
-    level: "medium",
-  },
-  {
-    id: "fc79",
-    q: "Dans une chaîne alimentaire, que sont les producteurs ?",
-    a: "Les ==végétaux== (et les algues), qui fabriquent leur propre matière grâce à la **photosynthèse**.",
-    wrongA: "Les animaux qui font le plus de petits.",
-    subject: "svt",
-    topic: "Écosystème",
-    chapterId: "s4",
-    level: "easy",
-  },
-  {
-    id: "fc80",
-    q: "Quel est le rôle des décomposeurs ?",
-    a: "Ils transforment la ==matière morte== en matière minérale, que les producteurs réutilisent. Ce sont surtout des bactéries et des champignons.",
-    wrongA: "Ils chassent les animaux malades pour protéger l'écosystème.",
-    subject: "svt",
-    topic: "Écosystème",
-    chapterId: "s4",
-    level: "medium",
-  },
-  {
-    id: "fc81",
-    q: "Quelle charge portent les électrons, les protons et les neutrons ?",
-    a: "Électrons : ==négative==. Protons : ==positive==. Neutrons : **aucune charge**.",
-    wrongA: "Électrons : positive. Protons : négative. Neutrons : aucune charge.",
-    subject: "physique",
-    topic: "Atome",
-    chapterId: "p1",
-    level: "medium",
-  },
-  {
-    id: "fc82",
-    q: "Pourquoi un atome est-il électriquement neutre ?",
-    a: "Il a ==autant de protons que d'électrons==, donc ses charges positives et négatives s'annulent.",
-    wrongA: "Parce qu'il n'a ni protons ni électrons.",
-    subject: "physique",
-    topic: "Atome",
-    chapterId: "p1",
-    level: "medium",
-  },
-  {
-    id: "fc83",
-    q: "Que représente le numéro atomique $Z$ d'un élément ?",
-    a: "Le **nombre de protons** de son noyau (et d'électrons de l'atome neutre) : $Z = 6$ pour le ==carbone==.",
-    wrongA: "Le nombre de neutrons de son noyau.",
-    subject: "physique",
-    topic: "Atome",
-    chapterId: "p1",
-    level: "medium",
-  },
-  {
-    id: "fc84",
-    q: "Dans une réaction chimique, que sont les réactifs et les produits ?",
-    a: "**Réactifs** : ce qui est ==consommé== au départ. **Produits** : ce qui est ==formé== à la fin.",
-    wrongA: "Réactifs : ce qui est formé à la fin. Produits : ce qui est consommé au départ.",
-    subject: "physique",
-    topic: "Réactions chimiques",
-    chapterId: "p2",
-    level: "easy",
-  },
-  {
-    id: "fc85",
-    q: "Que signifie « équilibrer » une équation de réaction ?",
-    a: "Ajuster les **coefficients** pour avoir ==le même nombre d'atomes de chaque élément== avant et après la flèche.",
-    wrongA: "Mettre autant de molécules avant qu'après la flèche.",
-    subject: "physique",
-    topic: "Réactions chimiques",
-    chapterId: "p2",
-    level: "medium",
-  },
-  {
-    id: "fc86",
-    q: "Comment sait-on qu'une transformation chimique a eu lieu ?",
-    a: "De ==nouvelles espèces chimiques== apparaissent : changement de couleur, dégagement de gaz, dépôt solide, chaleur produite…",
-    wrongA: "Les substances ont seulement changé d'état, comme de l'eau qui gèle.",
-    subject: "physique",
-    topic: "Réactions chimiques",
-    chapterId: "p2",
-    level: "medium",
-  },
-  {
-    id: "fc87",
-    q: "Dans quelle unité mesure-t-on l'intensité d'un courant ?",
-    a: "En **ampères** (A), avec un ==ampèremètre== branché en série.",
-    wrongA: "En volts (V), avec un voltmètre branché en série.",
-    subject: "physique",
-    topic: "Électricité",
-    chapterId: "p3",
-    level: "easy",
-  },
-  {
-    id: "fc88",
-    q: "Comment branche-t-on un voltmètre pour mesurer une tension ?",
-    a: "En ==dérivation== (en parallèle), aux bornes du composant.",
-    wrongA: "En série, dans la branche du composant, comme un ampèremètre.",
-    subject: "physique",
-    topic: "Électricité",
-    chapterId: "p3",
-    level: "medium",
-  },
-  {
-    id: "fc89",
-    q: "Dans un circuit en série avec deux lampes, que vaut l'intensité ?",
-    a: "La **même** en tout point du circuit : ==l'intensité est identique== partout.",
-    wrongA: "Elle diminue après chaque lampe, car chaque lampe en consomme un peu.",
-    subject: "physique",
-    topic: "Électricité",
-    chapterId: "p3",
-    level: "medium",
-  },
-  {
-    id: "fc90",
-    q: "Dans quelle unité mesure-t-on l'énergie ?",
-    a: "En ==joules== (J). Pour l'énergie électrique domestique, on utilise aussi le **kilowattheure** (kWh).",
-    wrongA: "En watts (W), qui mesurent aussi l'énergie stockée.",
-    subject: "physique",
-    topic: "Énergie",
-    chapterId: "p4",
-    level: "easy",
-  },
-  {
-    id: "fc91",
-    q: "Quelle relation relie énergie, puissance et durée ?",
-    a: "$E = P \\times t$ : l'énergie (J) est égale à la ==puissance (W) multipliée par la durée (s)==.",
-    wrongA: "$E = \\frac{P}{t}$ : l'énergie est la puissance divisée par la durée.",
-    subject: "physique",
-    topic: "Énergie",
-    chapterId: "p4",
-    level: "hard",
-  },
-  {
-    id: "fc92",
-    q: "De quoi dépend l'énergie cinétique d'un objet ?",
-    a: "De sa ==masse== et de sa ==vitesse== : $E_c = \\frac{1}{2} m v^2$. Plus il est lourd et rapide, plus elle est grande.",
-    wrongA: "Uniquement de sa hauteur au-dessus du sol.",
-    subject: "physique",
-    topic: "Énergie",
-    chapterId: "p4",
-    level: "medium",
-  },
-  {
-    id: "fc93",
-    q: 'Quel est le past simple de "go" ?',
-    a: '"**went**" : "go" est irrégulier. "Yesterday, I ==went== to school."',
-    wrongA: '"goed" : on ajoute -ed comme pour les verbes réguliers.',
-    subject: "anglais",
-    topic: "Past simple",
-    chapterId: "a2",
-    level: "easy",
-  },
-  {
-    id: "fc94",
-    q: "Comment forme-t-on la négation au past simple ?",
-    a: "Avec **didn't** + verbe de base : \"I ==didn't go==\". Le verbe ne se met pas au passé.",
-    wrongA: "Avec didn't + verbe au passé : \"I didn't went\".",
-    subject: "anglais",
-    topic: "Past simple",
-    chapterId: "a2",
-    level: "medium",
-  },
-  {
-    id: "fc95",
-    q: "Comment pose-t-on une question au past simple ?",
-    a: 'Avec **Did** + sujet + verbe de base : "==Did you play== football yesterday ?"',
-    wrongA: 'On inverse simplement sujet et verbe : "Played you football yesterday ?"',
-    subject: "anglais",
-    topic: "Past simple",
-    chapterId: "a2",
-    level: "medium",
-  },
-  {
-    id: "fc96",
-    q: "Comment forme-t-on le present perfect ?",
-    a: '**have / has** + ==participe passé== : "I have finished", "she has gone".',
-    wrongA: '**was / were** + verbe en -ing : "I was finishing".',
-    subject: "anglais",
-    topic: "Present perfect",
-    chapterId: "a3",
-    level: "easy",
-  },
-  {
-    id: "fc97",
-    q: 'Quelle différence entre "for" et "since" avec le present perfect ?',
-    a: '"**For**" + une ==durée== (for three years). "**Since**" + un ==point de départ== (since 2022).',
-    wrongA: '"For" + un point de départ (for 2022). "Since" + une durée (since three years).',
-    subject: "anglais",
-    topic: "Present perfect",
-    chapterId: "a3",
-    level: "medium",
-  },
-  {
-    id: "fc98",
-    q: 'Peut-on dire "I have seen him yesterday" ?',
-    a: '**Non** : avec un moment précis et terminé (yesterday, last year), on utilise le ==past simple== : "I saw him yesterday".',
-    wrongA: "Oui : le present perfect s'emploie dès qu'on parle du passé, quel que soit le moment.",
-    subject: "anglais",
-    topic: "Present perfect",
-    chapterId: "a3",
-    level: "medium",
-  },
-  {
-    id: "fc99",
-    q: 'Que signifie "You mustn\'t smoke here" ?',
-    a: "Une **interdiction** : tu ==n'as pas le droit== de fumer ici.",
-    wrongA: "Tu n'es pas obligé de fumer ici, mais tu peux.",
-    subject: "anglais",
-    topic: "Modals",
-    chapterId: "a4",
-    level: "medium",
-  },
-  {
-    id: "fc100",
-    q: 'Que signifie "You don\'t have to come" ?',
-    a: "Tu **n'es pas obligé** de venir : tu ==peux== venir si tu veux.",
-    wrongA: "Tu n'as pas le droit de venir.",
-    subject: "anglais",
-    topic: "Modals",
-    chapterId: "a4",
-    level: "medium",
-  },
-  {
-    id: "fc101",
-    q: 'Que suit un modal comme "can", "should" ou "must" ?',
-    a: 'Le verbe à l\'==infinitif sans "to"== : "She should go", jamais "She should to go" ni "She shoulds go".',
-    wrongA: 'Le verbe avec "to" et un -s à la 3e personne : "She shoulds to go".',
-    subject: "anglais",
-    topic: "Modals",
-    chapterId: "a4",
-    level: "medium",
   },
 ];
 
@@ -2774,6 +2036,173 @@ export const STORIES: Record<
           "'Must' exprime une obligation forte, presque une règle incontournable, contrairement à 'should' ou 'could'.",
       },
     ],
+  },
+};
+
+export const LESSON_INTRO: Record<string, import("./types").LessonIntro> = {
+  m1: {
+    hook: "Partager une pizza entre potes sans embrouille ? C'est déjà des fractions.",
+    cheatCode:
+      "Numérateur en haut, dénominateur en bas. Pour simplifier, tu divises les deux par le même nombre.",
+    piege:
+      "Additionner les dénominateurs entre eux. Non ! On met au même dénominateur avant d'additionner.",
+  },
+  m2: {
+    hook: "Ton prof veut savoir si l'angle d'un mur est droit sans équerre géante ? Pythagore répond.",
+    cheatCode:
+      "Dans un triangle rectangle : a² + b² = c² (c = l'hypoténuse, le côté le plus long).",
+    piege:
+      "Utiliser Pythagore sur un triangle qui n'est pas rectangle. Vérifie toujours l'angle droit avant.",
+  },
+  m3: {
+    hook: "Trouver combien de V-Bucks il te manque sans compter à la main ? Une équation fait le calcul pour toi.",
+    cheatCode:
+      "Une équation, c'est une balance : ce que tu fais d'un côté, tu le fais de l'autre. Toujours.",
+    piege: "Changer un côté sans toucher l'autre. La balance bascule et ta réponse est fausse.",
+  },
+  m4: {
+    hook: "Calculer le prix d'une commande livraison selon le nombre d'articles ? Fonction affine direct.",
+    cheatCode: 'f(x) = ax + b. "a" c\'est la pente, "b" le point de départ (quand x = 0).',
+    piege: 'Confondre "a" et "b". Le "b" c\'est l\'ordonnée à l\'origine, pas la pente.',
+  },
+  m5: {
+    hook: "Savoir quel jeu la classe préfère sans demander à chacun ? Les stats font le tri.",
+    cheatCode:
+      "Moyenne = somme des valeurs ÷ nombre de valeurs. La médiane, c'est la valeur du milieu triée.",
+    piege: "Confondre moyenne et médiane. Une valeur extrême fausse la moyenne, pas la médiane.",
+  },
+  f1: {
+    hook: "Tu binges une série et tu devines la suite ? T'as déjà le réflexe du roman.",
+    cheatCode: "Un récit = narrateur + personnages + intrigue. Repère qui raconte et à quel temps.",
+    piege:
+      "Confondre l'auteur et le narrateur. Ce sont presque toujours deux personnes différentes.",
+  },
+  f2: {
+    hook: "La poésie c'est 3 points gratos au contrôle, viens on plie ça !",
+    cheatCode:
+      "Un alexandrin = 12 syllabes, un décasyllabe = 10. Compte les syllabes, pas les mots.",
+    piege:
+      'Oublier le "e" muet en fin de vers avant une consonne : il compte dans le décompte des syllabes.',
+  },
+  f3: {
+    hook: "Une scène de dispute filmée façon TikTok ? Au théâtre, ça s'appelle une réplique.",
+    cheatCode:
+      "Didascalies = indications de mise en scène (en italique). Répliques = ce que disent les personnages.",
+    piege:
+      "Croire que les didascalies sont dites à voix haute par les acteurs. Elles sont juste lues, pas jouées.",
+  },
+  f4: {
+    hook: "Convaincre tes parents de reculer l'heure du couvre-feu ? C'est de l'argumentation pure.",
+    cheatCode:
+      "Thèse = ton avis. Argument = pourquoi. Exemple = la preuve concrète. Les 3 dans l'ordre.",
+    piege: "Donner un exemple sans argument derrière. Un exemple seul ne prouve rien.",
+  },
+  h1: {
+    hook: "Une bande de citoyens qui gerbent leur roi ? C'est le season finale de 1789.",
+    cheatCode:
+      "Prise de la Bastille (14 juillet 1789) = début. Déclaration des droits de l'homme = août 1789.",
+    piege:
+      "Confondre la prise de la Bastille avec l'exécution de Louis XVI (1793, 4 ans plus tard).",
+  },
+  h2: {
+    hook: "Un mec devient empereur juste après une révolution anti-rois ? Contradiction ? Bienvenue chez Napoléon.",
+    cheatCode:
+      "Napoléon = général devenu empereur en 1804. Il garde certaines idées de la Révolution (Code civil).",
+    piege:
+      "Croire que Napoléon a annulé toute la Révolution. Il en garde une bonne partie, il la verrouille.",
+  },
+  h3: {
+    hook: "République, monarchie, dictature... c'est juste des règles du jeu différentes pour diriger un pays.",
+    cheatCode:
+      "République = pouvoir élu. Monarchie = pouvoir héréditaire. Dictature = pouvoir sans contre-pouvoir.",
+    piege:
+      "Croire qu'une élection suffit à faire une démocratie. Il faut aussi la liberté de la contester.",
+  },
+  h4: {
+    hook: "Tes sneakers fabriquées en Asie et vendues en France ? Bienvenue dans la mondialisation.",
+    cheatCode:
+      "Mondialisation = mise en réseau des échanges (biens, capitaux, infos) à l'échelle mondiale.",
+    piege:
+      "Croire que la mondialisation profite pareil à tout le monde. Elle crée aussi des inégalités.",
+  },
+  s1: {
+    hook: "Pourquoi t'es essoufflé après un sprint ? Ton corps réclame plus d'oxygène.",
+    cheatCode: "Respiration = O₂ inspiré, CO₂ expiré. Les poumons échangent ces gaz avec le sang.",
+    piege:
+      "Confondre respiration et digestion. La respiration, c'est l'échange de gaz, pas la nourriture.",
+  },
+  s2: {
+    hook: "Ton kebab de midi devient de l'énergie pour réviser ce soir ? Merci la digestion.",
+    cheatCode:
+      "La digestion transforme les aliments en nutriments absorbés par l'intestin grêle vers le sang.",
+    piege:
+      "Croire que la digestion se fait que dans l'estomac. Ça continue surtout dans l'intestin.",
+  },
+  s3: {
+    hook: "Pourquoi t'as les yeux de ta mère et le nez de ton père ? La génétique a la réponse.",
+    cheatCode:
+      "Un gène vient en 2 exemplaires (allèles), un de chaque parent. Le dominant s'exprime en premier.",
+    piege:
+      "Croire qu'un caractère vient d'un seul parent. Les deux allèles jouent, même si un seul se voit.",
+  },
+  s4: {
+    hook: "Une forêt, c'est un peu comme un groupe d'amis : chacun dépend des autres pour survivre.",
+    cheatCode:
+      "Écosystème = êtres vivants + milieu + leurs interactions (chaînes alimentaires, ressources).",
+    piege:
+      "Penser qu'un écosystème ne change jamais. Il évolue sans cesse, surtout si un élément disparaît.",
+  },
+  p1: {
+    hook: "Ton téléphone, la table, l'air : tout est fait des mêmes briques minuscules.",
+    cheatCode:
+      "Atome = noyau (protons + neutrons) + électrons qui tournent autour. Il est électriquement neutre.",
+    piege:
+      "Croire qu'un atome, c'est plein comme une bille. C'est surtout du vide autour du noyau.",
+  },
+  p2: {
+    hook: "Un feu d'artifice, c'est de la chimie qui explose littéralement sous tes yeux.",
+    cheatCode:
+      "Réactifs → Produits. La masse totale ne change jamais (conservation de la matière).",
+    piege:
+      "Oublier d'équilibrer l'équation chimique. Il doit y avoir le même nombre d'atomes de chaque côté.",
+  },
+  p3: {
+    hook: "Ton chargeur qui charge ton tel, c'est des électrons qui filent dans un circuit.",
+    cheatCode:
+      "U = R × I (tension = résistance × intensité). C'est la loi d'Ohm, retiens juste ces 3 lettres.",
+    piege: "Confondre tension (Volts) et intensité (Ampères). Ce ne sont pas la même grandeur.",
+  },
+  p4: {
+    hook: "Rien ne se crée, rien ne se perd. Ton énergie du matin devient ta fatigue du soir.",
+    cheatCode:
+      "L'énergie se transforme (électrique, mécanique, thermique...) mais ne disparaît jamais.",
+    piege:
+      'Croire que l\'énergie se "consomme" et disparaît. Elle se transforme juste en autre chose.',
+  },
+  a1: {
+    hook: "Décrire ta routine du matin en anglais sans te planter ? Present simple à la rescousse.",
+    cheatCode: 'I/you/we/they + verbe. He/she/it + verbe + S. "She likes" pas "she like".',
+    piege:
+      "Oublier le S à la 3e personne du singulier. C'est LE piège classique du present simple.",
+  },
+  a2: {
+    hook: "Raconter ce que t'as fait ce week-end en anglais ? Past simple, direct.",
+    cheatCode:
+      "Verbes réguliers + ED (played). Verbes irréguliers à apprendre par cœur (go → went).",
+    piege: 'Ajouter ED à un verbe irrégulier. "Goed" n\'existe pas, c\'est "went".',
+  },
+  a3: {
+    hook: '"I have lost my keys" : tu les as perdues et tu les cherches encore là maintenant.',
+    cheatCode:
+      "HAVE/HAS + participe passé. Utilisé quand le passé a un lien direct avec le présent.",
+    piege:
+      "Utiliser le present perfect pour une date précise (\"yesterday\"). Là, c'est le past simple qu'il faut.",
+  },
+  a4: {
+    hook: 'Donner un conseil à ton pote sans sonner comme sa mère ? "Should" fait le taf.',
+    cheatCode: "Should = conseil. Must = obligation forte. Can/could = capacité ou permission.",
+    piege:
+      'Confondre "must" (obligatoire) et "should" (juste un conseil). Le niveau de pression n\'est pas le même.',
   },
 };
 

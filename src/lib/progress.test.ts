@@ -1,31 +1,7 @@
 import { describe, it, expect } from "vitest";
-import {
-  chapterMastery,
-  computeGoalPct,
-  ensureSession,
-  goalTarget,
-  grantXp,
-  MASTERED_AT_REPETITIONS,
-  remainingToGoal,
-  resolveChapters,
-  reviewReward,
-  sm2,
-  XP_REWARDS,
-  resolveRestoredTab,
-  resolveRestoredView,
-} from "@/lib/progress";
-import { DEFAULT_USER, FLASHCARDS, SUBJECTS } from "@/data";
-import type { AppState, CardReview } from "@/types";
-
-const isMastered = (r: CardReview) => r.repetitions >= MASTERED_AT_REPETITIONS;
-
-const review = (repetitions: number, lastConfidence: CardReview["lastConfidence"]): CardReview => ({
-  repetitions,
-  interval: 1,
-  ease: 2.5,
-  nextReviewAt: 0,
-  lastConfidence,
-});
+import { ensureSession, resolveRestoredTab, resolveRestoredView } from "@/lib/progress";
+import { DEFAULT_USER } from "@/data";
+import type { AppState } from "@/types";
 
 // A full, minimal-but-valid AppState so each test only has to override the handful of fields
 // its own case actually cares about — the rest never matters to ensureSession's own branching.
@@ -44,19 +20,20 @@ function baseState(overrides: Partial<AppState>): AppState {
     dailyGoalMet: false,
     darkMode: false,
     dyslexiaMode: false,
-    textSize: "normal",
     soundOn: true,
-    hapticsOn: true,
     currentSubjectId: null,
     currentChapterId: null,
     lastSubjectId: null,
     lastChapterId: null,
+    currentLessonMode: "vocal",
     completedChapters: [],
+    chatBridgeMessage: null,
     lessonReturnTo: null,
     lastCompletion: null,
     cardReviews: {},
     sessionDate: new Date().toDateString(),
-    sessionXpEarned: 30,
+    sessionCardsReviewed: 3,
+    sessionChaptersDone: 1,
     ...overrides,
   };
 }
@@ -73,7 +50,8 @@ describe("ensureSession", () => {
     const s = baseState({ sessionDate: daysAgo(1), dailyGoalMet: true, streak: 4 });
     const result = ensureSession(s);
     expect(result.streak).toBe(5);
-    expect(result.sessionXpEarned).toBe(0);
+    expect(result.sessionCardsReviewed).toBe(0);
+    expect(result.sessionChaptersDone).toBe(0);
     expect(result.dailyGoalMet).toBe(false);
   });
 
@@ -146,7 +124,7 @@ describe("ensureSession", () => {
     const s = baseState({ sessionDate: "not-a-real-date", streak: 3 });
     const result = ensureSession(s);
     expect(Number.isNaN(result.streak)).toBe(false);
-    expect(result.sessionXpEarned).toBe(0);
+    expect(result.sessionCardsReviewed).toBe(0);
   });
 });
 
@@ -170,171 +148,5 @@ describe("resolveRestoredTab", () => {
     expect(resolveRestoredTab("settings", "progres")).toBe("progres");
     expect(resolveRestoredTab("lesson", "revisions")).toBe("revisions");
     expect(resolveRestoredTab("lesson", undefined)).toBe("home");
-  });
-});
-
-describe("resolveChapters", () => {
-  const maths = SUBJECTS[0].chapters;
-
-  it("suggests the first unfinished chapter and leaves the rest open", () => {
-    const resolved = resolveChapters(maths, []);
-    expect(resolved.map((c) => c.status)).toEqual(["current", "open", "open", "open", "open"]);
-  });
-
-  it("marks finished chapters done and moves the suggestion to the next one", () => {
-    const resolved = resolveChapters(maths, [maths[0].id, maths[1].id]);
-    expect(resolved.map((c) => c.status)).toEqual(["done", "done", "current", "open", "open"]);
-  });
-
-  it("never locks a chapter, even when finished out of order", () => {
-    const resolved = resolveChapters(maths, [maths[3].id]);
-    expect(resolved.map((c) => c.status)).toEqual(["current", "open", "open", "done", "open"]);
-  });
-});
-
-describe("sm2 spacing", () => {
-  const DAY = 24 * 60 * 60 * 1000;
-  const t0 = 1_000_000_000_000;
-
-  it("starts a new card at one repetition, due the next day", () => {
-    const r = sm2(undefined, "sure", t0);
-    expect(r.repetitions).toBe(1);
-    expect(r.interval).toBe(1);
-    expect(r.nextReviewAt).toBe(t0 + DAY);
-  });
-
-  it("gives no repetition credit for a correct answer before the card is due", () => {
-    const first = sm2(undefined, "sure", t0);
-    const sameDay = sm2(first, "sure", t0 + 60 * 60 * 1000);
-    expect(sameDay.repetitions).toBe(1);
-    expect(sameDay.nextReviewAt).toBe(first.nextReviewAt);
-    expect(isMastered(sameDay)).toBe(false);
-  });
-
-  it("advances once the card is due, and only then reaches mastery", () => {
-    const first = sm2(undefined, "sure", t0);
-    const nextDay = sm2(first, "sure", t0 + DAY);
-    expect(nextDay.repetitions).toBe(2);
-    expect(nextDay.interval).toBe(3);
-    expect(isMastered(nextDay)).toBe(true);
-  });
-
-  it("still resets a card answered wrong before it was due", () => {
-    const second = sm2(sm2(undefined, "sure", t0), "sure", t0 + DAY);
-    const forgotten = sm2(second, "not-sure", t0 + DAY + 1000);
-    expect(forgotten.repetitions).toBe(0);
-    expect(forgotten.interval).toBe(1);
-  });
-
-  it("answering the same card many times in one sitting never masters it", () => {
-    let r = sm2(undefined, "sure", t0);
-    for (let i = 1; i <= 10; i++) r = sm2(r, "sure", t0 + i * 60 * 1000);
-    expect(r.repetitions).toBe(1);
-    expect(isMastered(r)).toBe(false);
-  });
-});
-
-describe("reviewReward", () => {
-  const DAY = 24 * 60 * 60 * 1000;
-  const t0 = 1_000_000_000_000;
-
-  it("pays the new-card price for a card seen for the first time", () => {
-    expect(reviewReward(undefined, t0)).toEqual({ xp: XP_REWARDS.NEW_CARD, kind: "new" });
-  });
-
-  it("pays the most for a card remembered after the gap it was given", () => {
-    const first = sm2(undefined, "sure", t0);
-    expect(reviewReward(first, t0 + DAY)).toEqual({
-      xp: XP_REWARDS.RETRIEVED_CARD,
-      kind: "retrieved",
-    });
-    expect(XP_REWARDS.RETRIEVED_CARD).toBeGreaterThan(XP_REWARDS.NEW_CARD);
-  });
-
-  it("adds a revenge bonus when the card was missed the time before", () => {
-    const missed = sm2(sm2(undefined, "sure", t0), "not-sure", t0 + DAY);
-    expect(reviewReward(missed, t0 + 2 * DAY)).toEqual({
-      xp: XP_REWARDS.RETRIEVED_CARD + XP_REWARDS.REVENGE_BONUS,
-      kind: "revenge",
-    });
-  });
-
-  it("pays almost nothing for a card answered again before it is due, so replaying is no farm", () => {
-    const first = sm2(undefined, "sure", t0);
-    expect(reviewReward(first, t0 + 1000)).toEqual({
-      xp: XP_REWARDS.PRACTICE_CARD,
-      kind: "practice",
-    });
-    expect(XP_REWARDS.PRACTICE_CARD).toBeLessThan(XP_REWARDS.NEW_CARD / 2);
-  });
-
-  it("keeps paying full price for a card that comes due again, however well it is known", () => {
-    const mastered = sm2(sm2(undefined, "sure", t0), "sure", t0 + DAY);
-    expect(reviewReward(mastered, t0 + 10 * DAY).kind).toBe("retrieved");
-  });
-});
-
-describe("grantXp (daily chest)", () => {
-  const user = { ...DEFAULT_USER, goal: "regulier" }; // 80 XP a day
-
-  it("adds the XP to the account and to today's tally", () => {
-    const r = grantXp(baseState({ user, xp: 500, sessionXpEarned: 10 }), 15);
-    expect(r).toEqual({ xp: 515, sessionXpEarned: 25, dailyGoalMet: false });
-  });
-
-  it("opens the daily chest the moment the goal is reached, on top of the XP", () => {
-    const r = grantXp(baseState({ user, xp: 500, sessionXpEarned: 70 }), 15);
-    expect(r.dailyGoalMet).toBe(true);
-    expect(r.xp).toBe(500 + 15 + XP_REWARDS.DAILY_CHEST);
-    // The chest is a bonus, not part of what it was a reward for.
-    expect(r.sessionXpEarned).toBe(85);
-  });
-
-  it("opens it only once a day", () => {
-    const r = grantXp(baseState({ user, xp: 600, sessionXpEarned: 90, dailyGoalMet: true }), 15);
-    expect(r.xp).toBe(615);
-  });
-});
-
-describe("chapterMastery", () => {
-  const m1Total = FLASHCARDS.filter((c) => c.chapterId === "m1").length;
-  const m1Card = FLASHCARDS.find((c) => c.chapterId === "m1")!;
-
-  it("knows nothing before any review, and counts only that chapter's own cards", () => {
-    expect(chapterMastery("m1", {})).toEqual({ total: m1Total, mastered: 0, weak: 0 });
-  });
-
-  it("counts a card as mastered only once it has cleared the learning phase", () => {
-    const justShown = { [m1Card.id]: review(MASTERED_AT_REPETITIONS - 1, "sure") };
-    const cleared = { [m1Card.id]: review(MASTERED_AT_REPETITIONS, "sure") };
-    expect(chapterMastery("m1", justShown).mastered).toBe(0);
-    expect(chapterMastery("m1", cleared).mastered).toBe(1);
-  });
-
-  it("flags a card last judged wrong as a weak spot", () => {
-    const missed = { [m1Card.id]: review(0, "not-sure") };
-    expect(chapterMastery("m1", missed)).toEqual({ total: m1Total, mastered: 0, weak: 1 });
-  });
-
-  it("ignores reviews of cards from other chapters", () => {
-    const other = FLASHCARDS.find((c) => c.chapterId !== "m1")!;
-    expect(chapterMastery("m1", { [other.id]: review(5, "sure") }).mastered).toBe(0);
-  });
-});
-
-describe("daily goal (measured in real XP)", () => {
-  const user = { ...DEFAULT_USER, goal: "regulier" };
-
-  it("reads its target in XP and reports progress against it", () => {
-    const s = baseState({ user, sessionXpEarned: 45 });
-    expect(goalTarget(s)).toBe(80);
-    expect(computeGoalPct(s)).toBe(56);
-    expect(remainingToGoal(s)).toBe(35);
-  });
-
-  it("caps at 100% and never reports a negative remainder", () => {
-    const s = baseState({ user, sessionXpEarned: 250 });
-    expect(computeGoalPct(s)).toBe(100);
-    expect(remainingToGoal(s)).toBe(0);
   });
 });

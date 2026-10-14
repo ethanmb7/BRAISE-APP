@@ -6,22 +6,18 @@ import {
   motion,
   useReducedMotion,
 } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Check, MessageCircle, Smartphone } from "lucide-react";
 import { BraiseMascot } from "@/components/BraiseMascot";
 import { StreakFlameIcon } from "@/components/StreakFlameIcon";
 import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
 import { fireConfetti } from "@/lib/confetti";
-import { CONTENT_LEVEL_NOTE, LEVELS } from "@/data";
-import { COPY } from "@/lib/copy";
-import { DEFAULT_TONE, pickLine } from "@/lib/tone";
+import { LEVELS } from "@/data";
 import type { Level, Personality } from "@/types";
 
 type Mood = "happy" | "proud" | "cool" | "eager";
 
-// No consent step: nothing leaves the device (no account, no server, no AI), so there is nothing
-// to consent to. Bring it back when a backend does.
-const STEPS = ["welcome", "name", "level", "tone", "rhythm", "ready"] as const;
+const STEPS = ["welcome", "name", "level", "tone", "rhythm", "consent", "ready"] as const;
 type StepId = (typeof STEPS)[number];
 // Steps that show the progress bar: every question, not the two "hero" moments around them.
 const QUESTION_COUNT = STEPS.length - 1;
@@ -30,17 +26,17 @@ const LEVEL_INFO: Record<string, { tag: string; icon: string; reaction: string }
   "2nde": {
     tag: "Nouveau lycée",
     icon: "🌱",
-    reaction: "2nde, nouveau rythme. On pose de bonnes bases ensemble.",
+    reaction: "La 2nde, nouveau rythme. On pose de bonnes bases ensemble.",
   },
   "1ere": {
     tag: "Bac de français",
     icon: "✍️",
-    reaction: "1ère, bac de français au bout. Pour l’instant : les bases de 2nde.",
+    reaction: "La 1ère, avec le bac de français au bout. On va s’organiser.",
   },
   term: {
     tag: "Année du bac",
     icon: "🎓",
-    reaction: "Terminale, année du bac. Pour l’instant : les bases de 2nde.",
+    reaction: "Terminale, l’année du bac. On va gérer ça ensemble.",
   },
 };
 
@@ -67,18 +63,21 @@ const RHYTHMS = [
     title: "Tranquille",
     desc: "Un peu chaque jour, sans prise de tête.",
     flames: 1,
+    reaction: "Tranquille, ça marche. Un peu chaque jour, c’est déjà énorme.",
   },
   {
     id: "regulier",
     title: "Régulier",
     desc: "Le bon rythme pour progresser.",
     flames: 2,
+    reaction: "Régulier, le bon plan. C’est comme ça qu’on retient pour de vrai.",
   },
   {
     id: "a-fond",
     title: "À fond",
     desc: "Pour les périodes de contrôles.",
     flames: 3,
+    reaction: "À fond ! Je te préviens, je vais te suivre de près.",
   },
 ];
 
@@ -97,6 +96,7 @@ export function OnboardingView() {
   const [level, setLevel] = useState<Level | null>(null);
   const [personality, setPersonality] = useState<Personality | null>(null);
   const [goal, setGoal] = useState<string | null>(null);
+  const [consent, setConsent] = useState(false);
   // Braise's reply to the answer just given on this screen — cleared on every screen change.
   const [reaction, setReaction] = useState<{ text: string; mood: Mood } | null>(null);
 
@@ -104,8 +104,6 @@ export function OnboardingView() {
   const hero = stepId === "welcome" || stepId === "ready";
   const trimmedName = name.trim();
   const tone = TONES.find((t) => t.id === personality);
-  // Until a tone is picked the app speaks Chill; every later line follows the student's choice.
-  const voiceTone = personality ?? DEFAULT_TONE;
   const rhythm = RHYTHMS.find((r) => r.id === goal);
 
   const canContinue: Record<StepId, boolean> = {
@@ -114,6 +112,7 @@ export function OnboardingView() {
     level: level !== null,
     tone: personality !== null,
     rhythm: goal !== null,
+    consent,
     ready: true,
   };
 
@@ -122,8 +121,8 @@ export function OnboardingView() {
     name: { text: "Comment je t’appelle ?", mood: "eager" },
     level: { text: `Enchanté, ${trimmedName} ! T’es en quelle classe ?`, mood: "happy" },
     tone: { text: "Et tu me préfères comment ? Touche pour m’entendre.", mood: "eager" },
-    // Said after the tone was picked, so it is already in that tone.
-    rhythm: { text: pickLine(voiceTone, COPY.onboarding.rhythmQuestion), mood: "happy" },
+    rhythm: { text: "Tu passes me voir à quel rythme ?", mood: "happy" },
+    consent: { text: "Dernière chose avant d’y aller.", mood: "proud" },
     ready: { text: "", mood: "proud" },
   };
   const line = reaction ?? question[stepId];
@@ -176,6 +175,7 @@ export function OnboardingView() {
     level: "Continuer",
     tone: "Continuer",
     rhythm: "Continuer",
+    consent: "Valider",
     ready: "C’est parti !",
   };
 
@@ -212,10 +212,7 @@ export function OnboardingView() {
                 welcome stage and the small speaker seat instead of unmounting and redrawing. */}
             <motion.div layout transition={SPRING} className="onb-avatar">
               <motion.div layout transition={SPRING} className="onb-avatar-inner">
-                <BraiseMascot
-                  size={stepId === "ready" ? 100 : hero ? 132 : stepId === "name" ? 92 : 60}
-                  mood={line.mood}
-                />
+                <BraiseMascot size={hero ? 132 : stepId === "name" ? 92 : 60} mood={line.mood} />
               </motion.div>
             </motion.div>
 
@@ -226,10 +223,7 @@ export function OnboardingView() {
               />
             )}
             {stepId === "ready" && (
-              <HeroCopy
-                title={`Bienvenue, ${trimmedName}\u00a0!`}
-                subtitle={pickLine(voiceTone, COPY.onboarding.readySubtitle)}
-              />
+              <HeroCopy title={`Bienvenue, ${trimmedName} !`} subtitle="Ton Braise est prêt." />
             )}
             {!hero && <Bubble key={line.text} text={line.text} />}
           </div>
@@ -261,34 +255,31 @@ export function OnboardingView() {
               )}
 
               {stepId === "level" && (
-                <>
-                  <div className="onb-stack onb-stack--fill">
-                    {LEVELS.map((l) => (
-                      <Tile
-                        key={l.id}
-                        selected={level?.id === l.id}
-                        className="onb-tile--row"
-                        onSelect={() => {
-                          tap();
-                          setLevel(l);
-                          setReaction({
-                            text: LEVEL_INFO[l.id]?.reaction ?? "Noté !",
-                            mood: "proud",
-                          });
-                        }}
-                      >
-                        <span>
-                          <b>{l.label}</b>
-                          <small>{LEVEL_INFO[l.id]?.tag}</small>
-                        </span>
-                        <span className="onb-tile-icon" aria-hidden="true">
-                          {LEVEL_INFO[l.id]?.icon}
-                        </span>
-                      </Tile>
-                    ))}
-                  </div>
-                  <p className="onb-hint">{CONTENT_LEVEL_NOTE}</p>
-                </>
+                <div className="onb-stack onb-stack--fill">
+                  {LEVELS.map((l) => (
+                    <Tile
+                      key={l.id}
+                      selected={level?.id === l.id}
+                      className="onb-tile--row"
+                      onSelect={() => {
+                        tap();
+                        setLevel(l);
+                        setReaction({
+                          text: LEVEL_INFO[l.id]?.reaction ?? "Noté !",
+                          mood: "proud",
+                        });
+                      }}
+                    >
+                      <span>
+                        <b>{l.label}</b>
+                        <small>{LEVEL_INFO[l.id]?.tag}</small>
+                      </span>
+                      <span className="onb-tile-icon" aria-hidden="true">
+                        {LEVEL_INFO[l.id]?.icon}
+                      </span>
+                    </Tile>
+                  ))}
+                </div>
               )}
 
               {stepId === "tone" && (
@@ -330,7 +321,7 @@ export function OnboardingView() {
                         tap();
                         setGoal(r.id);
                         setReaction({
-                          text: pickLine(voiceTone, COPY.onboarding.rhythm[r.id]),
+                          text: r.reaction,
                           mood: r.id === "a-fond" ? "cool" : "happy",
                         });
                       }}
@@ -349,6 +340,53 @@ export function OnboardingView() {
                     </Tile>
                   ))}
                 </div>
+              )}
+
+              {stepId === "consent" && (
+                <>
+                  {/* Must stay literally true: when accounts/cloud sync land, the first line changes. */}
+                  <div className="onb-info">
+                    <p>
+                      <Smartphone size={20} aria-hidden="true" />
+                      <span>Ta progression est enregistrée sur cet appareil.</span>
+                    </p>
+                    <p>
+                      <MessageCircle size={20} aria-hidden="true" />
+                      <span>
+                        Quand tu me parles, tes messages passent par un service d’IA pour que je
+                        puisse te répondre. Évite d’y mettre des infos perso.
+                      </span>
+                    </p>
+                  </div>
+                  <motion.button
+                    type="button"
+                    role="checkbox"
+                    aria-checked={consent}
+                    className={`onb-check ${consent ? "is-checked" : ""}`}
+                    whileTap={{ x: 2, y: 2 }}
+                    onClick={() => {
+                      tap();
+                      setConsent((c) => !c);
+                      setReaction(consent ? null : { text: "Merci. On y va ?", mood: "happy" });
+                    }}
+                  >
+                    <span className="onb-check-box" aria-hidden="true">
+                      <AnimatePresence>
+                        {consent && (
+                          <motion.span
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0 }}
+                            transition={SPRING}
+                          >
+                            <Check size={16} strokeWidth={3.5} />
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </span>
+                    C’est bon pour moi
+                  </motion.button>
+                </>
               )}
 
               {stepId === "ready" && level && tone && rhythm && (
@@ -383,14 +421,6 @@ export function OnboardingView() {
           </AnimatePresence>
 
           <footer className="onb-footer">
-            {stepId === "ready" && (
-              // In the footer, not the page: a long first name makes the title wrap and pushes
-              // everything down, and a note in the page flow ended up hidden under this button.
-              // Must stay literally true: when accounts or cloud sync land, this line changes.
-              <p className="onb-hint onb-footnote">
-                Ta progression reste sur cet appareil. Tu pourras la sauvegarder dans Moi.
-              </p>
-            )}
             <motion.button
               type="button"
               className="onb-cta"

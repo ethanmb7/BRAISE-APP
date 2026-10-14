@@ -1,17 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import { GlossaryButton } from "@/components/GlossarySheet";
 import { motion, MotionConfig } from "framer-motion";
 import { Clock3, Play, Sparkles, Trophy } from "lucide-react";
 import { BraisePioche } from "@/components/BraisePioche";
 import { sfx } from "@/lib/sound";
-import { XP_REWARDS } from "@/lib/progress";
 import { getLastPiocheOpenDate, setLastPiocheOpenDate } from "@/lib/celebrations";
 import { firePiocheReveal, getPiocheRevealTiming } from "@/lib/piocheTransition";
 
 interface HeroPiocheCardProps {
-  /** Fuller sentence (Braise's reason for this pick, then the chapter, subject and minutes)
-   *  announced to screen readers only — none of that shows as its own visible line in the card
-   *  (matches the photo reference: a plain 3-line stack, no 4th hook line). */
+  /** Fuller sentence (from `dailyPickLine()`) announced to screen readers only — folds the
+   *  personalised hook, chapter and subject into one flowing sentence, even though none of that
+   *  shows as its own visible line in the card (matches the photo reference: a plain 3-line
+   *  stack, no 4th hook line). */
   bubbleLine: string;
   subjectName?: string;
   /** A subject-owned colour used as a small identity signal, never as the CTA colour. */
@@ -22,9 +21,6 @@ interface HeroPiocheCardProps {
   /** Real count of FLASHCARDS tagged with this chapter's id — not a fixed session size; every
    *  chapter has its own real deck. */
   cardCount: number;
-  /** The student is still in a Déclic touched in the last two days: the card says "Reprendre" (their own
-   *  next step), not "Pioche du jour" (a choice of Braise's), and the help for that word goes. */
-  resuming?: boolean;
   soundOn: boolean;
   onStart: () => void;
 }
@@ -49,7 +45,6 @@ export function HeroPiocheCard({
   chapterTitle,
   duration,
   cardCount,
-  resuming = false,
   soundOn,
   onStart,
 }: HeroPiocheCardProps) {
@@ -163,10 +158,10 @@ export function HeroPiocheCard({
               : { duration: 0.1 }
           }
         >
-          <span className="font-mono text-[0.7rem] font-black tracking-[0.12em] text-[#7C2D12]">
+          <span className="font-mono text-[0.48rem] font-black tracking-[0.12em] text-[#7C2D12]">
             MISSION TROUVÉE
           </span>
-          <span className="mt-0.5 font-display text-[0.7rem] font-black leading-none text-[#151821]">
+          <span className="mt-0.5 font-display text-[0.66rem] font-black leading-none text-[#151821]">
             C’est parti !
           </span>
         </motion.div>
@@ -196,14 +191,9 @@ export function HeroPiocheCard({
                 failure), 6.25:1 for dark ink. Three real fonts: font-mono for the eyebrow
                 (same as every other small-caps label app-wide), font-display for the title,
                 font-sans for the stats line. */}
-            <p className="flex flex-wrap items-center gap-x-1 font-mono text-[0.7rem] font-black uppercase tracking-wide text-[#151821]">
+            <p className="flex items-center gap-1 font-mono text-[0.67rem] font-black uppercase tracking-wide text-[#151821]">
               <Sparkles size={12} strokeWidth={3} />{" "}
-              {launching ? "Mission trouvée !" : resuming ? "Reprendre" : "Pioche du jour"}
-              {!launching && !resuming && (
-                <span className="-my-3 -mr-2 text-[#151821]">
-                  <GlossaryButton term="pioche" />
-                </span>
-              )}
+              {launching ? "Mission trouvée !" : "Pioche du jour"}
             </p>
             <h2 className="line-clamp-2 font-display text-xl font-black leading-tight text-[#151821]">
               {chapterTitle}
@@ -211,36 +201,33 @@ export function HeroPiocheCard({
           </div>
         </div>
         <div
-          className="relative mt-4 flex flex-wrap gap-2 max-[380px]:gap-1.5"
+          className="relative mt-4 grid grid-cols-3 gap-2"
           aria-label="Les repères de ta mission"
         >
-          <div className="flex-none flex items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 max-[380px]:px-1.5 shadow-[2px_2px_0px_0px_#151821]">
-            <Clock3 size={15} strokeWidth={3} color="#151821" aria-hidden="true" />
-            <span className="whitespace-nowrap font-mono text-[0.7rem] font-black text-[#151821]">
+          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
+            <Clock3 size={15} strokeWidth={3} aria-hidden="true" />
+            <span className="font-mono text-[0.67rem] font-black text-[#151821]">
               {duration} MIN
             </span>
           </div>
-          <div className="order-last min-w-[7.5rem] flex-1 flex items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 max-[380px]:px-1.5 shadow-[2px_2px_0px_0px_#151821]">
+          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
             <span
               aria-hidden="true"
               className="h-3 w-3 flex-none rounded-full border-2 border-[#151821]"
               style={{ background: subjectColor ?? "#FDC800" }}
             />
-            <span className="min-w-0 font-mono text-[0.7rem] font-black uppercase text-[#151821]">
+            <span className="truncate font-mono text-[0.67rem] font-black uppercase text-[#151821]">
               {subjectName ?? "Mission"}
             </span>
           </div>
-          <div className="flex-none flex items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 max-[380px]:px-1.5 shadow-[2px_2px_0px_0px_#151821]">
-            <Trophy size={15} strokeWidth={3} color="#151821" aria-hidden="true" />
-            <span className="whitespace-nowrap font-mono text-[0.7rem] font-black text-[#151821]">
-              +{XP_REWARDS.CHAPTER_COMPLETE} XP
-            </span>
+          <div className="flex min-w-0 items-center gap-1.5 rounded-xl border-2 border-black/80 bg-[#FFF8EE] px-2 py-2 shadow-[2px_2px_0px_0px_#151821]">
+            <Trophy size={15} strokeWidth={3} aria-hidden="true" />
+            <span className="font-mono text-[0.67rem] font-black text-[#151821]">+50 AURA</span>
           </div>
         </div>
         <span className="sr-only">
           {bubbleLine} Cette mission contient {cardCount} carte{cardCount > 1 ? "s" : ""}, dure
-          environ {duration} minutes et rapporte {XP_REWARDS.CHAPTER_COMPLETE} XP à sa première
-          validation.
+          environ {duration} minutes et rapporte 50 points d'Aura à sa première validation.
         </span>
 
         {launching && (

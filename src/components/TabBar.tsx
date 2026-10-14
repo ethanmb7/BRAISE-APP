@@ -1,6 +1,7 @@
-import { CalendarDays, Layers, TrendingUp, User } from "lucide-react";
-import { motion } from "framer-motion";
-import type { TabId } from "@/types";
+import { CalendarDays, Layers, TrendingUp, User } from 'lucide-react';
+import { motion } from 'framer-motion';
+import type { TabId } from '@/types';
+
 
 type Props = {
   active: TabId;
@@ -8,15 +9,18 @@ type Props = {
 };
 
 const TABS: { id: TabId; label: string; icon: typeof CalendarDays }[] = [
-  { id: "home", label: "Aujourd’hui", icon: CalendarDays },
-  { id: "revisions", label: "Réviser", icon: Layers },
-  { id: "progres", label: "Aura", icon: TrendingUp },
-  { id: "profile", label: "Moi", icon: User },
+  { id: 'home', label: 'Aujourd’hui', icon: CalendarDays },
+  { id: 'revisions', label: 'Réviser', icon: Layers },
+  { id: 'progres', label: 'Aura', icon: TrendingUp },
+  { id: 'profile', label: 'Moi', icon: User },
 ];
 
 export function TabBar({ active, onChange }: Props) {
   return (
-    <nav className="braise-tabbar" aria-label="Navigation principale">
+    <nav
+      className="braise-tabbar"
+      aria-label="Navigation principale"
+    >
       {TABS.map((t) => {
         const Icon = t.icon;
         const isActive = active === t.id;
@@ -25,14 +29,14 @@ export function TabBar({ active, onChange }: Props) {
             key={t.id}
             type="button"
             onClick={() => onChange(t.id)}
-            aria-current={isActive ? "page" : undefined}
-            className={`braise-tab ${isActive ? "is-active" : ""}`}
+            aria-current={isActive ? 'page' : undefined}
+            className={`braise-tab ${isActive ? 'is-active' : ''}`}
           >
             {isActive && (
               <motion.span
                 layoutId="tab-puck"
                 className="braise-tab-puck"
-                transition={{ type: "spring", stiffness: 560, damping: 32, mass: 0.72 }}
+                transition={{ type: 'spring', stiffness: 560, damping: 32, mass: 0.72 }}
               />
             )}
             <motion.span

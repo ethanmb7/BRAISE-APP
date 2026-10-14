@@ -11,3 +11,4 @@
 
 - Les pages Matières et parcours utilisent un langage de decks collector néobrutalistes partagé ; cela rend l’exploration cohérente, tactile et adaptée aux lycéens.
 - Le Déclic met Braise en scène comme interlocuteur animé et garde une seule idée par écran ; cela rend la méthode propriétaire vivante sans singer les réseaux sociaux.
+- Réviser feedback uses two scoped paper surfaces with a full-width verdict band and listening control, without a mascot footer; scrollable corrections and fixed actions preserve reading on small mobile screens without changing grading.

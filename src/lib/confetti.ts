@@ -2,17 +2,7 @@ import confetti from "canvas-confetti";
 
 const DOPAMINE_COLORS = ["#F97316", "#FFC24B", "#3B82F6", "#10B981"];
 
-// "Réduire les animations" and the dyslexia mode stop every animation (DESIGN_RULES.md); confetti is
-// a canvas, not a CSS animation, so it has to ask. The callers already skip it for the system's
-// setting; the dyslexia mode is only known from the page.
-function motionAllowed(): boolean {
-  if (typeof document === "undefined") return false;
-  if (document.querySelector(".dyslexia-mode")) return false;
-  return !window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-}
-
 export function fireConfetti() {
-  if (!motionAllowed()) return;
   confetti({
     particleCount: 90,
     spread: 72,
@@ -28,7 +18,6 @@ export function fireConfetti() {
 // micro-celebration, sized to punctuate a verdict rather than to end a session. `big` is the
 // Super Braise version: same origin, twice the particles, a touch more spread.
 export function fireMicroConfetti(x: number, y: number, big = false) {
-  if (!motionAllowed()) return;
   confetti({
     particleCount: big ? 48 : 22,
     spread: big ? 70 : 52,

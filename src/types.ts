@@ -32,12 +32,10 @@ export type Subject = {
 export type Chapter = {
   id: string;
   title: string;
-  /** Fresh-install baseline only — real status comes from resolveChapters(). A chapter is never
-   *  locked: "current" is only the suggested next one, every other unfinished chapter is "open". Mastery and the
-   *  "à renforcer" signal are never stored on a chapter: they're derived from the student's real
-   *  card-review history (see chapterMastery in lib/progress.ts), so they can't be hand-set to
-   *  contradict what the student actually did. */
-  status: "done" | "current" | "open";
+  status: "done" | "current" | "locked";
+  mastery: number;
+  reinforce?: boolean;
+  skip?: boolean;
   duration: number;
 };
 
@@ -46,6 +44,12 @@ export type StorySlide = {
   text: string;
   bg: string;
   duration: number;
+};
+
+export type LessonIntro = {
+  hook: string;
+  cheatCode: string;
+  piege: string;
 };
 
 export type QuizQuestion = {
@@ -66,20 +70,6 @@ export type Flashcard = {
   /** Chapter this card drills, so "Revoir la notion" can open the exact lesson. */
   chapterId: string;
   level: "easy" | "medium" | "hard";
-  /** Set on a card that comes from a course Déclic rather than the older deck: where it is saved, what
-   *  the student reads after answering, and what the claim's truth is (its own, not a random one). */
-  course?: CourseCardRef;
-};
-
-/** Where a Réviser card taken from a course Déclic lives in the course service. */
-export type CourseCardRef = {
-  declicId: string;
-  deckId: string;
-  /** Whether the claim as the Déclic wrote it is true ("carre") or false ("intox"). */
-  answer: "carre" | "intox";
-  /** The Déclic's own words after a right and after a wrong answer: they explain, never just "faux". */
-  feedbackCorrect: string;
-  feedbackIncorrect: string;
 };
 
 export type Badge = {
@@ -89,9 +79,9 @@ export type Badge = {
   cond: string;
 };
 
-export type TextSize = "normal" | "large" | "xlarge";
+export type ChatMessage = { role: "user" | "model"; text: string };
 
-export type Confidence = "not-sure" | "sure";
+export type Confidence = "not-sure" | "doubt" | "sure";
 
 export type CardReview = {
   repetitions: number;
@@ -146,16 +136,14 @@ export type AppState = {
   dailyGoalMet: boolean;
   darkMode: boolean;
   dyslexiaMode: boolean;
-  /** Root text size for the whole app (every font-size is in rem, so this scales all of it). */
-  textSize: TextSize;
   soundOn: boolean;
-  /** The phone's small buzz on taps and rewards. Its own switch, apart from the sound. */
-  hapticsOn: boolean;
   currentSubjectId: string | null;
   currentChapterId: string | null;
   lastSubjectId: string | null;
   lastChapterId: string | null;
+  currentLessonMode: "vocal" | "echanger";
   completedChapters: string[];
+  chatBridgeMessage: string | null;
   /** Where "back" from a lesson should land when it wasn't reached through a subject (e.g.
    *  "Revoir la notion" mid-session on Réviser). In-memory only, never persisted. */
   lessonReturnTo: ViewId | null;
@@ -163,10 +151,6 @@ export type AppState = {
   lastCompletion: ChapterCompletion | null;
   cardReviews: Record<string, CardReview>;
   sessionDate: string;
-  /** Real XP earned today (resets at the day boundary, same as everything else prefixed
-   *  `session`) — the one number the daily goal is measured in, same unit the header/Aura/every
-   *  other reward number already shows. Replaced separate sessionCardsReviewed/
-   *  sessionChaptersDone counters that weighted a chapter as "worth 3 cards" for the goal while
-   *  XP itself weighted it at 5x — two numbers for the same day's effort that didn't agree. */
-  sessionXpEarned: number;
+  sessionCardsReviewed: number;
+  sessionChaptersDone: number;
 };

@@ -18,6 +18,12 @@
 
 ## Interface
 
+- [x] Recentrer la correction de Réviser entre l’en-tête et les actions pour supprimer le grand vide : flux mobile vérifié
+- [ ] Sauvegarder la correction et son nouveau placement sur ethanmb7/BRAISE-APP en conservant les nouveautés GitHub
+- [x] Reprendre le visuel après réponse de Réviser : bandeau choisi, vraie DA BRAISE, deux zones distinctes et correction accessible sans masquer les actions
+- [x] Compacter le retour de réponse de Réviser sur mobile : retirer la mascotte de cet espace, priorité à la bonne réponse et aux actions, vérifier petits écrans
+- [ ] Refaire visuellement l’onboarding en rencontre vivante avec Braise : codes jeu vidéo et sociaux, ton amical lycéen, néobrutalisme et placement stable
+- [ ] Comparer les accueils d’applications d’éducation et de jeux pour proposer trois concepts d’onboarding BRAISE réellement nouveaux
 - [x] Remplacer le HUD-tableau de bord par un en-tête compact centré sur l'identité
 - [x] Compacter la Pioche sans réduire Braise et rapprocher contenu, repères et CTA
 - [ ] Aujourd'hui : une action principale, une Pioche compacte et un rythme discret

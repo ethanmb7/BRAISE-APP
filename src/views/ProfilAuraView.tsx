@@ -1,6 +1,5 @@
 import { memo, useCallback, useMemo, useState, type CSSProperties } from "react";
 import { motion } from "framer-motion";
-import { PageHeader } from "@/components/PageHeader";
 import { WifiOff, Layers } from "lucide-react";
 import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
@@ -18,7 +17,6 @@ import {
   RANKS,
   computeSubjectMastery,
   countMasteredCards,
-  countSubjectsSeen,
   computeBraiseInsight,
   computeNextMilestone,
   type Rank,
@@ -28,7 +26,6 @@ import {
 } from "@/lib/aura";
 import { getAgeGroup, progressAdvice, strongSubjectLine } from "@/lib/braiseVoice";
 import { FLASHCARDS } from "@/data";
-import { useCourseMastery } from "@/lib/course/useCourseMastery";
 
 // Diameter of the hero ring frame — the single largest element on the page, on purpose.
 const HERO_SIZE = 180;
@@ -60,15 +57,17 @@ export function ProfilAuraView() {
   const [shareOpen, setShareOpen] = useState(false);
   const { current, next } = getRankInfo(state.xp);
   const dueCount = getDueCards().length;
-  const course = useCourseMastery();
 
-  const stats = useMemo(
-    () => ({
-      subjectsCount: countSubjectsSeen(state.cardReviews, course),
-      masteredCards: countMasteredCards(state.cardReviews, course),
-    }),
-    [state.cardReviews, course],
-  );
+  const stats = useMemo(() => {
+    const reviewedIds = Object.keys(state.cardReviews);
+    const subjectsSeen = new Set(
+      reviewedIds.map((id) => FLASHCARDS.find((c) => c.id === id)?.subject).filter(Boolean),
+    );
+    return {
+      subjectsCount: subjectsSeen.size,
+      masteredCards: countMasteredCards(state.cardReviews),
+    };
+  }, [state.cardReviews]);
 
   // Once the rank ladder is maxed, RankRail's own caption has nothing left to say — this keeps
   // it pointing forward on a different, uncapped axis instead of just announcing a dead end. See
@@ -82,10 +81,7 @@ export function ProfilAuraView() {
   // (computeBraiseInsight), phrased through the existing tone system so it matches every other
   // Braise line in the app instead of inventing new copy. null (too little real history yet)
   // renders nothing — see BraiseInsightCard below.
-  const insight = useMemo(
-    () => computeBraiseInsight(state.cardReviews, course),
-    [state.cardReviews, course],
-  );
+  const insight = useMemo(() => computeBraiseInsight(state.cardReviews), [state.cardReviews]);
   const insightLine = useMemo(() => {
     if (!insight) return null;
     const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
@@ -95,8 +91,8 @@ export function ProfilAuraView() {
   }, [insight, state.user.personality, state.user.level]);
 
   const subjectMastery = useMemo(
-    () => computeSubjectMastery(state.cardReviews, course),
-    [state.cardReviews, course],
+    () => computeSubjectMastery(state.cardReviews),
+    [state.cardReviews],
   );
 
   const handleShareOpen = useCallback(() => {
@@ -134,7 +130,7 @@ export function ProfilAuraView() {
 
   return (
     <div className="view is-active aura-view aura-hud">
-      <PageHeader kicker="Aura" title="Ton parcours" />
+      <h1 className="aura-view-title">Ton parcours</h1>
 
       {!isOnline && (
         <div className="aura-offline-banner" role="status">
@@ -154,15 +150,16 @@ export function ProfilAuraView() {
           <AuraHeroScene rank={current} streak={state.streak} freezes={state.freezes} />
         </motion.div>
 
-        {/* Pillar 2 — Contrat de rétention : "Ta Braise" montre les 5 paliers et, dans la même carte, le
-            chiffre qui nourrit la fierté ou l'envie de revenir ("X XP jusqu'à Y"). */}
         <motion.div variants={staggerItem}>
-          <BraiseEvolutionLine
-            currentRankId={current.id}
-            next={next}
-            xp={state.xp}
-            milestone={milestone}
-          />
+          <BraiseEvolutionLine currentRankId={current.id} />
+        </motion.div>
+
+        {/* Pillar 2 — Contrat de rétention : le chiffre de progression qui nourrit la fierté ou
+            l'envie de revenir. Portait autrefois aussi un rail des 5 rangs sous ce chiffre, mais
+            "Ta Braise" juste au-dessus montre déjà les 5 mêmes paliers — deux rangées de pastilles
+            identiques l'une sous l'autre ne racontaient rien de plus qu'une seule. */}
+        <motion.div variants={staggerItem}>
+          <RankProgressCaption next={next} xp={state.xp} milestone={milestone} />
         </motion.div>
 
         {/* "Ce que Braise a remarqué" juste avant la grille qu'elle commente (jamais avant le rail
@@ -292,25 +289,25 @@ const AuraHeroScene = memo(function AuraHeroScene({
   );
 });
 
+const EVOLUTION_NAMES: Record<string, string> = {
+  bronze: "Étincelle",
+  argent: "Focus",
+  or: "Impact",
+  platine: "Maîtrise",
+  legende: "Libre",
+};
+
 const BraiseEvolutionLine = memo(function BraiseEvolutionLine({
   currentRankId,
-  next,
-  xp,
-  milestone,
 }: {
   currentRankId: string;
-  next: Rank | null;
-  xp: number;
-  milestone: NextMilestone;
 }) {
   const currentIdx = RANKS.findIndex((rank) => rank.id === currentRankId);
   return (
     <section className="braise-evolution-line" aria-label="Les évolutions de Braise">
       <div className="braise-evolution-heading">
         <span>TA BRAISE</span>
-        <strong>
-          {currentIdx + 1} sur {RANKS.length}
-        </strong>
+        <strong>{EVOLUTION_NAMES[currentRankId]}</strong>
       </div>
       <div className="braise-evolution-cast">
         {RANKS.map((rank, index) => {
@@ -327,14 +324,11 @@ const BraiseEvolutionLine = memo(function BraiseEvolutionLine({
                 expression={current ? "proud" : "happy"}
                 labelled={false}
               />
-              <span>{rank.name}</span>
+              <span>{current ? EVOLUTION_NAMES[rank.id] : rank.name}</span>
             </div>
           );
         })}
       </div>
-      {/* The number that goes with the five forms ("804 XP jusqu'à Platine"), inside the same card:
-          the forms say where Braise stands, this says how far the next one is. */}
-      <RankProgressCaption next={next} xp={xp} milestone={milestone} />
     </section>
   );
 });
@@ -501,7 +495,7 @@ function ProfilAuraSkeleton() {
       aria-busy="true"
       aria-label="Chargement de ton parcours"
     >
-      <PageHeader kicker="Aura" title="Ton parcours" />
+      <h1 className="aura-view-title">Ton parcours</h1>
 
       <div className="aura-hero">
         <Skeleton width={HERO_SIZE} height={HERO_SIZE} radius={999} style={{ marginBottom: 10 }} />

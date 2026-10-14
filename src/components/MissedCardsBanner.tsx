@@ -1,6 +1,4 @@
 import { X, ChevronRight, ShieldCheck } from "lucide-react";
-import { COPY } from "@/lib/copy";
-import { useTone } from "@/lib/useTone";
 
 interface MissedCardsBannerProps {
   /** Real count of FLASHCARDS whose last review was judged wrong (cardReviews[id].lastConfidence
@@ -19,7 +17,6 @@ interface MissedCardsBannerProps {
 // notions that can be secured calmly, so the optional review path remains supportive rather
 // than competing with, or emotionally punishing, the daily mission.
 export function MissedCardsBanner({ count, onOpen, onDismiss }: MissedCardsBannerProps) {
-  const { t } = useTone();
   return (
     <div className="relative">
       <span
@@ -31,7 +28,7 @@ export function MissedCardsBanner({ count, onOpen, onDismiss }: MissedCardsBanne
           type="button"
           onClick={onDismiss}
           aria-label="Masquer les notions à sécuriser"
-          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full transition-transform active:scale-90"
+          className="flex-shrink-0 rounded-full p-1 transition-transform active:scale-90"
         >
           <X size={22} strokeWidth={3} className="text-[#151821]" />
         </button>
@@ -44,10 +41,10 @@ export function MissedCardsBanner({ count, onOpen, onDismiss }: MissedCardsBanne
             <ShieldCheck size={22} strokeWidth={2.5} className="flex-shrink-0 text-[#151821]" />
             <span>
               <b className="block font-display text-lg font-black leading-tight text-[#151821]">
-                {t(COPY.home.missedTitle)}
+                À sécuriser
               </b>
               <span className="text-sm font-bold text-[#151821]/75">
-                {t(COPY.home.missedSub(count))}
+                Revoir {count} notion{count > 1 ? "s" : ""}, sans pression.
               </span>
             </span>
           </div>

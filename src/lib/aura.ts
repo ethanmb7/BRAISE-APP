@@ -1,6 +1,4 @@
 import { SUBJECTS, FLASHCARDS } from "@/data";
-import type { CourseMastery } from "@/lib/course/mastery";
-import { MASTERED_AT_REPETITIONS } from "@/lib/progress";
 import type { CardReview } from "@/types";
 
 export type Rank = {
@@ -12,14 +10,9 @@ export type Rank = {
   colorTo: string;
 };
 
-// Thresholds are still reachable within a handful of real sessions for Bronze->Argent on
-// purpose (see XP_REWARDS in lib/progress.ts for the per-action amounts they're pacing
-// against), so the very first rank-up lands fast; the curve stretches out after that so
-// Légende stays a genuine long-term target.
-// Thresholds sized to the pace and to the amount of content: at a "régulier" ~80 XP a day, Argent
-// comes after about a week, Or after two, Platine after a month and a half, Légende only with
-// sustained review. A first pass over all the content is worth ~2,300 XP, so Or is reachable
-// within it and everything above needs the reviews that spaced repetition keeps asking for.
+// Thresholds match the base flashcard XP economy (+15/carte "sûre") — Bronze->Argent is
+// reachable within a handful of real sessions on purpose, so the very first rank-up lands
+// fast; the curve stretches out after that so Légende stays a genuine long-term target.
 export const RANKS: Rank[] = [
   // Same fix as Argent below, applied to the rank every single new user starts on and sees the
   // most: bronze used to be a pale, desaturated tan (#e8b088) that read as washed-out next to the
@@ -30,13 +23,13 @@ export const RANKS: Rank[] = [
   // without a real saturated hue, which read as flat next to bronze/or/platine/légende and landed
   // worst on exactly the first rank-up most new users ever see. A vivid "chrome blue" keeps the
   // cool/metallic read of silver through hue and shine rather than through desaturation.
-  { id: "argent", name: "Argent", emoji: "🥈", min: 400, colorFrom: "#8ecfff", colorTo: "#3373d6" },
-  { id: "or", name: "Or", emoji: "🥇", min: 1200, colorFrom: "#ffe08a", colorTo: "#e8a317" },
+  { id: "argent", name: "Argent", emoji: "🥈", min: 500, colorFrom: "#8ecfff", colorTo: "#3373d6" },
+  { id: "or", name: "Or", emoji: "🥇", min: 1500, colorFrom: "#ffe08a", colorTo: "#e8a317" },
   {
     id: "platine",
     name: "Platine",
     emoji: "💎",
-    min: 2800,
+    min: 3500,
     colorFrom: "#b9f3ea",
     colorTo: "#7c3aed",
   },
@@ -44,7 +37,7 @@ export const RANKS: Rank[] = [
     id: "legende",
     name: "Légende",
     emoji: "👑",
-    min: 5500,
+    min: 7000,
     colorFrom: "#ffb199",
     colorTo: "#ff6f59",
   },
@@ -78,25 +71,23 @@ export type SubjectMastery = {
   started: boolean;
 };
 
+// A card only counts as "acquise" once it's cleared the SM-2 learning phase (recalled
+// correctly at least twice in a row), not merely seen once — repetitions=1 just means "shown",
+// not "known". Subjects with zero reviewed cards are flagged `started: false` rather than
+// given a 0% score: "0%" reads as "tried and failed", "pas commencé" reads as what's actually
+// true — the player hasn't touched that subject in Réviser yet.
+const MASTERED_AT_REPETITIONS = 2;
+
 // Used to return a percentage of *reviewed* cards mastered — which quietly rewarded only ever
 // reviewing the easy cards you already knew (one card, mastered once, read as "100%"). Absolute
 // counts against the subject's real total ("3/6 cartes") can't be inflated that way and give
 // the card-stack visual something concrete to fan out, not an abstract fill percentage.
-export function computeSubjectMastery(
-  cardReviews: Record<string, CardReview>,
-  course?: CourseMastery,
-): SubjectMastery[] {
-  // The older deck and the cards of the course decks count together: one student, one memory.
-  const reviews = { ...cardReviews, ...course?.reviews };
-  const cards = [
-    ...FLASHCARDS.map((c) => ({ id: c.id, subject: c.subject })),
-    ...(course?.cards ?? []),
-  ];
+export function computeSubjectMastery(cardReviews: Record<string, CardReview>): SubjectMastery[] {
   return SUBJECTS.map((s) => {
-    const subjectCardIds = cards.filter((c) => c.subject === s.id).map((c) => c.id);
-    const reviewed = subjectCardIds.filter((id) => reviews[id]);
+    const subjectCardIds = FLASHCARDS.filter((c) => c.subject === s.id).map((c) => c.id);
+    const reviewed = subjectCardIds.filter((id) => cardReviews[id]);
     const mastered = subjectCardIds.filter(
-      (id) => reviews[id] && reviews[id].repetitions >= MASTERED_AT_REPETITIONS,
+      (id) => cardReviews[id] && cardReviews[id].repetitions >= MASTERED_AT_REPETITIONS,
     );
     const started = reviewed.length > 0;
     return {
@@ -114,24 +105,8 @@ export function computeSubjectMastery(
 // Total mastered cards across every subject — used by the share card as a fallback stat when
 // the streak is 0 (see ShareAuraModal): a "0 JOURS" chip on a card meant to be shared is a bad
 // look, this is a real number to show instead, never fabricated.
-export function countMasteredCards(
-  cardReviews: Record<string, CardReview>,
-  course?: CourseMastery,
-): number {
-  return [...Object.values(cardReviews), ...Object.values(course?.reviews ?? {})].filter(
-    (r) => r.repetitions >= MASTERED_AT_REPETITIONS,
-  ).length;
-}
-
-/** How many different subjects the student has reviewed a card of, in either method. */
-export function countSubjectsSeen(
-  cardReviews: Record<string, CardReview>,
-  course?: CourseMastery,
-): number {
-  const seen = new Set<string>();
-  for (const card of FLASHCARDS) if (cardReviews[card.id]) seen.add(card.subject);
-  for (const card of course?.cards ?? []) if (course?.reviews[card.id]) seen.add(card.subject);
-  return seen.size;
+export function countMasteredCards(cardReviews: Record<string, CardReview>): number {
+  return Object.values(cardReviews).filter((r) => r.repetitions >= MASTERED_AT_REPETITIONS).length;
 }
 
 export type BraiseInsight =
@@ -164,16 +139,10 @@ const STRONG_SUBJECT_MIN_RATIO = 0.5;
 // time-of-day claim would have to be invented rather than computed.
 export function computeBraiseInsight(
   cardReviews: Record<string, CardReview>,
-  course?: CourseMastery,
 ): BraiseInsight | null {
   let worst: { topic: string; subjectName: string; repetitions: number } | null = null;
-  const reviews = { ...cardReviews, ...course?.reviews };
-  const cards = [
-    ...FLASHCARDS.map((c) => ({ id: c.id, subject: c.subject, topic: c.topic })),
-    ...(course?.cards ?? []),
-  ];
-  for (const card of cards) {
-    const review = reviews[card.id];
+  for (const card of FLASHCARDS) {
+    const review = cardReviews[card.id];
     if (
       !review ||
       review.lastConfidence === "sure" ||
@@ -189,7 +158,7 @@ export function computeBraiseInsight(
 
   let best: SubjectMastery | null = null;
   let bestRatio = 0;
-  for (const s of computeSubjectMastery(cardReviews, course)) {
+  for (const s of computeSubjectMastery(cardReviews)) {
     if (s.totalCount < STRONG_SUBJECT_MIN_CARDS) continue;
     const ratio = s.masteredCount / s.totalCount;
     if (ratio >= STRONG_SUBJECT_MIN_RATIO && ratio > bestRatio) {

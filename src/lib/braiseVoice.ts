@@ -10,6 +10,25 @@ export function getAgeGroup(levelId: string | null | undefined): AgeGroup {
 
 export type VoiceCtx = { personality: Personality; age: AgeGroup };
 
+export function revisionReaction(ctx: VoiceCtx, facts: { correct: boolean; wasLie: boolean; doubled: boolean }): string {
+  const direct = ctx.personality === "savage";
+  if (facts.correct && facts.doubled) return direct
+    ? "J’aime ce coup-là. Tu as joué ton joker, et tu avais raison."
+    : "J’avoue, joli coup ! Ton joker a doublé les XP de cette carte.";
+  if (facts.correct && facts.wasLie) return direct
+    ? "Bon, tu m’as grillé. Je garde un œil sur toi."
+    : "Tu m’as démasqué ! J’aime quand tu ne me crois pas sur parole.";
+  if (facts.correct) return direct
+    ? "OK, on est d’accord. Cette fois, je ne bluffais pas."
+    : "Oui, je disais vrai. Bien vu de m’avoir fait confiance ici.";
+  if (facts.wasLie) return direct
+    ? "Mon bluff est passé. Mais je préfère qu’on garde la vraie réponse."
+    : "Je t’ai eu avec celle-là. Viens, on garde la bonne version ensemble.";
+  return direct
+    ? "Tu m’as soupçonné, j’aime l’esprit critique. Mais ici, je disais vrai."
+    : "Je comprends ton doute. Cette fois, pas de bluff : ma réponse était vraie.";
+}
+
 function pick(list: string[]): string {
   return list[Math.floor(Math.random() * list.length)];
 }
@@ -86,26 +105,10 @@ export function missedTruth(ctx: VoiceCtx): string {
 // voix doit donc rester clairement distincte de quizWrong, jamais une variante déguisée de "raté".
 export function quizDontKnow(ctx: VoiceCtx): string {
   return byCombo(ctx, {
-    "chill-college": [
-      "Pas de souci, on regarde ça ensemble.",
-      "Aucun problème, c'est fait pour ça.",
-      "Ok, on découvre ça ensemble alors !",
-    ],
-    "chill-lycee": [
-      "Pas de souci, c'est exactement pour ça qu'on est là.",
-      "Ok, on regarde ça calmement.",
-      "Aucun stress, c'est une vraie question à creuser.",
-    ],
-    "savage-college": [
-      "Honnête, j'aime ça. On répare le trou tout de suite.",
-      "Ok, au moins tu triches pas. On regarde.",
-      "Assumé. On corrige ça vite fait.",
-    ],
-    "savage-lycee": [
-      "Au moins t'es honnête. On répare ça maintenant.",
-      "Ok, pas de bluff. On regarde ce qui coince.",
-      "Assumé, c'est déjà bien. On creuse.",
-    ],
+    'chill-college': ["Pas de souci, on regarde ça ensemble.", "Aucun problème, c'est fait pour ça.", 'Ok, on découvre ça ensemble alors !'],
+    'chill-lycee': ["Pas de souci, c'est exactement pour ça qu'on est là.", 'Ok, on regarde ça calmement.', "Aucun stress, c'est une vraie question à creuser."],
+    'savage-college': ["Honnête, j'aime ça. On répare le trou tout de suite.", 'Ok, au moins tu triches pas. On regarde.', "Assumé. On corrige ça vite fait."],
+    'savage-lycee': ["Au moins t'es honnête. On répare ça maintenant.", "Ok, pas de bluff. On regarde ce qui coince.", "Assumé, c'est déjà bien. On creuse."],
   });
 }
 
@@ -157,7 +160,7 @@ export function lessonComplete(ctx: VoiceCtx, name: string): string {
 }
 
 /** Short, visible hookline for the hero card — the chapter title and subject already have their
- *  own slots there, so it never repeats them; it only has to carry the
+ *  own slots there, so unlike `dailyPickLine` this never repeats them; it only has to carry the
  *  personality/age tone in a few words. Onboarding's own first question justifies asking for a
  *  first name with "Braise a besoin d'un prénom pour te parler comme un vrai pote" — it was never
  *  actually used anywhere on Home, so that promise went unkept on the one screen seen the most.
@@ -218,7 +221,7 @@ export function rankUpLine(ctx: VoiceCtx, rankName: string, rankId?: string): st
         `Rang ${rankName}. Ton avatar récupère ${avatarUnlock} au passage.`,
       ],
       "savage-lycee": [
-        `Rang ${rankName}. Ta flamme grandit, et ton avatar aussi — ${avatarUnlock} t'attend.`,
+        `Rang ${rankName}. Le classement tremble, et ton avatar aussi — ${avatarUnlock} t'attend.`,
         `${rankName} débloqué. Ton avatar gagne ${avatarUnlock}, le bac recule encore d'un pas.`,
       ],
     });
@@ -237,7 +240,7 @@ export function rankUpLine(ctx: VoiceCtx, rankName: string, rankId?: string): st
       `Rang ${rankName}. Pas mal pour un mardi.`,
     ],
     "savage-lycee": [
-      `Rang ${rankName}. Ta flamme grandit, et ça se voit.`,
+      `Rang ${rankName}. Le classement tremble.`,
       `${rankName} débloqué. Le bac recule encore d'un pas.`,
     ],
   });
@@ -301,6 +304,29 @@ export function verdictTag(ctx: VoiceCtx, kind: "carre" | "super" | "aie" | "gri
   return byCombo(ctx, tables[kind]);
 }
 
+export function dailyPickLine(
+  ctx: VoiceCtx,
+  userName: string,
+  subjectName: string,
+  chapterTitle: string,
+  duration: number,
+): string {
+  return byCombo(ctx, {
+    "chill-college": [
+      `Salut ${userName} ! Aujourd'hui, Braise a pioché "${chapterTitle}" (${subjectName}) pour toi. ${duration} min, zéro pression.`,
+    ],
+    "chill-lycee": [
+      `${userName}, pioche du jour : "${chapterTitle}" en ${subjectName}. ${duration} minutes, tranquille.`,
+    ],
+    "savage-college": [
+      `${userName}, le sort en a décidé : "${chapterTitle}" (${subjectName}). Tu peux pas fuir, désolé.`,
+    ],
+    "savage-lycee": [
+      `${userName}, tirage au sort du jour : "${chapterTitle}" en ${subjectName}. Le hasard ne négocie pas.`,
+    ],
+  });
+}
+
 export function duelIntro(ctx: VoiceCtx): string {
   return byCombo(ctx, {
     "chill-college": [
@@ -350,6 +376,46 @@ export function duelResult(ctx: VoiceCtx, won: boolean): string {
     "savage-lycee": [
       "Victoire de Braise. La machine ne dort jamais.",
       "Perdu. Le café ce soir, tu le mérites pas.",
+    ],
+  });
+}
+
+/** Closing check-in line after Braise proactively opens a lesson conversation. */
+export function lessonOpenerCheckIn(ctx: VoiceCtx): string {
+  return byCombo(ctx, {
+    "chill-college": [
+      "Ça te parle ou tu veux que je réexplique un bout ?",
+      "Dis-moi si un truc est flou, on reprend ensemble.",
+    ],
+    "chill-lycee": [
+      "Ça va, t'as suivi ? Dis-moi si un point mérite d'être creusé.",
+      "Tout est clair ou il y a un passage à revoir ?",
+    ],
+    "savage-college": [
+      "Bon, t'as suivi ou je parle dans le vide ?",
+      "Alors, ça capte ou faut un dessin ?",
+    ],
+    "savage-lycee": [
+      "T'as capté ou faut que je répète comme si t'avais 6 ans ?",
+      "Bon spoiler : c'est pas si dur. T'en es où ?",
+    ],
+  });
+}
+
+/** Invitation for the student to explain a concept back to Braise in their own words (Feynman technique). */
+export function feynmanInvite(ctx: VoiceCtx, topic: string): string {
+  return byCombo(ctx, {
+    "chill-college": [
+      `Fais comme si j'avais 10 ans et que je connaissais rien à "${topic}" — tu m'expliques ?`,
+    ],
+    "chill-lycee": [
+      `Explique-moi "${topic}" comme si je découvrais complètement le sujet, vas-y je t'écoute.`,
+    ],
+    "savage-college": [
+      `Allez, prouve-moi que t'as pas juste zappé le cours. Explique-moi "${topic}" façon débutant total.`,
+    ],
+    "savage-lycee": [
+      `Vas-y, convaincs-moi que t'as vraiment compris "${topic}" — explique comme si j'avais zéro base.`,
     ],
   });
 }
@@ -533,4 +599,20 @@ export function recapTrophyLine(ctx: VoiceCtx): { title: string; sub: string } {
       "savage-lycee": ["Demain, sans excuse.", "Reviens demain — ta série te surveille."],
     }),
   };
+}
+
+/** Extra instructions appended to the Mistral system prompt so free-text chat matches the chosen tone. */
+export function toneSystemPrompt(ctx: VoiceCtx): string {
+  const ageLine =
+    ctx.age === "college"
+      ? "L'élève est au collège (6e-3e) : mots très simples, phrases très courtes, exemples très concrets."
+      : "L'élève est au lycée (2nde-Terminale) : tu peux être un peu plus précis et nuancé, mais toujours simple et jamais scolaire.";
+  // Savage used to ask for "sarcasme léger quand l'élève se trompe" — mocking a teenager's mistake
+  // is exactly the humiliation the product vision rules out. The energy and the jokes stay; their
+  // target moves from the student to the trap itself.
+  const personaLine =
+    ctx.personality === "savage"
+      ? 'Mode "Coach Savage" : énergique, direct, second degré et petites vannes complices. Tu peux charrier la situation ("ce piège-là, il attrape tout le monde"), jamais l\'élève lui-même : aucun sarcasme sur son erreur, rien qui puisse le faire se sentir bête.'
+      : 'Mode "Pote Chill" : calme, encourageant, zéro pression, bienveillant même face à une erreur.';
+  return `${ageLine}\n${personaLine}`;
 }

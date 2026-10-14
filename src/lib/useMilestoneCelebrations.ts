@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import { computeUnlockedBadges } from "@/lib/progress";
-import { getRankInfo, RANKS, type Rank } from "@/lib/aura";
-import { sfx } from "@/lib/sound";
-import { BADGES } from "@/data";
-import type { AppState, Badge } from "@/types";
+import { getRankInfo, RANKS, type Rank } from '@/lib/aura';
+import { sfx } from '@/lib/sound';
+import { BADGES } from '@/data';
+import type { AppState, Badge } from '@/types';
 import {
   getSeenRank,
   setSeenRank,
@@ -11,20 +11,21 @@ import {
   setSeenBadgeIds,
   hasBaselinedBadges,
   recordBadgeUnlockedAt,
-} from "@/lib/celebrations";
+} from '@/lib/celebrations';
 
 export type Celebration =
-  { type: "rank"; fromRank: Rank; toRank: Rank } | { type: "badge"; badge: Badge };
+  | { type: 'rank'; fromRank: Rank; toRank: Rank }
+  | { type: 'badge'; badge: Badge };
 
 // Badges stay a quick toast, auto-dismissed on a short timer. A rank-up is now a dedicated full
 // screen with its own explicit "Continuer"/"Passer" buttons — this long timeout is only a safety
 // net for whoever doesn't tap either (so the screen can never get permanently stuck), not the
 // primary way to leave it: a deliberate full-screen moment should end on the student's own terms.
-const AUTO_DISMISS_MS: Record<Celebration["type"], number> = { badge: 2200, rank: 12000 };
+const AUTO_DISMISS_MS: Record<Celebration['type'], number> = { badge: 2200, rank: 12000 };
 
 type CelebrationState = Pick<
   AppState,
-  "streak" | "xp" | "freezeArmed" | "freezes" | "completedChapters" | "everUsedFreeze"
+  'streak' | 'xp' | 'freezeArmed' | 'freezes' | 'completedChapters' | 'everUsedFreeze'
 >;
 
 /** Rank-ups and badge unlocks were both real, already-computed milestones (getRankInfo,
@@ -36,7 +37,7 @@ type CelebrationState = Pick<
 export function useMilestoneCelebrations(
   state: CelebrationState,
   loaded: boolean,
-  soundOn: boolean,
+  soundOn: boolean
 ): { celebration: Celebration | null; dismiss: () => void } {
   const [queue, setQueue] = useState<Celebration[]>([]);
   const [active, setActive] = useState<Celebration | null>(null);
@@ -47,9 +48,10 @@ export function useMilestoneCelebrations(
     const seenRankId = getSeenRank();
     if (seenRankId !== null && seenRankId !== toRank.id) {
       const fromRank = RANKS.find((r) => r.id === seenRankId) ?? toRank;
-      setQueue((q) => [...q, { type: "rank", fromRank, toRank }]);
+      setQueue((q) => [...q, { type: 'rank', fromRank, toRank }]);
     }
     setSeenRank(toRank.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loaded, state.xp]);
 
   useEffect(() => {
@@ -64,7 +66,7 @@ export function useMilestoneCelebrations(
       newlyUnlocked.forEach((id) => {
         recordBadgeUnlockedAt(id);
         const badge = BADGES.find((b) => b.id === id);
-        if (badge) setQueue((q) => [...q, { type: "badge", badge }]);
+        if (badge) setQueue((q) => [...q, { type: 'badge', badge }]);
       });
     }
     setSeenBadgeIds(unlockedIds);
@@ -82,7 +84,7 @@ export function useMilestoneCelebrations(
     const [next, ...rest] = queue;
     setActive(next);
     setQueue(rest);
-    if (next.type === "badge") sfx.complete(soundOn);
+    if (next.type === 'badge') sfx.complete(soundOn);
   }, [queue, active, soundOn]);
 
   useEffect(() => {

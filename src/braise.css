@@ -1,18 +1,8 @@
+
 :root {
   /* Signature — the one true action colour. Every major CTA in the app ("Continuer",
-     "Partager", "Valider", "Terminer") is this orange. Nothing else claims it. The vivid
-     --neo-orange is for shapes, glows and icons; a small label needs more contrast than it gives
-     (3.4:1 with white, 3.2:1 on cream, 4.5:1 is the floor), so words use the two tokens below,
-     the same orange made just dark enough. contrast.test.ts holds the numbers. */
+     "Partager", "Valider", "Terminer") uses --neo-orange, full stop. Nothing else claims it. */
   --neo-orange: #ff4500;
-  /* A button filled with the signature orange and a white label. */
-  --orange-fill: color-mix(in srgb, var(--neo-orange) 80%, #000);
-  /* The label on it. */
-  --on-orange: #fff;
-  /* Orange words on a surface (a kicker, a small heading). Repeated under .dark, where --ink
-     is light: a custom property is resolved where it is declared, not where it is used. The 30%
-     of ink is what lets it clear 4.5:1 on the soft orange glow behind the page headers too. */
-  --orange-text: color-mix(in srgb, var(--neo-orange) 70%, var(--ink) 30%);
   --neo-ink: #151821;
   --neo-blue: #1e3a8a;
 
@@ -63,36 +53,15 @@
      dark mode by never changing at all. */
   --rev-paper: #faf8f3;
   --rev-ink-soft: rgba(22, 33, 58, 0.72);
-
-  /* Correct/wrong tinted surfaces (Déclic tiles, the fiche's à-retenir/piège blocks). A fixed
-     light tint with var(--ink) text reads fine here in light mode, but --ink flips to near-white
-     under .dark, leaving near-white text on a near-white tint — under 1.1:1 contrast, effectively
-     invisible (confirmed by computing WCAG contrast, not just eyeballing it). Own token pair per
-     state, redefined under .dark, so both the background AND its text stay a real pair instead of
-     mixing a fixed surface with a theme-adaptive text colour. */
-  --feedback-correct-bg: #dcfce7;
-  --feedback-correct-text: #065f46;
-  --feedback-correct-label: var(--mint-text);
-  --feedback-wrong-bg: #ffe1dc;
-  --feedback-wrong-text: #7f1d1d;
-  --feedback-wrong-label: var(--coral-2);
 }
 
 .dark {
-  --orange-text: color-mix(in srgb, var(--neo-orange) 70%, var(--ink) 30%);
   --blue-pale: #0f1830;
   --paper: #1a2444;
   --ink: #eaf1ff;
   --ink-soft: rgba(234, 241, 255, 0.72);
   --line: rgba(234, 241, 255, 0.12);
   --bg: #0f1830;
-
-  --feedback-correct-bg: #123524;
-  --feedback-correct-text: #86efac;
-  --feedback-correct-label: #34d399;
-  --feedback-wrong-bg: #3a1512;
-  --feedback-wrong-text: #fecaca;
-  --feedback-wrong-label: #f87171;
 }
 
 .dyslexia-mode,
@@ -105,12 +74,8 @@
 .dyslexia-mode h2,
 .dyslexia-mode h3,
 .dyslexia-mode .story-text,
-.dyslexia-mode .quiz-q2,
-.dyslexia-mode .declic-bubble,
-.dyslexia-mode .declic-fiche-title,
-.dyslexia-mode .declic-fiche-text,
-.dyslexia-mode .declic-moment-line {
-  font-family: "IBM Plex Sans", sans-serif !important;
+.dyslexia-mode .quiz-q2 {
+  font-family: 'IBM Plex Sans', sans-serif !important;
   font-weight: 600 !important;
 }
 
@@ -144,26 +109,14 @@
   border-radius: 8px;
   background: #ffd650;
   color: #151821;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem;
   font-weight: 900;
   letter-spacing: 0.08em;
 }
-.capte-intro > div {
-  display: grid;
-  min-width: 0;
-}
-.capte-intro b {
-  font-family: "Baloo 2", sans-serif;
-  font-size: 0.82rem;
-  font-weight: 800;
-  line-height: 1.05;
-}
-.capte-intro small {
-  margin-top: 2px;
-  color: var(--ink-soft);
-  font-size: 0.7rem;
-}
+.capte-intro > div { display: grid; min-width: 0; }
+.capte-intro b { font-family: 'Baloo 2', sans-serif; font-size: 0.82rem; font-weight: 800; line-height: 1.05; }
+.capte-intro small { margin-top: 2px; color: var(--ink-soft); font-size: 0.62rem; }
 .capte-tools {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -183,21 +136,11 @@
   color: var(--ink);
   font-size: 0.7rem;
   font-weight: 800;
-  transition:
-    transform 120ms ease,
-    background 120ms ease;
+  transition: transform 120ms ease, background 120ms ease;
 }
-.capte-tools button:hover {
-  background: color-mix(in srgb, var(--blue-pale) 65%, var(--paper));
-}
-.capte-tools button:active {
-  transform: scale(0.98);
-}
-.capte-tools button[aria-pressed="true"] {
-  border-color: var(--blue);
-  background: var(--blue-pale);
-  color: var(--blue-2);
-}
+.capte-tools button:hover { background: color-mix(in srgb, var(--blue-pale) 65%, var(--paper)); }
+.capte-tools button:active { transform: scale(0.98); }
+.capte-tools button[aria-pressed='true'] { border-color: var(--blue); background: var(--blue-pale); color: var(--blue-2); }
 .capte-reformulate {
   display: flex;
   width: 100%;
@@ -211,18 +154,15 @@
   background: #ffd650;
   box-shadow: 3px 3px 0 #151821;
   color: #151821;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-size: 0.82rem;
   font-weight: 800;
 }
-.capte-reformulate:active {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 #151821;
-}
+.capte-reformulate:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #151821; }
 .capte-reformulation-hint {
   margin: 0 4px 8px;
   color: var(--ink-soft);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   line-height: 1.35;
   text-align: center;
 }
@@ -232,60 +172,20 @@
 .complete-reward-label {
   display: block;
   color: var(--ink-soft);
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
   font-weight: 850;
   letter-spacing: 0.09em;
   text-transform: uppercase;
 }
-.complete-learning-summary {
-  display: grid;
-  width: 100%;
-  gap: 8px;
-  margin: 14px 0 16px;
-  text-align: left;
-}
-.complete-learning-summary > div {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: start;
-  gap: 9px;
-  padding: 11px;
-  border: 1.5px solid color-mix(in srgb, var(--ink) 17%, transparent);
-  border-radius: 16px;
-  background: var(--paper);
-}
-.complete-learning-summary > div > span {
-  display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  border-radius: 11px;
-  background: #dcfce7;
-  color: #08764d;
-}
-.complete-learning-summary > div:last-child > span {
-  background: #e9edff;
-  color: #344caa;
-}
-.complete-learning-summary p {
-  display: grid;
-  gap: 2px;
-  margin: 0;
-}
-.complete-learning-summary b {
-  font-family: "Baloo 2", sans-serif;
-  font-size: 0.8rem;
-  line-height: 1.1;
-}
-.complete-learning-summary small {
-  color: var(--ink-soft);
-  font-size: 0.7rem;
-  line-height: 1.35;
-}
-.complete-reward-label {
-  margin-bottom: 5px;
-}
+.complete-learning-summary { display: grid; width: 100%; gap: 8px; margin: 14px 0 16px; text-align: left; }
+.complete-learning-summary > div { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: 9px; padding: 11px; border: 1.5px solid color-mix(in srgb, var(--ink) 17%, transparent); border-radius: 16px; background: var(--paper); }
+.complete-learning-summary > div > span { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 11px; background: #dcfce7; color: #08764d; }
+.complete-learning-summary > div:last-child > span { background: #e9edff; color: #344caa; }
+.complete-learning-summary p { display: grid; gap: 2px; margin: 0; }
+.complete-learning-summary b { font-family: 'Baloo 2', sans-serif; font-size: 0.8rem; line-height: 1.1; }
+.complete-learning-summary small { color: var(--ink-soft); font-size: 0.66rem; line-height: 1.35; }
+.complete-reward-label { margin-bottom: 5px; }
 
 html,
 body {
@@ -293,18 +193,10 @@ body {
   margin: 0;
 }
 
-/* Réglages > Taille du texte. Every font-size in the app is in rem, so scaling the root is enough. */
-html[data-text-size="large"] {
-  font-size: 112.5%;
-}
-html[data-text-size="xlarge"] {
-  font-size: 125%;
-}
-
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: "IBM Plex Sans", sans-serif;
+  font-family: 'IBM Plex Sans', sans-serif;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   display: flex;
@@ -327,7 +219,7 @@ body {
 h1,
 h2,
 h3 {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 700;
   margin: 0;
   line-height: 1.1;
@@ -348,6 +240,7 @@ h3 {
   background: none;
   -webkit-appearance: none;
 }
+
 
 /* WCAG 2.4.7 Focus Visible — grepping every component built this session turned up zero
    `focus:`/`focus-visible:` classes anywhere, so every button relied on whatever faint default
@@ -386,11 +279,7 @@ select {
   max-height: 100dvh;
   margin: 0 auto;
   background:
-    radial-gradient(
-      circle at 50% -12%,
-      color-mix(in srgb, var(--neo-orange) 9%, transparent),
-      transparent 34%
-    ),
+    radial-gradient(circle at 50% -12%, color-mix(in srgb, var(--neo-orange) 9%, transparent), transparent 34%),
     var(--bg);
   /* body's own `color: var(--ink)` (below) resolves once, against :root's light-mode --ink,
      because .app-shell.dark's override lives *below* body in the tree — a descendant's
@@ -459,8 +348,8 @@ select {
   letter-spacing: -0.015em;
 }
 .topbar-back {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-sm);
   background: var(--paper);
   border: 1.5px solid color-mix(in srgb, var(--ink) 18%, transparent);
@@ -469,9 +358,7 @@ select {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition:
-    transform 120ms ease,
-    box-shadow 120ms ease;
+  transition: transform 120ms ease, box-shadow 120ms ease;
 }
 .topbar-back:active {
   transform: scale(0.94);
@@ -559,11 +446,8 @@ select {
 .onb--welcome .onb-scene {
   flex: 1;
 }
-/* Compact on purpose: the avatar, the title, the pass, its storage note and the button must all
-   fit above the fold on a 732px-high phone, or the note hides under the sticky button. */
 .onb--ready .onb-scene {
-  gap: 14px;
-  padding: 8px 0 12px;
+  padding: 28px 0 24px;
 }
 .onb-avatar {
   flex-shrink: 0;
@@ -608,13 +492,10 @@ select {
 .onb-hero-copy h1 {
   max-width: 12ch;
   margin: 0 auto;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-size: 2.1rem;
   font-weight: 800;
   line-height: 1.02;
-  /* A name makes the title wrap at an arbitrary point: balance the lines so the closing "!" never
-     ends up alone on one (the non-breaking space in the string keeps it with the name). */
-  text-wrap: balance;
 }
 .onb-hero-copy p {
   max-width: 22ch;
@@ -635,18 +516,10 @@ select {
   background: var(--paper);
   box-shadow: 3px 3px 0 var(--neo-ink);
   color: var(--ink);
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-size: 1.22rem;
   font-weight: 800;
   line-height: 1.18;
-}
-.onb--level .onb-bubble,
-.onb--tone .onb-bubble,
-.onb--rhythm .onb-bubble {
-  /* Braise's question and its reaction to the answer swap into this same bubble. A fixed height
-     (three lines) means the tiles below never jump when the reaction arrives. */
-  min-height: 6.5rem;
-  align-content: center;
 }
 .onb-bubble-ghost,
 .onb-bubble-live {
@@ -660,17 +533,20 @@ select {
   display: flex;
   flex-direction: column;
 }
-/* The name screen has a single block: Braise's question and the field stay together as one
-   group, centred in the page, instead of hugging the top and leaving a hole above the button —
-   the free space is split between the auto margins above and below. */
-.onb--name .onb-scene {
+/* Screens with a single block (the name field, the data notice): Braise's question and the
+   answer stay together as one group, centred in the page, instead of hugging the top and leaving
+   a hole above the button — the free space is split between the auto margins above and below. */
+.onb--name .onb-scene,
+.onb--consent .onb-scene {
   margin-top: auto;
 }
-.onb-body--name {
+.onb-body--name,
+.onb-body--consent {
   flex: 0 0 auto;
   margin-bottom: auto;
 }
-.onb--name .onb-footer {
+.onb--name .onb-footer,
+.onb--consent .onb-footer {
   margin-top: 0;
 }
 .onb-hint {
@@ -678,11 +554,6 @@ select {
   color: var(--ink-soft);
   font-size: 0.84rem;
   text-align: center;
-}
-.onb-footnote {
-  margin: 0 0 10px;
-  font-size: 0.78rem;
-  line-height: 1.35;
 }
 
 /* Name */
@@ -694,7 +565,7 @@ select {
   background: var(--paper);
   box-shadow: 4px 4px 0 var(--neo-ink);
   color: var(--ink);
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-size: 1.4rem;
   font-weight: 800;
 }
@@ -753,9 +624,7 @@ select {
   box-shadow: 3px 3px 0 var(--neo-ink);
   color: var(--ink);
   text-align: left;
-  transition:
-    box-shadow 0.12s ease,
-    background 0.15s ease;
+  transition: box-shadow 0.12s ease, background 0.15s ease;
 }
 .onb-tile:active {
   box-shadow: 1px 1px 0 var(--neo-ink);
@@ -775,7 +644,7 @@ select {
 }
 .onb-tile--row b {
   display: block;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-size: 1.18rem;
   font-weight: 800;
   line-height: 1.1;
@@ -817,6 +686,61 @@ select {
   filter: none;
 }
 
+/* Consent */
+.onb-info {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 16px;
+  background: var(--paper);
+}
+.onb-info p {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.45;
+}
+.onb-info svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.onb-check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: var(--ink);
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+.onb-check.is-checked {
+  background: #ffd43b;
+  color: #151821;
+}
+.onb-check-box {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 2.5px solid #151821;
+  border-radius: 8px;
+  background: #fff;
+  color: #151821;
+}
+
 /* Ready — the pass: the student's own answers reflected back, like a ticket being handed over. */
 .onb-pass {
   padding: 16px 18px 6px;
@@ -830,7 +754,7 @@ select {
   display: block;
   padding-bottom: 10px;
   border-bottom: 2.5px dashed rgba(21, 24, 33, 0.35);
-  font-family: "IBM Plex Mono", monospace;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -847,14 +771,14 @@ select {
   border-top: 1.5px solid rgba(21, 24, 33, 0.12);
 }
 .onb-pass dt {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
   opacity: 0.6;
 }
 .onb-pass dd {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-size: 1.12rem;
   font-weight: 800;
   text-align: right;
@@ -868,13 +792,9 @@ select {
   padding: 18px 0 calc(18px + env(safe-area-inset-bottom, 0px));
   background: linear-gradient(to bottom, transparent, var(--bg) 35%);
 }
-.onb--welcome .onb-footer {
-  background: none;
-}
-/* The ready screen scrolls under its footer when a long first name wraps the title, so the footer
-   needs the screen's own colour behind the note and the button. */
+.onb--welcome .onb-footer,
 .onb--ready .onb-footer {
-  background: linear-gradient(to bottom, transparent, #ff6b35 35%);
+  background: none;
 }
 .onb-cta {
   width: 100%;
@@ -884,12 +804,10 @@ select {
   background: var(--neo-orange);
   box-shadow: 4px 4px 0 #151821;
   color: #151821;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-size: 1.2rem;
   font-weight: 800;
-  transition:
-    box-shadow 0.12s ease,
-    opacity 0.15s ease;
+  transition: box-shadow 0.12s ease, opacity 0.15s ease;
 }
 .onb--welcome .onb-cta,
 .onb--ready .onb-cta {
@@ -918,13 +836,8 @@ select {
   animation: flameFloat 3s ease-in-out infinite;
 }
 @keyframes flameFloat {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 .btn-block {
   background: var(--sun);
@@ -944,8 +857,8 @@ select {
    "Continuer", CompleteView "Suivant"/"Terminer") — same signature orange and same hard-shadow
    physical press as every other major action button in the app. */
 .btn-block.blue {
-  background: var(--orange-fill);
-  color: var(--on-orange);
+  background: var(--neo-orange);
+  color: #fff;
   border: 2.5px solid #000;
   box-shadow: 3px 3px 0 #000;
 }
@@ -958,8 +871,8 @@ select {
 }
 /* Used by LevelSheet. */
 .level-group-label {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
   text-transform: uppercase;
   color: var(--ink-soft);
   margin-bottom: 8px;
@@ -1033,27 +946,16 @@ select {
    small helpers bridge things Tailwind's core doesn't ship (a reusable keyframe, cross-browser
    scrollbar hiding) without duplicating them. */
 @keyframes bumpPop {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.25);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+  100% { transform: scale(1); }
 }
 .tw-bump {
   animation: bumpPop 0.4s ease;
 }
 @keyframes h-float {
-  0%,
-  100% {
-    transform: translateY(0) rotate(-3deg);
-  }
-  50% {
-    transform: translateY(-6px) rotate(3deg);
-  }
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-6px) rotate(3deg); }
 }
 .tw-float {
   animation: h-float 3s ease-in-out infinite;
@@ -1062,9 +964,7 @@ select {
    .tw-bump and .tw-float as separate classes on one element just has the later rule in the
    cascade win the whole `animation` shorthand instead of both playing. */
 .tw-float-pop {
-  animation:
-    bumpPop 0.4s ease,
-    h-float 3s ease-in-out 0.4s infinite;
+  animation: bumpPop 0.4s ease, h-float 3s ease-in-out 0.4s infinite;
 }
 /* A near-imperceptible idle "breathing" scale on a CTA — an ambient tell that it's the thing to
    press, distinct from any tap/press feedback. Kept on a wrapper, never the interactive element
@@ -1072,13 +972,8 @@ select {
    utility, and stacking a CSS `animation` (also `transform`-driven) directly on that same
    element would have the animation silently overwrite the utility's transform every frame. */
 @keyframes ctaPulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.018);
-  }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.018); }
 }
 .tw-cta-pulse {
   animation: ctaPulse 2.4s ease-in-out infinite;
@@ -1090,7 +985,7 @@ select {
   overflow: hidden;
 }
 .tw-shimmer::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: -60%;
@@ -1139,6 +1034,15 @@ select {
 .aura-content {
   margin: auto 0;
 }
+.aura-view-title {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  /* --ink (theme-aware), not --neo-ink (fixed near-black) — this text sits directly on the
+     page background, which flips in dark mode; --neo-ink wouldn't and would go near-invisible. */
+  color: var(--ink);
+  margin: 4px 0 16px;
+}
 .aura-offline-banner {
   display: flex;
   align-items: center;
@@ -1148,7 +1052,7 @@ select {
   border-radius: 12px;
   padding: 10px 14px;
   margin-bottom: 14px;
-  font-family: "IBM Plex Sans", sans-serif;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-weight: 600;
   font-size: 0.76rem;
   color: var(--neo-ink);
@@ -1157,13 +1061,8 @@ select {
 /* --- Loading skeleton — every block reuses the real component's own card class (same
    border/shadow/padding), so swapping skeleton -> real content shifts zero pixels. --- */
 @keyframes skeletonPulse {
-  0%,
-  100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 1;
-  }
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }
 .skeleton-block {
   flex-shrink: 0;
@@ -1204,15 +1103,8 @@ select {
   animation: auraHeroGlowBreathe 5s ease-in-out infinite;
 }
 @keyframes auraHeroGlowBreathe {
-  0%,
-  100% {
-    opacity: 0.32;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    opacity: 0.48;
-    transform: translate(-50%, -50%) scale(1.08);
-  }
+  0%, 100% { opacity: 0.32; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.48; transform: translate(-50%, -50%) scale(1.08); }
 }
 @media (prefers-reduced-motion: reduce) {
   .aura-hero-glow {
@@ -1272,7 +1164,7 @@ select {
   line-height: 1;
 }
 .aura-streak-count {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 1.05rem;
   line-height: 1;
@@ -1314,7 +1206,7 @@ select {
 .aura-hero-rankname {
   display: block;
   margin-top: 12px;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 1.3rem;
   letter-spacing: 0.03em;
@@ -1330,31 +1222,12 @@ select {
   font-size: 1.1rem;
   animation: auraSparkle 1.8s ease-in-out infinite;
 }
-.aura-sparkle.s1 {
-  top: 4px;
-  left: 2px;
-  animation-delay: 0s;
-}
-.aura-sparkle.s2 {
-  top: 14px;
-  right: -4px;
-  animation-delay: 0.5s;
-}
-.aura-sparkle.s3 {
-  bottom: 10px;
-  left: -8px;
-  animation-delay: 1s;
-}
+.aura-sparkle.s1 { top: 4px; left: 2px; animation-delay: 0s; }
+.aura-sparkle.s2 { top: 14px; right: -4px; animation-delay: 0.5s; }
+.aura-sparkle.s3 { bottom: 10px; left: -8px; animation-delay: 1s; }
 @keyframes auraSparkle {
-  0%,
-  100% {
-    opacity: 0.2;
-    transform: scale(0.8);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.15);
-  }
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.15); }
 }
 /* --- BraiseInsightCard ("Ce que Braise a remarqué") — same card shell as .mastery-section
    (2.5px black border, 22px radius, --paper fill, hard 4px shadow) so it reads as the same family
@@ -1369,14 +1242,14 @@ select {
 }
 .braise-insight-tab {
   display: inline-block;
-  background: var(--orange-fill);
-  color: var(--on-orange);
+  background: color-mix(in srgb, var(--neo-orange) 80%, #000);
+  color: #fff;
   border: 2px solid #000;
   border-radius: 8px;
   padding: 4px 10px;
   margin-bottom: 12px;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -1391,7 +1264,7 @@ select {
   flex-shrink: 0;
 }
 .braise-insight-line {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 0.86rem;
   line-height: 1.3;
@@ -1413,15 +1286,15 @@ select {
   padding: 0 3px 7px;
 }
 .braise-evolution-heading span {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
   font-weight: 700;
   color: var(--ink-soft);
 }
 .braise-evolution-heading strong {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-size: 0.9rem;
-  color: var(--orange-text);
+  color: var(--neo-orange);
 }
 .braise-evolution-cast {
   display: grid;
@@ -1439,9 +1312,7 @@ select {
   justify-content: flex-end;
   gap: 2px;
   border-bottom: 3px solid transparent;
-  transition:
-    transform 180ms ease,
-    opacity 180ms ease;
+  transition: transform 180ms ease, opacity 180ms ease;
 }
 .braise-evolution-stage svg {
   max-width: 100%;
@@ -1451,8 +1322,8 @@ select {
   width: 100%;
   overflow: hidden;
   color: var(--ink);
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.48rem;
   font-weight: 700;
   text-align: center;
   text-overflow: ellipsis;
@@ -1468,7 +1339,7 @@ select {
    each rank's own hue readable, while staying clearly duller than the current stage. */
 .braise-evolution-stage.is-locked {
   filter: grayscale(0.45);
-  opacity: 0.74;
+  opacity: 0.6;
 }
 .braise-mascot .braise-outfit {
   transform-origin: 54px 76px;
@@ -1478,27 +1349,20 @@ select {
   animation: braise-core-pulse 2.8s ease-in-out infinite;
 }
 @keyframes braise-core-pulse {
-  0%,
-  100% {
-    transform: scale(0.94);
-  }
-  50% {
-    transform: scale(1.06);
-  }
+  0%, 100% { transform: scale(0.94); }
+  50% { transform: scale(1.06); }
 }
 .braise-form-legende .braise-outfit,
 .braise-form-platine .braise-outfit {
   filter: drop-shadow(1px 1px 0 rgba(21, 24, 33, 0.22));
 }
 @media (prefers-reduced-motion: reduce) {
-  .braise-mascot .braise-core {
-    animation: none;
-  }
+  .braise-mascot .braise-core { animation: none; }
 }
 .rank-rail-caption {
   text-align: center;
   margin: 0 0 16px;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 0.98rem;
 }
@@ -1511,16 +1375,10 @@ select {
    dark mode's already-passing contrast comfortable rather than dragging it down). Verified both
    ways: 4.59:1 in light mode, 5.94:1 in dark. */
 .rank-rail-caption-amount {
-  color: var(--orange-text);
+  color: color-mix(in srgb, var(--neo-orange) 80%, var(--ink) 20%);
 }
 .rank-rail-caption-rest {
   color: var(--ink);
-}
-/* Inside the "Ta Braise" card: under the five forms, set apart by a dashed line. */
-.braise-evolution-line .rank-rail-caption {
-  margin: 8px 3px 0;
-  padding-top: 9px;
-  border-top: 2px dashed color-mix(in srgb, var(--ink) 22%, transparent);
 }
 
 /* --- The 5-rank ladder rail — season-pass style, every rank visible at once, nothing hidden
@@ -1590,13 +1448,8 @@ select {
   animation: railPulse 1.8s ease-in-out infinite;
 }
 @keyframes railPulse {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.08);
-  }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
 }
 
 /* --- SubjectMasteryGrid — the container had gone through three passes (bare, a rounded
@@ -1624,14 +1477,14 @@ select {
   display: inline-block;
   /* White text on plain --neo-orange measured 3.44:1 — under the 4.5:1 WCAG minimum for text.
      A 20%-darker fill clears it (~5.1:1) without becoming a visibly different colour. */
-  background: var(--orange-fill);
-  color: var(--on-orange);
+  background: color-mix(in srgb, var(--neo-orange) 80%, #000);
+  color: #fff;
   border: 2px solid #000;
   border-radius: 8px;
   padding: 4px 10px;
   margin-bottom: 14px;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -1677,29 +1530,10 @@ select {
   align-items: center;
   justify-content: center;
 }
-.mastery-card:nth-child(1) {
-  left: 2px;
-  transform: rotate(-9deg);
-  z-index: 1;
-}
-.mastery-card:nth-child(2) {
-  left: 15px;
-  bottom: 2px;
-  transform: rotate(-3deg);
-  z-index: 2;
-}
-.mastery-card:nth-child(3) {
-  left: 27px;
-  bottom: 3px;
-  transform: rotate(3deg);
-  z-index: 3;
-}
-.mastery-card:nth-child(4) {
-  left: 38px;
-  bottom: 4px;
-  transform: rotate(9deg);
-  z-index: 4;
-}
+.mastery-card:nth-child(1) { left: 2px; transform: rotate(-9deg); z-index: 1; }
+.mastery-card:nth-child(2) { left: 15px; bottom: 2px; transform: rotate(-3deg); z-index: 2; }
+.mastery-card:nth-child(3) { left: 27px; bottom: 3px; transform: rotate(3deg); z-index: 3; }
+.mastery-card:nth-child(4) { left: 38px; bottom: 4px; transform: rotate(9deg); z-index: 4; }
 .mastery-card.is-filled {
   box-shadow: 1.5px 1.5px 0 #000;
 }
@@ -1712,9 +1546,9 @@ select {
   opacity: 0.6;
 }
 .mastery-name {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 700;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   line-height: 1.15;
   color: var(--ink);
   text-align: center;
@@ -1722,8 +1556,8 @@ select {
 /* The real count, not a percentage — "3/6 cartes" can't be inflated the way "100%" could by
    only ever reviewing the one easy card in a six-card deck. */
 .mastery-count {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem;
   font-weight: 600;
   color: var(--ink-soft);
 }
@@ -1741,9 +1575,7 @@ select {
   box-shadow: 3px 3px 0 #000;
   padding: 10px 14px;
   margin-bottom: 12px;
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .badge-bridge:active {
   transform: translate(2px, 2px);
@@ -1769,15 +1601,15 @@ select {
   text-align: left;
 }
 .badge-bridge-hint {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 0.86rem;
   color: var(--ink);
   line-height: 1.2;
 }
 .badge-bridge-sub {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
   font-weight: 600;
   color: var(--ink-soft);
 }
@@ -1806,21 +1638,19 @@ select {
   justify-content: center;
   gap: 10px;
   width: 100%;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 1rem;
   border: 3px solid #000;
   border-radius: 999px;
   padding: 8px 22px 8px 8px;
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .aura-review-cta {
   /* Same fix as .mastery-tab: white text on plain --neo-orange is 3.44:1, under WCAG's 4.5:1
      minimum — on the page's single most important button, no less. 20% darker clears it. */
-  background: var(--orange-fill);
-  color: var(--on-orange);
+  background: color-mix(in srgb, var(--neo-orange) 80%, #000);
+  color: #fff;
   box-shadow: 5px 5px 0 #000;
 }
 .aura-share-cta {
@@ -1872,7 +1702,7 @@ select {
    on hover (desktop) and on every tap (mobile, which has no hover state to rely on). Reserved
    for Réviser now — the secondary Partager button stays calmer on purpose. */
 .aura-review-cta::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: -60%;
@@ -1887,12 +1717,8 @@ select {
   animation: shineSweep 0.7s ease forwards;
 }
 @keyframes shineSweep {
-  from {
-    left: -60%;
-  }
-  to {
-    left: 130%;
-  }
+  from { left: -60%; }
+  to { left: 130%; }
 }
 .aura-review-cta:active {
   transform: translate(3px, 3px);
@@ -1936,7 +1762,7 @@ select {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 1rem;
   color: var(--neo-ink);
@@ -1981,9 +1807,7 @@ select {
   border: 3.5px solid #000;
   box-shadow: 5px 5px 0 #000;
   border-radius: 999px;
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .share-export-btn:active {
   transform: translate(3px, 3px);
@@ -2019,7 +1843,7 @@ select {
 }
 .rev-empty-title {
   margin-top: 14px;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-size: 1.15rem;
   font-weight: 800;
   color: var(--neo-ink);
@@ -2036,14 +1860,12 @@ select {
   border-radius: 999px;
   padding: 12px 26px;
   background: linear-gradient(to bottom, #ffe066, #fdc800);
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 0.92rem;
   color: #000;
   box-shadow: 3px 3px 0 #000;
-  transition:
-    transform 0.1s ease,
-    box-shadow 0.1s ease;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 .rev-empty-btn:active {
   transform: translate(3px, 3px);
@@ -2111,12 +1933,8 @@ select {
   animation: recapFill var(--dur, 2000ms) linear forwards;
 }
 @keyframes recapFill {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
 /* Single full-cover tap target — a tap anywhere jumps straight to the trophy card (see
    skipToEnd in BraiseRecap.tsx), so there's no left/right split to style separately anymore. */
@@ -2138,8 +1956,8 @@ select {
   z-index: 5;
   text-align: center;
   pointer-events: none;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -2147,13 +1965,8 @@ select {
   animation: recapTapPulse 1.8s ease-in-out infinite;
 }
 @keyframes recapTapPulse {
-  0%,
-  100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 1;
-  }
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }
 .recap-slide {
   flex: 1;
@@ -2175,7 +1988,7 @@ select {
   background: var(--neo-ink);
 }
 .recap-title {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 2.1rem;
   line-height: 1.15;
@@ -2191,7 +2004,7 @@ select {
   color: var(--neo-ink);
 }
 .recap-sub {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 700;
   font-size: 1.05rem;
   color: rgba(255, 255, 255, 0.85);
@@ -2201,7 +2014,7 @@ select {
   margin-bottom: 10px;
 }
 .recap-xp {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 3.4rem;
   color: #fff;
@@ -2245,9 +2058,7 @@ select {
   border: 2px solid #000;
   border-radius: 50%;
   box-shadow: 2px 2px 0 #000;
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .recap-close:active {
   transform: translate(2px, 2px);
@@ -2281,14 +2092,14 @@ select {
   font-size: 1.1rem;
 }
 .recap-stat-value {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 1.05rem;
   color: var(--neo-ink);
 }
 .recap-stat-label {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -2304,9 +2115,7 @@ select {
   font-weight: 900;
   border: 3.5px solid #000;
   box-shadow: 5px 5px 0 #000;
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .recap-btn:active {
   transform: translate(3px, 3px);
@@ -2369,13 +2178,10 @@ select {
   border: 2.5px solid #000;
   color: #000;
   box-shadow: 3px 3px 0 #000;
-  transition:
-    transform 0.1s ease,
-    box-shadow 0.1s ease,
-    background 0.2s ease;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
 }
 .rev-icon-btn::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: -6px;
   border-radius: 50%;
@@ -2424,21 +2230,9 @@ select {
   animation: progressFlash 0.6s ease;
 }
 @keyframes progressFlash {
-  0% {
-    box-shadow:
-      3px 3px 0 #000,
-      0 0 0 0 rgba(16, 185, 129, 0);
-  }
-  30% {
-    box-shadow:
-      3px 3px 0 #000,
-      0 0 0 6px rgba(16, 185, 129, 0.35);
-  }
-  100% {
-    box-shadow:
-      3px 3px 0 #000,
-      0 0 0 0 rgba(16, 185, 129, 0);
-  }
+  0% { box-shadow: 3px 3px 0 #000, 0 0 0 0 rgba(16, 185, 129, 0); }
+  30% { box-shadow: 3px 3px 0 #000, 0 0 0 6px rgba(16, 185, 129, 0.35); }
+  100% { box-shadow: 3px 3px 0 #000, 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 .rev-count,
 .rev-combo {
@@ -2447,7 +2241,7 @@ select {
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 0.8rem;
   border-radius: 999px;
@@ -2458,33 +2252,21 @@ select {
   border: 2.5px solid #000;
   color: #000;
   box-shadow: 3px 3px 0 #000;
-  transition:
-    color 0.2s ease,
-    background 0.2s ease;
+  transition: color 0.2s ease, background 0.2s ease;
 }
 .rev-combo.is-hot {
-  color: var(--on-orange);
-  background: var(--orange-fill);
+  color: #fff;
+  background: var(--neo-orange);
 }
 .rev-combo-shake {
   animation: comboShake 0.4s ease;
 }
 @keyframes comboShake {
-  0% {
-    transform: scale(1) rotate(0);
-  }
-  25% {
-    transform: scale(1.14) rotate(-6deg);
-  }
-  55% {
-    transform: scale(1.06) rotate(5deg);
-  }
-  80% {
-    transform: scale(1.08) rotate(-3deg);
-  }
-  100% {
-    transform: scale(1) rotate(0);
-  }
+  0% { transform: scale(1) rotate(0); }
+  25% { transform: scale(1.14) rotate(-6deg); }
+  55% { transform: scale(1.06) rotate(5deg); }
+  80% { transform: scale(1.08) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0); }
 }
 /* Ephemeral toast (matching 1100ms JS timeout in HomeView) — Home has no `position: relative`
    stage to anchor an absolute toast to, so this one is fixed to the viewport. */
@@ -2494,7 +2276,7 @@ select {
   left: 50%;
   z-index: 60;
   pointer-events: none;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 0.95rem;
   white-space: nowrap;
@@ -2517,12 +2299,12 @@ select {
   left: 50%;
   z-index: 70;
   pointer-events: none;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 1rem;
   white-space: nowrap;
-  color: var(--on-orange);
-  background: var(--orange-fill);
+  color: #fff;
+  background: var(--neo-orange);
   border: 2.5px solid #000;
   border-radius: 999px;
   padding: 10px 20px;
@@ -2530,26 +2312,11 @@ select {
   animation: comboToastRise 2.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 @keyframes comboToastRise {
-  0% {
-    transform: translate(-50%, 16px) scale(0.85);
-    opacity: 0;
-  }
-  20% {
-    transform: translate(-50%, 0) scale(1.06);
-    opacity: 1;
-  }
-  35% {
-    transform: translate(-50%, 0) scale(1);
-    opacity: 1;
-  }
-  78% {
-    transform: translate(-50%, 0) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-50%, -8px) scale(0.94);
-    opacity: 0;
-  }
+  0% { transform: translate(-50%, 16px) scale(0.85); opacity: 0; }
+  20% { transform: translate(-50%, 0) scale(1.06); opacity: 1; }
+  35% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+  78% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -8px) scale(0.94); opacity: 0; }
 }
 /* Full viewport: the tab bar is hidden for the whole session (see App.tsx showTabBar), so
    there's no 68px strip to reserve under it anymore. */
@@ -2601,8 +2368,7 @@ select {
   z-index: 5;
   /* Transparent — the colour now lives in .flash-stage, behind this. */
   /* Top: header. Bottom: action dock + floating tab dock + gaps. */
-  padding: calc(58px + env(safe-area-inset-top, 0px)) 0
-    calc(178px + env(safe-area-inset-bottom, 0px));
+  padding: calc(58px + env(safe-area-inset-top, 0px)) 0 calc(178px + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -2726,21 +2492,9 @@ select {
   animation: jokerBurst 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 @keyframes jokerBurst {
-  0% {
-    transform: scale(0.6);
-    opacity: 0.9;
-    border-width: 4px;
-  }
-  70% {
-    transform: scale(1.35);
-    opacity: 0.35;
-    border-width: 2px;
-  }
-  100% {
-    transform: scale(1.65);
-    opacity: 0;
-    border-width: 1px;
-  }
+  0% { transform: scale(0.6); opacity: 0.9; border-width: 4px; }
+  70% { transform: scale(1.35); opacity: 0.35; border-width: 2px; }
+  100% { transform: scale(1.65); opacity: 0; border-width: 1px; }
 }
 /* These two are plain CSS @keyframes, not framer-motion — MotionConfig's reducedMotion="user"
    (RevisionsView) only reaches motion components, so the couple of CSS-only animations on this
@@ -2771,7 +2525,7 @@ select {
   border-radius: 14px;
   padding: 8px 12px;
   box-shadow: 3px 3px 0 #000;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 700;
   font-size: 0.74rem;
   line-height: 1.3;
@@ -2780,7 +2534,7 @@ select {
   pointer-events: none;
 }
 .joker-tip::after {
-  content: "";
+  content: '';
   position: absolute;
   bottom: -8px;
   left: 50%;
@@ -2808,7 +2562,7 @@ select {
   border-radius: 14px;
   padding: 8px 12px;
   box-shadow: 3px 3px 0 #000;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 700;
   font-size: 0.74rem;
   line-height: 1.3;
@@ -2817,7 +2571,7 @@ select {
   pointer-events: none;
 }
 .report-tip::after {
-  content: "";
+  content: '';
   position: absolute;
   top: -8px;
   right: 10px;
@@ -2841,8 +2595,8 @@ select {
 
 /* ===== Progrès (suite) ===== */
 .section-title {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
   color: var(--ink-soft);
   font-weight: 800;
   text-transform: uppercase;
@@ -2864,6 +2618,42 @@ select {
   border-radius: 999px;
   transition: width 0.4s ease;
 }
+.lesson-modes {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 18px;
+  background: var(--bg);
+  border: 2px solid #000;
+  border-radius: 999px;
+  padding: 5px;
+}
+.lesson-mode-btn {
+  flex: 1;
+  text-align: center;
+  padding: 9px 4px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.lesson-mode-btn:not(.is-on) {
+  background: rgba(255, 255, 255, 0.6);
+  border-color: rgba(21, 24, 33, 0.16);
+}
+.lesson-mode-btn.is-on {
+  background: var(--neo-ink);
+  color: #fff;
+  border-color: #000;
+}
 .lesson-panel {
   display: none;
 }
@@ -2880,21 +2670,6 @@ select {
   display: flex;
   flex-direction: column;
   min-height: 50vh;
-}
-/* Not a school-style bar — a row of small flames lighting up one by one, same dashed/muted
-   vocabulary as .onb-flames, so "how far am I from the Déclic" reads as a real cue, not decor. */
-.declic-progress {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 16px;
-}
-.declic-progress span {
-  opacity: 0.22;
-  filter: grayscale(1);
-}
-.declic-progress span.is-lit {
-  opacity: 1;
-  filter: none;
 }
 .declic-step {
   display: flex;
@@ -2918,7 +2693,7 @@ select {
   background: var(--paper);
   box-shadow: 3px 3px 0 var(--violet);
   color: var(--ink);
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-size: 1.15rem;
   font-weight: 800;
   line-height: 1.2;
@@ -2935,14 +2710,11 @@ select {
   background: var(--paper);
   box-shadow: 3px 3px 0 var(--neo-ink);
   color: var(--ink);
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-size: 1rem;
   font-weight: 800;
   text-align: left;
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.12s ease,
-    background 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
 }
 .declic-tile:not(:disabled):active {
   transform: translate(2px, 2px);
@@ -2952,16 +2724,14 @@ select {
   opacity: 0.65;
 }
 .declic-tile.is-correct {
-  background: var(--feedback-correct-bg);
+  background: #dcfce7;
   border-color: var(--mint-text);
   box-shadow: 3px 3px 0 var(--mint-text);
-  color: var(--feedback-correct-text);
 }
 .declic-tile.is-wrong {
-  background: var(--feedback-wrong-bg);
+  background: #ffe1dc;
   border-color: var(--coral-2);
   box-shadow: 3px 3px 0 var(--coral-2);
-  color: var(--feedback-wrong-text);
 }
 .declic-cta {
   display: flex;
@@ -2972,16 +2742,13 @@ select {
   padding: 13px 20px;
   border: 2.5px solid var(--neo-ink);
   border-radius: 999px;
-  background: var(--orange-fill);
+  background: var(--neo-orange);
   box-shadow: 3px 3px 0 var(--neo-ink);
-  color: var(--on-orange);
-  font-family: "Baloo 2", sans-serif;
+  color: #fff;
+  font-family: 'Baloo 2', sans-serif;
   font-size: 0.98rem;
   font-weight: 800;
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.12s ease,
-    opacity 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
 }
 .declic-cta:not(:disabled):active {
   transform: translate(2px, 2px);
@@ -3013,43 +2780,10 @@ select {
   border-radius: 20px 20px 20px 6px;
   font-size: 1rem;
 }
-/* The second, genuinely different explanation — shown only after "J'ai toujours pas compris".
-   Dashed violet border instead of the reaction bubble's solid one, so it visibly reads as a
-   second attempt rather than more of the same reply. */
-.declic-bubble--alt {
-  border-radius: 20px 20px 20px 6px;
-  border-style: dashed;
-  border-color: var(--violet);
-  background: color-mix(in srgb, var(--violet) 12%, var(--paper));
-  box-shadow: 3px 3px 0 var(--violet);
-  font-size: 1rem;
-}
-.declic-step-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-}
-/* Deliberately quiet — a text link, not a second CTA competing with "Suite". Getting it wrong
-   and moving on is the default path; asking for a different explanation is the exception. */
-.declic-link {
-  padding: 2px;
-  border: none;
-  background: none;
-  color: var(--ink-soft);
-  font-family: "Baloo 2", sans-serif;
-  font-size: 0.92rem;
-  font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-.declic-link:active {
-  opacity: 0.6;
-}
 .declic-reveal-kicker {
   display: block;
   margin-bottom: 6px;
-  font-family: "IBM Plex Mono", monospace;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -3097,14 +2831,14 @@ select {
 }
 .declic-timeline-year {
   margin-top: 8px;
-  font-family: "IBM Plex Mono", monospace;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 0.72rem;
   font-weight: 800;
   color: var(--ink);
 }
 .declic-timeline-label {
   margin-top: 2px;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   line-height: 1.25;
   color: var(--ink-soft);
 }
@@ -3128,7 +2862,7 @@ select {
   filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.2));
 }
 .declic-moment-kicker {
-  font-family: "IBM Plex Mono", monospace;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 0.75rem;
   font-weight: 900;
   letter-spacing: 0.14em;
@@ -3137,7 +2871,7 @@ select {
 }
 .declic-moment-line {
   max-width: 22ch;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-size: 1.3rem;
   font-weight: 800;
   line-height: 1.2;
@@ -3152,84 +2886,6 @@ select {
   .declic-moment-flame {
     animation: none !important;
   }
-}
-
-/* The closing fiche — "ce que ton prof attend de toi". Deliberately plain paper, not the violet
-   full-bleed of .declic-moment: that card is the emotional payoff, this one is the practical
-   takeaway a student would screenshot before a contrôle. Retenir/piège reuse the same
-   correct/wrong tint pair as .declic-tile instead of inventing new colours. */
-.declic-fiche {
-  /* Above the stage's decorative colour band (declic.css paints it absolutely-positioned): an
-     un-positioned card sat underneath it and lost its own title. */
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 22px 20px;
-  border: 3px solid var(--neo-ink);
-  border-radius: 22px;
-  background: var(--paper);
-  box-shadow: 5px 5px 0 var(--neo-ink);
-}
-.declic-fiche-kicker {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-}
-.declic-fiche-title {
-  font-family: "Baloo 2", sans-serif;
-  font-size: 1.4rem;
-  font-weight: 900;
-  color: var(--ink);
-}
-.declic-fiche-section {
-  padding: 12px 14px;
-  border: 2.5px solid var(--neo-ink);
-  border-radius: 14px;
-}
-.declic-fiche-section.is-retenir {
-  background: var(--feedback-correct-bg);
-  border-color: var(--mint-text);
-}
-.declic-fiche-section.is-piege {
-  background: var(--feedback-wrong-bg);
-  border-color: var(--coral-2);
-}
-.declic-fiche-label {
-  display: block;
-  margin-bottom: 4px;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-.declic-fiche-section.is-retenir .declic-fiche-label {
-  color: var(--feedback-correct-label);
-}
-.declic-fiche-section.is-piege .declic-fiche-label {
-  color: var(--feedback-wrong-label);
-}
-.declic-fiche-section.is-retenir .declic-fiche-text {
-  color: var(--feedback-correct-text);
-}
-.declic-fiche-section.is-piege .declic-fiche-text {
-  color: var(--feedback-wrong-text);
-}
-.declic-fiche-text {
-  font-family: "Baloo 2", sans-serif;
-  font-weight: 700;
-  font-size: 0.95rem;
-  line-height: 1.35;
-  color: var(--ink);
-}
-.declic-fiche .declic-cta {
-  align-self: center;
-  margin-top: 4px;
 }
 
 /* Story / Vocal Animé — the card itself is neutral paper, not a full-bleed subject colour.
@@ -3275,7 +2931,7 @@ select {
 .checkpoint-badge {
   display: inline-block;
   font-family: '"IBM Plex Mono", monospace';
-  font-size: 0.7rem;
+  font-size: 0.62rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -3309,10 +2965,7 @@ select {
   font-size: 0.95rem;
   color: var(--ink);
   cursor: pointer;
-  transition:
-    transform 0.1s ease,
-    box-shadow 0.1s ease,
-    background 0.15s ease;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease;
 }
 .checkpoint-opt:active {
   transform: translate(2px, 2px);
@@ -3336,14 +2989,8 @@ select {
   color: #b91c1c;
 }
 @keyframes pop-in {
-  from {
-    transform: scale(0.85);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 .story-progress-row {
   position: absolute;
@@ -3385,14 +3032,8 @@ select {
   animation: storyIn 0.3s ease;
 }
 @keyframes storyIn {
-  from {
-    opacity: 0;
-    transform: scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: none; }
 }
 /* The subject/chapter's theme colour (a gradient from data.ts) lives here — a medallion, not
    the whole stage — with a hard black border/shadow matching every other badge in the app. */
@@ -3417,7 +3058,7 @@ select {
   filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
 }
 .story-text {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 700;
   font-size: 1.35rem;
   line-height: 1.35;
@@ -3429,20 +3070,16 @@ select {
   width: 50%;
   z-index: 4;
 }
-.story-tap-zone.left {
-  left: 0;
-}
-.story-tap-zone.right {
-  right: 0;
-}
+.story-tap-zone.left { left: 0; }
+.story-tap-zone.right { right: 0; }
 .story-hint {
   position: absolute;
   bottom: 14px;
   left: 0;
   right: 0;
   text-align: center;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
   color: var(--ink-soft);
   z-index: 3;
 }
@@ -3505,28 +3142,100 @@ select {
   animation: wave 0.9s ease-in-out infinite;
   opacity: 1;
 }
-.audio-wave span:nth-child(2n) {
-  animation-delay: 0.15s;
-}
-.audio-wave span:nth-child(3n) {
-  animation-delay: 0.3s;
-}
+.audio-wave span:nth-child(2n) { animation-delay: 0.15s; }
+.audio-wave span:nth-child(3n) { animation-delay: 0.3s; }
 @keyframes wave {
-  0%,
-  100% {
-    height: 6px;
-  }
-  50% {
-    height: 24px;
-  }
+  0%, 100% { height: 6px; }
+  50% { height: 24px; }
 }
 .audio-meta {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
   color: var(--ink-soft);
   flex-shrink: 0;
 }
 
+/* Échanger / Chat */
+.peer-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.peer-msg {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  animation: msgIn 0.3s ease;
+}
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.peer-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--paper);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.peer-bubble {
+  background: var(--paper);
+  border-radius: 14px;
+  border-bottom-left-radius: 4px;
+  padding: 9px 13px;
+  font-size: 0.84rem;
+  max-width: 75%;
+  line-height: 1.45;
+}
+.peer-msg.me {
+  flex-direction: row-reverse;
+}
+.peer-msg.me .peer-bubble {
+  background: var(--blue);
+  color: var(--paper);
+  border-bottom-left-radius: 14px;
+  border-bottom-right-radius: 4px;
+}
+.peer-input-row {
+  display: flex;
+  gap: 8px;
+  position: sticky;
+  bottom: 0;
+  background: var(--bg);
+  padding: 8px 0;
+}
+.peer-input-row input {
+  flex: 1;
+  background: var(--paper);
+  border: none;
+  border-radius: 999px;
+  padding: 11px 16px;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+.peer-input-row input:focus {
+  outline: none;
+}
+.peer-send {
+  background: var(--blue);
+  color: var(--paper);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease;
+}
+.peer-send:active {
+  transform: scale(0.92);
+}
 .typing-dots {
   display: inline-flex;
   gap: 3px;
@@ -3539,23 +3248,11 @@ select {
   background: var(--ink-soft);
   animation: typingBounce 1s ease-in-out infinite;
 }
-.typing-dots span:nth-child(2) {
-  animation-delay: 0.15s;
-}
-.typing-dots span:nth-child(3) {
-  animation-delay: 0.3s;
-}
+.typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.3s; }
 @keyframes typingBounce {
-  0%,
-  60%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.5;
-  }
-  30% {
-    transform: translateY(-4px);
-    opacity: 1;
-  }
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-4px); opacity: 1; }
 }
 
 /* ===== Quiz ===== */
@@ -3569,14 +3266,8 @@ select {
   animation: cardIn 0.35s ease;
 }
 @keyframes cardIn {
-  from {
-    opacity: 0;
-    transform: translateX(24px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: none; }
 }
 .quiz-head {
   display: flex;
@@ -3594,35 +3285,45 @@ select {
   border-radius: 999px;
   background: var(--line);
 }
-.quiz-dots span.done {
-  background: var(--mint);
-}
-.quiz-dots span.now {
-  background: var(--blue);
-}
+.quiz-dots span.done { background: var(--mint); }
+.quiz-dots span.now { background: var(--blue); }
 .quiz-streak-badge {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-family: "IBM Plex Mono", monospace;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 0.76rem;
   font-weight: 600;
   color: var(--orange);
   opacity: 0;
   transition: opacity 0.5s ease;
 }
-.quiz-streak-badge.show {
-  opacity: 1;
+.quiz-streak-badge.show { opacity: 1; }
+.xp-pop {
+  position: absolute;
+  transform: translateX(-50%);
+  font-family: 'Baloo 2', sans-serif;
+  font-weight: 800;
+  color: var(--orange);
+  font-size: 1.15rem;
+  animation: xpFloat 0.9s ease forwards;
+  pointer-events: none;
+  z-index: 5;
+}
+@keyframes xpFloat {
+  0% { opacity: 0; transform: translateX(-50%) translateY(0); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-30px); }
 }
 .quiz-tag2 {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
   text-transform: uppercase;
   color: var(--ink-soft);
   margin-bottom: 8px;
 }
 .quiz-q2 {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 1.15rem;
   margin-bottom: 20px;
@@ -3646,9 +3347,7 @@ select {
   font-weight: 600;
   color: var(--ink);
   margin-bottom: 10px;
-  transition:
-    transform 0.1s ease,
-    box-shadow 0.1s ease;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 .quiz-opt2:active {
   transform: translate(2px, 2px);
@@ -3687,9 +3386,7 @@ select {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  transition:
-    transform 0.1s ease,
-    box-shadow 0.1s ease;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 .quiz-vf2 button:active {
   transform: translate(2px, 2px);
@@ -3706,15 +3403,9 @@ select {
   box-shadow: 1px 1px 0 #000;
 }
 @keyframes correctPop {
-  0% {
-    transform: scale(1);
-  }
-  40% {
-    transform: scale(1.06);
-  }
-  100% {
-    transform: scale(1);
-  }
+  0% { transform: scale(1); }
+  40% { transform: scale(1.06); }
+  100% { transform: scale(1); }
 }
 .quiz-fb2 {
   margin-top: 14px;
@@ -3725,9 +3416,7 @@ select {
   align-items: center;
   gap: 6px;
 }
-.quiz-fb2.ok {
-  color: var(--mint-text);
-}
+.quiz-fb2.ok { color: var(--mint-text); }
 .braise-explain {
   display: none;
   margin-top: 14px;
@@ -3744,14 +3433,8 @@ select {
   animation: explainIn 0.4s ease;
 }
 @keyframes explainIn {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: none; }
 }
 .braise-explain svg {
   width: 34px;
@@ -3759,7 +3442,7 @@ select {
   flex-shrink: 0;
 }
 .braise-explain .bx-title {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-size: 0.86rem;
   margin-bottom: 3px;
 }
@@ -3768,12 +3451,33 @@ select {
   color: var(--ink-soft);
   line-height: 1.45;
 }
+.quiz-bridge-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background: var(--coral);
+  color: #fff;
+  border: 2px solid #000;
+  border-radius: 999px;
+  padding: 13px;
+  font-weight: 700;
+  font-size: 0.86rem;
+  margin-top: 14px;
+  box-shadow: 3px 3px 0 #000;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.quiz-bridge-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000;
+}
 .quiz-summary2 {
   text-align: center;
   padding: 30px 10px;
 }
 .quiz-summary2 .big-score {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 2.6rem;
   color: var(--neo-orange);
@@ -3804,10 +3508,7 @@ select {
   animation: fall 1.8s ease-in forwards;
 }
 @keyframes fall {
-  to {
-    transform: translateY(200px) rotate(180deg);
-    opacity: 0;
-  }
+  to { transform: translateY(200px) rotate(180deg); opacity: 0; }
 }
 .complete-badge {
   width: 80px;
@@ -3828,24 +3529,16 @@ select {
   font-size: 0.86rem;
 }
 .complete-xp {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-size: 1.8rem;
   color: var(--orange);
   margin: 14px 0 4px;
   animation: xpBounce 0.5s ease;
 }
 @keyframes xpBounce {
-  0% {
-    transform: scale(0.5);
-    opacity: 0;
-  }
-  60% {
-    transform: scale(1.15);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  0% { transform: scale(0.5); opacity: 0; }
+  60% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
 }
 .complete-stats {
   display: flex;
@@ -3862,7 +3555,7 @@ select {
 }
 .complete-stat b {
   display: block;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-size: 1rem;
   color: var(--ink);
 }
@@ -3904,7 +3597,7 @@ select {
   transform: translateX(-50%);
 }
 .share-streak {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 1.8rem;
   color: #fff;
@@ -3918,8 +3611,8 @@ select {
 .share-brand {
   position: absolute;
   bottom: 18px;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
   color: rgba(255, 255, 255, 0.6);
   letter-spacing: 0.03em;
 }
@@ -3963,12 +3656,12 @@ select {
   gap: 2px;
 }
 .uni-row-label {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 700;
   font-size: 0.78rem;
 }
 .uni-row-sub {
-  font-size: 0.7rem;
+  font-size: 0.62rem;
   color: var(--ink-soft);
 }
 
@@ -3987,7 +3680,7 @@ select {
   align-items: baseline;
 }
 .rank-progress-head b {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 700;
   font-size: 0.76rem;
   display: inline-flex;
@@ -3999,8 +3692,8 @@ select {
    stay theme-reactive (var(--ink)) to track it. Verified both ends: 12.7–15:1 in light mode,
    8.8–11.4:1 in dark, across all four real rank-to-rank transitions. */
 .rank-progress-almost {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.56rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.02em;
@@ -4010,9 +3703,9 @@ select {
   padding: 2px 7px;
 }
 .rank-progress-head span {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   color: var(--ink-soft);
-  font-family: "IBM Plex Mono", monospace;
+  font-family: 'IBM Plex Mono', monospace;
 }
 .rank-progress-track {
   height: 10px;
@@ -4066,9 +3759,9 @@ select {
   flex: 1;
   text-align: center;
   padding: 9px 0;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 700;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: var(--ink-soft);
   transition: transform 0.12s ease;
 }
@@ -4093,6 +3786,7 @@ select {
   color: var(--ink-soft);
   font-size: 0.7rem;
   margin-top: 2px;
+  opacity: 0.8;
 }
 
 /* ===== Hero card — one focal point (bold border, hard shadow, the real per-rank gradient),
@@ -4135,8 +3829,8 @@ select {
 .profile-hero-overline {
   position: relative;
   margin-right: auto;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -4147,14 +3841,10 @@ select {
   padding: 5px 9px;
 }
 .profile-pass-strip::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: -40% -10%;
-  background: repeating-linear-gradient(
-    58deg,
-    rgba(255, 255, 255, 0.18) 0 8px,
-    transparent 8px 24px
-  );
+  background: repeating-linear-gradient(58deg, rgba(255, 255, 255, 0.18) 0 8px, transparent 8px 24px);
   transform: rotate(-3deg);
 }
 .profile-hero-rank-pill {
@@ -4164,8 +3854,8 @@ select {
   gap: 5px;
   background: var(--neo-ink);
   color: #fff;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -4221,9 +3911,7 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .profile-hero-avatar:active {
   transform: translate(2px, 2px);
@@ -4244,7 +3932,7 @@ select {
   color: #fff;
 }
 .profile-hero-name {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 1.62rem;
   line-height: 1.05;
@@ -4271,8 +3959,8 @@ select {
   margin-bottom: 11px;
 }
 .profile-face-label {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -4296,7 +3984,7 @@ select {
   margin-top: 14px;
 }
 .profile-hero-bubble::before {
-  content: "";
+  content: '';
   position: absolute;
   top: -8px;
   left: 24px;
@@ -4312,7 +4000,7 @@ select {
 }
 .profile-hero-bubble p {
   margin: 0;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 700;
   font-size: 0.78rem;
   line-height: 1.35;
@@ -4331,13 +4019,13 @@ select {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 0.72rem;
   color: color-mix(in srgb, var(--neo-orange) 70%, var(--ink) 30%);
 }
 .profile-hero-num {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 2.3rem;
   line-height: 1;
@@ -4345,8 +4033,8 @@ select {
   font-variant-numeric: tabular-nums;
 }
 .profile-hero-lbl {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -4363,13 +4051,13 @@ select {
 }
 .profile-hero-mini b {
   display: block;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 700;
   font-size: 1.02rem;
   font-variant-numeric: tabular-nums;
 }
 .profile-hero-mini span {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   color: var(--ink-soft);
 }
 
@@ -4380,19 +4068,17 @@ select {
   gap: 8px;
   width: 100%;
   text-align: center;
-  background: var(--orange-fill);
-  color: var(--on-orange);
+  background: color-mix(in srgb, var(--neo-orange) 80%, #000);
+  color: #fff;
   border: 2.5px solid var(--neo-ink);
   box-shadow: 3px 3px 0 var(--neo-ink);
   border-radius: 16px;
   padding: 14px;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 800;
   font-size: 0.86rem;
   margin-bottom: 22px;
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .profile-hero-cta:active {
   transform: translate(2px, 2px);
@@ -4416,9 +4102,7 @@ select {
   padding: 4px 2px 6px;
   scrollbar-width: none;
 }
-.profile-avatar-rail::-webkit-scrollbar {
-  display: none;
-}
+.profile-avatar-rail::-webkit-scrollbar { display: none; }
 .profile-avatar-rail .profile-avatar-option {
   flex: 0 0 auto;
   border: 2.5px solid #000;
@@ -4482,7 +4166,7 @@ select {
   justify-content: center;
 }
 .profile-avatar-unlock-hint {
-  font-size: 0.7rem;
+  font-size: 0.66rem;
   color: var(--ink-soft);
   margin: -4px 0 12px;
 }
@@ -4510,7 +4194,7 @@ select {
   padding: 11px;
   border-radius: 12px;
   border: 2px solid var(--neo-ink);
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 700;
   font-size: 0.86rem;
   transition: transform 0.12s ease;
@@ -4526,8 +4210,8 @@ select {
   color: var(--ink);
 }
 .profile-identity-save {
-  background: var(--orange-fill);
-  color: var(--on-orange);
+  background: var(--neo-orange);
+  color: #fff;
 }
 
 /* Subject chips — real toggles (see ProfileView.tsx), same "act on me" affordance as the
@@ -4544,9 +4228,7 @@ select {
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--ink-soft);
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .profile-subject-chip.is-active {
   background: #eff3ff;
@@ -4573,9 +4255,7 @@ select {
   box-shadow: 3px 3px 0 var(--neo-ink);
   color: var(--ink);
   font-size: 0.9rem;
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .profile-settings-link:active {
   transform: translate(2px, 2px);
@@ -4597,109 +4277,20 @@ select {
   overflow: hidden;
 }
 .settings-label {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-soft);
   padding: 10px 4px 7px;
 }
-/* Sits right under the group it explains (the level picker), so it pulls the group's own
-   bottom margin back in. */
-.settings-note {
-  margin: -10px 4px 18px;
-  color: var(--ink-soft);
-  font-size: 0.78rem;
-}
-/* Text-size picker: three "Aa" samples, the chosen one filled. */
-.settings-sizes {
-  display: flex;
-  gap: 6px;
-}
-.settings-size {
-  display: grid;
-  min-width: 38px;
-  height: 38px;
-  place-items: center;
-  border: 1.5px solid color-mix(in srgb, var(--ink) 20%, transparent);
-  border-radius: 10px;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: "Baloo 2", sans-serif;
-  font-weight: 800;
-  line-height: 1;
-}
-.settings-size.is-active {
-  background: var(--orange-fill);
-  border-color: var(--neo-ink);
-  color: var(--on-orange);
-}
-/* Backup panels: an expanded area under the row that opened it. */
-.settings-panel {
-  display: grid;
-  gap: 10px;
-  padding: 4px 14px 14px;
-}
-.settings-hint {
-  margin: 0;
-  color: var(--ink-soft);
-  font-size: 0.8rem;
-  line-height: 1.45;
-}
-.settings-error {
-  margin: 0;
-  color: var(--coral-2);
-  font-size: 0.8rem;
-  font-weight: 650;
-}
-.settings-textarea {
-  width: 100%;
-  border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
-  border-radius: 10px;
-  background: var(--bg);
-  color: var(--ink);
-  padding: 10px;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
-  line-height: 1.4;
-  word-break: break-all;
-  resize: vertical;
-}
-.settings-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.settings-btn {
-  flex: 0 0 auto;
-  border: 1.5px solid color-mix(in srgb, var(--ink) 20%, transparent);
-  border-radius: 999px;
-  background: var(--paper);
-  color: var(--ink);
-  padding: 8px 14px;
-  font-size: 0.82rem;
-  font-weight: 700;
-}
-.settings-btn:active {
-  transform: scale(0.97);
-}
-.settings-btn:disabled {
-  opacity: 0.4;
-}
-.settings-btn--primary {
-  background: var(--orange-fill);
-  border-color: var(--neo-ink);
-  color: var(--on-orange);
-}
 .settings-row {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   min-height: 60px;
-  /* on a very narrow phone the control drops under its name instead of cutting the name */
-  gap: 8px 14px;
+  gap: 14px;
   padding: 10px 14px;
   font-size: 0.9rem;
   font-weight: 650;
@@ -4758,7 +4349,7 @@ select {
   cursor: pointer;
 }
 .slider::before {
-  content: "";
+  content: '';
   position: absolute;
   width: 18px;
   height: 18px;
@@ -4804,14 +4395,8 @@ select {
   animation: braiseBlink 4.2s ease-in-out infinite;
 }
 @keyframes braiseBlink {
-  0%,
-  92%,
-  100% {
-    transform: scaleY(1);
-  }
-  95% {
-    transform: scaleY(0.08);
-  }
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.08); }
 }
 
 /* Happy: gentle float + flicker */
@@ -4822,21 +4407,12 @@ select {
   animation: flameFlicker 1.2s ease-in-out infinite alternate;
 }
 @keyframes braiseFloat {
-  0%,
-  100% {
-    transform: translateY(0) scale(1);
-  }
-  50% {
-    transform: translateY(-5px) scale(1.02);
-  }
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-5px) scale(1.02); }
 }
 @keyframes flameFlicker {
-  0% {
-    transform: scale(1) rotate(-1deg);
-  }
-  100% {
-    transform: scale(1.04, 0.98) rotate(1.5deg);
-  }
+  0% { transform: scale(1) rotate(-1deg); }
+  100% { transform: scale(1.04, 0.98) rotate(1.5deg); }
 }
 /* Ta série's own flame badge, reusing this same keyframe rather than inventing a new one — it
    had zero idle motion, the first thing the eye lands on in that card being completely static
@@ -4858,16 +4434,9 @@ select {
   animation: flameFlicker 1.1s ease-in-out infinite alternate;
 }
 @keyframes braiseEager {
-  0%,
-  100% {
-    transform: rotate(0deg) translateY(0);
-  }
-  25% {
-    transform: rotate(-6deg) translateY(-2px);
-  }
-  75% {
-    transform: rotate(6deg) translateY(-2px);
-  }
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  25% { transform: rotate(-6deg) translateY(-2px); }
+  75% { transform: rotate(6deg) translateY(-2px); }
 }
 
 /* Hesitant: wobble + slight shrink */
@@ -4878,25 +4447,13 @@ select {
   animation: flameDim 1.6s ease-in-out infinite;
 }
 @keyframes braiseWobble {
-  0%,
-  100% {
-    transform: rotate(0deg) scale(0.97);
-  }
-  25% {
-    transform: rotate(-3deg) scale(0.96);
-  }
-  75% {
-    transform: rotate(3deg) scale(0.96);
-  }
+  0%, 100% { transform: rotate(0deg) scale(0.97); }
+  25% { transform: rotate(-3deg) scale(0.96); }
+  75% { transform: rotate(3deg) scale(0.96); }
 }
 @keyframes flameDim {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.82;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.82; }
 }
 
 /* Proud: big bounce + glow pulse */
@@ -4910,25 +4467,13 @@ select {
   animation: flameGlow 1.4s ease-in-out infinite 0.15s;
 }
 @keyframes braiseProud {
-  0%,
-  100% {
-    transform: translateY(0) scale(1);
-  }
-  30% {
-    transform: translateY(-10px) scale(1.08);
-  }
-  60% {
-    transform: translateY(-4px) scale(1.04);
-  }
+  0%, 100% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-10px) scale(1.08); }
+  60% { transform: translateY(-4px) scale(1.04); }
 }
 @keyframes flameGlow {
-  0%,
-  100% {
-    filter: brightness(1);
-  }
-  30% {
-    filter: brightness(1.25) drop-shadow(0 0 6px rgba(255, 194, 75, 0.6));
-  }
+  0%, 100% { filter: brightness(1); }
+  30% { filter: brightness(1.25) drop-shadow(0 0 6px rgba(255, 194, 75, 0.6)); }
 }
 
 /* Sleepy: slow droop + dim */
@@ -4942,33 +4487,78 @@ select {
   animation: eyesDroop 4s ease-in-out infinite;
 }
 @keyframes braiseSnooze {
-  0%,
-  100% {
-    transform: translateY(2px) scale(0.98);
-  }
-  50% {
-    transform: translateY(6px) scale(0.95);
-  }
+  0%, 100% { transform: translateY(2px) scale(0.98); }
+  50% { transform: translateY(6px) scale(0.95); }
 }
 @keyframes flameSnooze {
-  0%,
-  100% {
-    opacity: 0.9;
-  }
-  50% {
-    opacity: 0.65;
-  }
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 0.65; }
 }
 @keyframes eyesDroop {
-  0%,
-  100% {
-    transform: scaleY(1);
-  }
-  50% {
-    transform: scaleY(0.3);
-  }
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.3); }
 }
 
+/* ===== Braise explain drawer ===== */
+.explain-drawer {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
+  width: 100%;
+  max-width: 428px;
+  background: var(--bg);
+  border-radius: 24px 24px 0 0;
+  padding: 10px 20px calc(14px + env(safe-area-inset-bottom, 0px));
+  z-index: 91;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+.explain-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0 12px;
+}
+.explain-head-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.explain-head-info b {
+  display: block;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 0.92rem;
+}
+.explain-head-info span {
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+}
+.explain-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.explain-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1.5px solid rgba(21, 24, 33, 0.35);
+  border-radius: 999px;
+  padding: 11px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  margin-top: 14px;
+  transition: transform 0.15s ease;
+}
+.explain-btn:active {
+  transform: scale(0.97);
+}
 .listen-btn {
   display: inline-flex;
   align-items: center;
@@ -5018,13 +4608,8 @@ select {
   animation: braiseShiver 3.2s ease-in-out infinite;
 }
 @keyframes braiseShiver {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-2px) rotate(-1deg);
-  }
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-2px) rotate(-1deg); }
 }
 
 /* ===== Views ===== */
@@ -5037,14 +4622,8 @@ select {
   animation: fadeUp 0.26s ease;
 }
 @keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
 }
 
 /* ===== Profil → Aura : le seul renvoi vers la progression =====
@@ -5064,9 +4643,7 @@ select {
   box-shadow: 3px 3px 0 var(--neo-ink);
   color: var(--ink);
   text-align: left;
-  transition:
-    transform 0.12s ease,
-    box-shadow 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 .profile-aura-link:active {
   transform: translate(2px, 2px);
@@ -5090,7 +4667,7 @@ select {
   gap: 2px;
 }
 .profile-aura-link-label {
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-weight: 700;
   font-size: 0.95rem;
   line-height: 1.1;
@@ -5099,6 +4676,7 @@ select {
   font-size: 0.75rem;
   color: var(--ink-soft);
 }
+
 
 /* ===== Nouveautés reprises du dépôt GitHub (Pioche + barre de mission) ===== */
 /* PiocheRevealVeil — see the component for why this exists. Fixed to the viewport (not
@@ -5148,12 +4726,12 @@ select {
 }
 .home-header-copy small {
   color: var(--ink-soft);
-  font-size: 0.7rem;
+  font-size: 0.66rem;
   font-weight: 650;
 }
 .home-header-copy b {
   overflow: hidden;
-  font-family: "Baloo 2", sans-serif;
+  font-family: 'Baloo 2', sans-serif;
   font-size: 1.08rem;
   font-weight: 800;
   text-overflow: ellipsis;
@@ -5180,12 +4758,8 @@ select {
   font-weight: 800;
   box-shadow: 2px 2px 0 var(--neo-ink);
 }
-.home-header-streak {
-  padding: 0 9px;
-}
-.home-header-aura {
-  padding: 0 8px 0 5px;
-}
+.home-header-streak { padding: 0 9px; }
+.home-header-aura { padding: 0 8px 0 5px; }
 .home-header-aura > span {
   display: grid;
   width: 28px;
@@ -5199,9 +4773,7 @@ select {
    instead of a generic scale-down borrowed from a different, softer design language. */
 .home-header-identity,
 .home-header-aura {
-  transition:
-    transform 120ms ease,
-    box-shadow 120ms ease;
+  transition: transform 120ms ease, box-shadow 120ms ease;
 }
 .home-header-identity:active .home-header-avatar {
   transform: translate(2px, 2px);
@@ -5213,9 +4785,7 @@ select {
 }
 
 /* ===== Matières — exploration volontaire ===== */
-.subjects-view {
-  padding-top: 18px;
-}
+.subjects-view { padding-top: 18px; }
 .subjects-heading {
   display: flex;
   align-items: flex-start;
@@ -5235,9 +4805,9 @@ select {
 }
 .subjects-heading p {
   margin: 0 0 1px;
-  color: var(--orange-text);
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  color: var(--neo-orange);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -5266,22 +4836,11 @@ select {
   color: var(--ink-soft);
   font-size: 0.75rem;
 }
-.subjects-summary span {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-.subjects-summary b {
-  color: var(--ink);
-}
+.subjects-summary span { display: flex; align-items: center; gap: 5px; }
+.subjects-summary b { color: var(--ink); }
 
-.home-view {
-  position: relative;
-}
-.home-mission-zone {
-  position: relative;
-  isolation: isolate;
-}
+.home-view { position: relative; }
+.home-mission-zone { position: relative; isolation: isolate; }
 
 /* ===== Navigation basse — quatre boutons physiques, un seul signal fort ===== */
 .braise-tabbar {
@@ -5290,8 +4849,7 @@ select {
   bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   z-index: 40;
   display: grid;
-  /* four equal tabs, except that none is ever narrower than its own name ("Aujourd'hui" is the longest) */
-  grid-template-columns: repeat(4, minmax(min-content, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: stretch;
   gap: 5px;
   min-height: 68px;
@@ -5318,9 +4876,7 @@ select {
   padding: 4px 2px;
   border-radius: 11px;
   color: var(--ink-soft);
-  transition:
-    color 150ms ease,
-    transform 100ms ease;
+  transition: color 150ms ease, transform 100ms ease;
 }
 
 .braise-tab:hover {
@@ -5369,8 +4925,8 @@ select {
 .braise-tab-label {
   max-width: 100%;
   overflow: hidden;
-  font-family: "Baloo 2", sans-serif;
-  font-size: 0.7rem;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 0.66rem;
   font-weight: 800;
   line-height: 1;
   letter-spacing: 0;
@@ -5386,7 +4942,7 @@ select {
   }
 
   .braise-tab-label {
-    font-size: 0.7rem;
+    font-size: 0.62rem;
   }
 }
 
@@ -5397,297 +4953,137 @@ select {
     transition: none;
   }
 
-  /* Passage de rang — la transformation vient de Braise, pas d'un badge générique. */
-  .rank-up-stage {
-    background-color: var(--bg);
-    background-image:
-      radial-gradient(
-        circle,
-        color-mix(in srgb, var(--ink) 16%, transparent) 1.2px,
-        transparent 1.2px
-      ),
-      linear-gradient(180deg, color-mix(in srgb, var(--rank-from) 22%, var(--bg)) 0%, var(--bg) 58%);
-    background-size:
-      18px 18px,
-      100% 100%;
-    color: var(--ink);
-  }
-  .rank-up-stage::before {
-    content: "";
-    position: absolute;
-    inset: 0 0 34%;
-    background: var(--rank-to);
-    border-bottom: 3px solid var(--ink);
-    clip-path: polygon(0 0, 100% 0, 100% 88%, 68% 94%, 38% 88%, 0 97%);
-    transition: clip-path 0.42s cubic-bezier(0.2, 0.9, 0.25, 1.1);
-  }
-  .rank-up-stage.is-impact::before {
-    clip-path: polygon(0 0, 100% 0, 100% 96%, 73% 89%, 42% 98%, 0 90%);
-  }
-  .rank-up-kicker,
-  .rank-up-rank-stamp {
-    letter-spacing: 0;
-  }
-  .rank-up-rank-stamp {
-    font-family: var(--font-impact);
-  }
-  .rank-up-character-zone::after {
-    content: "";
-    position: absolute;
-    z-index: 0;
-    left: 50%;
-    bottom: 1px;
-    width: 156px;
-    height: 18px;
-    transform: translateX(-50%);
-    border: 3px solid var(--ink);
-    border-radius: 50%;
-    background: color-mix(in srgb, var(--rank-from) 48%, var(--bg));
-  }
-  .rank-up-transform-label {
-    position: absolute;
-    z-index: 20;
-    bottom: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: max-content;
-    border: 2.5px solid var(--ink);
-    background: var(--paper);
-    box-shadow: 3px 3px 0 var(--ink);
-    padding: 3px 10px;
-    font: 900 0.7rem/1.2 var(--font-impact);
-    letter-spacing: 0;
-  }
-  .rank-up-braise {
-    transform-origin: 50% 92%;
-  }
-  .rank-up-braise .braise-mascot,
-  .rank-up-braise .braise-mascot .flame-outer,
-  .rank-up-braise .braise-mascot .flame-middle,
-  .rank-up-braise .braise-mascot .braise-eyes {
-    animation: none;
-  }
-  .braise-mascot .braise-body,
-  .braise-mascot .braise-face,
-  .braise-mascot .braise-arm,
-  .braise-mascot .braise-foot {
-    transform-box: view-box;
-  }
-  .braise-mascot .braise-body {
-    transform-origin: 54px 98px;
-  }
-  .braise-mascot .braise-face {
-    transform-origin: 54px 67px;
-  }
-  .braise-mascot .braise-arm-left {
-    transform-origin: 28px 68px;
-  }
-  .braise-mascot .braise-arm-right {
-    transform-origin: 80px 68px;
-  }
-  .braise-mascot .braise-foot-left {
-    transform-origin: 40px 103px;
-  }
-  .braise-mascot .braise-foot-right {
-    transform-origin: 70px 103px;
-  }
-  .rank-up-braise .pose-focus .braise-face {
-    animation: rank-look-core 0.35s ease-out both;
-  }
-  .rank-up-braise .pose-focus .braise-arm-left {
-    transform: rotate(-7deg) translate(2px, 1px);
-  }
-  .rank-up-braise .pose-focus .braise-arm-right {
-    transform: rotate(7deg) translate(-2px, 1px);
-  }
-  .rank-up-braise .pose-charge .braise-body {
-    animation: rank-body-brace 0.6s cubic-bezier(0.55, 0, 0.8, 0.35) both;
-  }
-  .rank-up-braise .pose-charge .braise-face {
-    animation: rank-face-brace 0.6s cubic-bezier(0.55, 0, 0.8, 0.35) both;
-  }
-  .rank-up-braise .pose-charge .braise-arm-left {
-    animation: rank-arm-brace-left 0.6s cubic-bezier(0.55, 0, 0.8, 0.35) both;
-  }
-  .rank-up-braise .pose-charge .braise-arm-right {
-    animation: rank-arm-brace-right 0.6s cubic-bezier(0.55, 0, 0.8, 0.35) both;
-  }
-  .rank-up-braise .pose-charge .braise-foot-left {
-    transform: translate(-3px, 1px) rotate(-5deg);
-  }
-  .rank-up-braise .pose-charge .braise-foot-right {
-    transform: translate(3px, 1px) rotate(5deg);
-  }
-  .rank-up-braise .pose-land .braise-body {
-    animation: rank-body-follow 0.72s cubic-bezier(0.18, 0.85, 0.24, 1.18) both;
-  }
-  .rank-up-braise .pose-land .braise-face {
-    animation: rank-face-follow 0.72s cubic-bezier(0.18, 0.85, 0.24, 1.18) 0.05s both;
-  }
-  .rank-up-braise .pose-land .braise-arm-left {
-    animation: rank-arm-celebrate-left 0.72s ease-out 0.08s both;
-  }
-  .rank-up-braise .pose-land .braise-arm-right {
-    animation: rank-arm-celebrate-right 0.72s ease-out 0.08s both;
-  }
-  .rank-up-braise .pose-victory .braise-arm-left {
-    transform: rotate(-5deg);
-  }
-  .rank-up-braise .pose-victory .braise-arm-right {
-    transform: rotate(5deg);
-  }
-  .rank-up-braise.is-charging .braise-core {
-    animation: rank-core-charge 0.5s steps(3, end) both;
-  }
-  .rank-up-braise.is-charging .braise-eyes {
-    transform-origin: 54px 60px;
-    animation: rank-focus-eyes 0.5s ease-in both;
-  }
-  .rank-up-braise.is-evolved .braise-core {
-    animation: rank-core-settle 0.65s ease-out 0.2s both;
-  }
-  @keyframes rank-core-charge {
-    0% {
-      transform: scale(1);
-    }
-    18% {
-      transform: scale(1.35);
-    }
-    32% {
-      transform: scale(1.06);
-    }
-    55% {
-      transform: scale(1.75);
-    }
-    68% {
-      transform: scale(1.22);
-    }
-    100% {
-      transform: scale(2.45);
-    }
-  }
-  @keyframes rank-look-core {
-    from {
-      transform: translateY(0);
-    }
-    to {
-      transform: translateY(2px) scaleY(0.96);
-    }
-  }
-  @keyframes rank-body-brace {
-    from {
-      transform: scale(1);
-    }
-    to {
-      transform: translateY(5px) scaleX(1.06) scaleY(0.93);
-    }
-  }
-  @keyframes rank-face-brace {
-    from {
-      transform: translateY(1px);
-    }
-    to {
-      transform: translateY(5px) scaleX(0.97);
-    }
-  }
-  @keyframes rank-arm-brace-left {
-    from {
-      transform: rotate(-7deg);
-    }
-    to {
-      transform: translate(7px, 4px) rotate(13deg);
-    }
-  }
-  @keyframes rank-arm-brace-right {
-    from {
-      transform: rotate(7deg);
-    }
-    to {
-      transform: translate(-7px, 4px) rotate(-13deg);
-    }
-  }
-  @keyframes rank-body-follow {
-    0% {
-      transform: scaleY(1.08);
-    }
-    58% {
-      transform: translateY(4px) scaleX(1.08) scaleY(0.92);
-    }
-    78% {
-      transform: translateY(-2px) scaleX(0.98) scaleY(1.04);
-    }
-    100% {
-      transform: none;
-    }
-  }
-  @keyframes rank-face-follow {
-    0%,
-    48% {
-      transform: translateY(-2px);
-    }
-    70% {
-      transform: translateY(3px) scaleY(0.96);
-    }
-    100% {
-      transform: none;
-    }
-  }
-  @keyframes rank-arm-celebrate-left {
-    0% {
-      transform: rotate(10deg);
-    }
-    55% {
-      transform: rotate(-13deg);
-    }
-    100% {
-      transform: rotate(-5deg);
-    }
-  }
-  @keyframes rank-arm-celebrate-right {
-    0% {
-      transform: rotate(-10deg);
-    }
-    55% {
-      transform: rotate(13deg);
-    }
-    100% {
-      transform: rotate(5deg);
-    }
-  }
-  @keyframes rank-focus-eyes {
-    from {
-      transform: scaleY(1);
-    }
-    to {
-      transform: scaleY(0.45);
-    }
-  }
-  @keyframes rank-core-settle {
-    0% {
-      transform: scale(1.8);
-    }
-    55% {
-      transform: scale(0.86);
-    }
-    100% {
-      transform: scale(1);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .rank-up-braise.is-charging .braise-core,
-    .rank-up-braise.is-charging .braise-eyes,
-    .rank-up-braise.is-evolved .braise-core {
-      animation: none;
-    }
-    .rank-up-braise .braise-body,
-    .rank-up-braise .braise-face,
-    .rank-up-braise .braise-arm,
-    .rank-up-braise .braise-foot {
-      animation: none !important;
-      transform: none !important;
-    }
-    .rank-up-stage::before {
-      transition: none;
-    }
-  }
+/* Passage de rang — la transformation vient de Braise, pas d'un badge générique. */
+.rank-up-stage {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(circle, color-mix(in srgb, var(--ink) 16%, transparent) 1.2px, transparent 1.2px),
+    linear-gradient(180deg, color-mix(in srgb, var(--rank-from) 22%, var(--bg)) 0%, var(--bg) 58%);
+  background-size: 18px 18px, 100% 100%;
+  color: var(--ink);
+}
+.rank-up-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 34%;
+  background: var(--rank-to);
+  border-bottom: 3px solid var(--ink);
+  clip-path: polygon(0 0, 100% 0, 100% 88%, 68% 94%, 38% 88%, 0 97%);
+  transition: clip-path .42s cubic-bezier(.2,.9,.25,1.1);
+}
+.rank-up-stage.is-impact::before {
+  clip-path: polygon(0 0, 100% 0, 100% 96%, 73% 89%, 42% 98%, 0 90%);
+}
+.rank-up-kicker,
+.rank-up-rank-stamp { letter-spacing: 0; }
+.rank-up-rank-stamp { font-family: var(--font-impact); }
+.rank-up-character-zone::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  bottom: 1px;
+  width: 156px;
+  height: 18px;
+  transform: translateX(-50%);
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--rank-from) 48%, var(--bg));
+}
+.rank-up-transform-label {
+  position: absolute;
+  z-index: 20;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  border: 2.5px solid var(--ink);
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--ink);
+  padding: 3px 10px;
+  font: 900 .7rem/1.2 var(--font-impact);
+  letter-spacing: 0;
+}
+.rank-up-braise { transform-origin: 50% 92%; }
+.rank-up-braise .braise-mascot,
+.rank-up-braise .braise-mascot .flame-outer,
+.rank-up-braise .braise-mascot .flame-middle,
+.rank-up-braise .braise-mascot .braise-eyes {
+  animation: none;
+}
+.braise-mascot .braise-body,
+.braise-mascot .braise-face,
+.braise-mascot .braise-arm,
+.braise-mascot .braise-foot {
+  transform-box: view-box;
+}
+.braise-mascot .braise-body { transform-origin: 54px 98px; }
+.braise-mascot .braise-face { transform-origin: 54px 67px; }
+.braise-mascot .braise-arm-left { transform-origin: 28px 68px; }
+.braise-mascot .braise-arm-right { transform-origin: 80px 68px; }
+.braise-mascot .braise-foot-left { transform-origin: 40px 103px; }
+.braise-mascot .braise-foot-right { transform-origin: 70px 103px; }
+.rank-up-braise .pose-focus .braise-face {
+  animation: rank-look-core .35s ease-out both;
+}
+.rank-up-braise .pose-focus .braise-arm-left { transform: rotate(-7deg) translate(2px, 1px); }
+.rank-up-braise .pose-focus .braise-arm-right { transform: rotate(7deg) translate(-2px, 1px); }
+.rank-up-braise .pose-charge .braise-body { animation: rank-body-brace .6s cubic-bezier(.55,0,.8,.35) both; }
+.rank-up-braise .pose-charge .braise-face { animation: rank-face-brace .6s cubic-bezier(.55,0,.8,.35) both; }
+.rank-up-braise .pose-charge .braise-arm-left { animation: rank-arm-brace-left .6s cubic-bezier(.55,0,.8,.35) both; }
+.rank-up-braise .pose-charge .braise-arm-right { animation: rank-arm-brace-right .6s cubic-bezier(.55,0,.8,.35) both; }
+.rank-up-braise .pose-charge .braise-foot-left { transform: translate(-3px, 1px) rotate(-5deg); }
+.rank-up-braise .pose-charge .braise-foot-right { transform: translate(3px, 1px) rotate(5deg); }
+.rank-up-braise .pose-land .braise-body { animation: rank-body-follow .72s cubic-bezier(.18,.85,.24,1.18) both; }
+.rank-up-braise .pose-land .braise-face { animation: rank-face-follow .72s cubic-bezier(.18,.85,.24,1.18) .05s both; }
+.rank-up-braise .pose-land .braise-arm-left { animation: rank-arm-celebrate-left .72s ease-out .08s both; }
+.rank-up-braise .pose-land .braise-arm-right { animation: rank-arm-celebrate-right .72s ease-out .08s both; }
+.rank-up-braise .pose-victory .braise-arm-left { transform: rotate(-5deg); }
+.rank-up-braise .pose-victory .braise-arm-right { transform: rotate(5deg); }
+.rank-up-braise.is-charging .braise-core {
+  animation: rank-core-charge .5s steps(3, end) both;
+}
+.rank-up-braise.is-charging .braise-eyes {
+  transform-origin: 54px 60px;
+  animation: rank-focus-eyes .5s ease-in both;
+}
+.rank-up-braise.is-evolved .braise-core {
+  animation: rank-core-settle .65s ease-out .2s both;
+}
+@keyframes rank-core-charge {
+  0% { transform: scale(1); }
+  18% { transform: scale(1.35); }
+  32% { transform: scale(1.06); }
+  55% { transform: scale(1.75); }
+  68% { transform: scale(1.22); }
+  100% { transform: scale(2.45); }
+}
+@keyframes rank-look-core { from { transform: translateY(0); } to { transform: translateY(2px) scaleY(.96); } }
+@keyframes rank-body-brace { from { transform: scale(1); } to { transform: translateY(5px) scaleX(1.06) scaleY(.93); } }
+@keyframes rank-face-brace { from { transform: translateY(1px); } to { transform: translateY(5px) scaleX(.97); } }
+@keyframes rank-arm-brace-left { from { transform: rotate(-7deg); } to { transform: translate(7px, 4px) rotate(13deg); } }
+@keyframes rank-arm-brace-right { from { transform: rotate(7deg); } to { transform: translate(-7px, 4px) rotate(-13deg); } }
+@keyframes rank-body-follow { 0% { transform: scaleY(1.08); } 58% { transform: translateY(4px) scaleX(1.08) scaleY(.92); } 78% { transform: translateY(-2px) scaleX(.98) scaleY(1.04); } 100% { transform: none; } }
+@keyframes rank-face-follow { 0%, 48% { transform: translateY(-2px); } 70% { transform: translateY(3px) scaleY(.96); } 100% { transform: none; } }
+@keyframes rank-arm-celebrate-left { 0% { transform: rotate(10deg); } 55% { transform: rotate(-13deg); } 100% { transform: rotate(-5deg); } }
+@keyframes rank-arm-celebrate-right { 0% { transform: rotate(-10deg); } 55% { transform: rotate(13deg); } 100% { transform: rotate(5deg); } }
+@keyframes rank-focus-eyes {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(.45); }
+}
+@keyframes rank-core-settle {
+  0% { transform: scale(1.8); }
+  55% { transform: scale(.86); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rank-up-braise.is-charging .braise-core,
+  .rank-up-braise.is-charging .braise-eyes,
+  .rank-up-braise.is-evolved .braise-core { animation: none; }
+  .rank-up-braise .braise-body,
+  .rank-up-braise .braise-face,
+  .rank-up-braise .braise-arm,
+  .rank-up-braise .braise-foot { animation: none !important; transform: none !important; }
+  .rank-up-stage::before { transition: none; }
+}
 }

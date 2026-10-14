@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 // The BRAISE brand mark: a simplified, iconic flame with face and core — no arms, legs, or
 // rank outfit. This is the logo, not the character (use BraiseMascot for the living character).
 // Falls back to the generated PNG on any runtime SVG hiccup, but the vector version is the
 // canonical mark: crisp at every size, themeable, and consistent with BraiseCharacter.tsx.
 
-const INK = "#151821";
-const FACE = "#FFF2D8";
+const INK = '#151821';
+const FACE = '#FFF2D8';
 
 type Props = { size?: number; className?: string };
 
-function BraiseLogoSVG({ size = 52, className = "" }: Props) {
+function BraiseLogoSVG({ size = 52, className = '' }: Props) {
   return (
     <svg
       width={size}
@@ -56,43 +56,19 @@ function BraiseLogoSVG({ size = 52, className = "" }: Props) {
       <circle cx="65.2" cy="58.8" r="1.2" fill="#FFFFFF" />
 
       {/* smirk */}
-      <path
-        d="M45 71 Q54 76 63 70"
-        stroke={INK}
-        strokeWidth="3.2"
-        strokeLinecap="round"
-        fill="none"
-      />
+      <path d="M45 71 Q54 76 63 70" stroke={INK} strokeWidth="3.2" strokeLinecap="round" fill="none" />
 
       {/* cheek blush */}
-      <path
-        d="M34 69 l4 -1"
-        stroke="#FF6F59"
-        strokeWidth="3"
-        strokeLinecap="round"
-        opacity="0.65"
-      />
+      <path d="M34 69 l4 -1" stroke="#FF6F59" strokeWidth="3" strokeLinecap="round" opacity="0.65" />
 
       {/* incandescent core */}
-      <path
-        d="M53 76 L58 82 L53 90 L48 82 Z"
-        fill="#FFD84B"
-        stroke={INK}
-        strokeWidth="2.6"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M51 78 L54 75"
-        stroke="#FFFFFF"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        opacity="0.8"
-      />
+      <path d="M53 76 L58 82 L53 90 L48 82 Z" fill="#FFD84B" stroke={INK} strokeWidth="2.6" strokeLinejoin="round" />
+      <path d="M51 78 L54 75" stroke="#FFFFFF" strokeWidth="1.8" strokeLinecap="round" opacity="0.8" />
     </svg>
   );
 }
 
-export function BraiseLogo({ size = 52, className = "" }: Props) {
+export function BraiseLogo({ size = 52, className = '' }: Props) {
   const [useFallback, setUseFallback] = useState(false);
 
   useEffect(() => {

@@ -1,8 +1,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
-import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
-import { Volume2 } from "lucide-react";
+import { motion, AnimatePresence, useAnimationControls, useReducedMotion } from "framer-motion";
+import { Volume2, Check, RotateCcw } from "lucide-react";
 import { RichText } from "@/components/RichText";
-import { BraiseMascot } from "@/components/BraiseMascot";
 
 // The centre of the Réviser screen: "Tactile 3D" neo-brutalism — opaque paper cards, generous
 // rounding, a hard extruded shadow (the same construction as every button in the app) — with
@@ -44,7 +43,6 @@ export function QuestionCard({
   color,
   subjectLabel,
   topic,
-  alreadyMastered,
 }: {
   question: string;
   emoji: string;
@@ -52,14 +50,10 @@ export function QuestionCard({
   /** Folded into this card's own header — no separate pill floating above it anymore. */
   subjectLabel: string;
   topic: string;
-  /** Whether this exact card already cleared the SM-2 learning phase — shown as a quiet chip so
-   *  a card that is already known has a visible reason
-   *  instead of just being a smaller number with no explanation the moment it's judged. */
-  alreadyMastered?: boolean;
 }) {
   return (
     <motion.div
-      className={`${CARD} px-5 py-4 text-left`}
+      className={`${CARD} rev-question-card px-5 py-4 text-left`}
       initial={{ opacity: 0, y: -18, rotate: -1.5, scale: 0.94 }}
       animate={{ opacity: 1, y: 0, rotate: 0, scale: 1 }}
       transition={SPRING}
@@ -74,17 +68,8 @@ export function QuestionCard({
           {emoji}
         </span>
         <span className="font-display text-[0.92rem] font-extrabold leading-tight text-black">
-          {subjectLabel}{" "}
-          <span className="text-black/60" aria-hidden="true">
-            ·
-          </span>{" "}
-          {topic}
+          {subjectLabel} <span className="text-black/40">·</span> {topic}
         </span>
-        {alreadyMastered && (
-          <span className="ml-auto flex-shrink-0 rounded-full border-[1.5px] border-black/20 bg-black/[0.05] px-2 py-0.5 font-mono text-[0.7rem] font-bold uppercase tracking-wide text-black/45">
-            Connue
-          </span>
-        )}
       </div>
       <p className="mt-3 font-sans text-[1.2rem] font-bold leading-snug text-black">
         <RichText text={question} markClass={HIGHLIGHT} strongClass={STRONG} />
@@ -100,9 +85,6 @@ export type ResultProps = {
   tag: string;
   text: string;
   xp: number;
-  /** Why this card paid what it paid ("Retrouvée !", "Revanche !"…), named on the verdict so the
-   *  number is never a mystery. Absent on a miss. */
-  reason?: string;
   speaking: boolean;
   onListen: () => void;
 };
@@ -154,6 +136,7 @@ export function AnswerCard({
   // re-render (speaking toggling, combo changing) or never fire it at all. Hooks run
   // unconditionally, before the `typing` early return, so this stays legal regardless of which
   // branch below actually renders.
+  const reduced = useReducedMotion();
   const controls = useAnimationControls();
   const wasJudged = useRef(judged);
 
@@ -163,7 +146,7 @@ export function AnswerCard({
   }, []);
 
   useEffect(() => {
-    if (judged && !wasJudged.current) {
+    if (judged && !wasJudged.current && !reduced) {
       // The verdict lands: a quick physical punch, distinct from the border/shadow colour
       // fade — a win or a miss should feel like something hit the card, not just recoloured it.
       controls.start({
@@ -172,7 +155,7 @@ export function AnswerCard({
       });
     }
     wasJudged.current = judged;
-  }, [judged, controls]);
+  }, [judged, controls, reduced]);
 
   if (typing) {
     // A compact chat bubble, not a full-width card standing in for one — this used to be the
@@ -207,11 +190,10 @@ export function AnswerCard({
   // that overflow: this one paragraph was close to a fifth of the card's total height on the
   // measured worst case. 90 characters is roughly "this is running past two short lines."
   const claimIsLong = claim.length > 90;
-  const truthIsLong = truth.length > 90;
 
   return (
     <motion.div
-      className={`${CARD} relative px-5 py-5 text-left transition-[border-color,box-shadow] duration-300 ${verdictClass}`}
+      className={`${judged ? "rev-answer-compact" : CARD} relative ${judged ? "" : "px-5 py-5"} text-left transition-[border-color,box-shadow] duration-300 ${judged ? "" : verdictClass}`}
       initial={{ opacity: 0, y: -14, scaleY: 0.94, scale: 1 }}
       animate={controls}
       style={{ transformOrigin: "top center" }}
@@ -220,59 +202,13 @@ export function AnswerCard({
           neighbouring card. Chips: the verdict, the XP won. */}
       {judged && result && <VerdictBar {...result} />}
 
-      {judged && wasLie ? (
-        <>
-          {/* The trap, crossed out elegantly — a single stroke drawing itself left to right
-              (not a static text-decoration snapping on), then the truth unfolds right under
-              it once the strike lands. Single line + truncate: the trap is the thing to
-              forget, it doesn't need room to wrap. A hair of rotation, tapered ends (mask) and
-              a tiny overshoot in the easing keep it reading as a felt-tip stroke rather than a
-              ruler-drawn vector line — the same "hand-made" imperfection as the tilted cards. */}
-          <div className="relative inline-block max-w-full">
-            <p className="truncate font-sans text-[0.98rem] font-semibold text-black/40">
-              <RichText
-                text={claim}
-                markClass="bg-transparent font-semibold"
-                strongClass="font-semibold"
-              />
-            </p>
-            <motion.span
-              aria-hidden="true"
-              className="absolute left-0 top-1/2 h-[3px] w-full bg-[var(--coral-2)]"
-              style={{
-                originX: 0,
-                rotate: -1.2,
-                maskImage:
-                  "linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)",
-                WebkitMaskImage:
-                  "linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)",
-              }}
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 0.3, delay: 0.16, ease: [0.34, 1.35, 0.64, 1] }}
-            />
-          </div>
-          {/* …and the truth unfolding right under it, timed to start once the strike lands. */}
-          <motion.div
-            className="mt-3 border-t-2 border-dashed border-black/20 pt-3"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            transition={{
-              height: { type: "spring", stiffness: 320, damping: 30, delay: 0.36 },
-              opacity: { duration: 0.3, delay: 0.42 },
-            }}
-            style={{ overflow: "hidden" }}
-          >
-            <span className="inline-block rounded-md bg-black px-2 py-0.5 font-mono text-[0.7rem] font-bold uppercase tracking-[0.08em] text-white">
-              En vrai
-            </span>
-            <p
-              className={`mt-2 font-sans font-bold text-black ${truthIsLong ? "text-[1.1rem] leading-tight" : "text-[1.3rem] leading-snug"}`}
-            >
-              <RichText text={truth} markClass={HIGHLIGHT} strongClass={STRONG} />
-            </p>
-          </motion.div>
-        </>
+      {judged ? (
+        <div className="rev-answer-body">
+          {wasLie && <span className="rev-truth-label">En vrai</span>}
+          <p className="font-sans font-bold text-sapie-neo-ink">
+            <RichText text={truth} markClass={HIGHLIGHT} strongClass={STRONG} />
+          </p>
+        </div>
       ) : (
         <p
           className={`font-sans font-bold text-black ${claimIsLong ? "text-[1.1rem] leading-tight" : "text-[1.3rem] leading-snug"}`}
@@ -292,9 +228,7 @@ export function AnswerCard({
           dare badge just vanished the instant `judged` flipped, because a plain ternary has no
           exit to play. Now all three states get one. */}
       <AnimatePresence mode="wait" initial={false}>
-        {judged && result ? (
-          <ResultStrip key="result" {...result} />
-        ) : tutorial ? (
+        {judged ? null : tutorial ? (
           <TutorialHint key="tutorial" />
         ) : (
           <DareBadge key="dare" prompt={prompt} color={subjectColor} />
@@ -361,105 +295,28 @@ function DareBadge({ prompt, color }: { prompt: string; color: string }) {
   );
 }
 
-/** The verdict as a row of chips at the top of the card, in its own slot. Each chip is the
- *  app's sticker (border + hard shadow + a glossy inner edge); they pop in one after another
- *  with spring overshoot, like a real reward landing rather than a UI element fading in. */
-function VerdictBar({ verdict, tag, xp, reason }: ResultProps) {
+/** Verdict and reward remain separate from Braise's personal reaction. */
+function VerdictBar({ verdict, xp, speaking, onListen }: ResultProps) {
+  const reduced = useReducedMotion();
   const win = verdict === "win";
-  const chip =
-    "rounded-xl border-2 border-black px-2.5 py-1 font-display text-[0.72rem] font-black uppercase tracking-wide shadow-[2px_2px_0_#000,inset_0_1px_0_rgba(255,255,255,0.55)]";
-  const pop = (delay: number) => ({
-    initial: { opacity: 0, scale: 0.5, y: -6 },
-    animate: { opacity: 1, scale: [0.5, 1.15, 1], y: 0 },
-    transition: { duration: 0.4, delay },
-  });
   return (
-    // No streak chip here anymore — it duplicated the header's own persistent .rev-combo pill
-    // (always on screen, judged or not) for zero information gain, at the cost of a whole extra
-    // row exactly on the cards most likely to already be tall (a long correction, mid-streak).
-    <div
-      className="mb-3 flex flex-wrap items-center gap-2 border-b-2 border-dashed border-black/15 pb-3"
-      aria-live="polite"
-    >
-      <motion.span
-        className={`${chip} ${win ? "bg-[var(--mint)] text-black" : "bg-[var(--coral-2)] text-white"}`}
-        {...pop(0.08)}
-      >
-        {tag}
-      </motion.span>
-      {reason && (
-        <motion.span className={`${chip} bg-white text-black`} {...pop(0.15)}>
-          {reason}
+    <div className={`rev-result-heading ${win ? "is-win" : "is-miss"}`} role="status">
+      <div className="rev-result-status">
+        <motion.span className="rev-result-symbol" aria-hidden="true"
+          initial={reduced ? false : { scale: .85 }} animate={{ scale: 1 }} transition={{ duration: .18 }}>
+          {win ? <Check size={19} strokeWidth={3} /> : <RotateCcw size={18} strokeWidth={2.6} />}
         </motion.span>
-      )}
-      {xp > 0 && <XpChip xp={xp} chip={chip} />}
+        <span>{win ? "Bien vu !" : "À retenir"}</span>
+      </div>
+      <div className="rev-result-tools">
+        {xp > 0 && <span className="rev-result-xp">+{xp} XP</span>}
+        <button type="button" onClick={onListen} onPointerDown={(e) => e.stopPropagation()}
+          aria-label={speaking ? "Lecture en cours" : "Écouter la bonne réponse"}
+          title="Écouter la bonne réponse" aria-pressed={speaking} className="rev-feedback-listen">
+          <Volume2 size={18} strokeWidth={2.4} />
+        </button>
+      </div>
     </div>
   );
 }
 
-/** The XP chip as an actual token, not a label: pops in with spring overshoot, then a diagonal
- *  shine sweeps across it once — the same beat a coin or a loot drop gets in the games this
- *  screen is competing with for a teenager's attention. */
-function XpChip({ xp, chip }: { xp: number; chip: string }) {
-  return (
-    <motion.span
-      className={`${chip} relative overflow-hidden bg-gradient-to-b from-[#FFE066] to-[#FDC800] text-black`}
-      initial={{ opacity: 0, scale: 0.5, y: -6 }}
-      animate={{ opacity: 1, scale: [0.5, 1.15, 1], y: 0 }}
-      transition={{ duration: 0.4, delay: 0.22 }}
-    >
-      +{xp} XP
-      <motion.span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 bg-gradient-to-r from-transparent via-white/70 to-transparent"
-        initial={{ x: "-40%" }}
-        animate={{ x: "280%" }}
-        transition={{ duration: 0.65, delay: 0.55, ease: "easeOut" }}
-      />
-    </motion.span>
-  );
-}
-
-/** Footer of the answer card once judged: Braise's line, with listen beside it. */
-function ResultStrip({ verdict, text, speaking, onListen }: ResultProps) {
-  return (
-    <motion.div
-      className="mt-4 border-t-2 border-dashed border-black/20 pt-3"
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -4, transition: { duration: 0.16 } }}
-      transition={{ ...SPRING, delay: 0.12 }}
-    >
-      <div className="flex items-start gap-3">
-        {/* This is Braise's own line — chat-message construction (avatar beside text), reusing
-            space this footer already reserves rather than adding a new one: this is the only
-            place all session Braise actually shows a face reacting to the verdict, instead of
-            colour and text carrying the whole feeling alone. */}
-        <BraiseMascot
-          size={30}
-          mood={verdict === "win" ? "happy" : "hesitant"}
-          className="flex-shrink-0"
-        />
-        <p
-          className={`flex-1 font-display text-[0.95rem] font-bold leading-snug ${verdict === "win" ? "text-black" : "text-black/80"}`}
-        >
-          {text}
-        </p>
-        {/* Listen sits beside Braise's line, not under it — one less line on a card that is
-            already the tallest on the screen when a trap gets corrected. */}
-        <button
-          type="button"
-          onClick={onListen}
-          onPointerDown={(e) => e.stopPropagation()}
-          aria-label={speaking ? "Lecture en cours" : "Écouter la bonne réponse"}
-          aria-pressed={speaking}
-          className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border-2 border-black shadow-[2px_2px_0_#000] transition-transform active:translate-y-[2px] active:shadow-none ${
-            speaking ? "bg-[var(--sun)] text-black" : "bg-white text-black"
-          }`}
-        >
-          <Volume2 size={17} strokeWidth={2.4} />
-        </button>
-      </div>
-    </motion.div>
-  );
-}

@@ -1,32 +1,21 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useApp } from "@/store";
-import { computeGoalPct, remainingToGoal } from "@/lib/progress";
+import { computeGoalPct, remainingToGoal, resolveChapters } from "@/lib/progress";
 import { sfx } from "@/lib/sound";
-import { COPY } from "@/lib/copy";
-import { useTone } from "@/lib/useTone";
-import { useCourseProgress } from "@/lib/course/useCourseProgress";
-import { useCourseMastery } from "@/lib/course/useCourseMastery";
-import { buildLibrary, type Library } from "@/lib/catalog/catalog";
-import { dueInLibrary, pickGlobalResume } from "@/lib/world/resume";
-import type { HubWorld } from "@/components/world/Hub";
 import { fireConfetti } from "@/lib/confetti";
 import { LevelSheet } from "@/components/LevelSheet";
 import { HeaderHUD } from "@/components/HeaderHUD";
 import { HeroPiocheCard } from "@/components/HeroPiocheCard";
 import { MissedCardsBanner } from "@/components/MissedCardsBanner";
-import { WorldsTeaser } from "@/components/world/WorldsTeaser";
-import { BrakeCard, MomentSheet, NotifInvite } from "@/components/notifications/Reminders";
-import { useReminders } from "@/components/notifications/useReminders";
-import { frequencyFromGoal, isBraked } from "@/lib/notifications/model";
-import { shouldInvite } from "@/lib/notifications/store";
-import { useNotifState } from "@/lib/notifications/useNotifState";
+import { SubjectDecks } from "@/components/SubjectDecks";
 import { TodayStrip } from "@/components/TodayStrip";
 import { ShareAuraModal } from "@/components/ShareAuraModal";
-import { SUBJECTS, SUBJECT_SHORT_NAMES } from "@/data";
-import { getRankInfo, countMasteredCards, countSubjectsSeen } from "@/lib/aura";
+import { SUBJECTS, FLASHCARDS } from "@/data";
+import { dailyPickLine, getAgeGroup } from "@/lib/braiseVoice";
+import { getRankInfo, countMasteredCards } from "@/lib/aura";
 import { getIntoxDismissedCount, setIntoxDismissedCount } from "@/lib/celebrations";
-import type { Level } from "@/types";
+import type { Level, Subject, Chapter } from "@/types";
 
 // Same choreography language as Ton Aura: a calm stagger fade for each block.
 const staggerContainer = {
@@ -60,28 +49,37 @@ export function HomeView() {
     setSheetOpen(false);
   };
 
-  // The way into the courses: one small world per subject, with a pastille where notions are waiting for
-  // a refresh. The wording follows where the student stands, never an alarm.
-  const { t } = useTone();
-  const courseProgress = useCourseProgress();
-  const courseMastery = useCourseMastery();
-  const libraries = SUBJECTS.map((s) =>
-    buildLibrary(s.id, {
-      completedChapters: state.completedChapters,
-      cardReviews: state.cardReviews,
-      course: courseProgress,
-      now: Date.now(),
-    }),
-  ).filter((l): l is Library => l !== null);
+  // "Chapitres prioritaires" — every subject's in-progress chapter, ranked by real mastery
+  // (lowest first). No exam-date field exists anywhere in the data model, so this deliberately
+  // isn't a fabricated "DS dans 2 jours" countdown — mastery % and the reinforce flag are the
+  // real signals already tracked per chapter.
+  const priorityChapters: { subject: Subject; chapter: Chapter }[] = SUBJECTS.map((s) => {
+    const chapter = resolveChapters(s.chapters, state.completedChapters).find(
+      (c) => c.status === "current",
+    );
+    return chapter ? { subject: s, chapter } : null;
+  })
+    .filter((x): x is { subject: Subject; chapter: Chapter } => x !== null)
+    .sort((a, b) => a.chapter.mastery - b.chapter.mastery);
 
-  // Today's mission is what Braise would point at in "Où on va ?": the same ladder, the same function,
-  // so the two screens never give different advice (a Déclic touched in the last two days, a review
-  // that has come due, a point that mixes up, an older Déclic, then something new). Nothing is drawn
-  // at random any more; on day zero the ladder lands on the first chapter of the first subject.
-  const pick = pickGlobalResume(libraries, state.lastSubjectId);
-  const currentSubject = pick ? SUBJECTS.find((s) => s.id === pick.subjectId) : undefined;
-  const currentEntry = pick?.resume.entry;
-  const resuming = pick?.resume.reason === "resume" && pick.resume.fresh === true;
+  // "Pioche du jour" — a real daily random draw across every subject's in-progress chapter,
+  // not a "continue where you left off" shortcut: the same pool as "Chapitres prioritaires"
+  // above, indexed by a hash of today's date so the pick is stable all day and changes
+  // tomorrow. (The previous version just replayed state.lastSubjectId/lastChapterId, which is
+  // a "continue" feature, not a draw — it's still tracked in the store for other uses, just no
+  // longer what drives this card, since the product is explicitly framed as a daily draw.)
+  const todaySeed = new Date().toISOString().slice(0, 10);
+  let hash = 0;
+  for (let i = 0; i < todaySeed.length; i++) hash = (hash * 31 + todaySeed.charCodeAt(i)) >>> 0;
+  const dailyPick =
+    priorityChapters.length > 0 ? priorityChapters[hash % priorityChapters.length] : null;
+  const currentSubject = dailyPick?.subject;
+  const currentChapter = dailyPick?.chapter;
+  // Real per-chapter deck size (FLASHCARDS filtered by chapterId) — the card used to show a
+  // fixed "10 cartes" for every chapter; every chapter actually has its own real count.
+  const currentChapterCardCount = currentChapter
+    ? FLASHCARDS.filter((c) => c.chapterId === currentChapter.id).length
+    : 0;
   // Real count of cards whose last swipe-judge verdict was wrong — reviewCard() writes
   // 'not-sure' on an incorrect judgment (RevisionsView), never anything invented here.
   const missedCardsCount = Object.values(state.cardReviews).filter(
@@ -96,56 +94,70 @@ export function HomeView() {
     setIntoxDismissedCountState(missedCardsCount);
   };
 
-  // Read to screen readers only, for now: why Braise points here, in the words she uses in "Où on va ?".
-  const reason = pick?.resume.reason;
-  const says =
-    !pick || !reason
-      ? t(COPY.library.allSet)
-      : reason === "review"
-        ? t(COPY.library.reviewSays(pick.resume.entry.dueCount))
-        : t(COPY.library.resumeSays[reason]);
+  const voiceCtx = { personality: state.user.personality, age: getAgeGroup(state.user.level) };
   const bubbleLine =
-    currentSubject && currentEntry
-      ? `${says} ${currentEntry.title}, ${currentSubject.name}, ${currentEntry.minutes} minutes.`
-      : says;
+    currentSubject && currentChapter
+      ? dailyPickLine(
+          voiceCtx,
+          state.user.name,
+          currentSubject.name,
+          currentChapter.title,
+          currentChapter.duration,
+        )
+      : `${state.user.name}, série de ${state.streak} jours. On lâche rien !`;
 
-  const worlds: HubWorld[] = SUBJECTS.map((s) => {
-    const library = libraries.find((l) => l.subjectId === s.id);
+  // Each card's "Niv." is the current chapter's real position in the subject's own sequence
+  // (no separate per-subject level field exists), and its label is that chapter's own title
+  // with a leading article stripped for brevity — real data, never a generated sentence, and
+  // never truncated with an ellipsis. "Maths" is the only display shortening on the subject
+  // name itself (same subject, casual form) — every other name is the real one, shown in full.
+  //
+  // Sorted by the current chapter's own mastery, lowest first: this grid now does the job that
+  // "Chapitres prioritaires" used to do as a separate carousel — same data (every subject's
+  // current chapter), it was never two different things, just the same list shown twice.
+  const SHORT_SUBJECT_NAME: Record<string, string> = { maths: "Maths" };
+  const stripLeadingArticle = (title: string) => title.replace(/^(les |la |le |l')/i, "");
+  const subjectDecks = SUBJECTS.map((s) => {
+    const chapters = resolveChapters(s.chapters, state.completedChapters);
+    const doneCount = chapters.filter((c) => c.status === "done").length;
+    const pct = Math.round((doneCount / chapters.length) * 100);
+    const currentIndex = chapters.findIndex((c) => c.status === "current");
+    const current = currentIndex >= 0 ? chapters[currentIndex] : null;
     return {
       id: s.id,
-      name: s.name,
-      shortName: SUBJECT_SHORT_NAMES[s.id] ?? s.name,
+      name: SHORT_SUBJECT_NAME[s.id] ?? s.name,
       color: s.color,
-      due: library ? dueInLibrary(library) : 0,
-      suggested: false,
+      pct,
+      level: currentIndex >= 0 ? currentIndex + 1 : chapters.length,
+      chapterLabel: current ? stripLeadingArticle(current.title) : s.name,
+      chapterCount: chapters.length,
+      doneCount,
+      duration: current?.duration ?? null,
+      currentChapterId: current?.id,
+      currentMastery: current?.mastery ?? 100,
+      // Same subject the hero card above already names as today's draw — surfacing it first
+      // here too, instead of leaving the grid to sort purely on mastery, matters most on a
+      // fresh account: a real new user's 6 decks all tie at 0% mastery (see resolveChapters),
+      // so without this every card looks interchangeable and nothing says where to start.
+      isDailyPick: s.id === currentSubject?.id,
     };
-  });
-  const dueTotal = worlds.reduce((sum, w) => sum + w.due, 0);
-  const startedAny =
-    state.completedChapters.length > 0 || Object.keys(state.cardReviews).length > 0;
-  const teaserSays =
-    dueTotal > 0
-      ? t(COPY.world.teaserDue(dueTotal))
-      : startedAny
-        ? t(COPY.world.teaserBack)
-        : t(COPY.world.teaserNew);
+  }).sort(
+    (a, b) => Number(b.isDailyPick) - Number(a.isDailyPick) || a.currentMastery - b.currentMastery,
+  );
 
-  // Braise asks, once the student has had a taste of the app, if she can come and see them; and when her
-  // messages went unanswered three times, she says she went quiet. Never both, never twice in a row.
-  const notif = useNotifState();
-  const { enable } = useReminders();
-  const [momentOpen, setMomentOpen] = useState(false);
-  const tasted =
-    state.completedChapters.length > 0 ||
-    Object.keys(state.cardReviews).length >= 5 ||
-    Object.values(courseProgress.declics).some((d) => d.completionStatus === "completed");
-  const braked = notif.prefs.enabled && isBraked(notif.history, notif.opens, Date.now());
-  const invite = !braked && shouldInvite(notif, tasted, Date.now());
+  const goToChapter = (subjectId: string, chapterId?: string) => {
+    sfx.tap(state.soundOn);
+    openSubject(subjectId, chapterId);
+  };
 
   // Same derivation as ProfilAuraView's own share button — real distinct-subjects-reviewed
   // count from card review history, not a second, possibly-diverging computation.
-  const subjectsCount = countSubjectsSeen(state.cardReviews, courseMastery);
-  const masteredCards = countMasteredCards(state.cardReviews, courseMastery);
+  const subjectsCount = new Set(
+    Object.keys(state.cardReviews)
+      .map((id) => FLASHCARDS.find((c) => c.id === id)?.subject)
+      .filter(Boolean),
+  ).size;
+  const masteredCards = countMasteredCards(state.cardReviews);
   const rank = getRankInfo(state.xp).current;
 
   return (
@@ -178,16 +190,15 @@ export function HomeView() {
           <motion.div variants={staggerItem} className="home-mission-zone">
             <HeroPiocheCard
               bubbleLine={bubbleLine}
-              subjectName={currentSubject ? SUBJECT_SHORT_NAMES[currentSubject.id] : undefined}
+              subjectName={currentSubject?.name}
               subjectColor={currentSubject?.color}
-              chapterTitle={currentEntry?.title ?? "Leçon du jour"}
-              duration={currentEntry?.minutes ?? 0}
-              cardCount={currentEntry?.cards ?? 0}
-              resuming={resuming}
+              chapterTitle={currentChapter?.title ?? "Leçon du jour"}
+              duration={currentChapter?.duration ?? 0}
+              cardCount={currentChapterCardCount}
               soundOn={state.soundOn}
               onStart={() => {
-                if (currentSubject && currentEntry)
-                  openLesson(currentSubject.id, currentEntry.chapterId);
+                if (currentSubject && currentChapter)
+                  openLesson(currentSubject.id, currentChapter.id);
               }}
             />
           </motion.div>
@@ -224,48 +235,34 @@ export function HomeView() {
             </motion.div>
           )}
 
-          {(braked || invite) && (
-            <motion.div variants={staggerItem}>
-              {braked ? <BrakeCard /> : <NotifInvite onAccept={() => setMomentOpen(true)} />}
-            </motion.div>
-          )}
-
           <motion.div variants={staggerItem} className="space-y-3">
-            <div>
-              <span className="font-mono text-[0.7rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">
-                Apprendre
-              </span>
-              <h2 className="font-display text-[1.15rem] font-extrabold leading-tight text-[var(--ink)]">
-                Tes cours
-              </h2>
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <span className="font-mono text-[0.62rem] font-black uppercase tracking-[0.13em] text-[var(--ink-soft)]">
+                  Accès rapide
+                </span>
+                <h2 className="font-display text-[1.15rem] font-extrabold leading-tight text-[var(--ink)]">
+                  Tes matières
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setTab("subjects")}
+                className="text-xs font-black text-[var(--neo-orange)]"
+              >
+                Tout voir →
+              </button>
             </div>
-            <WorldsTeaser
-              worlds={worlds}
-              says={teaserSays}
-              onOpenAll={() => {
-                sfx.tap(state.soundOn);
-                setTab("subjects");
-              }}
-              onOpenSubject={(id) => {
-                sfx.tap(state.soundOn);
-                openSubject(id);
+            <SubjectDecks
+              items={subjectDecks.slice(0, 2)}
+              onSelect={(id) => {
+                const deck = subjectDecks.find((d) => d.id === id);
+                goToChapter(id, deck?.currentChapterId);
               }}
             />
           </motion.div>
         </motion.div>
       </div>
-
-      {momentOpen && (
-        <MomentSheet
-          initial={{ ...notif.prefs, frequency: frequencyFromGoal(state.user.goal) }}
-          confirmLabel="Activer les rappels"
-          onClose={() => setMomentOpen(false)}
-          onConfirm={(prefs) => {
-            setMomentOpen(false);
-            void enable(prefs);
-          }}
-        />
-      )}
 
       <LevelSheet
         open={sheetOpen}

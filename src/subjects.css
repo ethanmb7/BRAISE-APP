@@ -23,9 +23,9 @@
 
 .subjects-heading p {
   margin: 0 0 1px;
-  color: var(--orange-text);
+  color: var(--neo-orange);
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
