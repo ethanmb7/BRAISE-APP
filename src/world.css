@@ -800,3 +800,156 @@
   z-index: 3;
   padding: 0 var(--page-gutter);
 }
+
+/* ----- "Ton brasier": the student's fire, between the Pioche and "Tes mondes" ----------------------- */
+/* Each notion already touched is an ember (hot: fresh; warm; "couve": starting to fade); a flame lights
+   above the fire once the day has had some activity. No number anywhere: the heap says it. The embers
+   differ by more than their colour (a bright heart for the hot ones, a dotted outline for the rest). */
+
+.bras {
+  padding: 10px 14px 12px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: var(--ink);
+}
+.bras-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.bras-title {
+  margin: 0;
+  font: 800 1rem/1.1 var(--font-display);
+}
+.bras-btn {
+  min-height: 44px;
+  flex: none;
+  padding: 0 14px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 12px;
+  background: var(--paper);
+  box-shadow: 2px 2px 0 var(--neo-ink);
+  color: var(--ink);
+  font: 400 0.8rem/1 var(--font-impact);
+}
+.bras-btn:active {
+  box-shadow: none;
+  transform: translate(2px, 2px);
+}
+.bras-btn:focus-visible,
+.bras-keep:focus-visible {
+  outline: 3px solid var(--neo-orange);
+  outline-offset: 3px;
+}
+.bras-say {
+  margin: 2px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.bras-pit {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 4px;
+  overflow: visible;
+}
+.bras-stone {
+  fill: #d9d6e0;
+  stroke: var(--neo-ink);
+  stroke-width: 2.2;
+}
+.bras-twigs {
+  fill: none;
+  stroke: var(--neo-ink);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+}
+.bras-em-body {
+  fill: var(--ember, #ffd2b6);
+  stroke: var(--neo-ink);
+  stroke-width: 2.2;
+}
+.bras-em-core {
+  fill: #ffd166;
+  opacity: 0;
+}
+.bras-em.is-hot {
+  --ember: #ff6b35;
+}
+.bras-em.is-hot .bras-em-core {
+  opacity: 1;
+}
+.bras-em.is-warm {
+  --ember: #ff9a5c;
+}
+.bras-em.is-warm .bras-em-core {
+  opacity: 0.6;
+}
+.bras-em.is-couve {
+  --ember: #ffd2b6;
+}
+.bras-em.is-couve .bras-em-body {
+  stroke-dasharray: 3.5 2.5;
+}
+.bras-flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+/* the flame of the day waits pale above the fire, and lights once the day has had some activity */
+.bras-flame-body {
+  fill: #ffd9c7;
+  stroke: var(--neo-ink);
+  stroke-width: 1.7;
+  stroke-linejoin: round;
+  transition: fill 0.45s;
+}
+.bras-flame-heart {
+  fill: #ffd166;
+  opacity: 0;
+  transition: opacity 0.45s;
+}
+.bras.is-lit .bras-flame-body {
+  fill: #ff6b35;
+}
+.bras.is-lit .bras-flame-heart {
+  opacity: 1;
+}
+@keyframes bras-ignite {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.45) rotate(-5deg);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .app-shell:not(.dyslexia-mode) .bras.is-lit .bras-flame {
+    animation: bras-ignite 0.7s ease-out both;
+  }
+}
+.bras-keep {
+  min-height: 44px;
+  margin-top: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-soft);
+  font:
+    700 0.72rem/1 "IBM Plex Mono",
+    monospace;
+  letter-spacing: 0.04em;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-transform: uppercase;
+}

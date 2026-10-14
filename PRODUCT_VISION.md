@@ -305,9 +305,12 @@ interprétation de l'équipe, à corriger si elle est fausse.
 | Des points qui récompensent le temps ou qu'on peut farmer ; des données inventées.                                                  | Cela détourne de ce qu'on mesure : retrouver sans aide.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | _projet_                                                                                           |
 | Un cinquième onglet, un réseau social, plusieurs monnaies.                                                                          | Focus du prototype.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | _projet_                                                                                           |
 
-**La flamme du jour** (la ligne sous la Pioche) **dit ce qui se remplit, elle ne raconte pas ce qui reste :** « Ta flamme
-du jour » avec sa barre ; quand l'objectif est atteint, la flamme s'allume (« Flamme allumée, +20 XP. À demain. ») et
-la journée a une **fin**, comme une grille qu'on termine. **La série ne dépend pas de l'objectif :** une activité,
+**Ton brasier** (l'espace entre la Pioche et Tes mondes) : **ce que tu sais, c'est de la braise. Si tu n'y touches pas,
+ça couve ; deux minutes, et ça se rallume.** Chaque notion déjà touchée y est une braise (chaude quand elle est
+fraîche, « qui couve » quand elle s'efface), calculée depuis les vraies révisions. « Rallumer · 2 min » lance 5 cartes,
+les dues d'abord. Dès que la journée a eu une activité, la flamme au-dessus du feu s'allume (« Ton feu est allumé. À
+demain. ») et la journée a une **fin**, comme une grille qu'on termine. Jamais « éteint » ni « mort » : un feu ne meurt
+pas. Aucun chiffre sur le feu. **La série ne dépend pas de l'objectif :** une activité,
 même légère, la garde ; l'objectif n'ouvre que le bonus (un objectif exigeant ne doit pas devenir un obstacle à
 l'habitude). Récompense immédiate, jamais de minuteur, jamais de tirage au hasard.
 

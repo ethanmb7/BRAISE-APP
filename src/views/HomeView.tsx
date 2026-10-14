@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useApp } from "@/store";
-import { computeGoalPct, remainingToGoal } from "@/lib/progress";
 import { sfx } from "@/lib/sound";
 import { COPY } from "@/lib/copy";
 import { useTone } from "@/lib/useTone";
@@ -10,22 +9,21 @@ import { useCourseMastery } from "@/lib/course/useCourseMastery";
 import { buildLibrary, type Library } from "@/lib/catalog/catalog";
 import { dueInLibrary, pickGlobalResume, verbFor } from "@/lib/world/resume";
 import { focusSubjectId } from "@/lib/world/soon";
+import { embersOf, requestQuick } from "@/lib/world/brasier";
 import { Hub, type HubWorld } from "@/components/world/Hub";
 import { fireConfetti } from "@/lib/confetti";
 import { LevelSheet } from "@/components/LevelSheet";
 import { HeaderHUD } from "@/components/HeaderHUD";
 import { HeroPiocheCard } from "@/components/HeroPiocheCard";
-import { DueCard } from "@/components/DueCard";
+import { Brasier } from "@/components/world/Brasier";
 import { BrakeCard, MomentSheet, NotifInvite } from "@/components/notifications/Reminders";
 import { useReminders } from "@/components/notifications/useReminders";
 import { frequencyFromGoal, isBraked } from "@/lib/notifications/model";
 import { shouldInvite } from "@/lib/notifications/store";
 import { useNotifState } from "@/lib/notifications/useNotifState";
-import { TodayStrip } from "@/components/TodayStrip";
 import { ShareAuraModal } from "@/components/ShareAuraModal";
 import { SUBJECTS, SUBJECT_SHORT_NAMES } from "@/data";
 import { getRankInfo, countMasteredCards, countSubjectsSeen } from "@/lib/aura";
-import { getIntoxDismissedCount, setIntoxDismissedCount } from "@/lib/celebrations";
 import type { Level } from "@/types";
 
 // Same choreography language as Ton Aura: a calm stagger fade for each block.
@@ -42,7 +40,6 @@ export function HomeView() {
   const { state, setTab, setView, openSubject, openLesson, setUser } = useApp();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
-  const [intoxDismissedCount, setIntoxDismissedCountState] = useState(getIntoxDismissedCount);
   const prevGoalMet = useRef(state.dailyGoalMet);
 
   useEffect(() => {
@@ -111,17 +108,10 @@ export function HomeView() {
           : undefined,
     };
   });
-  // One number for what is waiting: the sum of the pastilles on the worlds. The card under the rhythm, the
-  // caption of the worlds and the strip all say this same number, so the page never gives two.
-  const dueTotal = worlds.reduce((sum, w) => sum + w.due, 0);
-  // Dismissing the card hides it at the count it was dismissed at: it comes back when more notions are
-  // waiting than then, not gone for good.
-  const showDueCard = dueTotal > intoxDismissedCount;
-  const handleDismissDue = () => {
-    sfx.tap(state.soundOn);
-    setIntoxDismissedCount(dueTotal);
-    setIntoxDismissedCountState(dueTotal);
-  };
+  // The student's fire: one ember per notion already touched. The flame is lit once the day has had some
+  // activity (the streak asks for no more); the goal only opens the day's bonus.
+  const embers = embersOf(libraries);
+  const lit = state.sessionXpEarned > 0 || state.dailyGoalMet;
   // Braise asks, once the student has had a taste of the app, if she can come and see them; and when her
   // messages went unanswered three times, she says she went quiet. Never both, never twice in a row.
   const notif = useNotifState();
@@ -183,35 +173,22 @@ export function HomeView() {
           </motion.div>
 
           <motion.div variants={staggerItem}>
-            <TodayStrip
-              streak={state.streak}
-              dailyGoalMet={state.dailyGoalMet}
-              remaining={remainingToGoal(state)}
-              goalPct={computeGoalPct(state)}
-              dueCount={dueTotal}
-              onShare={() => {
+            <Brasier
+              embers={embers}
+              lit={lit}
+              goalMet={state.dailyGoalMet}
+              onRallumer={() => {
+                sfx.tap(state.soundOn);
+                requestQuick();
+                setTab("revisions");
+              }}
+              onKeep={() => {
                 sfx.tap(state.soundOn);
                 if (navigator.vibrate) navigator.vibrate(10);
                 setShareOpen(true);
               }}
             />
           </motion.div>
-
-          {/* One secondary block at a time: Braise's request is rare and passes (it has its own cooldown),
-              the due card is there almost every day: so the request takes the card's place while it is open,
-              otherwise it would never be seen. */}
-          {showDueCard && !(braked || invite) && (
-            <motion.div variants={staggerItem}>
-              <DueCard
-                count={dueTotal}
-                onOpen={() => {
-                  sfx.tap(state.soundOn);
-                  setTab("revisions");
-                }}
-                onDismiss={handleDismissDue}
-              />
-            </motion.div>
-          )}
 
           <motion.div variants={staggerItem} className="space-y-3">
             <div>
