@@ -15,7 +15,19 @@ const plural = (n: number) => (n > 1 ? "s" : "");
 
 export const COPY = {
   home: {
+    /** The day's flame (the strip under the Pioche). It names what fills; it does not narrate what is left:
+     *  the bar says that, and a number or an "encore" would turn it into a quota. When the goal is reached
+     *  the day has an end ("À demain"), as a puzzle you finish. The streak does not depend on it. */
+    flame: L("Ta flamme du jour", "Ta flamme du jour. Elle attend."),
+    flameLit: L(
+      `Flamme allumée, +${XP_REWARDS.DAILY_CHEST} XP. À demain.`,
+      `Flamme allumée. +${XP_REWARDS.DAILY_CHEST} XP. Reviens demain.`,
+    ),
     keepMoment: L("Garder ce moment", "Immortaliser ça"),
+    /** The card that says what waits for a refresh (the sum of the pastilles on the worlds). */
+    dueTitle: L("À rallumer", "Elles t'attendent"),
+    dueSub: (n: number) =>
+      L(`${n} truc${plural(n)}.`, `${n} truc${plural(n)} à remettre en place.`),
   },
 
   /** A subject's library: what Braise says in the strip under the map, at the one course it points at. */
@@ -44,24 +56,6 @@ export const COPY = {
       "Tout est dans la poche. Je n'ai plus rien à redire. Étonnant.",
     ),
     moreComing: L("D'autres cours arrivent bientôt.", "D'autres cours arrivent. Patience."),
-  },
-
-  /** "Ton brasier" (between the Pioche and "Tes mondes"): the student's notions are embers; they smoulder
-   *  ("couvent") when they start to fade, and a short session relights them. Never "éteint", never a number. */
-  brasier: {
-    title: L("Ton brasier", "Ton brasier, version braise"),
-    rallumer: L("Rallumer · 2 min", "Rallume · 2 min"),
-    couve: L("Ça couve par endroits.", "Ça couve. Un coup de souffle ?"),
-    warm: L("Tout est au chaud.", "Tout est au chaud. Bravo, j'ai rien à dire."),
-    lit: L("Ton feu est allumé. À demain.", "Feu allumé. Reviens demain."),
-    litBonus: L(
-      `Ton feu est allumé, +${XP_REWARDS.DAILY_CHEST} XP. À demain.`,
-      `Feu allumé, +${XP_REWARDS.DAILY_CHEST} XP. Reviens demain.`,
-    ),
-    empty: L(
-      "Ton feu attend sa première braise : fais un Déclic.",
-      "Pas une braise. Un Déclic pour commencer ?",
-    ),
   },
 
   /** "Un truc important bientôt ?": said to a friend, never as a deadline. No countdown, no urgency. */

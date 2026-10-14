@@ -178,7 +178,7 @@ export function buildDemoData(now: number): Record<string, string> {
     lastSubjectId: "maths",
     lastChapterId: "m4",
     sessionDate: new Date(now).toDateString(),
-    sessionXpEarned: 0,
+    sessionXpEarned: 20,
     view: "home",
     tab: "home",
     currentSubjectId: null,

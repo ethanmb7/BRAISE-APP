@@ -151,15 +151,10 @@ ni un compte à rebours.
 - **Les mondes ont tous la même taille** ; seul le monde conseillé est plus grand : une taille dit une
   importance, jamais un hasard. Le placement est piloté par la liste des matières, **jusqu'à dix** (`hubPlaces`,
   testé).
-- **Aujourd'hui : un seul objet entre la Pioche et Tes mondes, « Ton brasier ».** Chaque notion déjà touchée est
-  une braise (`lib/world/brasier.ts` : chaude, tiède, ou « qui couve »), calculée depuis les vraies révisions ; le
-  tas est une pyramide, les plus chaudes au cœur. Un seul bouton clair, « Rallumer · 2 min » (la Pioche reste la
-  seule surface pleine), lance 5 cartes de Réviser, les dues d'abord. **Aucun chiffre sur le feu** : l'état se dit
-  par la forme (cœur clair pour les chaudes, contour en pointillés pour celles qui couvent), pas par la couleur
-  seule, et se lit à voix haute (« 1 braise au chaud, 7 qui couvent »). Jamais « éteint », « mort » ni « cendre ».
-  La flamme pâle au-dessus du feu s'allume dès que la journée a eu une activité ; le feu n'a pas d'objectif.
-  Ordre : la Pioche, le brasier, « Tes mondes ». Une seule Braise : celle de la Pioche ; les cartes de rappels
-  prennent la flamme.
+- **Aujourd'hui : un seul chiffre pour ce qui attend.** « À rafraîchir » est la somme des pastilles des mondes ;
+  la carte de révision, la phrase sous « Tes cours » et le rythme disent ce même nombre. Ordre : la Pioche,
+  le rythme (il la situe), la carte « À rafraîchir » (le chemin vers Réviser, où « Réviser » est le bon mot),
+  puis « Tes cours ». Une seule Braise : celle de la Pioche ; les cartes de rappels prennent la flamme.
 - **Tout est construit dans le flux** (jamais à des coordonnées dessinées) : un nom vit dans la même boîte que
   son image, donc de 320 à 430 px et en texte très grand rien ne se chevauche.
 

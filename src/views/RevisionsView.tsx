@@ -29,7 +29,6 @@ import { FLASHCARDS, SUBJECTS, SUBJECT_SHORT_NAMES } from "@/data";
 import type { Flashcard, Confidence, CardReview } from "@/types";
 import { COURSE_REGISTRY } from "@/lib/course/registry";
 import { focusSubjectId } from "@/lib/world/soon";
-import { QUICK_SIZE, clearQuick, peekQuick } from "@/lib/world/brasier";
 import { courseProgressStore } from "@/lib/course/progressStore";
 import { useCourseProgress } from "@/lib/course/useCourseProgress";
 import { recordCourseReview } from "@/lib/course/session";
@@ -91,21 +90,9 @@ export function RevisionsView() {
   // the new first card. A remount can't leave anything half-reset.
   const [sessionKey, setSessionKey] = useState(0);
 
-  // "Rallumer · 2 min" on Aujourd'hui asks for a short session (see lib/world/brasier.ts): read once when
-  // this screen opens, cleared right after so the next visit is the usual one.
-  const quick = useMemo(() => peekQuick(), []);
-  useEffect(() => {
-    clearQuick();
-  }, []);
-  const sessionSize = quick ? QUICK_SIZE : SESSION_SIZE;
-
   // A fresh, in-progress snapshot (coming back from "Revoir la notion") resumes that exact
   // deck; otherwise a new draw. Read once per session key, so a restart always re-draws.
-  // A short session asked for on purpose starts fresh: it does not pick up an older one left half done.
-  const resume = useMemo(
-    () => (sessionKey === 0 && !quick ? readSnapshot() : null),
-    [sessionKey, quick],
-  );
+  const resume = useMemo(() => (sessionKey === 0 ? readSnapshot() : null), [sessionKey]);
 
   // One session = SESSION_SIZE cards, drawn once (re-drawn on restart via `sessionKey`) so
   // reviewing a card mid-session can't shift the deck under a running index. Priority, then
@@ -128,9 +115,9 @@ export function RevisionsView() {
       if (restored.length === resume.cardIds.length) return restored;
     }
     // A few cards from the Déclics where the student had trouble, if there are any.
-    const fromCourse = pickCourseCards(COURSE_SOURCE, courseProgressStore.get(), Date.now())
-      .map(courseCardToFlashcard)
-      .slice(0, quick ? 2 : undefined);
+    const fromCourse = pickCourseCards(COURSE_SOURCE, courseProgressStore.get(), Date.now()).map(
+      courseCardToFlashcard,
+    );
     const dueIds = new Set(getDueCards());
     const chosen = new Set(state.user.subjects);
     // Something matters soon in this subject (see lib/world/soon.ts): it gets more of the session.
@@ -147,7 +134,7 @@ export function RevisionsView() {
     const picked = [...FLASHCARDS]
       .map((c) => ({ c, p: priority(c) }))
       .sort((a, b) => b.p - a.p)
-      .slice(0, sessionSize - fromCourse.length)
+      .slice(0, SESSION_SIZE - fromCourse.length)
       .map(({ c }) => c);
     for (let i = picked.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
