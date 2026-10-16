@@ -541,7 +541,7 @@
   position: sticky;
   display: grid;
   gap: 6px;
-  padding: 10px;
+  padding: 14px 10px 10px;
 }
 /* One row for the choice: the picture, the real name with what it costs, the button. It wraps under
    the name on a very narrow screen rather than squeezing the name. */
@@ -593,6 +593,31 @@
   -webkit-line-clamp: 2;
   color: var(--ink);
   font: 700 0.88rem/1.3 var(--font-display);
+}
+/* A sheet you can pull down to put away (as on the maps and the music players). The grip is decoration: the
+   cross and Escape stay for keyboards and screen readers. */
+.dock-grab {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  width: 34px;
+  height: 4px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--neo-ink) 30%, transparent);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+/* The card arrives once, a little from below, each time another island is picked. */
+@media (prefers-reduced-motion: no-preference) {
+  .app-shell:not(.dyslexia-mode) .dock--sheet {
+    animation: dock-in 0.24s cubic-bezier(0.2, 0.9, 0.3, 1.15) backwards;
+  }
+}
+@keyframes dock-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
 }
 /* The cross sits on the corner of the card, outside its frame: it costs no room. Its pressable zone is 44px. */
 .dock-close {

@@ -144,7 +144,7 @@ ni un compte à rebours.
   l'accroche sur deux lignes au plus (le texte entier reste lu aux lecteurs d'écran). Le bouton est orange
   (`--orange-fill`) quand il y a une raison d'y aller et **papier** pour un chapitre « Dans la poche » (rien
   d'urgent, une seule surface pleine). Sur un écran très étroit, il passe sous le nom plutôt que d'écraser le nom.
-  La croix est posée sur le coin de la carte, hors de son cadre : elle ne prend aucune place (32 px dessinée, 44 px
+  La carte est une **feuille qu'on peut tirer vers le bas pour la ranger** (comme sur les cartes et les lecteurs de musique ; une petite poignée en haut le dit), et elle **arrive une fois, un peu par le bas**, à chaque île choisie (coupé sous « réduire les animations » et en mode dyslexie). Pas de repère qui pointe vers l'île : la carte est trop loin d'elle, il montrerait l'île qui se trouve juste au-dessus (essayé, retiré). La croix est posée sur le coin de la carte, hors de son cadre : elle ne prend aucune place (32 px dessinée, 44 px
   pressable). Aucune pastille d'état (l'île, son mot et le verbe le disent ; le nom lu aux lecteurs d'écran
   contient l'état), aucun niveau (« 2nde »), aucune ligne mono, aucun gain de points, nombre de cartes ou
   « vu il y a… ». Les points de progression n'y sont plus : l'île porte l'état (drapeau, mot), et la page du chapitre

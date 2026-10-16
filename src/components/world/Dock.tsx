@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { ArrowRight, Flame, X } from "lucide-react";
 import { StreakFlameIcon } from "@/components/StreakFlameIcon";
 import { MathText } from "@/components/course/MathText";
@@ -38,11 +39,21 @@ export function Dock({
   if (selected) {
     const verb = startVerb(selected);
     return (
-      <section
+      <motion.section
+        key={selected.key}
         className="dock dock--card dock--sheet"
         aria-label={`${selected.title}, ${STATUS_LABEL[selected.status]}`}
         aria-live="polite"
+        drag="y"
+        dragDirectionLock
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={{ top: 0, bottom: 0.6 }}
+        dragSnapToOrigin
+        onDragEnd={(_, info) => {
+          if (info.offset.y > 48 || info.velocity.y > 500) onClose();
+        }}
       >
+        <span className="dock-grab" aria-hidden="true" />
         <button type="button" className="dock-close" onClick={onClose} aria-label="Fermer">
           <X size={16} strokeWidth={3.2} aria-hidden="true" />
         </button>
@@ -78,7 +89,7 @@ export function Dock({
             <MathText text={selected.hook} />
           </p>
         )}
-      </section>
+      </motion.section>
     );
   }
 
