@@ -136,7 +136,10 @@ ni un compte à rebours.
 - **La carte du bas d'une matière est une carte à collectionner** (`Dock`) : l'emblème de l'île suggérée (le même
   dessin que sur la carte), le verbe en petit (« Commencer », « Reprendre »…), le vrai nom du chapitre, un bouton
   rond. **Pas de phrase** : la carte ne répète pas ce que dit déjà la carte (Braise est sur l'île). Elle fait
-  90 px, au lieu de 107 avec sa phrase, et laisse voir la dernière île.
+  90 px, au lieu de 107 avec sa phrase, et laisse voir la dernière île. **La carte d'une île touchée est la même
+  carte** (même emblème dans le carré teinté, même verbe en petit, même bouton rond) avec en plus une ligne du
+  haut (état, points, « à rallumer », croix) et, sous le titre, la ligne mono « chapitre · niveau · minutes » :
+  il n'y a plus de gros bouton « Commencer » pleine largeur.
 - **Le nom de la matière n'est écrit qu'une fois :** dans la barre du haut de l'archipel (pas de second grand
   titre, pas de « Où on va ? »). Le texte qui répète ce que l'écran dit déjà est retiré : pas de légende sous le
   titre de « Tes mondes », pas de note de niveau pour un élève de 2nde (elle ne s'adresse qu'à Première et

@@ -37,8 +37,13 @@ export function Dock({
   const { t } = useTone();
 
   if (selected) {
+    const verb = startVerb(selected);
     return (
-      <section className="dock dock--sheet" aria-label={selected.title} aria-live="polite">
+      <section
+        className="dock dock--card dock--sheet"
+        aria-label={selected.title}
+        aria-live="polite"
+      >
         <div className="dock-top">
           <StatusChip status={selected.status} />
           <Dots dots={selected.dots} source={selected.source} />
@@ -49,16 +54,31 @@ export function Dock({
             <X size={18} strokeWidth={3} />
           </button>
         </div>
-        <b className="dock-title">
-          <MathText text={selected.hook ?? selected.title} />
-        </b>
-        <span className="dock-name">
-          {selected.hook ? `${selected.title} · ` : ""}
-          {selected.levelLabel} · {selected.minutes} min
-        </span>
-        <button type="button" className="dock-cta" onClick={() => onOpen(selected)}>
-          {startVerb(selected)} <ArrowRight size={18} strokeWidth={3} />
-        </button>
+        <div className="dock-row">
+          <span className="dock-card-art" aria-hidden="true">
+            <svg viewBox="0 0 80 80">
+              <Emblem kind={emblemOf(selected)} size={72} x={4} y={4} />
+            </svg>
+          </span>
+          <span className="dock-card-text">
+            <small>{verb}</small>
+            <b>
+              <MathText text={selected.hook ?? selected.title} />
+            </b>
+            <span className="dock-name">
+              {selected.hook ? `${selected.title} · ` : ""}
+              {selected.levelLabel} · {selected.minutes} min
+            </span>
+          </span>
+          <button
+            type="button"
+            className="dock-card-go"
+            onClick={() => onOpen(selected)}
+            aria-label={`${verb} ${selected.title}`}
+          >
+            <ArrowRight size={22} strokeWidth={3.2} aria-hidden="true" />
+          </button>
+        </div>
       </section>
     );
   }

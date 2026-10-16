@@ -537,39 +537,15 @@
   font-weight: 700;
   line-height: 1.3;
 }
-.dock-cta {
-  display: flex;
-  min-height: 52px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 0 14px;
-  border: 3px solid var(--neo-ink);
-  border-radius: 14px;
-  background: var(--orange-fill);
-  box-shadow: 3px 3px 0 var(--neo-ink);
-  color: var(--on-orange);
-  font: 400 0.92rem/1.1 var(--font-impact);
-  text-align: left;
-}
-.dock-cta small {
-  display: block;
-  margin-top: 2px;
-  font:
-    700 0.7rem/1.2 "IBM Plex Mono",
-    monospace;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  opacity: 0.92;
-}
-.dock-cta:active {
-  box-shadow: none;
-  transform: translate(2px, 2px);
-}
 .dock--sheet {
   display: grid;
-  gap: 6px;
+  gap: 8px;
   align-items: start;
+}
+.dock-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 .dock-top {
   display: flex;
@@ -598,9 +574,6 @@
     monospace;
   text-transform: uppercase;
 }
-.dock-title {
-  font: 800 1.08rem/1.18 var(--font-display);
-}
 .dock-name {
   color: var(--ink-soft);
   font:
@@ -608,9 +581,6 @@
     monospace;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-}
-.dock--sheet .dock-cta {
-  margin-top: 6px;
 }
 
 /* The key to the flags of a map: one line or two, in the colours of the islands. */
@@ -653,7 +623,6 @@
     0 0 0 4px var(--neo-orange),
     4px 4px 0 4px var(--neo-ink);
 }
-.dock-cta:focus-visible,
 .dock-close:focus-visible {
   outline: 3px solid var(--neo-orange);
   outline-offset: 2px;
