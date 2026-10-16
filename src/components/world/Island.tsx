@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { motion } from "framer-motion";
 import { BraiseMascot } from "@/components/BraiseMascot";
 import { Emblem } from "@/components/world/Emblem";
+import { useDockVariant } from "@/lib/world/dockVariant";
 import type { EmblemKind } from "@/lib/world/emblems";
 import { STATUS_LABEL } from "@/lib/course/statusLabels";
 import { FLAG } from "@/components/world/flags";
@@ -58,6 +59,7 @@ export function Island({
   index,
   braise,
   onSelect,
+  goVerb,
 }: {
   entry: LibraryEntry;
   emblem: EmblemKind;
@@ -66,8 +68,11 @@ export function Island({
   index: number;
   /** Braise stands on the island's rim, on this side (the island she suggests). */
   braise: "left" | "right" | null;
+  /** What Braise would do here ("Commencer", "Reprendre"...), shown as a tag on the suggested island. */
+  goVerb?: string;
   onSelect: () => void;
 }) {
+  const variant = useDockVariant();
   const flag = FLAG[entry.status];
   const flame = entry.status === "needs_reinforcement" || entry.dueCount > 0;
   const label = [
@@ -154,6 +159,9 @@ export function Island({
           <i className="isl-tag isl-tag--due">{entry.dueCount} à rallumer</i>
         ) : (
           <i className={`isl-tag isl-tag--${entry.status}`}>{STATUS_LABEL[entry.status]}</i>
+        )}
+        {variant === "e" && suggested && !selected && goVerb && (
+          <i className="isl-go">{goVerb} →</i>
         )}
       </span>
     </motion.button>

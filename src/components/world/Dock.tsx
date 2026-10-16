@@ -6,6 +6,9 @@ import { MathText } from "@/components/course/MathText";
 import { COPY } from "@/lib/copy";
 import { useTone } from "@/lib/useTone";
 import { verbFor } from "@/lib/world/resume";
+import { useDockVariant } from "@/lib/world/dockVariant";
+import { Emblem } from "@/components/world/Emblem";
+import { emblemFor } from "@/lib/world/emblems";
 import type { LibraryEntry, Resume } from "@/lib/catalog/catalog";
 
 const startVerb = (entry: LibraryEntry) =>
@@ -29,6 +32,7 @@ export function Dock({
   onClose: () => void;
 }) {
   const { t } = useTone();
+  const variant = useDockVariant();
 
   if (selected) {
     return (
@@ -73,6 +77,60 @@ export function Dock({
     reason === "review"
       ? t(COPY.library.reviewSays(entry.dueCount))
       : t(COPY.library.resumeSays[reason]);
+  const verb = verbFor(resume);
+
+  // The suggested island carries its own tag on the map: nothing sits at the bottom.
+  if (variant === "e") return null;
+
+  if (variant === "b") {
+    return (
+      <section className="dock dock--bubble" aria-label="Braise te suggère" aria-live="polite">
+        <p className="dock-says">{says}</p>
+        <button type="button" className="dock-pill" onClick={() => onOpen(entry)}>
+          {verb} <ArrowRight size={16} strokeWidth={3} aria-hidden="true" />
+        </button>
+      </section>
+    );
+  }
+
+  if (variant === "c") {
+    return (
+      <section className="dock dock--bar" aria-label="Braise te suggère" aria-live="polite">
+        <span className="dock-bar-title">
+          <b>{entry.title}</b>
+          <small>{entry.minutes} min</small>
+        </span>
+        <button type="button" className="dock-pill" onClick={() => onOpen(entry)}>
+          {verb} <ArrowRight size={16} strokeWidth={3} aria-hidden="true" />
+        </button>
+      </section>
+    );
+  }
+
+  if (variant === "d") {
+    return (
+      <section className="dock dock--card" aria-label="Braise te suggère" aria-live="polite">
+        <span className="dock-card-art" aria-hidden="true">
+          <svg viewBox="0 0 80 80">
+            <Emblem kind={emblemFor(entry.chapterId, 0)} size={72} x={4} y={4} />
+          </svg>
+        </span>
+        <span className="dock-card-text">
+          <small>{verb}</small>
+          <b>{entry.title}</b>
+        </span>
+        <button
+          type="button"
+          className="dock-card-go"
+          onClick={() => onOpen(entry)}
+          aria-label={`${verb} ${entry.title}`}
+        >
+          <ArrowRight size={22} strokeWidth={3.2} aria-hidden="true" />
+        </button>
+      </section>
+    );
+  }
+
   return (
     <section className="dock" aria-label="Braise te suggère" aria-live="polite">
       <span className="dock-braise" aria-hidden="true">
