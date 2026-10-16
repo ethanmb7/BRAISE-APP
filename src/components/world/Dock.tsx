@@ -1,6 +1,5 @@
-import { ArrowRight, Clock, Flame, X } from "lucide-react";
+import { ArrowRight, Flame, X } from "lucide-react";
 import { StreakFlameIcon } from "@/components/StreakFlameIcon";
-import { Dots } from "@/components/library/Dots";
 import { MathText } from "@/components/course/MathText";
 import { COPY } from "@/lib/copy";
 import { STATUS_LABEL } from "@/lib/course/statusLabels";
@@ -38,7 +37,6 @@ export function Dock({
 
   if (selected) {
     const verb = startVerb(selected);
-    const started = selected.status !== "not_started";
     return (
       <section
         className="dock dock--card dock--sheet"
@@ -46,43 +44,40 @@ export function Dock({
         aria-live="polite"
       >
         <button type="button" className="dock-close" onClick={onClose} aria-label="Fermer">
-          <X size={18} strokeWidth={3} aria-hidden="true" />
+          <X size={16} strokeWidth={3.2} aria-hidden="true" />
         </button>
-        <div className="dock-row">
-          <span className="dock-card-art" aria-hidden="true">
+        <div className="dock-head">
+          <span className="dock-card-art dock-card-art--sm" aria-hidden="true">
             <svg viewBox="0 0 80 80">
               <Emblem kind={emblemOf(selected)} size={72} x={4} y={4} />
             </svg>
           </span>
           <span className="dock-card-text">
-            {(selected.hook || selected.dueCount > 0) && (
-              <span className="dock-kicker">
-                {selected.hook && <span>{selected.title}</span>}
-                {selected.dueCount > 0 && (
-                  <span className="dock-due">
-                    <Flame size={14} strokeWidth={2.6} aria-hidden="true" />
-                    {selected.dueCount} à rallumer
-                  </span>
-                )}
-              </span>
-            )}
-            <b>
-              <MathText text={selected.hook ?? selected.title} />
-            </b>
-            {started && <Dots dots={selected.dots} source={selected.source} />}
+            <b>{selected.title}</b>
+            <span className="dock-meta">
+              {selected.minutes} min
+              {selected.dueCount > 0 && (
+                <span className="dock-due">
+                  <Flame size={13} strokeWidth={2.6} aria-hidden="true" />
+                  {selected.dueCount} à rallumer
+                </span>
+              )}
+            </span>
           </span>
+          <button
+            type="button"
+            className={`dock-go${selected.status === "mastered" ? " dock-go--calm" : ""}`}
+            onClick={() => onOpen(selected)}
+          >
+            {verb}
+            <ArrowRight size={17} strokeWidth={3.2} aria-hidden="true" />
+          </button>
         </div>
-        <button
-          type="button"
-          className={`dock-go${selected.status === "mastered" ? " dock-go--calm" : ""}`}
-          onClick={() => onOpen(selected)}
-        >
-          <span>{verb}</span>
-          <em>
-            <Clock size={14} strokeWidth={2.8} aria-hidden="true" />
-            {selected.minutes} min
-          </em>
-        </button>
+        {selected.hook && (
+          <p className="dock-hook">
+            <MathText text={selected.hook} />
+          </p>
+        )}
       </section>
     );
   }

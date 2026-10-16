@@ -540,46 +540,43 @@
 .dock--sheet {
   position: sticky;
   display: grid;
-  gap: 12px;
-  align-items: start;
-  padding: 12px;
+  gap: 6px;
+  padding: 10px;
 }
-.dock-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding-right: 34px;
-}
-/* The cross sits in the corner; its pressable zone is 44px even though it is drawn smaller. */
-.dock-close {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  border: 2.5px solid var(--neo-ink);
-  border-radius: 50%;
-  background: var(--paper);
-  color: var(--ink);
-}
-.dock-close::after {
-  content: "";
-  position: absolute;
-  inset: -5px;
-}
-.dock--sheet .dock-card-text {
-  gap: 3px;
-}
-/* The real name of the chapter, small, above its hook; and what is waiting to be relit. */
-.dock-kicker {
+/* One row for the choice: the picture, the real name with what it costs, the button. It wraps under
+   the name on a very narrow screen rather than squeezing the name. */
+.dock-head {
   display: flex;
   flex-wrap: wrap;
-  gap: 2px 10px;
-  color: var(--ink-soft);
-  font: 700 0.8rem/1.25 var(--font-display);
+  align-items: center;
+  gap: 8px 10px;
 }
+.dock-card-art.dock-card-art--sm {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+}
+.dock-card-art.dock-card-art--sm svg {
+  width: 38px;
+  height: 38px;
+}
+.dock--sheet .dock-card-text {
+  min-width: 96px;
+  gap: 1px;
+}
+.dock--sheet .dock-card-text b {
+  font: 800 1rem/1.15 var(--font-display);
+  overflow-wrap: anywhere;
+}
+.dock-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 8px;
+  color: var(--ink-soft);
+  font: 700 0.8rem/1.3 var(--font-display);
+}
+/* What is waiting to be relit: in the brand's orange words, never an alarm colour. */
 .dock-due {
   display: inline-flex;
   align-items: center;
@@ -587,48 +584,55 @@
   color: var(--orange-text);
   font-weight: 800;
 }
-.dock--sheet .dock-card-text b {
+/* The hook: a line of curiosity under the choice, two lines at most (the full text is still read aloud). */
+.dock-hook {
   display: -webkit-box;
+  margin: 0;
   overflow: hidden;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  font: 800 1.04rem/1.2 var(--font-display);
+  -webkit-line-clamp: 2;
+  color: var(--ink);
+  font: 700 0.88rem/1.3 var(--font-display);
 }
-.dock--sheet .lib-dots {
-  margin-top: 3px;
+/* The cross sits on the corner of the card, outside its frame: it costs no room. Its pressable zone is 44px. */
+.dock-close {
+  position: absolute;
+  top: -12px;
+  right: -6px;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: 2px 2px 0 var(--neo-ink);
+  color: var(--ink);
 }
-/* The one button of the card: the verb says what happens, the minutes say what it costs. */
+.dock-close::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+}
+/* The one button: the verb says what happens. Orange when there is a reason to go; paper when the
+   chapter is already in the pocket (nothing urgent, one solid surface at most). */
 .dock-go {
-  display: flex;
-  min-height: 54px;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 0 16px;
-  border: 3px solid var(--neo-ink);
-  border-radius: 16px;
-  background: var(--orange-fill);
-  box-shadow: 4px 4px 0 var(--neo-ink);
-  color: var(--on-orange);
-  font: 400 1.1rem/1 var(--font-impact);
-}
-.dock-go em {
   display: inline-flex;
+  min-height: 44px;
   align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
-  border-radius: 99px;
-  background: rgb(0 0 0 / 0.22);
-  font: 800 0.8rem/1.2 var(--font-display);
-  font-style: normal;
+  gap: 6px;
+  margin-left: auto;
+  padding: 0 12px;
+  border: 3px solid var(--neo-ink);
+  border-radius: 14px;
+  background: var(--orange-fill);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: var(--on-orange);
+  font: 400 0.9rem/1 var(--font-impact);
 }
-/* Nothing urgent (a chapter already in the pocket): the button is paper, not orange. */
 .dock-go--calm {
   background: var(--paper);
   color: var(--ink);
-}
-.dock-go--calm em {
-  background: color-mix(in srgb, currentColor 12%, transparent);
 }
 .dock-go:active {
   box-shadow: none;

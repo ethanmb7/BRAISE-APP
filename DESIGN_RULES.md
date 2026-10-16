@@ -136,17 +136,19 @@ ni un compte à rebours.
 - **La carte du bas d'une matière est une carte à collectionner** (`Dock`) : l'emblème de l'île suggérée (le même
   dessin que sur la carte), le verbe en petit (« Commencer », « Reprendre »…), le vrai nom du chapitre, un bouton
   rond. **Pas de phrase** : la carte ne répète pas ce que dit déjà la carte (Braise est sur l'île). Elle fait
-  90 px, au lieu de 107 avec sa phrase, et laisse voir la dernière île. **La carte d'une île touchée garde le dessin et le style, mais
-  n'a qu'une mission : confirmer le choix et lancer.** Elle est faite d'un cadre fixe (une phrase, un bouton) dont
-  seul le contenu suit l'état du chapitre : le **vrai nom** en petit au-dessus de l'accroche (qui mène), une ligne
-  « 🔥 n à rallumer » en `--orange-text` s'il y en a (jamais de rouge d'urgence), les **points de progression
-  seulement si le chapitre est commencé** (ce qu'on possède : ils n'ont aucun sens sur un chapitre neuf), puis un
-  **bouton plein largeur dont le verbe est écrit** (Commencer, Reprendre, Rejouer) avec la durée dedans. Orange
-  (`--orange-fill`) quand il y a une raison d'y aller ; **papier** pour un chapitre « Dans la poche » (rien
-  d'urgent, une seule surface pleine). Elle ne porte **ni pastille d'état** (l'île, son mot et le verbe le disent ;
-  le nom lu aux lecteurs d'écran, lui, contient l'état), **ni niveau** (« 2nde »), **ni ligne mono**, **ni gain de
-  points, nombre de cartes ou « vu il y a… »**. L'accroche tient sur trois lignes au plus à l'écran. La croix
-  fait 34 px dessinée, 44 px pressable. Le bouton ouvre le chapitre (pas la révision de ses cartes à rallumer).
+  90 px, au lieu de 107 avec sa phrase, et laisse voir la dernière île. **La carte d'une île touchée n'a qu'une mission :
+  confirmer le choix et lancer. Elle est basse : 120 à 130 px à 390 px (jusqu'à 146 px à 320 px), contre 170 à
+  212 px avant, soit environ 15 % de l'écran.** Une rangée pour le choix : le petit dessin de l'île (44 px), le
+  **vrai nom** en titre avec ce que ça coûte (« 4 min ») et, s'il y en a, « 🔥 n à rallumer » en `--orange-text`
+  (jamais de rouge d'urgence), puis le **bouton dont le verbe est écrit** (Commencer, Reprendre, Rejouer). Dessous,
+  l'accroche sur deux lignes au plus (le texte entier reste lu aux lecteurs d'écran). Le bouton est orange
+  (`--orange-fill`) quand il y a une raison d'y aller et **papier** pour un chapitre « Dans la poche » (rien
+  d'urgent, une seule surface pleine). Sur un écran très étroit, il passe sous le nom plutôt que d'écraser le nom.
+  La croix est posée sur le coin de la carte, hors de son cadre : elle ne prend aucune place (32 px dessinée, 44 px
+  pressable). Aucune pastille d'état (l'île, son mot et le verbe le disent ; le nom lu aux lecteurs d'écran
+  contient l'état), aucun niveau (« 2nde »), aucune ligne mono, aucun gain de points, nombre de cartes ou
+  « vu il y a… ». Les points de progression n'y sont plus : l'île porte l'état (drapeau, mot), et la page du chapitre
+  le détail. Le bouton ouvre le chapitre (pas la révision de ses cartes à rallumer).
 - **Le nom de la matière n'est écrit qu'une fois :** dans la barre du haut de l'archipel (pas de second grand
   titre, pas de « Où on va ? »). Le texte qui répète ce que l'écran dit déjà est retiré : pas de légende sous le
   titre de « Tes mondes », pas de note de niveau pour un élève de 2nde (elle ne s'adresse qu'à Première et
