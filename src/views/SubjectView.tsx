@@ -17,7 +17,8 @@ import { useCourseProgress } from "@/lib/course/useCourseProgress";
 import { scrollMemory } from "@/lib/world/scroll";
 import { useReveal, useScrollMemory } from "@/lib/world/useScroll";
 import { buildLibrary, type Library, type LibraryEntry } from "@/lib/catalog/catalog";
-import { dueInLibrary, verbFor } from "@/lib/world/resume";
+import { dueInLibrary } from "@/lib/world/resume";
+import { emblemFor } from "@/lib/world/emblems";
 
 /** A subject as a map: an archipelago, one island per course. It shows everything, nothing is locked,
  *  and Braise points at one course in the strip under the map. */
@@ -150,7 +151,6 @@ function Archipel() {
         color={subject.color}
         entries={library.entries}
         suggestedKey={suggestedKey}
-        suggestedVerb={library.resume ? verbFor(library.resume) : undefined}
         selectedKey={selected?.key ?? null}
         onSelect={(key) => {
           sfx.tap(state.soundOn);
@@ -168,6 +168,12 @@ function Archipel() {
             selected={selected}
             onOpen={open}
             onClose={() => setSelectedKey(null)}
+            emblemOf={(entry) =>
+              emblemFor(
+                entry.chapterId,
+                library.entries.findIndex((e) => e.key === entry.key),
+              )
+            }
           />
         }
       />

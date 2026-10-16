@@ -908,80 +908,9 @@
   transform: translate(2px, 2px);
 }
 
-/* ----- TEMPORARY: four designs for the suggestion card of a subject (see lib/world/dockVariant.ts) ------ */
+/* ----- the suggestion card of a subject, a collector card ------------------------------------------ */
 
-/* b · Braise's bubble: one row, a tail pointing at the map */
-.dock--bubble {
-  position: sticky;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 12px;
-  padding: 10px 10px 10px 14px;
-  border-radius: 18px;
-}
-.dock--bubble::before {
-  content: "";
-  position: absolute;
-  top: -11px;
-  left: 28px;
-  width: 18px;
-  height: 18px;
-  border-top: 3px solid var(--neo-ink);
-  border-left: 3px solid var(--neo-ink);
-  background: var(--paper);
-  transform: rotate(45deg);
-}
-.dock--bubble .dock-says {
-  flex: 1;
-  font-size: 0.8rem;
-}
-.dock-pill {
-  display: inline-flex;
-  min-height: 44px;
-  flex: none;
-  align-items: center;
-  gap: 6px;
-  padding: 0 14px;
-  border: 3px solid var(--neo-ink);
-  border-radius: 12px;
-  background: var(--orange-fill);
-  box-shadow: 2px 2px 0 var(--neo-ink);
-  color: var(--on-orange);
-  font: 400 0.82rem/1 var(--font-impact);
-}
-.dock-pill:active {
-  box-shadow: none;
-  transform: translate(2px, 2px);
-}
-
-/* c · a thin bar: the name of the chapter and one button, no sentence */
-.dock--bar {
-  justify-content: space-between;
-  padding: 8px 8px 8px 14px;
-  border-radius: 16px;
-}
-.dock-bar-title {
-  display: grid;
-  min-width: 0;
-  gap: 1px;
-}
-.dock-bar-title b {
-  overflow: hidden;
-  font: 800 0.98rem/1.15 var(--font-display);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.dock-bar-title small {
-  color: var(--ink-soft);
-  font:
-    700 0.7rem/1.2 "IBM Plex Mono",
-    monospace;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-/* d · a collector card: the island's emblem, the verb, the name, a round go button */
+/* the island's emblem, the verb, the name, a round go button */
 .dock--card {
   gap: 12px;
   padding: 10px 10px 10px 10px;
@@ -1037,23 +966,6 @@
   transform: translate(2px, 2px);
 }
 
-/* e · a tag on the suggested island itself, like the one on the worlds of Aujourd'hui */
-.isl-go {
-  display: inline-block;
-  margin-top: 6px;
-  padding: 4px 10px 5px;
-  border: 2.5px solid var(--neo-ink);
-  border-radius: 9px;
-  background: var(--orange-fill);
-  box-shadow: 2px 2px 0 var(--neo-ink);
-  color: var(--on-orange);
-  font: 400 0.76rem/1.1 var(--font-impact);
-  font-style: normal;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-  transform: rotate(-3deg);
-}
-.dock-pill:focus-visible,
 .dock-card-go:focus-visible {
   outline: 3px solid var(--neo-orange);
   outline-offset: 3px;

@@ -41,7 +41,6 @@ export function Archipelago({
   color,
   entries,
   suggestedKey,
-  suggestedVerb,
   selectedKey,
   onSelect,
   dock,
@@ -50,8 +49,6 @@ export function Archipelago({
   color: string;
   entries: LibraryEntry[];
   suggestedKey: string | null;
-  /** What Braise would do on the suggested island ("Commencer", "Reprendre"...). */
-  suggestedVerb?: string;
   selectedKey: string | null;
   onSelect: (key: string) => void;
   dock: ReactNode;
@@ -130,7 +127,6 @@ export function Archipelago({
                   emblem={emblemFor(entry.chapterId, i)}
                   index={i}
                   suggested={entry.key === suggestedKey}
-                  goVerb={entry.key === suggestedKey ? suggestedVerb : undefined}
                   selected={entry.key === selectedKey}
                   braise={
                     entry.key === suggestedKey ? (cell.column === 1 ? "right" : "left") : null
