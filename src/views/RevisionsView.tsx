@@ -41,6 +41,8 @@ import {
   type ThemeRequest,
 } from "@/lib/revision/themeSession";
 import { BevelButton } from "@/components/revisions/BevelButton";
+import { ClozeStep } from "@/components/revisions/ClozeStep";
+import { clozeForChapter } from "@/lib/cloze";
 import { SwipeCard, type FlyDir, type Verdict } from "@/components/revisions/SwipeCard";
 
 // Plain direct localStorage key, deliberately outside the app's main progress-sync system
@@ -159,10 +161,13 @@ export function RevisionsView() {
   }, [sessionKey, resume]);
   // Whether this series really is the chapter's (a chapter without cards falls back to the usual mix).
   const themed = !!theme && cards.length > 0 && cards.every((c) => c.chapterId === theme.chapterId);
+  // A chapter tried before any lesson opens on its sentence to complete, then the cards.
+  const cloze = themed && theme ? clozeForChapter(theme.chapterId) : undefined;
+  const [clozeDone, setClozeDone] = useState(false);
 
   // A card of the older deck is saved with the older schedule; a card from a Déclic is saved in the course
   // service (its schedule, the Déclic's mastery, the wrong idea it counted) and pays the same points.
-  const { addXp } = useApp();
+  const { addXp, setTab } = useApp();
   const onReview = (card: Flashcard, confidence: Confidence) => {
     if (!card.course) return reviewCard(card.id, confidence);
     const found = findCourseCard(card.id, COURSE_SOURCE);
@@ -176,6 +181,28 @@ export function RevisionsView() {
     );
     if (confidence === "sure" && reward.xp > 0) addXp(reward.xp);
   };
+
+  if (cloze && !clozeDone) {
+    return (
+      <div className="view is-active rev-view">
+        <MotionConfig reducedMotion="user">
+          <ClozeStep
+            card={cloze}
+            soundOn={state.soundOn}
+            onDone={(sure) => {
+              // Saved like any card, but without points: nothing the student cannot see the reason of.
+              reviewCard(cloze.id, sure ? "sure" : "not-sure", false);
+              setClozeDone(true);
+            }}
+            onQuit={() => {
+              writeSnapshot(null);
+              setTab("home");
+            }}
+          />
+        </MotionConfig>
+      </div>
+    );
+  }
 
   return (
     <div className="view is-active rev-view">

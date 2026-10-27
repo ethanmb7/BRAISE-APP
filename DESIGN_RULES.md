@@ -163,6 +163,16 @@ ni un compte à rebours.
   jours. S'il y a eu des « Je sais plus » ou des ratés, le grand bouton est **« Revoir la notion »** (la leçon), « Enchaîner
   une autre série » devient un lien discret dessous. Seule la première série est celle du chapitre ; « Enchaîner une autre
   série » revient au mélange habituel.
+- **« Complète la règle » ouvre la série d'un chapitre tenté avant toute leçon.** Une phrase à trous, écrite à partir du
+  « À retenir » du chapitre (`lib/cloze.ts`, une par chapitre des anciennes bases), et des **tuiles à poser dans l'ordre**,
+  sans clavier : l'élève retrouve le mot au lieu de le reconnaître. Même scène colorée et mêmes cartes que Réviser, pastille
+  « Sans regarder », **une seule Braise** (en petit, avec sa bulle), rien de décoratif dans la phrase. Une mauvaise tuile
+  tremble une fois (pas sous « réduire les animations » ni en mode dyslexie), revient, et **dit pourquoi** avec le piège du
+  chapitre (le son doux, jamais le buzz) ; un mot de la règle posé au mauvais endroit le dit aussi. « Je sais plus » montre
+  la phrase et compte comme « pas sûr ». Réussie sans tuile fausse : « Voilà. Retrouvée toute seule. » ; sinon : « On la
+  rallume demain. » La carte est enregistrée dans le calendrier d'espacement **sans points** (aucun nombre dont l'élève ne voit
+  pas la raison). **Pas encore fait :** elle ne revient pas dans Réviser le lendemain (le tirage ne connaît que les cartes
+  Carré/Intox), et les chapitres de programme (Maths Seconde) n'ont pas encore de phrase.
 - **Le nom de la matière n'est écrit qu'une fois :** dans la barre du haut de l'archipel (pas de second grand
   titre, pas de « Où on va ? »). Le texte qui répète ce que l'écran dit déjà est retiré : pas de légende sous le
   titre de « Tes mondes », pas de note de niveau pour un élève de 2nde (elle ne s'adresse qu'à Première et
