@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Flame, X } from "lucide-react";
+import { ArrowRight, Flame, Target, X } from "lucide-react";
 import { StreakFlameIcon } from "@/components/StreakFlameIcon";
 import { MathText } from "@/components/course/MathText";
 import { COPY } from "@/lib/copy";
@@ -24,12 +24,15 @@ export function Dock({
   resume,
   selected,
   onOpen,
+  onTest,
   onClose,
   emblemOf,
 }: {
   resume: Resume | null;
   selected: LibraryEntry | null;
   onOpen: (entry: LibraryEntry) => void;
+  /** Starts a series of this chapter's cards before any lesson ("déjà vu en cours"). */
+  onTest?: (entry: LibraryEntry) => void;
   onClose: () => void;
   /** The picture of an island, so the card shows the same one as the map. */
   emblemOf: (entry: LibraryEntry) => EmblemKind;
@@ -88,6 +91,20 @@ export function Dock({
           <p className="dock-hook">
             <MathText text={selected.hook} />
           </p>
+        )}
+        {/* The method's second door: the chapter was already seen in class, so find it again first. */}
+        {onTest && selected.cards > 0 && (
+          <div className="dock-test">
+            <span>Déjà vu en cours ?</span>
+            <button
+              type="button"
+              onClick={() => onTest(selected)}
+              aria-label={`Déjà vu en cours : te tester d'abord sur ${selected.title}`}
+            >
+              <Target size={15} strokeWidth={3} aria-hidden="true" />
+              Teste-toi d’abord
+            </button>
+          </div>
         )}
       </motion.section>
     );

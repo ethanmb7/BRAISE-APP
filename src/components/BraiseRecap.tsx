@@ -23,6 +23,7 @@ export function BraiseRecap({
   wrongCount,
   maxCombo,
   xpEarned,
+  theme = null,
   onRestart,
   onGoHome,
 }: {
@@ -30,6 +31,8 @@ export function BraiseRecap({
   wrongCount: number;
   maxCombo: number;
   xpEarned: number;
+  /** The series was one chapter tried before any lesson: what came back is told, not what was missed. */
+  theme?: { title: string } | null;
   onRestart: () => void;
   onGoHome: () => void;
 }) {
@@ -41,7 +44,23 @@ export function BraiseRecap({
     () => ({ personality: state.user.personality, age: getAgeGroup(state.user.level) }),
     [state.user.personality, state.user.level],
   );
-  const trophy = useMemo(() => recapTrophyLine(voiceCtx), [voiceCtx]);
+  const generalTrophy = useMemo(() => recapTrophyLine(voiceCtx), [voiceCtx]);
+  // "Dans la poche" is a status earned over several days (see statusLabels), so a series that only
+  // tried a chapter once never claims it: it says what happens next.
+  const trophy = theme
+    ? wrongCount === 0
+      ? {
+          title: "REVENU SANS AIDE.",
+          sub: "Reviens demain : c’est en le retrouvant à des jours différents que ça passe dans la poche.",
+        }
+      : {
+          title: "ON Y REVIENT.",
+          sub: "Ce qui a glissé revient demain, au bon moment.",
+        }
+    : generalTrophy;
+
+  // What came back without help; the rest is "à rallumer", never a count of mistakes.
+  const retrieved = Math.max(0, reviewed - wrongCount);
 
   const slides: Slide[] = [
     {
@@ -49,8 +68,16 @@ export function BraiseRecap({
       bg: "ink",
       // What was done, never a count of mistakes: that is a mark, and Braise's line below reacts to
       // the session in her own words.
-      title: `${reviewed} CARTE${reviewed > 1 ? "S" : ""}.`,
-      sub: recapCardsLine(voiceCtx, wrongCount),
+      title: theme
+        ? retrieved > 0
+          ? `${retrieved} RETROUVÉE${retrieved > 1 ? "S" : ""}.`
+          : "PAS ENCORE."
+        : `${reviewed} CARTE${reviewed > 1 ? "S" : ""}.`,
+      sub: theme
+        ? wrongCount === 0
+          ? "Tout est revenu sans aide. Il reste à le garder."
+          : "Les autres, on les rallume ensemble."
+        : recapCardsLine(voiceCtx, wrongCount),
     },
     ...(maxCombo >= 2
       ? ([

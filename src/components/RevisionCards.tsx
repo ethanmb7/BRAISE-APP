@@ -44,6 +44,7 @@ export function QuestionCard({
   subjectLabel,
   topic,
   alreadyMastered,
+  blind = false,
 }: {
   question: string;
   emoji: string;
@@ -55,6 +56,8 @@ export function QuestionCard({
    *  a card that is already known has a visible reason
    *  instead of just being a smaller number with no explanation the moment it's judged. */
   alreadyMastered?: boolean;
+  /** A chapter tried before any lesson: the series says so, once, on its cards. */
+  blind?: boolean;
 }) {
   return (
     <motion.div
@@ -79,9 +82,18 @@ export function QuestionCard({
           </span>{" "}
           {topic}
         </span>
-        {alreadyMastered && (
-          <span className="ml-auto flex-shrink-0 rounded-full border-[1.5px] border-black/20 bg-black/[0.05] px-2 py-0.5 font-mono text-[0.7rem] font-bold uppercase tracking-wide text-black/70">
-            En poche
+        {(blind || alreadyMastered) && (
+          <span className="ml-auto flex flex-shrink-0 flex-col items-end gap-1">
+            {blind && (
+              <span className="rounded-full border-[1.5px] border-black bg-white px-2 py-0.5 font-mono text-[0.7rem] font-bold uppercase tracking-wide text-black">
+                Sans regarder
+              </span>
+            )}
+            {alreadyMastered && (
+              <span className="rounded-full border-[1.5px] border-black/20 bg-black/[0.05] px-2 py-0.5 font-mono text-[0.7rem] font-bold uppercase tracking-wide text-black/70">
+                En poche
+              </span>
+            )}
           </span>
         )}
       </div>

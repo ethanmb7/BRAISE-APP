@@ -34,6 +34,12 @@ import {
   type CourseSource,
 } from "@/lib/revision/courseCards";
 import { readSnapshot, writeSnapshot, type SessionSnapshot } from "@/lib/revisionSession";
+import {
+  clearThemeRequest,
+  peekThemeRequest,
+  themeDeck,
+  type ThemeRequest,
+} from "@/lib/revision/themeSession";
 import { BevelButton } from "@/components/revisions/BevelButton";
 import { SwipeCard, type FlyDir, type Verdict } from "@/components/revisions/SwipeCard";
 
@@ -83,9 +89,19 @@ export function RevisionsView() {
   // the new first card. A remount can't leave anything half-reset.
   const [sessionKey, setSessionKey] = useState(0);
 
+  // "Déjà vu en cours ? Teste-toi d'abord" (island card): the first series is that chapter's own cards.
+  // Held in state so the note can be cleared at once; only the first series is a theme, "Enchaîner
+  // une autre série" goes back to the usual mix.
+  const [themeAsked] = useState<ThemeRequest | null>(() => peekThemeRequest());
+  useEffect(() => () => clearThemeRequest(), []);
+  const theme = sessionKey === 0 ? themeAsked : null;
+
   // A fresh, in-progress snapshot (coming back from "Revoir la notion") resumes that exact
   // deck; otherwise a new draw. Read once per session key, so a restart always re-draws.
-  const resume = useMemo(() => (sessionKey === 0 ? readSnapshot() : null), [sessionKey]);
+  const resume = useMemo(
+    () => (sessionKey === 0 && !theme ? readSnapshot() : null),
+    [sessionKey, theme],
+  );
 
   // One session = SESSION_SIZE cards, drawn once (re-drawn on restart via `sessionKey`) so
   // reviewing a card mid-session can't shift the deck under a running index. Priority, then
@@ -106,6 +122,11 @@ export function RevisionsView() {
         })
         .filter((c): c is Flashcard => !!c);
       if (restored.length === resume.cardIds.length) return restored;
+    }
+    // The island card asked for one chapter: its own cards, tried before any lesson.
+    if (theme) {
+      const chapterCards = themeDeck(theme.chapterId, COURSE_SOURCE);
+      if (chapterCards.length > 0) return chapterCards;
     }
     // A few cards from the Déclics where the student had trouble, if there are any.
     const fromCourse = pickCourseCards(COURSE_SOURCE, courseProgressStore.get(), Date.now()).map(
@@ -136,6 +157,8 @@ export function RevisionsView() {
     return interleave(picked, fromCourse);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionKey, resume]);
+  // Whether this series really is the chapter's (a chapter without cards falls back to the usual mix).
+  const themed = !!theme && cards.length > 0 && cards.every((c) => c.chapterId === theme.chapterId);
 
   // A card of the older deck is saved with the older schedule; a card from a Déclic is saved in the course
   // service (its schedule, the Déclic's mastery, the wrong idea it counted) and pays the same points.
@@ -166,6 +189,7 @@ export function RevisionsView() {
         <SwipeDeck
           key={sessionKey}
           cards={cards}
+          theme={themed && theme ? { title: theme.title } : null}
           resume={resume && resume.cardIds.length === cards.length ? resume : null}
           soundOn={state.soundOn}
           onReview={onReview}
@@ -181,12 +205,15 @@ export function RevisionsView() {
 
 function SwipeDeck({
   cards,
+  theme,
   resume,
   soundOn,
   onReview,
   onRestartSession,
 }: {
   cards: Flashcard[];
+  /** Set when the series is one chapter tried before any lesson ("déjà vu en cours"). */
+  theme: { title: string } | null;
   resume: SessionSnapshot | null;
   soundOn: boolean;
   onReview: (card: Flashcard, c: Confidence) => void;
@@ -246,7 +273,8 @@ function SwipeDeck({
   // bet on catching a lie).
   const [jokerCharge, setJokerCharge] = useState(resume?.jokerCharge ?? 0);
   const [armed, setArmed] = useState(false);
-  const jokerReady = jokerCharge >= JOKER_CHARGE_NEEDED;
+  // A chapter tried before any lesson has no joker: the middle slot is "Je sais plus" instead.
+  const jokerReady = !theme && jokerCharge >= JOKER_CHARGE_NEEDED;
   // The charge completing and `judged` flipping true happen in the very same commit (both set
   // inside judge()), which swaps the dock to its "next" state before the joker button — and
   // the burst ring on it — ever gets to render. A plain `{jokerReady && <ring/>}` would not
@@ -469,6 +497,7 @@ function SwipeDeck({
         wrongCount={wrongCount}
         maxCombo={maxCombo}
         xpEarned={xpEarned}
+        theme={theme}
         onRestart={onRestartSession}
         onGoHome={() => setTab("home")}
       />
@@ -576,6 +605,27 @@ function SwipeDeck({
     // "Suivant" for INTOX/CARRÉ under a thumb already reaching for it would turn that tap
     // into a verdict on the next card. The student always moves on themselves: "Suivant",
     // a tap on the card, or a swipe in any direction — the way Duolingo's CONTINUE works.
+  };
+
+  // "Je sais plus": an honest answer, not a wrong one. The card is saved as "not sure" (it comes back
+  // tomorrow, with the revenge bonus), the streak and the joker are left alone, and the answer is right
+  // there with "Revoir la notion" under it. The soft cue, never the buzz of a verdict.
+  const dontKnow = () => {
+    if (judged || typing) return;
+    setTutorialDismissed(true);
+    setShowJokerExplainer(false);
+    setJudged(true);
+    setJudgedMode(null);
+    setWasCorrect(false);
+    setArmed(false);
+    setWrongCount((w) => w + 1);
+    sfx.soft(soundOn);
+    setFeedback({
+      tag: "Pas grave",
+      text: "Voilà ce qu’il fallait retrouver. On le rallume ensemble.",
+      xp: 0,
+    });
+    onReview(card, "not-sure");
   };
 
   // Single entry point for leaving the current card — tap, "Suivant", and a post-verdict
@@ -775,6 +825,7 @@ function SwipeDeck({
                   subjectLabel={SUBJECT_SHORT_NAMES[card.subject] ?? subject?.name ?? ""}
                   topic={card.topic}
                   alreadyMastered={currentCardMastered}
+                  blind={!!theme}
                 />
                 <AnimatePresence mode="wait" initial={false}>
                   <AnswerCard
@@ -836,54 +887,72 @@ function SwipeDeck({
                       <span>Intox</span>
                     </BevelButton>
                   </motion.div>
-                  <div className="relative flex-shrink-0">
-                    {/* `jokerJustCharged`, not `jokerReady` — see where it's computed: the
-                        charge completes in the same commit that swaps the dock away, so this
-                        button (and this ring) don't exist yet at that instant. This flag
-                        survives to the next time they do. */}
-                    {jokerJustCharged && (
-                      <span key="joker-burst" className="joker-burst-ring" aria-hidden="true" />
-                    )}
-                    <AnimatePresence>
-                      {showJokerExplainer && (
-                        <motion.div
-                          className="joker-tip"
-                          role="status"
-                          initial={{ opacity: 0, y: 6, scale: 0.92 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 4, scale: 0.95 }}
-                          transition={{ type: "spring", stiffness: 480, damping: 30 }}
-                        >
-                          Il est prêt ! ×2 sur ta prochaine bonne réponse.
-                        </motion.div>
+                  {theme && (
+                    <div className="relative flex-shrink-0">
+                      <BevelButton
+                        className="w-[92px]"
+                        base="bg-black/30"
+                        face="bg-[var(--rev-paper)] text-black border-dashed"
+                        onClick={dontKnow}
+                        label="Je sais plus"
+                        compact
+                      >
+                        <span className="rev-idk">Je sais plus</span>
+                      </BevelButton>
+                    </div>
+                  )}
+                  {!theme && (
+                    <div className="relative flex-shrink-0">
+                      {/* `jokerJustCharged`, not `jokerReady` — see where it's computed: the
+                          charge completes in the same commit that swaps the dock away, so this
+                          button (and this ring) don't exist yet at that instant. This flag
+                          survives to the next time they do. */}
+                      {jokerJustCharged && (
+                        <span key="joker-burst" className="joker-burst-ring" aria-hidden="true" />
                       )}
-                    </AnimatePresence>
-                    <BevelButton
-                      className="w-[62px]"
-                      round
-                      base={armed ? "bg-black" : jokerReady ? "bg-[var(--sun-ink)]" : "bg-black/30"}
-                      face={
-                        armed
-                          ? "bg-black text-[var(--sun)]"
-                          : jokerReady
-                            ? "bg-gradient-to-b from-[#FFE066] to-[#FDC800] text-black"
-                            : "bg-[var(--rev-paper)] text-black/40 border-dashed"
-                      }
-                      onClick={toggleArm}
-                      pressed={armed}
-                      label={
-                        jokerReady
-                          ? armed
-                            ? "Joker armé : ×2 sur ta prochaine réponse"
-                            : "Joker — double les points de ta prochaine réponse"
-                          : `Joker — se charge avec ${JOKER_CHARGE_NEEDED} bonnes réponses d'affilée`
-                      }
-                      badge={jokerReady ? "×2" : `${jokerCharge}/${JOKER_CHARGE_NEEDED}`}
-                      badgeTone={jokerReady ? "hot" : "muted"}
-                    >
-                      <Zap size={22} strokeWidth={2.6} />
-                    </BevelButton>
-                  </div>
+                      <AnimatePresence>
+                        {showJokerExplainer && (
+                          <motion.div
+                            className="joker-tip"
+                            role="status"
+                            initial={{ opacity: 0, y: 6, scale: 0.92 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 4, scale: 0.95 }}
+                            transition={{ type: "spring", stiffness: 480, damping: 30 }}
+                          >
+                            Il est prêt ! ×2 sur ta prochaine bonne réponse.
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                      <BevelButton
+                        className="w-[62px]"
+                        round
+                        base={
+                          armed ? "bg-black" : jokerReady ? "bg-[var(--sun-ink)]" : "bg-black/30"
+                        }
+                        face={
+                          armed
+                            ? "bg-black text-[var(--sun)]"
+                            : jokerReady
+                              ? "bg-gradient-to-b from-[#FFE066] to-[#FDC800] text-black"
+                              : "bg-[var(--rev-paper)] text-black/40 border-dashed"
+                        }
+                        onClick={toggleArm}
+                        pressed={armed}
+                        label={
+                          jokerReady
+                            ? armed
+                              ? "Joker armé : ×2 sur ta prochaine réponse"
+                              : "Joker — double les points de ta prochaine réponse"
+                            : `Joker — se charge avec ${JOKER_CHARGE_NEEDED} bonnes réponses d'affilée`
+                        }
+                        badge={jokerReady ? "×2" : `${jokerCharge}/${JOKER_CHARGE_NEEDED}`}
+                        badgeTone={jokerReady ? "hot" : "muted"}
+                      >
+                        <Zap size={22} strokeWidth={2.6} />
+                      </BevelButton>
+                    </div>
+                  )}
                   <motion.div className="flex-1" style={{ scale: acceptLift }}>
                     <BevelButton
                       className="w-full"

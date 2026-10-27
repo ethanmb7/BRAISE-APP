@@ -6,6 +6,7 @@ import { TopBar } from "@/components/TopBar";
 import { BraiseMascot } from "@/components/BraiseMascot";
 import { Archipelago } from "@/components/world/Archipelago";
 import { Dock } from "@/components/world/Dock";
+import { requestTheme } from "@/lib/revision/themeSession";
 import { SubjectStrip } from "@/components/world/SubjectStrip";
 import { SoonSheet } from "@/components/SoonSheet";
 import { activeSoon } from "@/lib/world/soon";
@@ -29,7 +30,7 @@ export function SubjectView() {
 }
 
 function Archipel() {
-  const { state, goBack, openLesson, openSubject, setSoon } = useApp();
+  const { state, goBack, openLesson, openSubject, setSoon, setTab } = useApp();
   const [soonOpen, setSoonOpen] = useState(false);
   const { t } = useTone();
   const courseProgress = useCourseProgress();
@@ -91,6 +92,13 @@ function Archipel() {
   const open = (entry: LibraryEntry) => {
     sfx.tap(state.soundOn);
     openLesson(subject.id, entry.chapterId);
+  };
+
+  // "Déjà vu en cours ?": Réviser gets a series of this chapter's cards, tried before any lesson.
+  const test = (entry: LibraryEntry) => {
+    sfx.tap(state.soundOn);
+    requestTheme({ subjectId: subject.id, chapterId: entry.chapterId, title: entry.title });
+    setTab("revisions");
   };
 
   const worlds: HubWorld[] = SUBJECTS.map((s) => ({
@@ -167,6 +175,7 @@ function Archipel() {
             resume={library.resume}
             selected={selected}
             onOpen={open}
+            onTest={test}
             onClose={() => setSelectedKey(null)}
             emblemOf={(entry) =>
               emblemFor(

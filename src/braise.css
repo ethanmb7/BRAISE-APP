@@ -5695,3 +5695,13 @@ select {
     }
   }
 }
+
+/* "Je sais plus" (a chapter tried before any lesson): two short centred lines, in the case of a sentence,
+   so the pill stays narrow between Intox and Carré. */
+.rev-idk {
+  display: block;
+  font: 800 0.8rem/1.1 var(--font-display);
+  letter-spacing: 0;
+  text-align: center;
+  text-transform: none;
+}
