@@ -189,7 +189,7 @@ export function RevisionsView() {
         <SwipeDeck
           key={sessionKey}
           cards={cards}
-          theme={themed && theme ? { title: theme.title } : null}
+          theme={themed ? theme : null}
           resume={resume && resume.cardIds.length === cards.length ? resume : null}
           soundOn={state.soundOn}
           onReview={onReview}
@@ -213,7 +213,7 @@ function SwipeDeck({
 }: {
   cards: Flashcard[];
   /** Set when the series is one chapter tried before any lesson ("déjà vu en cours"). */
-  theme: { title: string } | null;
+  theme: ThemeRequest | null;
   resume: SessionSnapshot | null;
   soundOn: boolean;
   onReview: (card: Flashcard, c: Confidence) => void;
@@ -236,6 +236,8 @@ function SwipeDeck({
   // `flying` turns truthy on "next".
   const [judgedMode, setJudgedMode] = useState<Verdict | null>(null);
   const [wasCorrect, setWasCorrect] = useState(false);
+  // "Je sais plus" is neither a hit nor a miss: its own soft colour and its own word.
+  const [wasUnsure, setWasUnsure] = useState(false);
   const [flying, setFlying] = useState(false);
   const [flyDir, setFlyDir] = useState<FlyDir>("right");
   // Verdict feedback: emoji tag, Braise's line, and the XP won (0 on a miss) — rendered
@@ -498,6 +500,15 @@ function SwipeDeck({
         maxCombo={maxCombo}
         xpEarned={xpEarned}
         theme={theme}
+        onReviewNotion={
+          theme
+            ? () => {
+                sfx.tap(soundOn);
+                writeSnapshot(null);
+                openLesson(theme.subjectId, theme.chapterId, "revisions");
+              }
+            : undefined
+        }
         onRestart={onRestartSession}
         onGoHome={() => setTab("home")}
       />
@@ -617,6 +628,7 @@ function SwipeDeck({
     setJudged(true);
     setJudgedMode(null);
     setWasCorrect(false);
+    setWasUnsure(true);
     setArmed(false);
     setWrongCount((w) => w + 1);
     sfx.soft(soundOn);
@@ -641,6 +653,7 @@ function SwipeDeck({
     y.set(0);
     setFlying(false);
     setJudged(false);
+    setWasUnsure(false);
     setJudgedMode(null);
     setFeedback(null);
     setIndex((i) => i + 1);
@@ -835,14 +848,14 @@ function SwipeDeck({
                     truth={card.a}
                     wasLie={!isTrueAnswer}
                     judged={judged}
-                    verdict={judged ? (wasCorrect ? "win" : "miss") : null}
+                    verdict={judged ? (wasCorrect ? "win" : wasUnsure ? "unsure" : "miss") : null}
                     prompt={prompt}
                     subjectColor={subject?.color ?? "var(--sun)"}
                     tutorial={showTutorial}
                     result={
                       judged && feedback
                         ? {
-                            verdict: wasCorrect ? "win" : "miss",
+                            verdict: wasCorrect ? "win" : wasUnsure ? "unsure" : "miss",
                             tag: feedback.tag,
                             text: feedback.text,
                             xp: feedback.xp,

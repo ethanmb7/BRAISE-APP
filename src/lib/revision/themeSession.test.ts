@@ -38,6 +38,13 @@ describe("themeDeck", () => {
     expect(new Set(deck.map((c) => c.id)).size).toBe(deck.length);
   });
 
+  it("starts with the easy cards and ends with the hard ones", () => {
+    const chapter = COURSE_REGISTRY.chapters[0];
+    const order = { easy: 0, medium: 1, hard: 2 } as const;
+    const levels = themeDeck(chapter.id, source).map((c) => order[c.level]);
+    expect(levels).toEqual([...levels].sort((a, b) => a - b));
+  });
+
   it("gives nothing for a chapter that has no card", () => {
     expect(themeDeck("no-such-chapter", source)).toEqual([]);
   });

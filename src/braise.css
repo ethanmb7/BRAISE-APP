@@ -5705,3 +5705,15 @@ select {
   text-align: center;
   text-transform: none;
 }
+
+/* Under the one big button of the end screen: the quiet way out. */
+.recap-link {
+  display: block;
+  min-height: 44px;
+  margin: 4px auto 0;
+  padding: 0 12px;
+  color: var(--ink);
+  font: 800 0.88rem/1.2 var(--font-display);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

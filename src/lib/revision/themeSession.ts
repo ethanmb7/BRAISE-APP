@@ -34,7 +34,11 @@ export function clearThemeRequest() {
   pending = null;
 }
 
-/** The cards of one chapter, from both content systems, in a random order. */
+const LEVEL_ORDER = { easy: 0, medium: 1, hard: 2 } as const;
+
+/** The cards of one chapter, from both content systems. Random inside each level, easy ones first: a
+ *  series that starts with what the student can find again is the one they carry on with (the first card
+ *  is never the hardest one). */
 export function themeDeck(
   chapterId: string,
   source: CourseSource,
@@ -60,5 +64,6 @@ export function themeDeck(
     const j = Math.floor(random() * (i + 1));
     [all[i], all[j]] = [all[j], all[i]];
   }
-  return all.slice(0, size);
+  // A stable sort keeps the shuffle inside each level.
+  return all.sort((a, b) => LEVEL_ORDER[a.level] - LEVEL_ORDER[b.level]).slice(0, size);
 }

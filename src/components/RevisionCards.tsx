@@ -89,7 +89,7 @@ export function QuestionCard({
                 Sans regarder
               </span>
             )}
-            {alreadyMastered && (
+            {alreadyMastered && !blind && (
               <span className="rounded-full border-[1.5px] border-black/20 bg-black/[0.05] px-2 py-0.5 font-mono text-[0.7rem] font-bold uppercase tracking-wide text-black/70">
                 En poche
               </span>
@@ -104,7 +104,7 @@ export function QuestionCard({
   );
 }
 
-type Verdict = "win" | "miss" | null;
+type Verdict = "win" | "miss" | "unsure" | null;
 
 export type ResultProps = {
   verdict: Exclude<Verdict, null>;
@@ -155,7 +155,7 @@ export function AnswerCard({
   const verdictClass =
     verdict === "win"
       ? "border-[var(--mint-text)] shadow-[6px_6px_0_var(--mint-text),inset_0_1.5px_0_rgba(255,255,255,0.7)]"
-      : verdict === "miss"
+      : verdict === "miss" || verdict === "unsure"
         ? "border-[var(--coral-2)] shadow-[6px_6px_0_var(--coral-2),inset_0_1.5px_0_rgba(255,255,255,0.7)]"
         : "";
 
@@ -328,8 +328,12 @@ function DareBadge({ prompt, color }: { prompt: string; color: string }) {
 function VerdictBar({ verdict, xp, reason, speaking, onListen }: ResultProps) {
   const reduced = useReducedMotion();
   const win = verdict === "win";
+  const unsure = verdict === "unsure";
   return (
-    <div className={`rev-result-heading ${win ? "is-win" : "is-miss"}`} role="status">
+    <div
+      className={`rev-result-heading ${win ? "is-win" : unsure ? "is-unsure" : "is-miss"}`}
+      role="status"
+    >
       <div className="rev-result-status">
         <motion.span
           className="rev-result-symbol"
@@ -340,7 +344,7 @@ function VerdictBar({ verdict, xp, reason, speaking, onListen }: ResultProps) {
         >
           {win ? <Check size={19} strokeWidth={3} /> : <RotateCcw size={18} strokeWidth={2.6} />}
         </motion.span>
-        <span>{win ? "Bien vu !" : "À retenir"}</span>
+        <span>{win ? "Bien vu !" : unsure ? "Pas grave" : "À retenir"}</span>
       </div>
       <div className="rev-result-tools">
         {xp > 0 && (

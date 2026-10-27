@@ -152,13 +152,17 @@ ni un compte à rebours.
 - **La seconde porte de la méthode : « Déjà vu en cours ? Teste-toi d'abord ».** Sur la carte d'une île touchée, une ligne
   sous l'accroche, séparée par un filet en pointillés : le texte à gauche, un bouton papier (contour et ombre dure,
   jamais une seconde surface pleine) à droite. Elle n'apparaît que si le chapitre a des cartes. Elle lance dans Réviser une
-  **série de ce chapitre seul** (jusqu'à 10 cartes, avant toute leçon). La carte monte alors d'environ 40 px (≈ 171 px à
-  375 px de large au lieu de 126-130) : à surveiller. Dans cette série : une pastille **« Sans regarder »** sur la carte de
-  question, et **« Je sais plus »** (pastille papier en pointillés, deux lignes) **à la place du joker** : une réponse
-  honnête, enregistrée comme « pas sûr » (la carte revient demain avec le bonus de revanche), qui n'efface ni la série
-  ni le joker et fait entendre le signal doux, jamais le buzz. L'écran de fin dit ce qui est **revenu** (« 2 retrouvées »),
-  jamais un nombre d'erreurs, et ne dit **jamais « dans la poche »** : ce statut se gagne sur plusieurs jours. Seule la
-  première série est celle du chapitre ; « Enchaîner une autre série » revient au mélange habituel.
+  **série de ce chapitre seul** (jusqu'à 10 cartes, avant toute leçon, **les plus faciles d'abord** : une série qui
+  commence par ce qu'on retrouve est celle qu'on poursuit). La carte monte alors d'environ 40 px (≈ 168 px à 375 px de
+  large au lieu de 126-130) : à surveiller. Dans cette série : une pastille **« Sans regarder »** sur la carte de question
+  (sans « En poche », qui l'encombrerait), et **« Je sais plus »** (pastille papier en pointillés, deux lignes) **à la
+  place du joker**. C'est une réponse honnête, pas une erreur : la carte est enregistrée « pas sûr » (elle revient demain
+  avec le bonus de revanche), la série et le joker ne bougent pas, le signal est le son doux, jamais le buzz, et la barre
+  de résultat est **jaune avec « Pas grave »** (jamais le corail d'une erreur). L'écran de fin dit ce qui est **revenu**
+  (« 2 retrouvées »), jamais un nombre d'erreurs, et ne dit **jamais « dans la poche »** : ce statut se gagne sur plusieurs
+  jours. S'il y a eu des « Je sais plus » ou des ratés, le grand bouton est **« Revoir la notion »** (la leçon), « Enchaîner
+  une autre série » devient un lien discret dessous. Seule la première série est celle du chapitre ; « Enchaîner une autre
+  série » revient au mélange habituel.
 - **Le nom de la matière n'est écrit qu'une fois :** dans la barre du haut de l'archipel (pas de second grand
   titre, pas de « Où on va ? »). Le texte qui répète ce que l'écran dit déjà est retiré : pas de légende sous le
   titre de « Tes mondes », pas de note de niveau pour un élève de 2nde (elle ne s'adresse qu'à Première et

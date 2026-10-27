@@ -29,6 +29,11 @@
 .rev-result-heading.is-miss {
   background: var(--rev-feedback-miss);
 }
+/* "Je sais plus": an honest answer, not a miss. The reward yellow with ink words, never the coral of an error. */
+.rev-result-heading.is-unsure {
+  background: var(--rev-feedback-reward);
+  color: #1a1a1a;
+}
 .rev-result-status {
   display: flex;
   align-items: center;
@@ -52,6 +57,9 @@
 }
 .is-miss .rev-result-symbol {
   color: var(--rev-feedback-miss);
+}
+.is-unsure .rev-result-symbol {
+  color: #1a1a1a;
 }
 .rev-result-tools {
   display: flex;

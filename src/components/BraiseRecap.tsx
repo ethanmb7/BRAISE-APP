@@ -24,6 +24,7 @@ export function BraiseRecap({
   maxCombo,
   xpEarned,
   theme = null,
+  onReviewNotion,
   onRestart,
   onGoHome,
 }: {
@@ -33,6 +34,8 @@ export function BraiseRecap({
   xpEarned: number;
   /** The series was one chapter tried before any lesson: what came back is told, not what was missed. */
   theme?: { title: string } | null;
+  /** After a series of one chapter where something slipped: the lesson, the one thing to do next. */
+  onReviewNotion?: () => void;
   onRestart: () => void;
   onGoHome: () => void;
 }) {
@@ -171,9 +174,20 @@ export function BraiseRecap({
                 <span className="recap-stat-label">Combo max</span>
               </div>
             </div>
-            <button className="btn-block recap-btn" onClick={onRestart}>
-              Enchaîner une autre série
-            </button>
+            {theme && wrongCount > 0 && onReviewNotion ? (
+              <>
+                <button className="btn-block recap-btn" onClick={onReviewNotion}>
+                  Revoir la notion
+                </button>
+                <button type="button" className="recap-link" onClick={onRestart}>
+                  Enchaîner une autre série
+                </button>
+              </>
+            ) : (
+              <button className="btn-block recap-btn" onClick={onRestart}>
+                Enchaîner une autre série
+              </button>
+            )}
           </div>
         ) : null}
       </div>

@@ -601,7 +601,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding-top: 6px;
+  padding-top: 5px;
   border-top: 2px dashed color-mix(in srgb, var(--neo-ink) 25%, transparent);
   color: var(--ink-soft);
   font: 700 0.8rem/1.2 var(--font-display);
@@ -609,7 +609,7 @@
 .dock-test button {
   position: relative;
   display: inline-flex;
-  min-height: 32px;
+  min-height: 30px;
   flex: 0 0 auto;
   align-items: center;
   gap: 5px;
