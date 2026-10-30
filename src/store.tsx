@@ -91,6 +91,7 @@ const INITIAL: AppState = {
   currentSubjectId: null,
   currentChapterId: null,
   soonBy: {},
+  chapterOpenedAt: {},
   lastSubjectId: null,
   lastChapterId: null,
   completedChapters: [],
@@ -262,6 +263,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       currentChapterId: chapterId,
       lastSubjectId: subjectId,
       lastChapterId: chapterId,
+      // The moment the chapter was last touched, so the library can say "Reprendre" about an older
+      // chapter the way it already does for a Déclic of the programme. Opening it is the honest
+      // signal: a chapter left halfway stores nothing else on this device.
+      chapterOpenedAt: { ...s.chapterOpenedAt, [chapterId]: Date.now() },
       // "Revoir la notion" from a Réviser session comes back to the session, not to the
       // subject page it was never on.
       lessonReturnTo: returnTo ?? null,

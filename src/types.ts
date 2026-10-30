@@ -129,6 +129,11 @@ export type AppState = {
   /** subject id -> when something important happens in it (see lib/world/soon.ts). Braise leans on that
    *  subject until the day has passed. Kept on the device. */
   soonBy: Record<string, number>;
+  /** chapter id -> when its lesson was last opened. The chapters of the official programme keep their
+   *  own `updatedAt` per Déclic (lib/course/types.ts); the older chapters had nothing at all, so the
+   *  library could never say "Reprendre" about one of them (see legacyEntry in lib/catalog/catalog.ts).
+   *  Kept on the device, like `soonBy`. */
+  chapterOpenedAt: Record<string, number>;
   view: ViewId;
   tab: TabId;
   user: UserProfile;

@@ -58,6 +58,7 @@ function baseState(overrides: Partial<AppState>): AppState {
     sessionDate: new Date().toDateString(),
     sessionXpEarned: 30,
     soonBy: {},
+    chapterOpenedAt: {},
     ...overrides,
   };
 }

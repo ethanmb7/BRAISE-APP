@@ -63,6 +63,7 @@ export function HomeView() {
     buildLibrary(s.id, {
       completedChapters: state.completedChapters,
       cardReviews: state.cardReviews,
+      chapterOpenedAt: state.chapterOpenedAt,
       course: courseProgress,
       now: Date.now(),
     }),

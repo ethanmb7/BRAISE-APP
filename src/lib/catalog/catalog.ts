@@ -94,6 +94,10 @@ export type Library = {
 export type LibraryState = {
   completedChapters: string[];
   cardReviews: Record<string, CardReview>;
+  /** Chapter id -> when its lesson was last opened (AppState.chapterOpenedAt). The only date an
+   *  older chapter has of its own; without it the first rung of the ladder was unreachable for
+   *  25 of the 26 chapters. */
+  chapterOpenedAt: Record<string, number>;
   course: CourseProgress;
   now: number;
 };
@@ -107,8 +111,17 @@ const LEVEL_LABEL: Record<ChapterDef["level"], string> = {
   terminale: "Terminale",
 };
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
 const dueSeen = (review: CardReview | undefined, now: number): boolean =>
   !!review && review.nextReviewAt <= now;
+
+/** When a card was last answered. The schedule is `nextReviewAt = answered + interval days`
+ *  (see sm2 in lib/progress.ts), so the date comes back exactly — except for an early correct
+ *  answer, which leaves the schedule alone on purpose and therefore still reports the review
+ *  before it. Good enough for "has this chapter been touched lately", never used as a count. */
+const answeredAt = (review: CardReview): number =>
+  Math.max(0, review.nextReviewAt - review.interval * DAY_MS);
 
 function courseEntry(chapter: ChapterDef, state: LibraryState): LibraryEntry {
   const declics = declicsOfChapter(chapter);
@@ -167,10 +180,12 @@ function legacyEntry(
   let weak = 0;
   let seen = 0;
   let dueCount = 0;
+  let lastAnswer = 0;
   const cardDots: DotState[] = cards.map((c) => {
     const r = state.cardReviews[c.id];
     if (!r) return "empty";
     seen++;
+    lastAnswer = Math.max(lastAnswer, answeredAt(r));
     if (dueSeen(r, state.now)) dueCount++;
     if (r.lastConfidence === "not-sure") {
       weak++;
@@ -183,12 +198,20 @@ function legacyEntry(
     return "half";
   });
 
+  // Two ways to have started a chapter without finishing it: opening its Déclic and leaving, or
+  // answering its cards first ("Déjà vu en cours ? Teste-toi d'abord" does exactly that, before
+  // any lesson). Both used to read as "pas commencé" on the maps and in the ladder.
+  const openedAt = state.chapterOpenedAt[chapter.id] ?? 0;
+  const updatedAt = Math.max(openedAt, lastAnswer);
+
   let status: DisplayStatus = "not_started";
   if (done) {
     if (weak > 0) status = "needs_reinforcement";
     else if (cards.length > 0 && mastered === cards.length) status = "mastered";
     else if (seen > 0) status = "understood";
     else status = "discovered";
+  } else if (updatedAt > 0) {
+    status = "in_progress";
   }
 
   return {
@@ -204,16 +227,15 @@ function legacyEntry(
     dots: [done ? "full" : "empty", ...cardDots],
     dueCount,
     cards: cards.length,
-    // Real chapters carry no timestamp of their own: the first one not yet done is the suggestion,
-    // which `resume` takes care of, so "never touched" is the honest value here.
-    updatedAt: 0,
+    updatedAt,
   };
 }
 
 /** Which entry Braise points at, in the order of `resumeRank`: a Déclic touched in the last two days,
  *  a review that has come due, a point that mixes up, an older Déclic left open, then the next thing
- *  to discover. Null when everything is remembered for good. An older chapter carries no date of its
- *  own (`updatedAt` is 0), so it is never "fresh": at best it is the fourth rung. */
+ *  to discover. Null when everything is remembered for good. Both content systems can reach every
+ *  rung: a chapter of the programme carries its Déclics' `updatedAt`, an older one the day its lesson
+ *  was opened or its cards last answered (see `legacyEntry`). */
 export function pickResume(
   entries: LibraryEntry[],
   suggestedKey: string | null,

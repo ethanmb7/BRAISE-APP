@@ -46,11 +46,12 @@ function Archipel() {
         ? buildLibrary(subject.id, {
             completedChapters: state.completedChapters,
             cardReviews: state.cardReviews,
+            chapterOpenedAt: state.chapterOpenedAt,
             course: courseProgress,
             now: Date.now(),
           })
         : null,
-    [subject, state.completedChapters, state.cardReviews, courseProgress],
+    [subject, state.completedChapters, state.cardReviews, state.chapterOpenedAt, courseProgress],
   );
 
   // The island that was open when the student left for a course is open again when they come back
@@ -110,6 +111,7 @@ function Archipel() {
       buildLibrary(s.id, {
         completedChapters: state.completedChapters,
         cardReviews: state.cardReviews,
+        chapterOpenedAt: state.chapterOpenedAt,
         course: courseProgress,
         now: Date.now(),
       }) as Library,

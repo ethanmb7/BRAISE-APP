@@ -20,6 +20,7 @@ const DAY = 86_400_000;
 const fresh = (): LibraryState => ({
   completedChapters: [],
   cardReviews: {},
+  chapterOpenedAt: {},
   course: emptyCourseProgress(),
   now: NOW,
 });
@@ -167,6 +168,49 @@ describe("buildLibrary", () => {
     };
     const m1 = buildLibrary("maths", state)!.entries.find((e) => e.chapterId === "m1")!;
     expect(m1.dueCount).toBe(1);
+  });
+
+  it("counts an older chapter as started once its lesson was opened or its cards answered", () => {
+    const cards = FLASHCARDS.filter((c) => c.chapterId === "m1");
+    const pick = (state: LibraryState) =>
+      buildLibrary("maths", state)!.entries.find((e) => e.chapterId === "m1")!;
+
+    const opened = { ...fresh(), chapterOpenedAt: { m1: NOW - DAY } };
+    expect(pick(opened).status).toBe("in_progress");
+    expect(pick(opened).updatedAt).toBe(NOW - DAY);
+
+    // "Teste-toi d'abord" answers a chapter's cards before any lesson: `nextReviewAt - interval`
+    // is when that happened, so the chapter is in progress without ever having been opened.
+    const tested = {
+      ...fresh(),
+      cardReviews: { [cards[0].id]: review({ interval: 3, nextReviewAt: NOW + 2 * DAY }) },
+    };
+    expect(pick(tested).status).toBe("in_progress");
+    expect(pick(tested).updatedAt).toBe(NOW - DAY);
+
+    // A finished chapter keeps the status its own cards give it.
+    expect(pick({ ...opened, completedChapters: ["m1"] }).status).toBe("discovered");
+  });
+
+  it("puts an older chapter opened today at the top of the ladder, an old one below a review", () => {
+    const cards = FLASHCARDS.filter((c) => c.chapterId === "m2");
+    const due = { [cards[0].id]: review({ nextReviewAt: NOW - DAY }) };
+
+    const today = buildLibrary("maths", {
+      ...fresh(),
+      completedChapters: ["m2"],
+      cardReviews: due,
+      chapterOpenedAt: { m1: NOW - 60 * 60 * 1000 },
+    })!.resume!;
+    expect(today).toMatchObject({ reason: "resume", fresh: true, entry: { key: "legacy:m1" } });
+
+    const longAgo = buildLibrary("maths", {
+      ...fresh(),
+      completedChapters: ["m2"],
+      cardReviews: due,
+      chapterOpenedAt: { m1: NOW - 5 * DAY },
+    })!.resume!;
+    expect(longAgo).toMatchObject({ reason: "review", entry: { chapterId: "m2" } });
   });
 
   it("suggests the first older chapter on a fresh install, and the next one after it", () => {

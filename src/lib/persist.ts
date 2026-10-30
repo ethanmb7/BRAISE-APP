@@ -44,6 +44,9 @@ type StoredProgress = {
   currentChapterId: string | null;
   /** Local-only, like the fields above: device_progress has no column for it. */
   soonBy?: Record<string, number>;
+  /** Local-only too. Absent in a save from before it existed: those devices simply have no "when
+   *  did I last open this chapter" history, which reads as "never touched". */
+  chapterOpenedAt?: Record<string, number>;
 };
 
 // Mirrors the real `device_progress` columns (supabase/migrations/20260730074908_...). That
@@ -128,6 +131,7 @@ function toAppState(p: StoredProgress, cardReviews: Record<string, CardReview>):
     currentSubjectId: p.currentSubjectId ?? null,
     currentChapterId: p.currentChapterId ?? null,
     soonBy: p.soonBy ?? {},
+    chapterOpenedAt: p.chapterOpenedAt ?? {},
   };
 }
 
@@ -229,6 +233,7 @@ export async function saveProgress(state: AppState): Promise<void> {
     currentSubjectId: state.currentSubjectId,
     currentChapterId: state.currentChapterId,
     soonBy: state.soonBy,
+    chapterOpenedAt: state.chapterOpenedAt,
   };
   try {
     localStorage.setItem(PROGRESS_KEY, JSON.stringify(row));
