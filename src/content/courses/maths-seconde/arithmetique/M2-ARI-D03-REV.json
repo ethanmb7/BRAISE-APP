@@ -1,0 +1,72 @@
+{
+  "id": "M2-ARI-D03-REV",
+  "declicId": "M2-ARI-D03",
+  "chapterId": "M2-ARI",
+  "title": "Révision : pair et impair",
+  "cards": [
+    {
+      "id": "M2-ARI-D03-REV-01",
+      "order": 1,
+      "statement": "Zéro est pair.",
+      "answer": "carre",
+      "concept": "zero_negatives",
+      "difficulty": 1,
+      "tags": [
+        "Zéro"
+      ],
+      "feedback": {
+        "correct": "0 = 2 × 0 avec 0 entier. Zéro satisfait la définition d’un nombre pair.",
+        "incorrect": "Zéro s’écrit 2 × 0. Il est pair : il n’a pas d’élément isolé."
+      }
+    },
+    {
+      "id": "M2-ARI-D03-REV-02",
+      "order": 2,
+      "statement": "−10 n’a pas de parité, car il est négatif.",
+      "answer": "intox",
+      "concept": "zero_negatives",
+      "difficulty": 2,
+      "tags": [
+        "Négatifs"
+      ],
+      "feedback": {
+        "correct": "−10 = 2 × (−5) avec −5 entier. Il est pair.",
+        "incorrect": "La parité concerne tous les entiers. −10 = 2 × (−5) montre qu’il est pair."
+      },
+      "correction": "−10 est pair : −10 = 2 × (−5), avec −5 entier.",
+      "misconceptionId": "believes_negative_integers_have_no_parity"
+    },
+    {
+      "id": "M2-ARI-D03-REV-03",
+      "order": 3,
+      "statement": "15 est pair, puisque 15 = 2 × 7,5.",
+      "answer": "intox",
+      "concept": "integer_multiplier",
+      "difficulty": 2,
+      "tags": [
+        "Multiplicateur entier"
+      ],
+      "feedback": {
+        "correct": "7,5 n’est pas entier. 15 = 2 × 7 + 1 : 15 est impair.",
+        "incorrect": "La forme 2k caractérise un pair seulement si k est entier. 7,5 ne l’est pas ; 15 est impair."
+      },
+      "correction": "15 est impair : 15 = 2 × 7 + 1, avec 7 entier.",
+      "misconceptionId": "accepts_non_integer_multiplier"
+    },
+    {
+      "id": "M2-ARI-D03-REV-04",
+      "order": 4,
+      "statement": "2 × 8 + 1 est un nombre impair.",
+      "answer": "carre",
+      "concept": "even_odd_forms",
+      "difficulty": 1,
+      "tags": [
+        "Écritures"
+      ],
+      "feedback": {
+        "correct": "L’écriture est de la forme 2k + 1 avec k = 8 entier. Elle donne un impair.",
+        "incorrect": "Le +1 est essentiel : 2 × 8 + 1 est de la forme 2k + 1, donc impair."
+      }
+    }
+  ]
+}

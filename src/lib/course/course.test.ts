@@ -120,7 +120,11 @@ describe("the M2-ARI-D01 content", () => {
     expect(chapter.title).toBe("Arithmétique");
     expect(chapter.level).toBe("seconde");
     expect(courseChaptersOfSubject("maths").map((c) => c.id)).toContain("M2-ARI");
-    expect(declicsOfChapter(chapter).map((d) => d.id)).toEqual(["M2-ARI-D01", "M2-ARI-D02"]);
+    expect(declicsOfChapter(chapter).map((d) => d.id)).toEqual([
+      "M2-ARI-D01",
+      "M2-ARI-D02",
+      "M2-ARI-D03",
+    ]);
   });
 
   it("carries its identity, objective and official source", () => {

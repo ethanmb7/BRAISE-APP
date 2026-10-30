@@ -53,6 +53,21 @@
       "id": "BO26-M2-ARI-CAP-01",
       "requirement": "Modéliser et résoudre un problème mobilisant les notions de multiple et de diviseur",
       "type": "direct"
+    },
+    {
+      "id": "BO26-M2-ARI-CONT-04",
+      "requirement": "Définir un entier pair",
+      "type": "direct"
+    },
+    {
+      "id": "BO26-M2-ARI-CONT-05",
+      "requirement": "Définir un entier impair",
+      "type": "direct"
+    },
+    {
+      "id": "BO26-M2-ARI-CAP-02",
+      "requirement": "Modéliser et résoudre un problème de parité",
+      "type": "direct"
     }
   ],
   "misconceptions": [
@@ -115,7 +130,23 @@
     {
       "id": "misses_divisors_in_list",
       "label": "oublier des diviseurs dans une liste (1, le nombre lui-même ou la moitié d’une paire)"
+    },
+    {
+      "id": "treats_zero_as_odd",
+      "label": "zéro serait impair ou sans parité"
+    },
+    {
+      "id": "believes_negative_integers_have_no_parity",
+      "label": "un entier négatif ne pourrait être ni pair ni impair"
+    },
+    {
+      "id": "swaps_even_odd_forms",
+      "label": "inverser les rôles des écritures 2k et 2k + 1"
     }
   ],
-  "declicIds": ["M2-ARI-D01", "M2-ARI-D02"]
+  "declicIds": [
+    "M2-ARI-D01",
+    "M2-ARI-D02",
+    "M2-ARI-D03"
+  ]
 }

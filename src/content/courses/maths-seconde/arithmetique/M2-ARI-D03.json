@@ -1,0 +1,776 @@
+{
+  "id": "M2-ARI-D03",
+  "chapterId": "M2-ARI",
+  "order": 3,
+  "title": "Tout le monde a son binôme ?",
+  "version": "1.0",
+  "targetDurationSec": [
+    240,
+    360
+  ],
+  "difficulty": {
+    "level": 1,
+    "label": "introduction"
+  },
+  "objective": "Je sais dire si un entier est pair ou impair, et l’écrire 2k ou 2k + 1 avec k entier.",
+  "prerequisites": [
+    "D02 : une multiplication par un entier."
+  ],
+  "detailedObjectives": [
+    "reconnaître un entier pair à son écriture 2k, avec k entier",
+    "reconnaître un entier impair à son écriture 2k + 1, avec k entier",
+    "refuser un multiplicateur non entier",
+    "savoir que zéro est pair",
+    "savoir qu’un entier négatif a une parité"
+  ],
+  "coverage": [
+    {
+      "mappingId": "BO26-M2-ARI-CONT-04",
+      "coverage": "full"
+    },
+    {
+      "mappingId": "BO26-M2-ARI-CONT-05",
+      "coverage": "full"
+    },
+    {
+      "mappingId": "BO26-M2-ARI-CAP-02",
+      "coverage": "introduced_and_practised"
+    }
+  ],
+  "misconceptionIds": [
+    "accepts_non_integer_multiplier",
+    "treats_zero_as_odd",
+    "believes_negative_integers_have_no_parity",
+    "swaps_even_odd_forms"
+  ],
+  "cards": [
+    {
+      "id": "M2-ARI-D03-C01",
+      "order": 1,
+      "type": "choice",
+      "beat": "together",
+      "objective": "entrer par une situation où les paires se voient",
+      "text": "14 élèves participent. 14 = 2 × 7 : sept binômes, personne seul. Le nombre 14 est…",
+      "choices": [
+        {
+          "id": "A",
+          "label": "Pair.",
+          "correct": true,
+          "feedback": {
+            "text": "14 est formé de sept paires : 14 = 2 × 7 avec 7 entier. C’est un nombre pair.",
+            "variants": {
+              "savage": "Tout le monde a son binôme. 14 est formé de sept paires : 14 = 2 × 7 avec 7 entier. C’est un nombre pair."
+            }
+          }
+        },
+        {
+          "id": "B",
+          "label": "Impair, car il s’écrit 2 × 7.",
+          "feedback": {
+            "text": "Une écriture 2 × k avec k entier caractérise un nombre pair. Ici, 14 = 2 × 7 : il est pair, sans élève isolé.",
+            "variants": {
+              "savage": "Le +1 change toute l’équipe. Une écriture 2 × k avec k entier caractérise un nombre pair. Ici, 14 = 2 × 7 : il est pair, sans élève isolé."
+            }
+          },
+          "misconceptionId": "swaps_even_odd_forms"
+        }
+      ],
+      "visual": {
+        "kind": "groups",
+        "total": 14,
+        "groupSize": 2,
+        "caption": "14 = 2 × 7",
+        "ariaLabel": "14 éléments : 7 groupes de 2, sans élément isolé."
+      },
+      "visualTiming": "after-answer"
+    },
+    {
+      "id": "M2-ARI-D03-C02",
+      "order": 2,
+      "type": "reveal",
+      "beat": "show",
+      "objective": "poser la définition d’un entier pair",
+      "text": {
+        "text": "14 = 2 × 7 : sept paires. Un entier est pair lorsqu’il peut s’écrire 2 × k avec k entier. Le nombre k peut être positif, nul ou négatif ; on regardera ces deux derniers cas un peu plus loin.",
+        "variants": {
+          "savage": "Le 2 annonce la taille de chaque paire. 14 = 2 × 7 : sept paires. Un entier est pair lorsqu’il peut s’écrire 2 × k avec k entier. Le nombre k peut être positif, nul ou négatif ; on regardera ces deux derniers cas un peu plus loin."
+        }
+      },
+      "visual": {
+        "kind": "groups",
+        "total": 14,
+        "groupSize": 2,
+        "caption": "14 = 2 × 7",
+        "ariaLabel": "14 éléments : 7 groupes de 2, sans élément isolé."
+      }
+    },
+    {
+      "id": "M2-ARI-D03-C03",
+      "order": 3,
+      "type": "choice",
+      "beat": "together",
+      "objective": "faire apparaître l’élément isolé, et refuser un multiplicateur non entier",
+      "text": "15 élèves : sept binômes et un élève seul. Quelle conclusion est correcte ?",
+      "choices": [
+        {
+          "id": "A",
+          "label": "15 est pair : 15 = 2 × 7,5.",
+          "feedback": {
+            "text": "7,5 n’est pas entier. L’égalité ne donne pas un nombre entier de paires. Avec 15 élèves, on forme sept paires et il y a un élève isolé : 15 est impair.",
+            "variants": {
+              "savage": "Le multiplicateur doit montrer sa carte d’entier. 7,5 n’est pas entier. L’égalité ne donne pas un nombre entier de paires. Avec 15 élèves, on forme sept paires et il y a un élève isolé : 15 est impair."
+            }
+          },
+          "misconceptionId": "accepts_non_integer_multiplier"
+        },
+        {
+          "id": "B",
+          "label": "15 est impair : 15 = 2 × 7 + 1.",
+          "correct": true,
+          "feedback": {
+            "text": "15 est formé de sept paires et d’un élément supplémentaire. L’écriture 2 × 7 + 1 avec 7 entier montre qu’il est impair.",
+            "variants": {
+              "savage": "Le +1, c’est l’élève sans binôme. 15 est formé de sept paires et d’un élément supplémentaire. L’écriture 2 × 7 + 1 avec 7 entier montre qu’il est impair."
+            }
+          }
+        }
+      ],
+      "visual": {
+        "kind": "groups",
+        "total": 15,
+        "groupSize": 2,
+        "caption": "15 = 2 × 7 + 1",
+        "ariaLabel": "15 éléments : 7 groupes de 2 et 1 élément(s) isolé(s)."
+      },
+      "visualTiming": "after-answer"
+    },
+    {
+      "id": "M2-ARI-D03-C04",
+      "order": 4,
+      "type": "reveal",
+      "beat": "show",
+      "objective": "poser la définition d’un entier impair",
+      "text": {
+        "text": "15 = 2 × 7 + 1. Un entier est impair lorsqu’il peut s’écrire 2 × k + 1 avec k entier. Pour une quantité positive, on voit des paires et un élément isolé. Attention : k doit être entier dans les deux définitions.",
+        "variants": {
+          "savage": "Le +1 n’est pas de la décoration. 15 = 2 × 7 + 1. Un entier est impair lorsqu’il peut s’écrire 2 × k + 1 avec k entier. Pour une quantité positive, on voit des paires et un élément isolé. Attention : k doit être entier dans les deux définitions."
+        }
+      },
+      "visual": {
+        "kind": "groups",
+        "total": 15,
+        "groupSize": 2,
+        "caption": "15 = 2 × 7 + 1",
+        "ariaLabel": "15 éléments : 7 groupes de 2 et 1 élément(s) isolé(s)."
+      }
+    },
+    {
+      "id": "M2-ARI-D03-C05",
+      "order": 5,
+      "type": "choice",
+      "beat": "trap",
+      "objective": "lire l’écriture en entier, le +1 compris",
+      "text": "Un nombre s’écrit 2 × 9 + 1. Il est…",
+      "choices": [
+        {
+          "id": "A",
+          "label": "Pair, puisque l’écriture contient 2 × 9.",
+          "feedback": {
+            "text": "Il faut regarder toute l’écriture. Le +1 ajoute un élément aux neuf paires : 2 × 9 + 1 est de la forme 2k + 1, donc impair.",
+            "variants": {
+              "savage": "Le +1 change toute l’équipe. Il faut regarder toute l’écriture. Le +1 ajoute un élément aux neuf paires : 2 × 9 + 1 est de la forme 2k + 1, donc impair."
+            }
+          },
+          "misconceptionId": "swaps_even_odd_forms"
+        },
+        {
+          "id": "B",
+          "label": "Impair, puisqu’il est de la forme 2k + 1 avec k entier.",
+          "correct": true,
+          "feedback": {
+            "text": "Ici, k = 9 est entier. L’écriture complète est 2k + 1 : le nombre est impair.",
+            "variants": {
+              "savage": "Le +1 a bien été pris en compte. Ici, k = 9 est entier. L’écriture complète est 2k + 1 : le nombre est impair."
+            }
+          }
+        }
+      ],
+      "visual": {
+        "kind": "groups",
+        "total": 19,
+        "groupSize": 2,
+        "caption": "2 × 9 + 1 = 19",
+        "ariaLabel": "19 éléments : 9 groupes de 2 et 1 élément(s) isolé(s)."
+      },
+      "visualTiming": "after-answer"
+    },
+    {
+      "id": "M2-ARI-D03-C06",
+      "order": 6,
+      "type": "reveal",
+      "beat": "show",
+      "objective": "étendre la parité à zéro et aux entiers négatifs",
+      "text": {
+        "text": "0 = 2 × 0 : zéro est pair. −8 = 2 × (−4) : −8 est pair. −7 = 2 × (−4) + 1 : −7 est impair. Les définitions utilisent un entier k ; son signe ne change pas la règle.",
+        "variants": {
+          "savage": "Le signe moins n’a pas de bouton « annuler la parité ». 0 = 2 × 0 : zéro est pair. −8 = 2 × (−4) : −8 est pair. −7 = 2 × (−4) + 1 : −7 est impair. Les définitions utilisent un entier k ; son signe ne change pas la règle."
+        }
+      },
+      "visual": {
+        "kind": "number-line",
+        "min": -8,
+        "max": 0,
+        "marks": [
+          -8,
+          -7,
+          0
+        ],
+        "ariaLabel": "Droite graduée de -8 à 0, avec -8, -7, 0 repéré(s)."
+      }
+    },
+    {
+      "id": "M2-ARI-D03-C07",
+      "order": 7,
+      "type": "choice",
+      "beat": "you",
+      "objective": "trancher le cas de zéro",
+      "text": "0 = 2 × 0. Zéro est…",
+      "choices": [
+        {
+          "id": "A",
+          "label": "Pair.",
+          "correct": true,
+          "feedback": {
+            "text": "0 s’écrit 2 × k avec k = 0 entier. Il est donc pair : il n’y a aucun élément isolé.",
+            "variants": {
+              "savage": "Zéro paire, zéro élément isolé. 0 s’écrit 2 × k avec k = 0 entier. Il est donc pair : il n’y a aucun élément isolé."
+            }
+          }
+        },
+        {
+          "id": "B",
+          "label": "Impair ou sans parité.",
+          "feedback": {
+            "text": "La définition s’applique à zéro : 0 = 2 × 0 avec 0 entier. Zéro est pair, pas impair ni sans parité.",
+            "variants": {
+              "savage": "Zéro ne cache pas un joueur solitaire. La définition s’applique à zéro : 0 = 2 × 0 avec 0 entier. Zéro est pair, pas impair ni sans parité."
+            }
+          },
+          "misconceptionId": "treats_zero_as_odd"
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D03-C08",
+      "order": 8,
+      "type": "choice",
+      "beat": "you",
+      "objective": "trancher le cas d’un entier négatif",
+      "text": "−11 = 2 × (−6) + 1. Quelle conclusion est correcte ?",
+      "choices": [
+        {
+          "id": "A",
+          "label": "−11 n’a pas de parité, parce qu’il est négatif.",
+          "feedback": {
+            "text": "La parité concerne aussi les entiers négatifs. −11 s’écrit 2k + 1 avec k = −6 entier : il est impair.",
+            "variants": {
+              "savage": "Le signe moins ne désactive pas la parité. La parité concerne aussi les entiers négatifs. −11 s’écrit 2k + 1 avec k = −6 entier : il est impair."
+            }
+          },
+          "misconceptionId": "believes_negative_integers_have_no_parity"
+        },
+        {
+          "id": "B",
+          "label": "−11 est impair.",
+          "correct": true,
+          "feedback": {
+            "text": "−11 s’écrit 2k + 1 avec k = −6 entier. Cette écriture établit qu’il est impair.",
+            "variants": {
+              "savage": "La définition marche aussi sous zéro. −11 s’écrit 2k + 1 avec k = −6 entier. Cette écriture établit qu’il est impair."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D03-C09",
+      "order": 9,
+      "type": "choice",
+      "beat": "you",
+      "objective": "réutiliser la parité dans une situation neuve",
+      "text": "19 élèves préparent un défi en binômes. Peut-on tout mettre en paires sans élément isolé ?",
+      "choices": [
+        {
+          "id": "A",
+          "label": "Oui : 19 = 2 × 9,5.",
+          "feedback": {
+            "text": "Le multiplicateur 9,5 n’est pas entier. 19 = 2 × 9 + 1 : il y a 9 paires et un élément isolé.",
+            "variants": {
+              "savage": "Le multiplicateur doit montrer sa carte d’entier. Le multiplicateur 9,5 n’est pas entier. 19 = 2 × 9 + 1 : il y a 9 paires et un élément isolé."
+            }
+          },
+          "misconceptionId": "accepts_non_integer_multiplier"
+        },
+        {
+          "id": "B",
+          "label": "Non : 19 = 2 × 9 + 1.",
+          "correct": true,
+          "feedback": {
+            "text": "19 contient 9 paires et un élément isolé. Il est impair : tout mettre en paires complètes est impossible.",
+            "variants": {
+              "savage": "Le contexte change, le +1 reste. 19 contient 9 paires et un élément isolé. Il est impair : tout mettre en paires complètes est impossible."
+            }
+          }
+        }
+      ],
+      "visual": {
+        "kind": "groups",
+        "total": 19,
+        "groupSize": 2,
+        "caption": "19 = 2 × 9 + 1",
+        "ariaLabel": "19 éléments : 9 groupes de 2 et 1 élément(s) isolé(s)."
+      },
+      "visualTiming": "after-answer",
+      "variants": [
+        {
+          "id": "M2-ARI-D03-C09-V02",
+          "text": "23 joueurs veulent jouer uniquement en duos. Peut-on tout mettre en paires sans élément isolé ?",
+          "choices": [
+            {
+              "id": "A",
+              "label": "Oui : 23 = 2 × 11,5.",
+              "feedback": {
+                "text": "Le multiplicateur 11,5 n’est pas entier. 23 = 2 × 11 + 1 : il y a 11 paires et un élément isolé.",
+                "variants": {
+                  "savage": "Le multiplicateur doit montrer sa carte d’entier. Le multiplicateur 11,5 n’est pas entier. 23 = 2 × 11 + 1 : il y a 11 paires et un élément isolé."
+                }
+              },
+              "misconceptionId": "accepts_non_integer_multiplier"
+            },
+            {
+              "id": "B",
+              "label": "Non : 23 = 2 × 11 + 1.",
+              "correct": true,
+              "feedback": {
+                "text": "23 contient 11 paires et un élément isolé. Il est impair : tout mettre en paires complètes est impossible.",
+                "variants": {
+                  "savage": "Le contexte change, le +1 reste. 23 contient 11 paires et un élément isolé. Il est impair : tout mettre en paires complètes est impossible."
+                }
+              }
+            }
+          ],
+          "visual": {
+            "kind": "groups",
+            "total": 23,
+            "groupSize": 2,
+            "caption": "23 = 2 × 11 + 1",
+            "ariaLabel": "23 éléments : 11 groupes de 2 et 1 élément(s) isolé(s)."
+          },
+          "visualTiming": "after-answer"
+        },
+        {
+          "id": "M2-ARI-D03-C09-V03",
+          "text": "25 jetons doivent être rangés par paires. Peut-on tout mettre en paires sans élément isolé ?",
+          "choices": [
+            {
+              "id": "A",
+              "label": "Oui : 25 = 2 × 12,5.",
+              "feedback": {
+                "text": "Le multiplicateur 12,5 n’est pas entier. 25 = 2 × 12 + 1 : il y a 12 paires et un élément isolé.",
+                "variants": {
+                  "savage": "Le multiplicateur doit montrer sa carte d’entier. Le multiplicateur 12,5 n’est pas entier. 25 = 2 × 12 + 1 : il y a 12 paires et un élément isolé."
+                }
+              },
+              "misconceptionId": "accepts_non_integer_multiplier"
+            },
+            {
+              "id": "B",
+              "label": "Non : 25 = 2 × 12 + 1.",
+              "correct": true,
+              "feedback": {
+                "text": "25 contient 12 paires et un élément isolé. Il est impair : tout mettre en paires complètes est impossible.",
+                "variants": {
+                  "savage": "Le contexte change, le +1 reste. 25 contient 12 paires et un élément isolé. Il est impair : tout mettre en paires complètes est impossible."
+                }
+              }
+            }
+          ],
+          "visual": {
+            "kind": "groups",
+            "total": 25,
+            "groupSize": 2,
+            "caption": "25 = 2 × 12 + 1",
+            "ariaLabel": "25 éléments : 12 groupes de 2 et 1 élément(s) isolé(s)."
+          },
+          "visualTiming": "after-answer"
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D03-C10",
+      "order": 10,
+      "type": "multi-step-choice",
+      "objective": "valider la parité : forme 2k, multiplicateur entier, signe négatif",
+      "text": {
+        "text": "Choisis une réponse à chaque étape. Les trois corrections arrivent après tes trois réponses.",
+        "variants": {
+          "savage": "Trois décisions, puis le débrief. Choisis une réponse à chaque étape. Les trois corrections arrivent après tes trois réponses."
+        }
+      },
+      "feedbackTiming": "after-all",
+      "steps": [
+        {
+          "id": "M2-ARI-D03-C10-V01-E01",
+          "question": "18 participants forment 9 binômes : 18 = 2 × 9. Le nombre 18 est…",
+          "options": [
+            {
+              "id": "A",
+              "label": "Impair, car il est de la forme 2k.",
+              "feedback": {
+                "text": "18 = 2 × 9 avec 9 entier. La forme 2k caractérise un pair, pas un impair.",
+                "variants": {
+                  "savage": "Le +1 change toute l’équipe. 18 = 2 × 9 avec 9 entier. La forme 2k caractérise un pair, pas un impair."
+                }
+              },
+              "misconceptionId": "swaps_even_odd_forms"
+            },
+            {
+              "id": "B",
+              "label": "Pair, car il est de la forme 2k avec k entier.",
+              "correct": true,
+              "feedback": {
+                "text": "18 est constitué de 9 paires complètes. L’égalité 18 = 2 × 9 montre qu’il est pair.",
+                "variants": {
+                  "savage": "La définition et les binômes sont d’accord. 18 est constitué de 9 paires complètes. L’égalité 18 = 2 × 9 montre qu’il est pair."
+                }
+              }
+            }
+          ],
+          "conceptId": "even_odd_forms",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D03-C02",
+            "toCardId": "M2-ARI-D03-C02"
+          }
+        },
+        {
+          "id": "M2-ARI-D03-C10-V01-E02",
+          "discriminating": true,
+          "question": "Pour 19 objets, quelle justification respecte la définition de la parité ?",
+          "options": [
+            {
+              "id": "A",
+              "label": "19 est pair, car 19 = 2 × 9,5.",
+              "feedback": {
+                "text": "9,5 n’est pas entier. 19 = 2 × 9 + 1 avec 9 entier : 19 est impair.",
+                "variants": {
+                  "savage": "Le multiplicateur doit montrer sa carte d’entier. 9,5 n’est pas entier. 19 = 2 × 9 + 1 avec 9 entier : 19 est impair."
+                }
+              },
+              "misconceptionId": "accepts_non_integer_multiplier"
+            },
+            {
+              "id": "B",
+              "label": "19 est impair, car 19 = 2 × 9 + 1 et 9 est entier.",
+              "correct": true,
+              "feedback": {
+                "text": "19 s’écrit 2k + 1 avec k = 9 entier. Il est donc impair ; un multiplicateur non entier ne prouverait pas qu’il est pair.",
+                "variants": {
+                  "savage": "Le mot entier n’a pas été oublié. 19 s’écrit 2k + 1 avec k = 9 entier. Il est donc impair ; un multiplicateur non entier ne prouverait pas qu’il est pair."
+                }
+              }
+            }
+          ],
+          "conceptId": "integer_multiplier",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D03-C03",
+            "toCardId": "M2-ARI-D03-C05"
+          }
+        },
+        {
+          "id": "M2-ARI-D03-C10-V01-E03",
+          "question": "-8 = 2 × (-4). Que peut-on dire de -8 ?",
+          "options": [
+            {
+              "id": "A",
+              "label": "Il est pair.",
+              "correct": true,
+              "feedback": {
+                "text": "-8 s’écrit 2k avec k = -4 entier. Il est pair, même s’il est négatif.",
+                "variants": {
+                  "savage": "Le signe moins laisse la définition fonctionner. -8 s’écrit 2k avec k = -4 entier. Il est pair, même s’il est négatif."
+                }
+              }
+            },
+            {
+              "id": "B",
+              "label": "Il n’a pas de parité, car il est négatif.",
+              "feedback": {
+                "text": "-8 est un entier ; il a une parité. L’égalité -8 = 2 × (-4) montre qu’il est pair.",
+                "variants": {
+                  "savage": "Le signe moins ne désactive pas la parité. -8 est un entier ; il a une parité. L’égalité -8 = 2 × (-4) montre qu’il est pair."
+                }
+              },
+              "misconceptionId": "believes_negative_integers_have_no_parity"
+            }
+          ],
+          "conceptId": "zero_negatives",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D03-C06",
+            "toCardId": "M2-ARI-D03-C08"
+          }
+        }
+      ],
+      "variants": [
+        {
+          "id": "M2-ARI-D03-C10-V02",
+          "steps": [
+            {
+              "id": "M2-ARI-D03-C10-V02-E01",
+              "question": "24 participants forment 12 binômes : 24 = 2 × 12. Le nombre 24 est…",
+              "options": [
+                {
+                  "id": "A",
+                  "label": "Impair, car il est de la forme 2k.",
+                  "feedback": {
+                    "text": "24 = 2 × 12 avec 12 entier. La forme 2k caractérise un pair, pas un impair.",
+                    "variants": {
+                      "savage": "Le +1 change toute l’équipe. 24 = 2 × 12 avec 12 entier. La forme 2k caractérise un pair, pas un impair."
+                    }
+                  },
+                  "misconceptionId": "swaps_even_odd_forms"
+                },
+                {
+                  "id": "B",
+                  "label": "Pair, car il est de la forme 2k avec k entier.",
+                  "correct": true,
+                  "feedback": {
+                    "text": "24 est constitué de 12 paires complètes. L’égalité 24 = 2 × 12 montre qu’il est pair.",
+                    "variants": {
+                      "savage": "La définition et les binômes sont d’accord. 24 est constitué de 12 paires complètes. L’égalité 24 = 2 × 12 montre qu’il est pair."
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "M2-ARI-D03-C10-V02-E02",
+              "discriminating": true,
+              "question": "Pour 25 objets, quelle justification respecte la définition de la parité ?",
+              "options": [
+                {
+                  "id": "A",
+                  "label": "25 est pair, car 25 = 2 × 12,5.",
+                  "feedback": {
+                    "text": "12,5 n’est pas entier. 25 = 2 × 12 + 1 avec 12 entier : 25 est impair.",
+                    "variants": {
+                      "savage": "Le multiplicateur doit montrer sa carte d’entier. 12,5 n’est pas entier. 25 = 2 × 12 + 1 avec 12 entier : 25 est impair."
+                    }
+                  },
+                  "misconceptionId": "accepts_non_integer_multiplier"
+                },
+                {
+                  "id": "B",
+                  "label": "25 est impair, car 25 = 2 × 12 + 1 et 12 est entier.",
+                  "correct": true,
+                  "feedback": {
+                    "text": "25 s’écrit 2k + 1 avec k = 12 entier. Il est donc impair ; un multiplicateur non entier ne prouverait pas qu’il est pair.",
+                    "variants": {
+                      "savage": "Le mot entier n’a pas été oublié. 25 s’écrit 2k + 1 avec k = 12 entier. Il est donc impair ; un multiplicateur non entier ne prouverait pas qu’il est pair."
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "M2-ARI-D03-C10-V02-E03",
+              "question": "-6 = 2 × (-3). Que peut-on dire de -6 ?",
+              "options": [
+                {
+                  "id": "A",
+                  "label": "Il est pair.",
+                  "correct": true,
+                  "feedback": {
+                    "text": "-6 s’écrit 2k avec k = -3 entier. Il est pair, même s’il est négatif.",
+                    "variants": {
+                      "savage": "Le signe moins laisse la définition fonctionner. -6 s’écrit 2k avec k = -3 entier. Il est pair, même s’il est négatif."
+                    }
+                  }
+                },
+                {
+                  "id": "B",
+                  "label": "Il n’a pas de parité, car il est négatif.",
+                  "feedback": {
+                    "text": "-6 est un entier ; il a une parité. L’égalité -6 = 2 × (-3) montre qu’il est pair.",
+                    "variants": {
+                      "savage": "Le signe moins ne désactive pas la parité. -6 est un entier ; il a une parité. L’égalité -6 = 2 × (-3) montre qu’il est pair."
+                    }
+                  },
+                  "misconceptionId": "believes_negative_integers_have_no_parity"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "M2-ARI-D03-C10-V03",
+          "steps": [
+            {
+              "id": "M2-ARI-D03-C10-V03-E01",
+              "question": "16 participants forment 8 binômes : 16 = 2 × 8. Le nombre 16 est…",
+              "options": [
+                {
+                  "id": "A",
+                  "label": "Impair, car il est de la forme 2k.",
+                  "feedback": {
+                    "text": "16 = 2 × 8 avec 8 entier. La forme 2k caractérise un pair, pas un impair.",
+                    "variants": {
+                      "savage": "Le +1 change toute l’équipe. 16 = 2 × 8 avec 8 entier. La forme 2k caractérise un pair, pas un impair."
+                    }
+                  },
+                  "misconceptionId": "swaps_even_odd_forms"
+                },
+                {
+                  "id": "B",
+                  "label": "Pair, car il est de la forme 2k avec k entier.",
+                  "correct": true,
+                  "feedback": {
+                    "text": "16 est constitué de 8 paires complètes. L’égalité 16 = 2 × 8 montre qu’il est pair.",
+                    "variants": {
+                      "savage": "La définition et les binômes sont d’accord. 16 est constitué de 8 paires complètes. L’égalité 16 = 2 × 8 montre qu’il est pair."
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "M2-ARI-D03-C10-V03-E02",
+              "discriminating": true,
+              "question": "Pour 17 objets, quelle justification respecte la définition de la parité ?",
+              "options": [
+                {
+                  "id": "A",
+                  "label": "17 est pair, car 17 = 2 × 8,5.",
+                  "feedback": {
+                    "text": "8,5 n’est pas entier. 17 = 2 × 8 + 1 avec 8 entier : 17 est impair.",
+                    "variants": {
+                      "savage": "Le multiplicateur doit montrer sa carte d’entier. 8,5 n’est pas entier. 17 = 2 × 8 + 1 avec 8 entier : 17 est impair."
+                    }
+                  },
+                  "misconceptionId": "accepts_non_integer_multiplier"
+                },
+                {
+                  "id": "B",
+                  "label": "17 est impair, car 17 = 2 × 8 + 1 et 8 est entier.",
+                  "correct": true,
+                  "feedback": {
+                    "text": "17 s’écrit 2k + 1 avec k = 8 entier. Il est donc impair ; un multiplicateur non entier ne prouverait pas qu’il est pair.",
+                    "variants": {
+                      "savage": "Le mot entier n’a pas été oublié. 17 s’écrit 2k + 1 avec k = 8 entier. Il est donc impair ; un multiplicateur non entier ne prouverait pas qu’il est pair."
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "M2-ARI-D03-C10-V03-E03",
+              "question": "-10 = 2 × (-5). Que peut-on dire de -10 ?",
+              "options": [
+                {
+                  "id": "A",
+                  "label": "Il est pair.",
+                  "correct": true,
+                  "feedback": {
+                    "text": "-10 s’écrit 2k avec k = -5 entier. Il est pair, même s’il est négatif.",
+                    "variants": {
+                      "savage": "Le signe moins laisse la définition fonctionner. -10 s’écrit 2k avec k = -5 entier. Il est pair, même s’il est négatif."
+                    }
+                  }
+                },
+                {
+                  "id": "B",
+                  "label": "Il n’a pas de parité, car il est négatif.",
+                  "feedback": {
+                    "text": "-10 est un entier ; il a une parité. L’égalité -10 = 2 × (-5) montre qu’il est pair.",
+                    "variants": {
+                      "savage": "Le signe moins ne désactive pas la parité. -10 est un entier ; il a une parité. L’égalité -10 = 2 × (-5) montre qu’il est pair."
+                    }
+                  },
+                  "misconceptionId": "believes_negative_integers_have_no_parity"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D03-C11",
+      "order": 11,
+      "type": "declic-summary",
+      "objective": "garder les deux écritures et leurs deux pièges",
+      "text": {
+        "text": "🔥 À garder\nUn entier ==pair== s’écrit 2k avec k entier. Un entier ==impair== s’écrit 2k + 1 avec k entier.\nPour une quantité positive, pense aux paires complètes ou aux paires avec un élément isolé.\nLe multiplicateur doit être entier.\nZéro est pair ; les négatifs ont aussi une parité.\n⚠️ Piège contrôle : 19 = 2 × 9 + 1, avec 9 entier. Donc 19 est impair. −8 = 2 × (−4), avec −4 entier. Donc −8 est pair.",
+        "variants": {
+          "savage": "🔥 On garde le raccourci, avec le raisonnement\nUn entier ==pair== s’écrit 2k avec k entier. Un entier ==impair== s’écrit 2k + 1 avec k entier.\nPour une quantité positive, pense aux paires complètes ou aux paires avec un élément isolé.\nLe multiplicateur doit être entier.\nZéro est pair ; les négatifs ont aussi une parité.\n⚠️ Piège contrôle : 19 = 2 × 9 + 1, avec 9 entier. Donc 19 est impair. −8 = 2 × (−4), avec −4 entier. Donc −8 est pair."
+        }
+      },
+      "actions": [
+        {
+          "id": "done",
+          "label": "J’ai capté 🔥",
+          "kind": "complete"
+        },
+        {
+          "id": "review",
+          "label": "Revoir le point qui me piège",
+          "kind": "menu"
+        }
+      ],
+      "menu": [
+        {
+          "id": "pair",
+          "label": "Pair : 2k",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D03-C01",
+            "toCardId": "M2-ARI-D03-C02"
+          }
+        },
+        {
+          "id": "impair",
+          "label": "Impair : 2k + 1",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D03-C03",
+            "toCardId": "M2-ARI-D03-C05"
+          }
+        },
+        {
+          "id": "zero-negatifs",
+          "label": "Zéro et les négatifs",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D03-C06",
+            "toCardId": "M2-ARI-D03-C08"
+          }
+        }
+      ]
+    }
+  ],
+  "assessment": {
+    "cardId": "M2-ARI-D03-C10",
+    "understoodMinScore": 2,
+    "requireDiscriminatingStep": true,
+    "understoodMessage": "Tu as réussi au moins deux étapes, dont celle qui distingue le raisonnement essentiel. Garde aussi le point à revoir s’il en reste un.",
+    "needsReinforcementMessage": "C’est à renforcer. On revoit l’exemple lié à ton erreur, puis on retente avec d’autres données.",
+    "followUpCount": 2
+  },
+  "mastery": {
+    "requiredDeferredSuccesses": 2,
+    "requiredCardRatio": 0.8
+  },
+  "deckId": "M2-ARI-D03-REV"
+}

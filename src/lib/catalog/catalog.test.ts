@@ -79,7 +79,7 @@ describe("buildLibrary", () => {
     const lib = buildLibrary("maths", fresh())!;
     const course = lib.entries.find((e) => e.source === "course")!;
     expect(course.hook).toBe("24 parts, 5 potes : ça tombe pile ?");
-    expect(course.dots).toEqual(["empty", "empty"]);
+    expect(course.dots).toEqual(["empty", "empty", "empty"]);
     expect(course.levelLabel).toBe("Seconde");
     expect(course.minutes).toBeGreaterThan(0);
   });
@@ -98,7 +98,7 @@ describe("buildLibrary", () => {
       },
     };
     const course = buildLibrary("maths", state)!.entries.find((e) => e.source === "course")!;
-    expect(course.dots).toEqual(["gold", "half"]);
+    expect(course.dots).toEqual(["gold", "half", "empty"]);
     expect(course.status).toBe("in_progress");
   });
 
