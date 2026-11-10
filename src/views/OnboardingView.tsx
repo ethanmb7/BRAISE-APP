@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import {
   AnimatePresence,
   LayoutGroup,
@@ -11,7 +11,9 @@ import { BraiseMascot } from "@/components/BraiseMascot";
 import { RichText } from "@/components/RichText";
 import { ThreadOnboarding } from "@/components/onboarding/ThreadOnboarding";
 import { PassOnboarding } from "@/components/onboarding/PassOnboarding";
+import { BraiseIntro } from "@/components/onboarding/BraiseIntro";
 import {
+  readIntro,
   readSkin,
   type OnbExchange,
   type OnbModel,
@@ -126,6 +128,10 @@ export function OnboardingView() {
   const [direction, setDirection] = useState(1);
   // Which skin is being tried (localStorage `braise_onb`); read once, like the other experiments.
   const [skin] = useState(readSkin);
+  // How the app opens (localStorage `braise_intro`), and whether that opening is still playing.
+  const [intro] = useState(readIntro);
+  const [introDone, setIntroDone] = useState(false);
+  const openWith = useCallback(() => setIntroDone(true), []);
   const [name, setName] = useState("");
   const [level, setLevel] = useState<Level | null>(null);
   const [personality, setPersonality] = useState<Personality | null>(null);
@@ -317,9 +323,12 @@ export function OnboardingView() {
     onBack: back,
   };
 
+  const opening = !introDone ? <BraiseIntro variant={intro} onDone={openWith} /> : null;
+
   if (skin === "thread") {
     return (
       <MotionConfig reducedMotion="user">
+        {opening}
         <ThreadOnboarding model={model} />
       </MotionConfig>
     );
@@ -327,6 +336,7 @@ export function OnboardingView() {
   if (skin === "pass") {
     return (
       <MotionConfig reducedMotion="user">
+        {opening}
         <PassOnboarding model={model} />
       </MotionConfig>
     );
@@ -334,6 +344,7 @@ export function OnboardingView() {
 
   return (
     <MotionConfig reducedMotion="user">
+      {opening}
       <LayoutGroup>
         <div className={`onb onb--${stepId}`}>
           <header className="onb-top">

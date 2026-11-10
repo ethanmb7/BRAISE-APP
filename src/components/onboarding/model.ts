@@ -19,6 +19,20 @@ export function readSkin(): OnbSkin {
   }
 }
 
+/** How the app opens; see components/onboarding/BraiseIntro.tsx for what each one says. */
+export type IntroVariant = "morph" | "none" | "card";
+
+export const ONB_INTRO_KEY = "braise_intro";
+
+export function readIntro(): IntroVariant {
+  try {
+    const v = localStorage.getItem(ONB_INTRO_KEY);
+    return v === "none" || v === "card" ? v : "morph";
+  } catch {
+    return "morph";
+  }
+}
+
 /** One answer the student can pick on the current screen. */
 export type OnbOption = {
   id: string;

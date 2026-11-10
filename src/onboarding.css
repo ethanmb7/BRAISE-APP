@@ -659,3 +659,73 @@
   opacity: 0.4;
   box-shadow: none;
 }
+
+/* ===== L'ouverture — les trois premières secondes =====
+   Un calque au-dessus de l'onboarding, qui se retire tout seul (ou au tap). Voir
+   components/onboarding/BraiseIntro.tsx pour ce que chaque variante raconte. */
+.onbi {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.onbi-seat {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  display: grid;
+  place-items: center;
+}
+.onbi-mark,
+.onbi-char {
+  grid-area: 1 / 1;
+  display: grid;
+  place-items: center;
+}
+.onbi-seat .onbi-mark,
+.onbi-seat .onbi-char {
+  position: absolute;
+  inset: 0;
+}
+/* Variante "card" : la marque allume le pass, qui monte du bas. */
+.onbi-card {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 96px;
+  padding: 16px 18px 20px;
+  border: 3px solid #151821;
+  border-radius: 18px;
+  background: #fffdf8;
+  box-shadow: 7px 7px 0 #151821;
+}
+.onbi-card span {
+  display: block;
+  padding-bottom: 12px;
+  border-bottom: 2.5px dashed rgba(21, 24, 33, 0.35);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #151821;
+}
+.onbi-card i {
+  display: block;
+  height: 3px;
+  margin: 18px 0;
+  border-radius: 2px;
+  background: repeating-linear-gradient(
+    to right,
+    rgba(21, 24, 33, 0.3) 0 7px,
+    transparent 7px 13px
+  );
+}
+.onbi-card i:nth-child(3) {
+  width: 70%;
+}
+.onbi-card i:last-child {
+  width: 45%;
+}
