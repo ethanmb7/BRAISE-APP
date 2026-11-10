@@ -487,7 +487,8 @@ select {
 }
 
 /* ===== Onboarding — a first conversation with Braise ===== */
-.app-content:has(.onb) {
+.app-content:has(.onb),
+.app-content:has(.onbt) {
   padding-bottom: 0;
 }
 .onb {

@@ -1,0 +1,347 @@
+/* ===== Onboarding, skin "thread" — the first conversation, kept on screen =====
+   Same grammar as the rest of the app (2.5px ink outline, hard offset shadow, flat saturated
+   fills); what is new is the shape of the screen: a message thread that grows, with the answers
+   offered as quick replies in a composer. See components/onboarding/ThreadOnboarding.tsx. */
+.onbt {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.onbt .onbt-field input {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* The header of a conversation: who you are talking to. */
+.onbt-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) var(--page-gutter) 10px;
+  border-bottom: 2.5px solid var(--neo-ink);
+  background: var(--paper);
+}
+.onbt-back {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 11px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 2px 2px 0 var(--neo-ink);
+}
+.onbt-back:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+.onbt-back:disabled {
+  opacity: 0.3;
+  box-shadow: none;
+  pointer-events: none;
+}
+.onbt-face {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 50%;
+  background: #fffdf8;
+}
+.onbt-who {
+  min-width: 0;
+  flex: 1;
+  display: block;
+  line-height: 1.1;
+}
+.onbt-who b {
+  display: block;
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+.onbt-who small {
+  display: block;
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+}
+/* Progress, read as a row of beads rather than said as a number. */
+.onbt-pips {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.onbt-pips span {
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--neo-ink);
+  border-radius: 50%;
+  background: var(--paper);
+}
+.onbt-pips span.is-done {
+  background: var(--neo-orange);
+}
+
+/* The thread itself: the only part that scrolls. */
+.onbt-thread {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px var(--page-gutter);
+}
+/* One exchange = Braise's line then the student's. Scoped to its own class on purpose: a bare
+   `> div` also caught the cards a message carries and turned them into flex columns, which broke
+   every highlighted word onto a line of its own. */
+.onbt-turn {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.onbt-said,
+.onbt-mine {
+  max-width: 84%;
+  margin: 0;
+  padding: 11px 14px;
+  border: 2.5px solid var(--neo-ink);
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+/* Braise speaks from the left, on paper; the corner points back at its avatar. */
+.onbt-said {
+  align-self: flex-start;
+  border-radius: 18px 18px 18px 5px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: var(--ink);
+}
+/* The student answers from the right, in the app's own yellow — their words, not the app's. */
+.onbt-mine {
+  align-self: flex-end;
+  border-radius: 18px 18px 5px 18px;
+  background: #ffd43b;
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: #151821;
+  font-weight: 800;
+}
+/* What a message carries: the card to judge, then the pass. */
+.onbt-attach {
+  align-self: flex-start;
+  width: min(100%, 320px);
+  margin: 0;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: 4px 4px 0 var(--neo-ink);
+  color: var(--ink);
+}
+.onbt-claim {
+  padding: 16px;
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1.14rem;
+  font-weight: 800;
+  line-height: 1.25;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+.onbt-claim.is-judged {
+  border-color: var(--mint-text);
+  box-shadow: 4px 4px 0 var(--mint-text);
+}
+.onbt-pass {
+  padding: 14px 16px 6px;
+  background: #fffdf8;
+}
+.onbt-pass-kicker {
+  display: block;
+  padding-bottom: 8px;
+  border-bottom: 2.5px dashed rgba(21, 24, 33, 0.35);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.onbt-pass > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+}
+.onbt-pass > div + div {
+  border-top: 1.5px solid rgba(21, 24, 33, 0.12);
+}
+.onbt-pass dt {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+.onbt-pass dd {
+  margin: 0;
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  text-align: right;
+}
+
+/* The composer: quick replies, then the button that moves on. */
+.onbt-composer {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px var(--page-gutter) calc(14px + env(safe-area-inset-bottom, 0px));
+  border-top: 2.5px solid var(--neo-ink);
+  background: var(--paper);
+}
+.onbt-replies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.onbt-reply {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 999px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: var(--ink);
+  font-family: "Baloo 2", sans-serif;
+  font-size: 0.98rem;
+  font-weight: 800;
+}
+.onbt-reply:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--neo-ink);
+}
+.onbt-reply.is-selected {
+  background: #ffd43b;
+  color: #151821;
+}
+.onbt-reply-aside {
+  display: inline-flex;
+  align-items: center;
+}
+.onbt-reply svg {
+  width: 18px;
+  height: 18px;
+}
+/* The two verdicts keep the colours they have everywhere else in the app. */
+.onbt-verdict {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 52px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 14px;
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: #151821;
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  transition:
+    opacity 0.25s ease,
+    box-shadow 0.12s ease;
+}
+.onbt-verdict--intox {
+  background: var(--coral);
+  color: #fff;
+}
+.onbt-verdict--carre {
+  background: var(--mint);
+}
+.onbt-verdict:not(:disabled):active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+.onbt-verdict.is-dimmed {
+  opacity: 0.3;
+  box-shadow: none;
+}
+/* The name is typed and sent, like any message. */
+.onbt-field {
+  display: flex;
+  gap: 8px;
+}
+.onbt-field input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 16px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 999px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: var(--ink);
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+.onbt-field input:focus {
+  outline: none;
+  box-shadow: 3px 3px 0 var(--neo-orange);
+}
+.onbt-field input::placeholder {
+  color: var(--ink-soft);
+  opacity: 0.6;
+}
+.onbt-field button {
+  width: 52px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 50%;
+  background: var(--neo-orange);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: #151821;
+}
+.onbt-field button:disabled {
+  opacity: 0.4;
+  box-shadow: none;
+}
+.onbt-cta {
+  width: 100%;
+  min-height: 54px;
+  border: 3px solid #151821;
+  border-radius: 15px;
+  background: var(--neo-orange);
+  box-shadow: 4px 4px 0 #151821;
+  color: #151821;
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1.14rem;
+  font-weight: 800;
+}
+.onbt-cta:not(:disabled):active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+.onbt-cta:disabled {
+  opacity: 0.4;
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onbt-thread {
+    scroll-behavior: auto;
+  }
+}

@@ -9,6 +9,13 @@ import {
 import { ArrowLeft } from "lucide-react";
 import { BraiseMascot } from "@/components/BraiseMascot";
 import { RichText } from "@/components/RichText";
+import { ThreadOnboarding } from "@/components/onboarding/ThreadOnboarding";
+import {
+  readSkin,
+  type OnbExchange,
+  type OnbModel,
+  type OnbOption,
+} from "@/components/onboarding/model";
 import { StreakFlameIcon } from "@/components/StreakFlameIcon";
 import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
@@ -116,6 +123,8 @@ export function OnboardingView() {
   const reducedMotion = useReducedMotion();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
+  // Which skin is being tried (localStorage `braise_onb`); read once, like the other experiments.
+  const [skin] = useState(readSkin);
   const [name, setName] = useState("");
   const [level, setLevel] = useState<Level | null>(null);
   const [personality, setPersonality] = useState<Personality | null>(null);
@@ -222,6 +231,98 @@ export function OnboardingView() {
     rhythm: "Continuer",
     ready: "C’est parti !",
   };
+
+  // Everything a skin needs, derived from the same state the default screens use.
+  const optionsFor: Record<string, OnbOption[]> = {
+    level: LEVELS.map((l) => ({
+      id: l.id,
+      title: l.label,
+      desc: LEVEL_INFO[l.id]?.tag,
+      aside: LEVEL_INFO[l.id]?.icon,
+      selected: level?.id === l.id,
+      onSelect: () => {
+        tap();
+        setLevel(l);
+        setReaction({ text: LEVEL_INFO[l.id]?.reaction ?? "Noté !", mood: "proud" });
+      },
+    })),
+    tone: TONES.map((t) => ({
+      id: t.id,
+      title: t.title,
+      desc: t.desc,
+      aside: <BraiseMascot size={22} mood={t.mood} />,
+      selected: personality === t.id,
+      onSelect: () => {
+        tap();
+        setPersonality(t.id);
+        setReaction({ text: t.sample, mood: t.mood });
+      },
+    })),
+    rhythm: RHYTHMS.map((r) => ({
+      id: r.id,
+      title: r.title,
+      desc: r.desc,
+      aside: (
+        <span className="onb-flames" aria-label={`Intensité ${r.flames} sur 3`}>
+          {[1, 2, 3].map((i) => (
+            <span key={i} className={i <= r.flames ? "is-lit" : ""}>
+              <StreakFlameIcon size={14} />
+            </span>
+          ))}
+        </span>
+      ),
+      selected: goal === r.id,
+      onSelect: () => {
+        tap();
+        setGoal(r.id);
+        setReaction({
+          text: pickLine(voiceTone, COPY.onboarding.rhythm[r.id]),
+          mood: r.id === "a-fond" ? "cool" : "happy",
+        });
+      },
+    })),
+  };
+
+  // What has already been exchanged, for the skins that keep the conversation on screen.
+  const history: OnbExchange[] = [];
+  const told = (id: StepId, student: string | null | undefined) => {
+    if (STEPS.indexOf(id) >= step || !student) return;
+    history.push({ id, braise: question[id].text, student });
+  };
+  told("demo", demoAnswer ? (demoAnswer === "intox" ? "✖ Intox" : "✔ Carré") : null);
+  told("name", trimmedName);
+  told("level", level?.label);
+  told("tone", tone?.title);
+  told("rhythm", rhythm?.title);
+
+  const model: OnbModel = {
+    stepId,
+    step,
+    questionCount: QUESTION_COUNT,
+    line,
+    options: optionsFor[stepId] ?? [],
+    history,
+    name: { value: name, onChange: setName },
+    demo: { claim: DEMO.claim, truth: DEMO.truth, picked: demoAnswer, onPick: answerDemo },
+    pass: [
+      { label: "Prénom", value: trimmedName || null },
+      { label: "Classe", value: level?.label ?? null },
+      { label: "Ton de Braise", value: tone?.title ?? null },
+      { label: "Rythme", value: rhythm?.title ?? null },
+    ],
+    canContinue: canContinue[stepId],
+    ctaLabel: ctaLabel[stepId],
+    onNext: next,
+    onBack: back,
+  };
+
+  if (skin === "thread") {
+    return (
+      <MotionConfig reducedMotion="user">
+        <ThreadOnboarding model={model} />
+      </MotionConfig>
+    );
+  }
 
   return (
     <MotionConfig reducedMotion="user">
