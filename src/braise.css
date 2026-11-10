@@ -491,7 +491,11 @@ select {
   padding-bottom: 0;
 }
 .onb {
-  min-height: 100%;
+  /* A definite height, not just a floor: `.app-content` is exactly one screen tall, so this gives
+     the flex column a fixed budget to share. With `min-height` the column grew past the screen on a
+     568px phone instead of letting the answers shrink, and the sticky footer — which then had
+     nowhere to sit — printed itself over the bottom of the pass. */
+  height: 100%;
   display: flex;
   flex-direction: column;
   padding: calc(14px + env(safe-area-inset-top, 0px)) var(--page-gutter) 0;
@@ -535,101 +539,52 @@ select {
   transform: translate(2px, 2px);
   box-shadow: none;
 }
-.onb-progress {
+/* One pip per step, filled as they are passed: how far in you are is countable at a glance, and
+   the row never changes width the way a growing bar's fill did. */
+.onb-pips {
+  flex: 1;
+  display: flex;
+  gap: 6px;
+}
+.onb-pips span {
   flex: 1;
   height: 14px;
-  overflow: hidden;
   border: 2.5px solid var(--neo-ink);
   border-radius: 999px;
   background: var(--paper);
+  transition:
+    background-color 0.25s ease,
+    transform 0.25s ease;
 }
-.onb-progress span {
-  display: block;
-  height: 100%;
+.onb-pips span.is-done {
   background: var(--neo-orange);
 }
+.onb-back:disabled {
+  opacity: 0.3;
+  box-shadow: none;
+  pointer-events: none;
+}
 
-/* Scene: Braise + what it says. Row on question screens, centred column on hero screens. */
+/* Scene: Braise in its seat and what it says. Identical on all six screens — same corner, same
+   size, same height — so the line being read and the answers under it never move between steps.
+   The height is fixed to the tallest line (three) for the same reason. */
 .onb-scene {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 12px;
-  margin-bottom: 22px;
-}
-.onb-scene.is-hero {
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 26px;
-  margin-bottom: 0;
-  text-align: center;
-}
-.onb--welcome .onb-scene {
-  flex: 1;
-}
-/* Compact on purpose: the avatar, the title, the pass, its storage note and the button must all
-   fit above the fold on a 732px-high phone, or the note hides under the sticky button. */
-.onb--ready .onb-scene {
-  gap: 14px;
-  padding: 8px 0 12px;
+  min-height: 112px;
+  margin-bottom: 20px;
 }
 .onb-avatar {
   flex-shrink: 0;
-  width: 76px;
-  height: 76px;
+  width: 78px;
+  height: 78px;
   display: grid;
   place-items: center;
   border: 2.5px solid #151821;
   border-radius: 50%;
   background: #fffdf8;
   box-shadow: 3px 3px 0 #151821;
-}
-.is-hero .onb-avatar {
-  width: 200px;
-  height: 200px;
-  border-width: 3px;
-  box-shadow: 6px 6px 0 #151821;
-}
-/* The name screen is the first real exchange and has a single field: Braise gets a bigger seat
-   above its question, which also gives that screen some weight instead of a lone input. */
-.onb-scene.is-column {
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-}
-.is-column .onb-avatar {
-  width: 128px;
-  height: 128px;
-  border-width: 3px;
-  box-shadow: 5px 5px 0 #151821;
-}
-.is-column .onb-bubble {
-  align-self: stretch;
-  border-radius: 20px;
-  text-align: center;
-}
-/* On the mascot itself, not on the layout-animated wrappers: a CSS transform animation there
-   would fight framer's own transforms mid-morph. */
-.is-hero .onb-avatar-inner > * {
-  animation: flameFloat 3s ease-in-out infinite;
-}
-.onb-hero-copy h1 {
-  max-width: 12ch;
-  margin: 0 auto;
-  font-family: "Baloo 2", sans-serif;
-  font-size: 2.1rem;
-  font-weight: 800;
-  line-height: 1.02;
-  /* A name makes the title wrap at an arbitrary point: balance the lines so the closing "!" never
-     ends up alone on one (the non-breaking space in the string keeps it with the name). */
-  text-wrap: balance;
-}
-.onb-hero-copy p {
-  max-width: 22ch;
-  margin: 12px auto 0;
-  font-size: 1.05rem;
-  font-weight: 700;
-  line-height: 1.35;
 }
 
 /* Braise's speech bubble — the low corner points back at it. Ghost + live text are stacked in
@@ -648,11 +603,9 @@ select {
   font-weight: 800;
   line-height: 1.18;
 }
-.onb--level .onb-bubble,
-.onb--tone .onb-bubble,
-.onb--rhythm .onb-bubble {
-  /* Braise's question and its reaction to the answer swap into this same bubble. A fixed height
-     (three lines) means the tiles below never jump when the reaction arrives. */
+/* Braise's question and its reaction to the answer swap into this same bubble, on every screen:
+   a fixed three-line height means nothing below jumps when the reaction arrives. */
+.onb-bubble {
   min-height: 6.5rem;
   align-content: center;
 }
@@ -668,18 +621,17 @@ select {
   display: flex;
   flex-direction: column;
 }
-/* The name screen has a single block: Braise's question and the field stay together as one
-   group, centred in the page, instead of hugging the top and leaving a hole above the button —
-   the free space is split between the auto margins above and below. */
-.onb--name .onb-scene {
-  margin-top: auto;
-}
-.onb-body--name {
-  flex: 0 0 auto;
-  margin-bottom: auto;
-}
-.onb--name .onb-footer {
-  margin-top: 0;
+/* The pass is the moment, not a list at the top of an empty page: it sits in the middle of its
+   screen, where the choice tiles were on the screens before. `min-height: 0` + `auto` because a
+   centred flex child that is taller than its box overflows BOTH ends — on a 568px-high screen the
+   bottom of the pass came out under the sticky footer, with the storage note printed across it. */
+.onb-body--ready {
+  justify-content: center;
+  min-height: 0;
+  overflow-y: auto;
+  /* Room for the pass's own tilt and hard shadow: a scroll box clips on both axes, and without
+     this the card's rotated corners were shaved off on the shortest screens. */
+  padding: 8px 7px;
 }
 .onb-hint {
   margin: 12px 0 0;
@@ -713,6 +665,56 @@ select {
 .onb-input:focus {
   outline: none;
   box-shadow: 4px 4px 0 var(--neo-orange);
+}
+
+/* Welcome — what the app does, in three paper cards. The first screen used to be a mascot and
+   two lines over an empty half-page; this is the same furniture as the choice tiles, so the
+   student already knows what a tappable-looking block will look like two screens later. */
+.onb-pitch {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.onb-pitch li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: var(--ink);
+}
+.onb-pitch-icon {
+  flex-shrink: 0;
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #151821;
+  border-radius: 50%;
+  background: #fffdf8;
+  font-size: 1.6rem;
+}
+.onb-pitch b {
+  display: block;
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1.16rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+.onb-pitch small {
+  display: block;
+  margin-top: 3px;
+  font-size: 0.84rem;
+  line-height: 1.3;
+  opacity: 0.75;
 }
 
 /* Choice tiles */
@@ -912,7 +914,8 @@ select {
 }
 @media (prefers-reduced-motion: reduce) {
   .onb,
-  .is-hero .onb-avatar-inner > * {
+  .onb-pips span,
+  .onb-tile {
     animation: none;
     transition: none;
   }

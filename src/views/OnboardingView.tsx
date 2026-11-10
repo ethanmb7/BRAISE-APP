@@ -84,10 +84,28 @@ const RHYTHMS = [
 
 const SPRING = { type: "spring", stiffness: 380, damping: 32 } as const;
 
-// Onboarding as a first conversation with Braise, not a form: one question per screen, Braise
-// stays on stage the whole time (it morphs from the welcome hero into the speaker's seat instead of
-// being redrawn), types its lines, and reacts to every answer — the tone choice literally switches
-// how it talks. Ends on a "pass" that reflects the student's answers back before the app opens.
+// What the app is, said in its own words, on the very first screen. Three real things it does —
+// no promise, no number it cannot keep.
+const PITCH: { icon: string; title: string; line: string }[] = [
+  { icon: "🔥", title: "Le Déclic", line: "Une notion expliquée comme un pote te l’expliquerait." },
+  { icon: "🃏", title: "Carré ou Intox", line: "Tu tranches, je te dis pourquoi. Sans note." },
+  {
+    icon: "⏱️",
+    title: "2 minutes",
+    line: "Assez pour que ça reste. Pas assez pour que ça saoule.",
+  },
+];
+
+// Onboarding as a first conversation with Braise, not a form: one question per screen, Braise types
+// its lines and reacts to every answer — the tone choice literally switches how it talks. Ends on a
+// "pass" that reflects the student's answers back before the app opens.
+//
+// Everything that frames the conversation sits at the SAME place on all six screens: the step pips,
+// Braise in its seat with the bubble, the answers, the button. Braise used to morph between a 200px
+// welcome hero, a 128px centred seat on the name screen and a 60px one elsewhere, and two screens
+// re-centred themselves vertically — so the one thing a student follows, the line being said and
+// what to tap under it, moved on every step. The screens still change colour at the two ends; the
+// furniture does not move.
 export function OnboardingView() {
   const { state, completeOnboarding } = useApp();
   const reducedMotion = useReducedMotion();
@@ -101,7 +119,6 @@ export function OnboardingView() {
   const [reaction, setReaction] = useState<{ text: string; mood: Mood } | null>(null);
 
   const stepId: StepId = STEPS[step];
-  const hero = stepId === "welcome" || stepId === "ready";
   const trimmedName = name.trim();
   const tone = TONES.find((t) => t.id === personality);
   // Until a tone is picked the app speaks Chill; every later line follows the student's choice.
@@ -118,13 +135,19 @@ export function OnboardingView() {
   };
 
   const question: Record<StepId, { text: string; mood: Mood }> = {
-    welcome: { text: "", mood: "happy" },
+    welcome: {
+      text: "Salut, moi c’est Braise. Tes cours, expliqués comme par un pote.",
+      mood: "happy",
+    },
     name: { text: "Comment je t’appelle ?", mood: "eager" },
     level: { text: `Enchanté, ${trimmedName} ! T’es en quelle classe ?`, mood: "happy" },
     tone: { text: "Et tu me préfères comment ? Touche pour m’entendre.", mood: "eager" },
     // Said after the tone was picked, so it is already in that tone.
     rhythm: { text: pickLine(voiceTone, COPY.onboarding.rhythmQuestion), mood: "happy" },
-    ready: { text: "", mood: "proud" },
+    ready: {
+      text: `Bienvenue, ${trimmedName}\u00a0! ${pickLine(voiceTone, COPY.onboarding.readySubtitle)}`,
+      mood: "proud",
+    },
   };
   const line = reaction ?? question[stepId];
 
@@ -183,55 +206,43 @@ export function OnboardingView() {
     <MotionConfig reducedMotion="user">
       <LayoutGroup>
         <div className={`onb onb--${stepId}`}>
-          {!hero && (
-            <header className="onb-top">
-              <button type="button" className="onb-back" onClick={back} aria-label="Retour">
-                <ArrowLeft size={20} strokeWidth={2.6} />
-              </button>
-              <div
-                className="onb-progress"
-                role="progressbar"
-                aria-label="Progression"
-                aria-valuemin={1}
-                aria-valuemax={QUESTION_COUNT - 1}
-                aria-valuenow={step}
-              >
-                <motion.span
-                  initial={false}
-                  animate={{ width: `${(step / QUESTION_COUNT) * 100}%` }}
-                  transition={SPRING}
-                />
-              </div>
-            </header>
-          )}
+          <header className="onb-top">
+            {/* Kept in place, not removed, on the first screen: taking it out would shift the pips
+                and everything under them sideways on the very next step. */}
+            <button
+              type="button"
+              className="onb-back"
+              onClick={back}
+              aria-label="Retour"
+              disabled={step === 0}
+            >
+              <ArrowLeft size={20} strokeWidth={2.6} />
+            </button>
+            <div
+              className="onb-pips"
+              role="progressbar"
+              aria-label="Progression"
+              aria-valuemin={0}
+              aria-valuemax={QUESTION_COUNT}
+              aria-valuenow={step}
+            >
+              {Array.from({ length: QUESTION_COUNT }, (_, i) => (
+                <span key={i} className={i < step ? "is-done" : ""} aria-hidden="true" />
+              ))}
+            </div>
+          </header>
 
-          <div
-            className={`onb-scene ${hero ? "is-hero" : ""} ${stepId === "name" ? "is-column" : ""}`}
-          >
-            {/* One persistent element across every screen: `layout` animates it between the big
-                welcome stage and the small speaker seat instead of unmounting and redrawing. */}
-            <motion.div layout transition={SPRING} className="onb-avatar">
-              <motion.div layout transition={SPRING} className="onb-avatar-inner">
-                <BraiseMascot
-                  size={stepId === "ready" ? 100 : hero ? 132 : stepId === "name" ? 92 : 60}
-                  mood={line.mood}
-                />
-              </motion.div>
+          {/* Braise's seat: same size, same corner, on every screen. Only what it says changes —
+              and it pops once when it reacts to an answer. */}
+          <div className="onb-scene">
+            <motion.div
+              className="onb-avatar"
+              animate={reaction ? { scale: [1, 1.08, 1] } : { scale: 1 }}
+              transition={{ duration: 0.34 }}
+            >
+              <BraiseMascot size={62} mood={line.mood} />
             </motion.div>
-
-            {stepId === "welcome" && (
-              <HeroCopy
-                title="Salut, moi c’est Braise."
-                subtitle="Tes cours, expliqués comme par un pote."
-              />
-            )}
-            {stepId === "ready" && (
-              <HeroCopy
-                title={`Bienvenue, ${trimmedName}\u00a0!`}
-                subtitle={pickLine(voiceTone, COPY.onboarding.readySubtitle)}
-              />
-            )}
-            {!hero && <Bubble key={line.text} text={line.text} />}
+            <Bubble key={line.text} text={line.text} />
           </div>
 
           <AnimatePresence mode="wait" initial={false} custom={direction}>
@@ -243,6 +254,27 @@ export function OnboardingView() {
               exit={{ opacity: 0, x: -32 * direction }}
               transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
             >
+              {stepId === "welcome" && (
+                <ul className="onb-pitch">
+                  {PITCH.map((p, i) => (
+                    <motion.li
+                      key={p.title}
+                      initial={{ opacity: 0, y: 14 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: 0.25 + i * 0.09 }}
+                    >
+                      <span className="onb-pitch-icon" aria-hidden="true">
+                        {p.icon}
+                      </span>
+                      <span>
+                        <b>{p.title}</b>
+                        <small>{p.line}</small>
+                      </span>
+                    </motion.li>
+                  ))}
+                </ul>
+              )}
+
               {stepId === "name" && (
                 <input
                   className="onb-input"
@@ -258,6 +290,14 @@ export function OnboardingView() {
                   autoComplete="given-name"
                   autoFocus
                 />
+              )}
+              {/* Said where it is asked, not only on the last screen: a first name is the one
+                  personal thing the app ever requests, and a student handed a stranger's phone in a
+                  test deserves the answer at that moment. Must stay literally true. */}
+              {stepId === "name" && (
+                <p className="onb-hint">
+                  Juste pour savoir comment t’appeler. Ça reste sur ton téléphone.
+                </p>
               )}
 
               {stepId === "level" && (
@@ -404,20 +444,6 @@ export function OnboardingView() {
         </div>
       </LayoutGroup>
     </MotionConfig>
-  );
-}
-
-function HeroCopy({ title, subtitle }: { title: string; subtitle: string }) {
-  return (
-    <motion.div
-      className="onb-hero-copy"
-      initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-    >
-      <h1>{title}</h1>
-      <p>{subtitle}</p>
-    </motion.div>
   );
 }
 
