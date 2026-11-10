@@ -10,6 +10,7 @@ import { ArrowLeft } from "lucide-react";
 import { BraiseMascot } from "@/components/BraiseMascot";
 import { RichText } from "@/components/RichText";
 import { ThreadOnboarding } from "@/components/onboarding/ThreadOnboarding";
+import { PassOnboarding } from "@/components/onboarding/PassOnboarding";
 import {
   readSkin,
   type OnbExchange,
@@ -320,6 +321,13 @@ export function OnboardingView() {
     return (
       <MotionConfig reducedMotion="user">
         <ThreadOnboarding model={model} />
+      </MotionConfig>
+    );
+  }
+  if (skin === "pass") {
+    return (
+      <MotionConfig reducedMotion="user">
+        <PassOnboarding model={model} />
       </MotionConfig>
     );
   }
