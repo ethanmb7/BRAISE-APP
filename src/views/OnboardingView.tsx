@@ -8,6 +8,7 @@ import {
 } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { BraiseMascot } from "@/components/BraiseMascot";
+import { RichText } from "@/components/RichText";
 import { StreakFlameIcon } from "@/components/StreakFlameIcon";
 import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
@@ -21,10 +22,26 @@ type Mood = "happy" | "proud" | "cool" | "eager";
 
 // No consent step: nothing leaves the device (no account, no server, no AI), so there is nothing
 // to consent to. Bring it back when a backend does.
-const STEPS = ["welcome", "name", "level", "tone", "rhythm", "ready"] as const;
+//
+// The first screen is a card to answer, not a question to fill in: the student plays the app's own
+// gesture — Intox or Carré, then Braise explains — before being asked for anything. Everything
+// after it is configuration, and it is only asked once the app has shown what it is worth.
+const STEPS = ["demo", "name", "level", "tone", "rhythm", "ready"] as const;
 type StepId = (typeof STEPS)[number];
-// Steps that show the progress bar: every question, not the two "hero" moments around them.
+// One pip per question. The opening card is not one: nothing is being asked there.
 const QUESTION_COUNT = STEPS.length - 1;
+
+// The claim of that first card. Hand-picked rather than drawn from the deck: at this point no
+// subject has been chosen, and the trap has to work for any lycéen, from any class. It is the
+// app's own content all the same (see the "Théorème de Pythagore" chapter and its card fc34).
+const DEMO = {
+  claim: "Le théorème de Pythagore marche dans n'importe quel triangle.",
+  /* The claim is false, so the expected answer is "intox". */
+  answer: "intox" as const,
+  truth: "Il marche seulement dans les triangles ==rectangles==, ceux qui ont un angle droit.",
+  win: "Bien vu, c'est une intox.",
+  miss: "Raté — mais c'est le piège classique.",
+};
 
 const LEVEL_INFO: Record<string, { tag: string; icon: string; reaction: string }> = {
   "2nde": {
@@ -84,18 +101,6 @@ const RHYTHMS = [
 
 const SPRING = { type: "spring", stiffness: 380, damping: 32 } as const;
 
-// What the app is, said in its own words, on the very first screen. Three real things it does —
-// no promise, no number it cannot keep.
-const PITCH: { icon: string; title: string; line: string }[] = [
-  { icon: "🔥", title: "Le Déclic", line: "Une notion expliquée comme un pote te l’expliquerait." },
-  { icon: "🃏", title: "Carré ou Intox", line: "Tu tranches, je te dis pourquoi. Sans note." },
-  {
-    icon: "⏱️",
-    title: "2 minutes",
-    line: "Assez pour que ça reste. Pas assez pour que ça saoule.",
-  },
-];
-
 // Onboarding as a first conversation with Braise, not a form: one question per screen, Braise types
 // its lines and reacts to every answer — the tone choice literally switches how it talks. Ends on a
 // "pass" that reflects the student's answers back before the app opens.
@@ -117,6 +122,8 @@ export function OnboardingView() {
   const [goal, setGoal] = useState<string | null>(null);
   // Braise's reply to the answer just given on this screen — cleared on every screen change.
   const [reaction, setReaction] = useState<{ text: string; mood: Mood } | null>(null);
+  // What the student answered on the opening card, once, so it can be shown settled.
+  const [demoAnswer, setDemoAnswer] = useState<"carre" | "intox" | null>(null);
 
   const stepId: StepId = STEPS[step];
   const trimmedName = name.trim();
@@ -126,7 +133,7 @@ export function OnboardingView() {
   const rhythm = RHYTHMS.find((r) => r.id === goal);
 
   const canContinue: Record<StepId, boolean> = {
-    welcome: true,
+    demo: demoAnswer !== null,
     name: trimmedName.length > 0,
     level: level !== null,
     tone: personality !== null,
@@ -135,8 +142,8 @@ export function OnboardingView() {
   };
 
   const question: Record<StepId, { text: string; mood: Mood }> = {
-    welcome: {
-      text: "Salut, moi c’est Braise. Tes cours, expliqués comme par un pote.",
+    demo: {
+      text: "Salut, moi c’est Braise. Vrai ou intox, à toi de voir :",
       mood: "happy",
     },
     name: { text: "Comment je t’appelle ?", mood: "eager" },
@@ -152,6 +159,20 @@ export function OnboardingView() {
   const line = reaction ?? question[stepId];
 
   const tap = () => sfx.tap(state.soundOn);
+
+  // The opening card. Right or wrong, Braise lands on the same explanation — the trap is what is
+  // teased, never the student — and the sound is the one Réviser plays for that same gesture.
+  const answerDemo = (side: "carre" | "intox") => {
+    if (demoAnswer) return;
+    const right = side === DEMO.answer;
+    setDemoAnswer(side);
+    if (right) sfx.correct(state.soundOn);
+    else sfx.soft(state.soundOn);
+    setReaction({
+      text: right ? DEMO.win : DEMO.miss,
+      mood: right ? "proud" : "happy",
+    });
+  };
 
   const goTo = (next: number) => {
     setDirection(next > step ? 1 : -1);
@@ -194,7 +215,7 @@ export function OnboardingView() {
   }, [stepId, reducedMotion]);
 
   const ctaLabel: Record<StepId, string> = {
-    welcome: "On y va !",
+    demo: "On continue",
     name: "Continuer",
     level: "Continuer",
     tone: "Continuer",
@@ -254,25 +275,32 @@ export function OnboardingView() {
               exit={{ opacity: 0, x: -32 * direction }}
               transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
             >
-              {stepId === "welcome" && (
-                <ul className="onb-pitch">
-                  {PITCH.map((p, i) => (
-                    <motion.li
-                      key={p.title}
-                      initial={{ opacity: 0, y: 14 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: 0.25 + i * 0.09 }}
-                    >
-                      <span className="onb-pitch-icon" aria-hidden="true">
-                        {p.icon}
-                      </span>
-                      <span>
-                        <b>{p.title}</b>
-                        <small>{p.line}</small>
-                      </span>
-                    </motion.li>
-                  ))}
-                </ul>
+              {stepId === "demo" && (
+                <div className="onb-demo">
+                  <motion.p
+                    className={`onb-claim ${demoAnswer ? "is-judged" : ""}`}
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.2 }}
+                  >
+                    {demoAnswer ? <RichText text={DEMO.truth} markClass="onb-mark" /> : DEMO.claim}
+                  </motion.p>
+                  <div className="onb-verdicts">
+                    {(["intox", "carre"] as const).map((side) => (
+                      <button
+                        key={side}
+                        type="button"
+                        className={`onb-verdict onb-verdict--${side} ${
+                          demoAnswer === side ? "is-picked" : ""
+                        } ${demoAnswer && demoAnswer !== side ? "is-dimmed" : ""}`}
+                        disabled={demoAnswer !== null}
+                        onClick={() => answerDemo(side)}
+                      >
+                        {side === "intox" ? "✖ Intox" : "✔ Carré"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               )}
 
               {stepId === "name" && (
