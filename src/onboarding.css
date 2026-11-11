@@ -346,16 +346,18 @@
   }
 }
 
-/* ===== Onboarding, skin "pass" — one object, built in front of the student =====
-   The member card is the stage and the progress at once: each answer is stamped onto it, and the
-   last screen is the finished object rather than a recap of the questions. See
-   components/onboarding/PassOnboarding.tsx. */
+/* ===== Onboarding, skin "pass" — un objet qu'on construit devant l'élève =====
+   La carte est la scène ET la progression : la ligne qu'on remplit s'ouvre dedans et pose sa
+   question, les autres attendent. Pas de barre de progression — à chaque information demandée,
+   on avance dans le pass, et ça se voit. Voir components/onboarding/PassOnboarding.tsx. */
 .onbp {
   height: 100%;
   display: flex;
   flex-direction: column;
   padding: 0 var(--page-gutter);
-  background: var(--bg);
+  /* L'orange de la marque du début à la fin : l'ouverture s'y déplie, la carte y reste posée. */
+  background: #ff6b35;
+  color: #151821;
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
@@ -363,9 +365,6 @@
 .onbp .onbp-input {
   -webkit-user-select: text;
   user-select: text;
-}
-.onbp--ready {
-  background: #ff6b35;
 }
 .onbp-top {
   flex-shrink: 0;
@@ -391,7 +390,7 @@
   box-shadow: none;
 }
 .onbp-back:disabled {
-  opacity: 0.3;
+  opacity: 0.35;
   box-shadow: none;
   pointer-events: none;
 }
@@ -406,7 +405,6 @@
   background: #fffdf8;
   box-shadow: 2px 2px 0 var(--neo-ink);
 }
-/* Braise's line, naked: on this skin the card is the object on paper, so the voice stays light. */
 .onbp-line {
   flex: 1;
   min-width: 0;
@@ -416,35 +414,34 @@
   font-size: 1.05rem;
   font-weight: 800;
   line-height: 1.2;
-  color: var(--ink);
-}
-.onbp--ready .onbp-line {
   color: #151821;
 }
 
-/* The stage: the card, centred, the only thing that matters. */
 .onbp-stage {
   flex: 1;
   min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 7px;
+  padding: 6px 8px 18px;
   overflow-y: auto;
+}
+/* L'enveloppe porte l'inclinaison et laisse dépasser Braise ; la carte elle-même reste droite
+   dans son coin de monde. */
+.onbp-wrap {
+  position: relative;
+  width: 100%;
 }
 .onbp-card {
   position: relative;
-  width: 100%;
   margin: 0;
-  padding: 16px 18px 8px;
+  padding: 15px 17px 8px;
   border: 3px solid #151821;
   border-radius: 18px;
-  background: #fffdf8;
+  /* Crème chaud, pas blanc cassé : sur l'orange, le blanc faisait pièce d'identité. */
+  background: #fff7e8;
   box-shadow: 7px 7px 0 #151821;
   color: #151821;
-}
-.onbp-card.is-sealed {
-  box-shadow: 7px 7px 0 #151821;
 }
 .onbp-kicker {
   display: flex;
@@ -462,117 +459,91 @@
   font-size: 0.78rem;
   opacity: 0.55;
 }
-.onbp-card > div {
+.onbp-row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
   padding: 11px 0;
 }
-.onbp-card > div + div {
+.onbp-row + .onbp-row {
   border-top: 1.5px solid rgba(21, 24, 33, 0.12);
 }
+/* La ligne qu'on remplit : elle s'ouvre, passe en colonne, et la question s'y lit en entier. */
+.onbp-row.is-open {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  padding: 13px 0;
+}
+/* Les étiquettes parlent comme Braise : minuscules, Baloo, pas les capitales mono d'un formulaire. */
 .onbp-card dt {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.72rem;
+  font-family: "Baloo 2", sans-serif;
+  font-size: 0.84rem;
   font-weight: 700;
-  text-transform: uppercase;
-  opacity: 0.55;
+  opacity: 0.5;
+}
+.onbp-row.is-open dt {
+  font-size: 1.05rem;
+  font-weight: 800;
+  opacity: 1;
 }
 .onbp-card dd {
   margin: 0;
-  font-family: "Baloo 2", sans-serif;
-  font-size: 1.14rem;
-  font-weight: 800;
   text-align: right;
 }
-/* A field still to fill: a line waiting to be written on. */
-.onbp-card dd i {
-  display: block;
-  width: 92px;
-  height: 3px;
-  border-radius: 2px;
-  background: repeating-linear-gradient(
-    to right,
-    rgba(21, 24, 33, 0.3) 0 7px,
-    transparent 7px 13px
-  );
-}
-/* The stamp that lands on the finished card. */
-/* On the left corner, not the right: on the right it landed straight across the last value of the
-   card it is supposed to validate. */
-.onbp-seal {
-  position: absolute;
-  left: 16px;
-  bottom: -18px;
-  padding: 7px 16px;
-  border: 3px solid var(--coral-2);
-  border-radius: 10px;
-  background: #fffdf8;
-  color: var(--coral-2);
-  font-family: "Baloo 2", sans-serif;
-  font-size: 1.1rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  box-shadow: 3px 3px 0 rgba(21, 24, 33, 0.25);
-}
-/* The opening card keeps the look it has in the other skins. */
-.onbp-claim {
-  width: 100%;
-  padding: 18px;
-  border: 2.5px solid var(--neo-ink);
-  border-radius: 18px;
-  background: var(--paper);
-  box-shadow: 5px 5px 0 var(--neo-ink);
-  color: var(--ink);
-  font-family: "Baloo 2", sans-serif;
-  font-size: 1.26rem;
-  font-weight: 800;
-  line-height: 1.25;
-  transition:
-    border-color 0.25s ease,
-    box-shadow 0.25s ease;
-}
-.onbp-claim.is-judged {
-  border-color: var(--mint-text);
-  box-shadow: 5px 5px 0 var(--mint-text);
-}
-
-.onbp-foot {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 14px 0 calc(16px + env(safe-area-inset-bottom, 0px));
-}
-.onbp-chips {
+.onbp-answers {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  text-align: left;
+}
+/* Une réponse donnée est collée, pas saisie. */
+.onbp-sticker {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 11px;
+  border: 2.5px solid #151821;
+  border-radius: 999px;
+  background: var(--sun, #ffd43b);
+  box-shadow: 2px 2px 0 #151821;
+  font-family: "Baloo 2", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+.onbp-sticker i {
+  font-style: normal;
+}
+/* Une ligne qui attend : un emplacement, pas des pointillés à remplir. */
+.onbp-slot {
+  display: block;
+  width: 78px;
+  height: 17px;
+  border: 2px dashed rgba(21, 24, 33, 0.25);
+  border-radius: 999px;
 }
 .onbp-chip {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  min-height: 46px;
-  padding: 9px 15px;
+  min-height: 44px;
+  padding: 8px 14px;
   border: 2.5px solid var(--neo-ink);
   border-radius: 999px;
-  background: var(--paper);
-  box-shadow: 3px 3px 0 var(--neo-ink);
+  background: #fffdf8;
+  box-shadow: 2px 2px 0 var(--neo-ink);
   color: var(--ink);
   font-family: "Baloo 2", sans-serif;
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 800;
 }
 .onbp-chip:active {
   transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 var(--neo-ink);
+  box-shadow: none;
 }
 .onbp-chip.is-selected {
-  background: #ffd43b;
-  color: #151821;
+  background: var(--sun, #ffd43b);
 }
 .onbp-chip-aside {
   display: inline-flex;
@@ -582,81 +553,98 @@
   width: 18px;
   height: 18px;
 }
-.onbp-verdicts {
-  display: flex;
-  gap: 12px;
-}
-.onbp-verdict {
-  flex: 1 1 0;
-  min-width: 0;
-  min-height: 56px;
-  border: 2.5px solid var(--neo-ink);
-  border-radius: 15px;
-  box-shadow: 4px 4px 0 var(--neo-ink);
-  color: #151821;
-  font-family: "Baloo 2", sans-serif;
-  font-size: 1.08rem;
-  font-weight: 800;
-  transition:
-    opacity 0.25s ease,
-    box-shadow 0.12s ease;
-}
-.onbp-verdict--intox {
-  background: var(--coral);
-  color: #fff;
-}
-.onbp-verdict--carre {
-  background: var(--mint);
-}
-.onbp-verdict:not(:disabled):active {
-  transform: translate(2px, 2px);
-  box-shadow: none;
-}
-.onbp-verdict.is-dimmed {
-  opacity: 0.3;
-  box-shadow: none;
-}
 .onbp-input {
   width: 100%;
-  padding: 14px 18px;
-  border: 3px solid var(--neo-ink);
-  border-radius: 15px;
-  background: var(--paper);
-  box-shadow: 4px 4px 0 var(--neo-ink);
+  padding: 11px 16px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 999px;
+  background: #fffdf8;
+  box-shadow: 2px 2px 0 var(--neo-ink);
   color: var(--ink);
   font-family: "Baloo 2", sans-serif;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   font-weight: 800;
 }
 .onbp-input:focus {
   outline: none;
-  box-shadow: 4px 4px 0 var(--neo-orange);
+  box-shadow: 2px 2px 0 var(--neo-orange);
 }
 .onbp-input::placeholder {
   color: var(--ink-soft);
-  opacity: 0.6;
+  opacity: 0.55;
+}
+/* Ce que Braise lance quand une réponse vient d'être donnée : une bulle courte, calée sous sa
+   tête, au-dessus de la carte. */
+.onbp-react {
+  position: absolute;
+  left: 0;
+  right: 92px;
+  top: -40px;
+  margin: 0;
+  padding: 8px 12px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 14px 14px 4px 14px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: var(--ink);
+  font-family: "Baloo 2", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+/* Braise passe la tête PAR-DESSUS la carte, comme quelqu'un qui regarde par-dessus un mur. En
+   bas, derrière, on ne voyait que ses pieds — et des pieds ne sourient pas. */
+.onbp-peek {
+  position: absolute;
+  right: 12px;
+  top: -44px;
+  z-index: -1;
+  pointer-events: none;
+}
+.onbp-seal {
+  position: absolute;
+  left: 16px;
+  /* Assez bas pour ne pas mordre sur la dernière ligne de la carte qu'il valide. */
+  bottom: -28px;
+  padding: 7px 16px;
+  border: 3px solid var(--coral-2);
+  border-radius: 10px;
+  background: #fff7e8;
+  color: var(--coral-2);
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  box-shadow: 3px 3px 0 rgba(21, 24, 33, 0.25);
+}
+
+.onbp-foot {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0 0 calc(16px + env(safe-area-inset-bottom, 0px));
 }
 .onbp-cta {
   width: 100%;
   min-height: 56px;
   border: 3px solid #151821;
   border-radius: 15px;
-  background: var(--neo-orange);
+  background: #fff;
   box-shadow: 4px 4px 0 #151821;
   color: #151821;
   font-family: "Baloo 2", sans-serif;
   font-size: 1.16rem;
   font-weight: 800;
 }
-.onbp--ready .onbp-cta {
-  background: #fff;
-}
 .onbp-cta:not(:disabled):active {
   transform: translate(2px, 2px);
   box-shadow: none;
 }
 .onbp-cta:disabled {
-  opacity: 0.4;
+  opacity: 0.45;
   box-shadow: none;
 }
 

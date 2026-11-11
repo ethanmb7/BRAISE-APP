@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, Send } from "lucide-react";
 import { BraiseMascot } from "@/components/BraiseMascot";
-import { RichText } from "@/components/RichText";
 import type { OnbModel } from "./model";
 
 // Skin "thread": the onboarding as the conversation it claims to be. Braise's lines arrive on the
@@ -16,15 +15,14 @@ import type { OnbModel } from "./model";
 // conversation you can scroll.
 export function ThreadOnboarding({ model }: { model: OnbModel }) {
   const endRef = useRef<HTMLDivElement>(null);
-  const { stepId, line, options, history, name, demo, pass, canContinue, ctaLabel } = model;
+  const { stepId, line, options, history, name, pass, canContinue, ctaLabel } = model;
 
   // Every new message pins the thread to its bottom, like any messaging app.
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "end", behavior: "smooth" });
-  }, [history.length, line.text, demo.picked]);
+  }, [history.length, line.text]);
 
   const isName = stepId === "name";
-  const isDemo = stepId === "demo";
   const isReady = stepId === "ready";
 
   return (
@@ -71,16 +69,6 @@ export function ThreadOnboarding({ model }: { model: OnbModel }) {
         <Said key={line.text} text={line.text} live />
 
         {/* Braise's messages can carry something: the card to judge, then the finished pass. */}
-        {isDemo && (
-          <motion.div
-            className={`onbt-attach onbt-claim ${demo.picked ? "is-judged" : ""}`}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.15 }}
-          >
-            {demo.picked ? <RichText text={demo.truth} markClass="onb-mark" /> : demo.claim}
-          </motion.div>
-        )}
         {isReady && (
           <motion.dl
             className="onbt-attach onbt-pass"
@@ -125,22 +113,6 @@ export function ThreadOnboarding({ model }: { model: OnbModel }) {
             >
               <Send size={18} strokeWidth={2.6} />
             </button>
-          </div>
-        ) : isDemo ? (
-          <div className="onbt-replies">
-            {(["intox", "carre"] as const).map((side) => (
-              <button
-                key={side}
-                type="button"
-                className={`onbt-verdict onbt-verdict--${side} ${
-                  demo.picked && demo.picked !== side ? "is-dimmed" : ""
-                }`}
-                disabled={demo.picked !== null}
-                onClick={() => demo.onPick(side)}
-              >
-                {side === "intox" ? "✖ Intox" : "✔ Carré"}
-              </button>
-            ))}
           </div>
         ) : options.length > 0 ? (
           <div className="onbt-replies">

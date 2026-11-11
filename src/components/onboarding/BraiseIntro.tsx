@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { BraiseLogo } from "@/components/BraiseLogo";
 import type { IntroVariant } from "./model";
 import { BraiseMascot } from "@/components/BraiseMascot";
@@ -18,14 +18,12 @@ import { BraiseMascot } from "@/components/BraiseMascot";
 const ORANGE = "#ff6b35";
 
 export function BraiseIntro({ variant, onDone }: { variant: IntroVariant; onDone: () => void }) {
-  const reduced = useReducedMotion();
   const [phase, setPhase] = useState<"mark" | "become" | "gone">("mark");
 
+  // Pas de court-circuit ici : si l'ouverture ne doit pas jouer, le parent ne monte simplement
+  // pas ce composant. Appeler onDone pendant le montage revenait à pousser un changement d'état
+  // dans un parent encore en train de se monter, ce que React signale à juste titre.
   useEffect(() => {
-    if (variant === "none" || reduced) {
-      onDone();
-      return;
-    }
     const a = setTimeout(() => setPhase("become"), 620);
     const b = setTimeout(() => {
       setPhase("gone");
@@ -35,9 +33,9 @@ export function BraiseIntro({ variant, onDone }: { variant: IntroVariant; onDone
       clearTimeout(a);
       clearTimeout(b);
     };
-  }, [variant, reduced, onDone]);
+  }, [onDone]);
 
-  if (variant === "none" || reduced || phase === "gone") return null;
+  if (phase === "gone") return null;
 
   return (
     <AnimatePresence>

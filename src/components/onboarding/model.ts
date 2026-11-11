@@ -59,14 +59,13 @@ export type OnbModel = {
   /** Everything already answered, oldest first. */
   history: OnbExchange[];
   name: { value: string; onChange: (v: string) => void };
-  demo: {
-    claim: string;
-    truth: string;
-    picked: "carre" | "intox" | null;
-    onPick: (side: "carre" | "intox") => void;
-  };
-  /** Filled fields of the pass; a field is absent until its question is answered. */
-  pass: { label: string; value: string | null }[];
+  /** Ce que Braise vient de répondre à la dernière réponse, s'il a réagi. La question, elle, est
+   *  posée par la ligne du pass qui s'ouvre, donc les deux ne se marchent pas dessus. */
+  reaction: string | null;
+  /** Les lignes du pass, dans l'ordre. `step` dit quelle question remplit la ligne, pour que la
+   *  carte puisse ouvrir la bonne au bon moment ; `emoji` est celui de la réponse choisie, pour
+   *  la coller en sticker une fois la ligne remplie. */
+  pass: { step: string; label: string; ask: string; value: string | null; emoji?: string }[];
   canContinue: boolean;
   ctaLabel: string;
   onNext: () => void;
