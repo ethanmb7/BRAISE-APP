@@ -78,7 +78,14 @@ export function PassOnboarding({ model }: { model: OnbModel }) {
                   >
                     <dt>{open ? f.ask : f.label}</dt>
                     {open ? (
-                      <dd className="onbp-answers">
+                      <dd
+                        className="onbp-answers"
+                        // Autant de colonnes égales que de réponses : trois tuiles alignées
+                        // plutôt qu'une rangée qui déborde et en renvoie une seule à la ligne.
+                        style={{
+                          gridTemplateColumns: `repeat(${Math.max(1, options.length)}, minmax(0, 1fr))`,
+                        }}
+                      >
                         {stepId === "name" ? (
                           <input
                             className="onbp-input"
@@ -107,7 +114,9 @@ export function PassOnboarding({ model }: { model: OnbModel }) {
                               <span aria-hidden="true" className="onbp-chip-aside">
                                 {o.aside}
                               </span>
-                              <span aria-hidden="true">{o.title}</span>
+                              <span aria-hidden="true" className="onbp-chip-label">
+                                {o.title}
+                              </span>
                             </button>
                           ))
                         )}

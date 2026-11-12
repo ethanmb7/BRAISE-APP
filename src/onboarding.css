@@ -492,9 +492,11 @@
   margin: 0;
   text-align: right;
 }
+/* Les réponses occupent une seule rangée de colonnes égales (le nombre vient du composant) :
+   en flex qui passe à la ligne, « Terminale » partait seul sur une deuxième rangée et la carte
+   grandissait d'autant. */
 .onbp-answers {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: 8px;
   text-align: left;
 }
@@ -523,20 +525,32 @@
   border: 2px dashed rgba(21, 24, 33, 0.25);
   border-radius: 999px;
 }
+/* Une tuile par réponse : le pictogramme au-dessus, le mot en dessous. Empilé, « Terminale » et
+   « Coach énergie » tiennent dans un tiers de carte à 320 px, ce qu'une puce en ligne ne faisait
+   pas — et trois tuiles de même taille se lisent d'un coup d'œil. */
 .onbp-chip {
-  display: inline-flex;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 7px;
-  min-height: 44px;
-  padding: 8px 14px;
+  justify-content: center;
+  gap: 3px;
+  min-height: 62px;
+  padding: 8px 4px;
   border: 2.5px solid var(--neo-ink);
-  border-radius: 999px;
+  border-radius: 14px;
   background: #fffdf8;
   box-shadow: 2px 2px 0 var(--neo-ink);
   color: var(--ink);
   font-family: "Baloo 2", sans-serif;
-  font-size: 0.98rem;
   font-weight: 800;
+  text-align: center;
+}
+.onbp-chip-label {
+  /* Le mot rétrécit avec la colonne au lieu d'être cassé en deux : à 320 px, « Terminale »
+     sortait coupé en « Termina / le ». La césure n'est là qu'en dernier recours. */
+  font-size: clamp(0.7rem, 3.4vw, 0.9rem);
+  line-height: 1.1;
+  hyphens: auto;
 }
 .onbp-chip:active {
   transform: translate(2px, 2px);
@@ -548,6 +562,8 @@
 .onbp-chip-aside {
   display: inline-flex;
   align-items: center;
+  font-size: 1.15rem;
+  line-height: 1;
 }
 .onbp-chip svg {
   width: 18px;
