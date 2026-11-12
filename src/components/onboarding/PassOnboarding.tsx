@@ -22,6 +22,10 @@ export function PassOnboarding({ model }: { model: OnbModel }) {
   const isReady = stepId === "ready";
   const filled = pass.filter((f) => f.value).length;
   const firstName = pass.find((f) => f.step === "name")?.value ?? "";
+  // La seule question qui soit une échelle ordonnée ; les autres sont des ensembles de réponses
+  // sans ordre, et gardent leurs puces.
+  const isScale = stepId === "rhythm";
+  const scaleIndex = options.findIndex((o) => o.selected);
 
   return (
     <div className={`onbp onbp--${stepId}`}>
@@ -98,6 +102,35 @@ export function PassOnboarding({ model }: { model: OnbModel }) {
                             autoComplete="given-name"
                             autoFocus
                           />
+                        ) : isScale ? (
+                          // Le rythme est une échelle, pas trois options sans rapport :
+                          // Tranquille → Régulier → À fond se lisent dans l'ordre. Le contrôle
+                          // segmenté le dit par sa forme, tient sur une rangée quoi qu'il arrive,
+                          // et c'est déjà celui que Profil utilise pour une préférence.
+                          <div className="onbp-seg" role="group" aria-label={f.ask}>
+                            {scaleIndex >= 0 && (
+                              <span
+                                className="onbp-seg-thumb"
+                                style={{
+                                  left: `calc(3px + ${scaleIndex} * (100% - 6px) / ${options.length})`,
+                                  width: `calc((100% - 6px) / ${options.length})`,
+                                }}
+                                aria-hidden="true"
+                              />
+                            )}
+                            {options.map((o) => (
+                              <button
+                                key={o.id}
+                                type="button"
+                                className={`onbp-seg-opt ${o.selected ? "is-active" : ""}`}
+                                aria-pressed={o.selected}
+                                aria-label={o.desc ? `${o.title} — ${o.desc}` : o.title}
+                                onClick={o.onSelect}
+                              >
+                                <span aria-hidden="true">{o.title}</span>
+                              </button>
+                            ))}
+                          </div>
                         ) : (
                           options.map((o) => (
                             <button
