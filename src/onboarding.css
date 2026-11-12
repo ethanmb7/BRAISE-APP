@@ -561,6 +561,54 @@
   font-size: 0.98rem;
   font-weight: 800;
 }
+/* Les deux voix de Braise : un bouton par manière de parler, et chacun PARLE. Le nom en haut,
+   la réplique en dessous entre guillemets — c'est elle qui fait choisir, pas l'adjectif. Pas de
+   mascotte dessus : deux Braise de 22 px côte à côte ne se distinguaient pas, et ce n'est pas le
+   visage qui change d'un ton à l'autre. */
+.onbp-voices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+.onbp-voice {
+  display: block;
+  width: 100%;
+  padding: 11px 14px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 16px;
+  background: #fffdf8;
+  box-shadow: 2px 2px 0 var(--neo-ink);
+  color: var(--ink);
+  text-align: left;
+}
+.onbp-voice:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+.onbp-voice.is-selected {
+  background: var(--sun, #ffd43b);
+}
+.onbp-voice b {
+  display: block;
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+/* La réplique : mise en voix par les guillemets français, pas par de l'italique — le gras de
+   Baloo en italique devient illisible en petit. */
+.onbp-voice q {
+  display: block;
+  margin-top: 3px;
+  font-family: "Baloo 2", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.25;
+  opacity: 0.75;
+  quotes: "\00AB\00A0" "\00A0\00BB";
+}
+
 /* Le contrôle segmenté du rythme : une seule piste bordée, trois parts égales, un curseur qui
    glisse. Même objet que celui de Profil (voir .seg-track dans braise.css), à l'échelle de la
    carte. Trois puces séparées disaient « trois options sans rapport » et débordaient sur deux

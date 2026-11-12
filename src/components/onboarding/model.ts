@@ -42,6 +42,9 @@ export type OnbOption = {
   desc?: string;
   /** An emoji, a mascot, the flames of a rhythm — whatever that question shows beside its label. */
   aside?: ReactNode;
+  /** Une réplique écrite DANS cette option, quand l'option est une manière de parler : on choisit
+   *  un ton en le lisant, pas en lisant un adjectif qui le décrit. */
+  quote?: string;
   selected: boolean;
   onSelect: () => void;
 };

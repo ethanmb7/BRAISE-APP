@@ -65,14 +65,14 @@ const TONES: { id: Personality; title: string; desc: string; sample: string; moo
     id: "chill",
     title: "Pote Chill",
     desc: "Doux, rassurant, zéro pression.",
-    sample: "Pas de stress. On reprend ça tranquille, une étape à la fois.",
+    sample: "Pas de stress. On y va tranquille.",
     mood: "happy",
   },
   {
     id: "savage",
     title: "Coach énergie",
     desc: "Direct, énergique, second degré.",
-    sample: "Ce piège-là attrape tout le monde. Pas toi, cette fois.",
+    sample: "Ce piège attrape tout le monde. Pas toi.",
     mood: "cool",
   },
 ];
@@ -228,7 +228,9 @@ export function OnboardingView() {
       id: t.id,
       title: t.title,
       desc: t.desc,
-      aside: <BraiseMascot size={22} mood={t.mood} />,
+      // Pas de mascotte sur ces boutons-là : deux Braise de 22 px côte à côte ne se distinguent
+      // pas, et ce n'est pas le visage qui change d'un ton à l'autre, c'est la phrase.
+      quote: t.sample,
       selected: personality === t.id,
       onSelect: () => {
         tap();

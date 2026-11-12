@@ -25,6 +25,7 @@ export function PassOnboarding({ model }: { model: OnbModel }) {
   // La seule question qui soit une échelle ordonnée ; les autres sont des ensembles de réponses
   // sans ordre, et gardent leurs puces.
   const isScale = stepId === "rhythm";
+  const isVoice = stepId === "tone";
   const scaleIndex = options.findIndex((o) => o.selected);
 
   return (
@@ -102,6 +103,28 @@ export function PassOnboarding({ model }: { model: OnbModel }) {
                             autoComplete="given-name"
                             autoFocus
                           />
+                        ) : isVoice ? (
+                          // Un ton ne se choisit pas sur une étiquette : « Doux, rassurant » est
+                          // une description, pas une voix. Chaque bouton porte donc une phrase
+                          // DITE dans ce ton-là — on choisit en lisant, pas en devinant. C'est
+                          // le même principe que les options écrites dans les mots de l'élève
+                          // (« I snack a lot ») plutôt qu'en catégories, dans les onboardings
+                          // relevés sur l'App Store.
+                          <div className="onbp-voices">
+                            {options.map((o) => (
+                              <button
+                                key={o.id}
+                                type="button"
+                                className={`onbp-voice ${o.selected ? "is-selected" : ""}`}
+                                aria-pressed={o.selected}
+                                aria-label={o.desc ? `${o.title} — ${o.desc}` : o.title}
+                                onClick={o.onSelect}
+                              >
+                                <b aria-hidden="true">{o.title}</b>
+                                {o.quote && <q aria-hidden="true">{o.quote}</q>}
+                              </button>
+                            ))}
+                          </div>
                         ) : isScale ? (
                           // Le rythme est une échelle, pas trois options sans rapport :
                           // Tranquille → Régulier → À fond se lisent dans l'ordre. Le contrôle
