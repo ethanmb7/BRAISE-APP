@@ -512,7 +512,7 @@
 .onbp-answers {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   text-align: left;
 }
 /* Une réponse donnée est collée, pas saisie. */
@@ -543,9 +543,15 @@
 .onbp-chip {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  justify-content: center;
+  /* Les puces d'une rangée se partagent la largeur : plus de bord droit en dents de scie, et
+     quand une réponse part à la ligne elle occupe toute la rangée au lieu de flotter à gauche.
+     Le resserrement du padding (14 → 9) fait tenir « 2nde · 1ère · Terminale » sur une seule
+     rangée à 375 px : dans les 285 px utiles de la carte, les trois puces en demandaient 295. */
+  flex: 1 1 auto;
+  gap: 6px;
   min-height: 44px;
-  padding: 8px 14px;
+  padding: 8px 9px;
   border: 2.5px solid var(--neo-ink);
   border-radius: 999px;
   background: #fffdf8;
