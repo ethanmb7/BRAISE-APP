@@ -1,6 +1,6 @@
 // What every onboarding skin is given. The questions, the answers and the state machine live once,
 // in OnboardingView; a skin only decides how the conversation LOOKS. Switch with
-// `localStorage.braise_onb` = "cartes" (default) | "thread" | "pass", same way the five suggestion
+// `localStorage.braise_onb` = "pass" (default) | "cartes" | "thread", same way the five suggestion
 // cards of a subject were tried against each other.
 import type { ReactNode } from "react";
 
@@ -10,12 +10,14 @@ export type OnbSkin = "cartes" | "thread" | "pass";
 
 export const ONB_SKIN_KEY = "braise_onb";
 
+/** Le pass est la peau retenue par le propriétaire : c'est elle par défaut. Les deux autres
+ *  restent accessibles pour comparer, en écrivant "cartes" ou "thread" dans la clé. */
 export function readSkin(): OnbSkin {
   try {
     const v = localStorage.getItem(ONB_SKIN_KEY);
-    return v === "thread" || v === "pass" ? v : "cartes";
+    return v === "thread" || v === "cartes" ? v : "pass";
   } catch {
-    return "cartes";
+    return "pass";
   }
 }
 
@@ -59,9 +61,6 @@ export type OnbModel = {
   /** Everything already answered, oldest first. */
   history: OnbExchange[];
   name: { value: string; onChange: (v: string) => void };
-  /** Ce que Braise vient de répondre à la dernière réponse, s'il a réagi. La question, elle, est
-   *  posée par la ligne du pass qui s'ouvre, donc les deux ne se marchent pas dessus. */
-  reaction: string | null;
   /** Les lignes du pass, dans l'ordre. `step` dit quelle question remplit la ligne, pour que la
    *  carte puisse ouvrir la bonne au bon moment ; `emoji` est celui de la réponse choisie, pour
    *  la coller en sticker une fois la ligne remplie. */

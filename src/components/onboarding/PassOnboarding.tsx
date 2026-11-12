@@ -18,7 +18,7 @@ import type { OnbModel } from "./model";
 // d'un formulaire. Le papier est crème chaud : sur l'orange de la marque, le blanc cassé faisait
 // document administratif.
 export function PassOnboarding({ model }: { model: OnbModel }) {
-  const { stepId, line, options, name, reaction, pass, canContinue, ctaLabel } = model;
+  const { stepId, line, options, name, pass, canContinue, ctaLabel } = model;
   const isReady = stepId === "ready";
   const filled = pass.filter((f) => f.value).length;
   const firstName = pass.find((f) => f.step === "name")?.value ?? "";
@@ -82,14 +82,7 @@ export function PassOnboarding({ model }: { model: OnbModel }) {
                   >
                     <dt>{open ? f.ask : f.label}</dt>
                     {open ? (
-                      <dd
-                        className="onbp-answers"
-                        // Autant de colonnes égales que de réponses : trois tuiles alignées
-                        // plutôt qu'une rangée qui déborde et en renvoie une seule à la ligne.
-                        style={{
-                          gridTemplateColumns: `repeat(${Math.max(1, options.length)}, minmax(0, 1fr))`,
-                        }}
-                      >
+                      <dd className="onbp-answers">
                         {stepId === "name" ? (
                           <input
                             className="onbp-input"
@@ -118,9 +111,7 @@ export function PassOnboarding({ model }: { model: OnbModel }) {
                               <span aria-hidden="true" className="onbp-chip-aside">
                                 {o.aside}
                               </span>
-                              <span aria-hidden="true" className="onbp-chip-label">
-                                {o.title}
-                              </span>
+                              <span aria-hidden="true">{o.title}</span>
                             </button>
                           ))
                         )}
@@ -168,20 +159,6 @@ export function PassOnboarding({ model }: { model: OnbModel }) {
               <span className="onbp-peek" aria-hidden="true">
                 <BraiseLogo size={74} />
               </span>
-            )}
-
-            {/* Braise réagit à ce qui vient d'être répondu, depuis sa place : la carte pose les
-                questions, lui commente. Les deux ne se disputent jamais le même espace. */}
-            {!isReady && reaction && (
-              <motion.p
-                key={reaction}
-                className="onbp-react"
-                initial={{ opacity: 0, y: 8, scale: 0.94 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ type: "spring", stiffness: 440, damping: 26 }}
-              >
-                {reaction}
-              </motion.p>
             )}
           </motion.div>
         }

@@ -131,8 +131,6 @@ export function OnboardingView() {
   const [level, setLevel] = useState<Level | null>(null);
   const [personality, setPersonality] = useState<Personality | null>(null);
   const [goal, setGoal] = useState<string | null>(null);
-  // Braise's reply to the answer just given on this screen — cleared on every screen change.
-  const [reaction, setReaction] = useState<{ text: string; mood: Mood } | null>(null);
 
   const stepId: StepId = STEPS[step];
   const trimmedName = name.trim();
@@ -160,13 +158,14 @@ export function OnboardingView() {
       mood: "proud",
     },
   };
-  const line = reaction ?? question[stepId];
+  // Une seule voix par écran : la question. Les commentaires de Braise après chaque choix
+  // sont retirés — ils s'ouvraient par-dessus la carte pour ne rien apprendre.
+  const line = question[stepId];
 
   const tap = () => sfx.tap(state.soundOn);
 
   const goTo = (next: number) => {
     setDirection(next > step ? 1 : -1);
-    setReaction(null);
     setStep(next);
   };
 
@@ -223,9 +222,6 @@ export function OnboardingView() {
       onSelect: () => {
         tap();
         setLevel(l);
-        // Pas de réaction ici : la classe est un réglage, pas une réponse à commenter, et la
-        // bulle qui s'ouvrait par-dessus la carte encombrait l'écran pour ne rien apprendre.
-        setReaction(null);
       },
     })),
     tone: TONES.map((t) => ({
@@ -237,7 +233,6 @@ export function OnboardingView() {
       onSelect: () => {
         tap();
         setPersonality(t.id);
-        setReaction({ text: t.sample, mood: t.mood });
       },
     })),
     rhythm: RHYTHMS.map((r) => ({
@@ -257,10 +252,6 @@ export function OnboardingView() {
       onSelect: () => {
         tap();
         setGoal(r.id);
-        setReaction({
-          text: pickLine(voiceTone, COPY.onboarding.rhythm[r.id]),
-          mood: r.id === "a-fond" ? "cool" : "happy",
-        });
       },
     })),
   };
@@ -284,7 +275,6 @@ export function OnboardingView() {
     options: optionsFor[stepId] ?? [],
     history,
     name: { value: name, onChange: setName },
-    reaction: reaction?.text ?? null,
     // Les lignes du pass : l'étiquette telle qu'elle se lit une fois remplie, la question telle
     // que Braise la pose quand la ligne s'ouvre, et l'emoji de la réponse pour le sticker.
     pass: [
@@ -378,7 +368,7 @@ export function OnboardingView() {
           <div className="onb-scene">
             <motion.div
               className="onb-avatar"
-              animate={reaction ? { scale: [1, 1.08, 1] } : { scale: 1 }}
+              animate={{ scale: 1 }}
               transition={{ duration: 0.34 }}
             >
               <BraiseMascot size={62} mood={line.mood} />
@@ -431,7 +421,6 @@ export function OnboardingView() {
                         onSelect={() => {
                           tap();
                           setLevel(l);
-                          setReaction(null);
                         }}
                       >
                         <span>
@@ -459,7 +448,6 @@ export function OnboardingView() {
                         onSelect={() => {
                           tap();
                           setPersonality(t.id);
-                          setReaction({ text: t.sample, mood: t.mood });
                         }}
                       >
                         <span className="onb-tone-face" aria-hidden="true">
@@ -486,10 +474,6 @@ export function OnboardingView() {
                       onSelect={() => {
                         tap();
                         setGoal(r.id);
-                        setReaction({
-                          text: pickLine(voiceTone, COPY.onboarding.rhythm[r.id]),
-                          mood: r.id === "a-fond" ? "cool" : "happy",
-                        });
                       }}
                     >
                       <span>
