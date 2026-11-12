@@ -45,21 +45,18 @@ const QUESTION_COUNT = STEPS.length - 1;
 // subject has been chosen, and the trap has to work for any lycéen, from any class. It is the
 // app's own content all the same (see the "Théorème de Pythagore" chapter and its card fc34).
 
-const LEVEL_INFO: Record<string, { tag: string; icon: string; reaction: string }> = {
+const LEVEL_INFO: Record<string, { tag: string; icon: string }> = {
   "2nde": {
     tag: "Nouveau lycée",
     icon: "🌱",
-    reaction: "2nde, nouveau rythme. On pose de bonnes bases ensemble.",
   },
   "1ere": {
     tag: "Bac de français",
     icon: "✍️",
-    reaction: "1ère, bac de français au bout. Pour l’instant : les bases de 2nde.",
   },
   term: {
     tag: "Année du bac",
     icon: "🎓",
-    reaction: "Terminale, année du bac. Pour l’instant : les bases de 2nde.",
   },
 };
 
@@ -226,7 +223,9 @@ export function OnboardingView() {
       onSelect: () => {
         tap();
         setLevel(l);
-        setReaction({ text: LEVEL_INFO[l.id]?.reaction ?? "Noté !", mood: "proud" });
+        // Pas de réaction ici : la classe est un réglage, pas une réponse à commenter, et la
+        // bulle qui s'ouvrait par-dessus la carte encombrait l'écran pour ne rien apprendre.
+        setReaction(null);
       },
     })),
     tone: TONES.map((t) => ({
@@ -432,10 +431,7 @@ export function OnboardingView() {
                         onSelect={() => {
                           tap();
                           setLevel(l);
-                          setReaction({
-                            text: LEVEL_INFO[l.id]?.reaction ?? "Noté !",
-                            mood: "proud",
-                          });
+                          setReaction(null);
                         }}
                       >
                         <span>

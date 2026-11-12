@@ -21,6 +21,7 @@ export function PassOnboarding({ model }: { model: OnbModel }) {
   const { stepId, line, options, name, reaction, pass, canContinue, ctaLabel } = model;
   const isReady = stepId === "ready";
   const filled = pass.filter((f) => f.value).length;
+  const firstName = pass.find((f) => f.step === "name")?.value ?? "";
 
   return (
     <div className={`onbp onbp--${stepId}`}>
@@ -34,21 +35,24 @@ export function PassOnboarding({ model }: { model: OnbModel }) {
         >
           <ArrowLeft size={19} strokeWidth={2.6} />
         </button>
-        {/* Sur la carte à juger et sur l'écran final, Braise parle depuis le haut. Pendant les
+        {/* Sur l'écran final seulement, Braise vient saluer depuis le haut. Pendant les
             questions il se tait ici : c'est la carte qui pose la question, et lui se contente de
-            la regarder par-dessus l'épaule. Un seul Braise par écran, toujours. */}
+            la regarder par-dessus l'épaule. Un seul Braise par écran, toujours.
+
+            Deux mots, pas trois lignes : « Ton Braise est prêt » répétait ce que le tampon PRÊT
+            dit déjà sur la carte, et la phrase entière partait sur trois lignes à côté d'une tête
+            de 40 px. Le prénom suffit à faire la fête. */}
         {isReady && (
           <>
             <motion.span
               className="onbp-face"
-              animate={{ scale: [1, 1.06, 1] }}
-              key={line.text}
+              animate={{ scale: [1, 1.08, 1] }}
               transition={{ duration: 0.34 }}
               aria-hidden="true"
             >
               <BraiseMascot size={40} mood={line.mood} />
             </motion.span>
-            <p className="onbp-line">{line.text}</p>
+            <h1 className="onbp-hello">Bienvenue, {firstName || "toi"}&nbsp;!</h1>
           </>
         )}
       </header>

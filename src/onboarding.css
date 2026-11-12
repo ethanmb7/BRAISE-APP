@@ -405,6 +405,23 @@
   background: #fffdf8;
   box-shadow: 2px 2px 0 var(--neo-ink);
 }
+/* Le salut de l'écran final : court, en gros, sur une ligne. */
+.onbp-hello {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding-top: 2px;
+  font-family: "Baloo 2", sans-serif;
+  /* 235 px restent à côté de la flèche et de la tête sur un écran de 375 : à 24 px, « Bienvenue,
+     Alexandre ! » fait 250 px et repart sur deux lignes de gros texte — exactement le fouillis
+     qu'on enlève. Le titre rétrécit donc avec l'écran ; seuls les prénoms très longs passent
+     encore sur deux lignes, équilibrées. */
+  font-size: clamp(1.05rem, 5.6vw, 1.4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: #151821;
+  text-wrap: balance;
+}
 .onbp-line {
   flex: 1;
   min-width: 0;
