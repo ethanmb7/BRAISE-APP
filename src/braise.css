@@ -5919,3 +5919,446 @@ select {
   box-shadow: none;
   transform: translate(3px, 3px);
 }
+
+/* ============================================================================
+   Moi — identité + télécommande
+   ----------------------------------------------------------------------------
+   Pas de cartes empilées : des titres surlignés au marqueur (le geste des
+   Déclics) et des lignes séparées par des filets. La hiérarchie vient de la
+   taille du texte, pas des cadres — c'est ce qui permet à la page de tenir
+   quand le texte passe en très grand ou que le mode dyslexie s'active.
+   Un seul orange sur cette page : la pastille de l'onglet actif, qui n'est pas
+   à nous. Le jaune ne décore jamais, il dit "c'est ce que tu as choisi".
+   ========================================================================== */
+
+.moi-kicker {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.moi-identity {
+  padding-top: 6px;
+}
+.moi-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Baloo 2", sans-serif;
+  font-weight: 800;
+  font-size: 2.1rem;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.moi-rename-btn {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  border: 2px solid var(--neo-ink);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 2px 2px 0 var(--neo-ink);
+}
+.moi-rename-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+.moi-rename {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.moi-rename input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 14px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+.moi-rename button {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 14px;
+  background: var(--mint);
+  color: #06281c;
+  box-shadow: 3px 3px 0 var(--neo-ink);
+}
+.moi-rename button.is-ghost {
+  background: var(--paper);
+  color: var(--ink);
+}
+.moi-sub {
+  margin-top: 8px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* Le héros. Un panneau orange tramé — la seule surface spectaculaire de la page — avec la
+   tête dans un cercle crème, et la pastille de collection posée à cheval sur la pliure.
+   La trame de points donne de la profondeur sans un seul dégradé : l'app n'en a aucun. */
+.moi-hero {
+  position: relative;
+  margin-top: 18px;
+  padding-bottom: 20px;
+}
+.moi-portrait {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  padding: 26px 0 36px;
+  border: 3px solid var(--neo-ink);
+  border-radius: 26px;
+  background-color: var(--neo-orange);
+  background-image: radial-gradient(rgba(21, 24, 33, 0.17) 1.7px, transparent 1.8px);
+  background-size: 14px 14px;
+  box-shadow: 6px 6px 0 var(--neo-ink);
+}
+.moi-portrait-ring {
+  display: grid;
+  place-items: center;
+  width: 150px;
+  height: 150px;
+  border: 3px solid var(--neo-ink);
+  border-radius: 50%;
+  background: #fff7e8;
+  box-shadow: 4px 5px 0 var(--neo-ink);
+}
+.moi-portrait:active {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+}
+
+.moi-collection-link {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 8px 10px 8px 18px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 999px;
+  background: #ffd43b;
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: var(--neo-ink);
+  white-space: nowrap;
+}
+.moi-collection-link b {
+  font-family: "Baloo 2", sans-serif;
+  font-size: 0.98rem;
+  font-weight: 800;
+}
+.moi-collection-link:active {
+  transform: translateX(-50%) translate(3px, 3px);
+  box-shadow: none;
+}
+
+/* Le surligneur jaune : il hiérarchise sans enfermer dans une carte. L'encre du
+   titre est volontairement fixe — le jaune ne change pas en mode sombre, donc
+   son texte ne doit pas devenir clair. */
+.moi-section {
+  /* Le trait de surligneur est posé en z-index négatif : sans contexte d'empilement propre,
+     il passerait derrière le fond de la page et deviendrait invisible. */
+  isolation: isolate;
+  margin: 26px 0 10px;
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1.08rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.moi-section span {
+  position: relative;
+  display: inline-block;
+  padding: 0 3px;
+  color: var(--neo-ink);
+}
+.moi-section span::before {
+  content: "";
+  position: absolute;
+  /* Le trait couvre toute la hauteur du mot, pas seulement sa base : l'encre du titre est
+     fixe (le jaune ne change pas avec le thème), donc en mode sombre un simple soulignement
+     laissait du texte foncé sur un fond foncé — illisible. Vérifié à l'écran, pas déduit. */
+  inset: -1px -6px 0;
+  border-radius: 4px;
+  background: #ffd43b;
+  z-index: -1;
+}
+
+.moi-rows {
+  display: flex;
+  flex-direction: column;
+}
+.moi-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 56px;
+  padding: 10px 2px;
+}
+.moi-row + .moi-row {
+  border-top: 1.5px solid var(--line);
+}
+.moi-row.is-stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+.moi-row-main {
+  flex: 1;
+  min-width: 0;
+}
+.moi-row-main b {
+  display: block;
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.moi-row-main small {
+  display: block;
+  margin-top: 1px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--ink-soft);
+}
+
+/* Contrôle segmenté à N options : la pastille se place en pourcentage, donc le
+   même composant sert au ton (2) et au rythme (3). */
+.moi-seg {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  padding: 3px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 999px;
+  background: var(--bg);
+}
+.moi-seg.is-wide {
+  width: 100%;
+}
+.moi-seg-thumb {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  border: 2px solid var(--neo-ink);
+  border-radius: 999px;
+  background: #ffd43b;
+  transition: left 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.moi-seg-opt {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  padding: 8px 14px;
+  font-family: "Baloo 2", sans-serif;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.moi-seg-opt.is-active {
+  color: var(--neo-ink);
+  font-weight: 800;
+}
+
+.moi-sizes {
+  display: flex;
+  gap: 7px;
+  flex: 0 0 auto;
+}
+.moi-size {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 13px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Baloo 2", sans-serif;
+  font-weight: 800;
+  line-height: 1;
+}
+.moi-size.is-active {
+  background: #ffd43b;
+  color: var(--neo-ink);
+  box-shadow: 2px 2px 0 var(--neo-ink);
+}
+
+.moi-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.moi-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 42px;
+  padding: 8px 14px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Baloo 2", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+.moi-chip.is-active {
+  background: #ffd43b;
+  color: var(--neo-ink);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+}
+.moi-chip:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+.moi-note {
+  margin-top: 10px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+.moi-note.is-above {
+  margin: -4px 0 10px;
+}
+
+.moi-doors {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 26px;
+}
+.moi-door {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 12px 16px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: var(--ink);
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.moi-door span {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+}
+.moi-door:active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+
+.moi-privacy {
+  margin-top: 18px;
+  text-align: center;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  opacity: 0.75;
+}
+
+/* La collection, en écran plein */
+.moi-collection-title {
+  margin: 4px 0 16px;
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1.9rem;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.moi-plate {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 11px;
+}
+.moi-head-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 12px 4px 10px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+  color: var(--ink);
+}
+.moi-head-card b {
+  font-family: "Baloo 2", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.1;
+}
+.moi-head-card em {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.moi-head-card.is-worn {
+  background: #ffd43b;
+  color: var(--neo-ink);
+  box-shadow: 4px 4px 0 var(--neo-ink);
+}
+.moi-head-card.is-worn em {
+  color: var(--neo-ink);
+}
+.moi-head-card.is-locked {
+  border-style: dashed;
+  box-shadow: none;
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+  opacity: 0.85;
+}
+.moi-head-locked {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  color: var(--ink-soft);
+}
+.moi-head-card:not(.is-locked):active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}

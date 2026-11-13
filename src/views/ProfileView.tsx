@@ -1,29 +1,56 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Settings, ChevronRight, Check, Pencil, X, HelpCircle } from "lucide-react";
+import { Check, ChevronRight, HelpCircle, Lock, Pencil, Settings, X } from "lucide-react";
 import { GlossarySheet } from "@/components/GlossarySheet";
 import { useApp } from "@/store";
-import { computeUnlockedBadges, countDoneChapters } from "@/lib/progress";
-import { sfx } from "@/lib/sound";
+import { sfx, setHaptics } from "@/lib/sound";
 import { getRankInfo, RANKS } from "@/lib/aura";
-import { useCountUp } from "@/lib/useCountUp";
-import { getAgeGroup, profileReactionLine } from "@/lib/braiseVoice";
-import { PageHeader } from "@/components/PageHeader";
-import { RankIcon } from "@/components/RankIcon";
-import { SubjectIcon } from "@/components/SubjectIcon";
-import { BraiseMascot } from "@/components/BraiseMascot";
+import { GOAL_TARGETS } from "@/lib/progress";
+import { TopBar } from "@/components/TopBar";
 import { AvatarGlyph } from "@/components/AvatarGlyph";
 import { getAvatarName } from "@/components/avatarGlyphs";
-import { BADGES, SUBJECTS, AVATARS } from "@/data";
-import type { Personality } from "@/types";
+import { Switch } from "@/components/Switch";
+import { AVATARS, CONTENT_LEVEL_NOTE, GOALS, LEVELS } from "@/data";
+import type { Level, Personality, TextSize } from "@/types";
 
-const PERSONAS: { id: Personality; title: string; sub: string }[] = [
-  { id: "chill", title: "Pote Chill", sub: "Encourageant, doux, zéro pression." },
-  { id: "savage", title: "Coach énergie", sub: "Second degré, piques amicales assumées." },
+// Ce que cette page est, et ce qu'elle n'est pas.
+//
+// Moi tient deux choses, et rien d'autre : **qui tu es** (ton prénom, ta classe, la tête que tu
+// portes, ta collection) et **comment l'app se comporte avec toi** (le ton de Braise, ton rythme,
+// ta façon de lire, le son, tes matières). La progression — XP, série, rang chiffré, badges —
+// vit entièrement sur Aura ; aucune de ces valeurs n'apparaît ici, et le rang n'est cité qu'à un
+// seul endroit : sur une tête verrouillée, pour dire ce qui l'ouvre.
+//
+// Décisions explicites, prises avec le propriétaire, pour que personne ne les "répare" plus tard :
+//   · aucun bouton d'action en bas — l'onglet Réviser est déjà dans la barre juste en dessous ;
+//   · aucune mascotte Braise sur cette page — il parle déjà sur Aujourd'hui et sur Aura, et ici
+//     c'est TA tête qu'on regarde, pas la sienne ;
+//   · chaque réglage se change sur place, sans ouvrir d'écran : un réglage derrière un chevron
+//     est un réglage qu'on ne change jamais ;
+//   · taille du texte, dyslexie, sombre, sons et vibrations ont quitté Paramètres pour venir ici.
+//     Ce sont les réglages de l'élève que le cours classique a déjà perdu : ils ne peuvent pas
+//     rester à deux écrans de profondeur. Paramètres garde la plomberie (notifications,
+//     sauvegarde, tout effacer, démo).
+
+const PERSONAS: { id: Personality; title: string }[] = [
+  { id: "chill", title: "Chill" },
+  { id: "savage", title: "Cash" },
 ];
 
-// Same rank-index comparison RankRail already uses (ProfilAuraView.tsx) — a rank-gated avatar
-// unlocks the moment the account reaches that rank or any higher one, never re-locks later.
+// `preview` est en px à dessein : les "Aa" témoins ne doivent pas grandir avec le réglage
+// qu'ils commandent.
+const TEXT_SIZES: { id: TextSize; label: string; preview: string }[] = [
+  { id: "normal", label: "Texte normal", preview: "13px" },
+  { id: "large", label: "Texte grand", preview: "16px" },
+  { id: "xlarge", label: "Texte très grand", preview: "19px" },
+];
+
+// Safari sur iPhone n'a pas d'API de vibration : l'interrupteur n'y ferait rien, on ne l'affiche
+// donc pas (même règle que l'ancien écran Paramètres).
+const CAN_VIBRATE = typeof navigator !== "undefined" && typeof navigator.vibrate === "function";
+
+/** Un avatar verrouillé par rang s'ouvre dès que le compte atteint ce rang ou un rang plus haut,
+ *  et ne se re-verrouille jamais (même comparaison d'index que RankRail sur Aura). */
 function isAvatarUnlocked(minRankId: string | undefined, currentRankId: string): boolean {
   if (!minRankId) return true;
   const minIdx = RANKS.findIndex((r) => r.id === minRankId);
@@ -31,13 +58,9 @@ function isAvatarUnlocked(minRankId: string | undefined, currentRankId: string):
   return currentIdx >= minIdx;
 }
 
-function formatShortDate(ts: number): string {
-  return new Date(ts).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
-}
-
 const staggerContainer = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.08, delayChildren: 0.04 } },
+  show: { transition: { staggerChildren: 0.06, delayChildren: 0.03 } },
 };
 const staggerItem = {
   hidden: { opacity: 0, y: 14 },
@@ -45,369 +68,398 @@ const staggerItem = {
 };
 
 export function ProfileView() {
-  const { state, setView, setTab, setPersonality, setUser } = useApp();
-  const [editingIdentity, setEditingIdentity] = useState(false);
-  const [lexiconOpen, setLexiconOpen] = useState(false);
+  const {
+    state,
+    setView,
+    setPersonality,
+    setUser,
+    toggleDark,
+    toggleDyslexia,
+    setTextSize,
+    toggleSound,
+    toggleHaptics,
+  } = useApp();
+  const [collectionOpen, setCollectionOpen] = useState(false);
+  const [editingName, setEditingName] = useState(false);
   const [draftName, setDraftName] = useState(state.user.name);
-  const [draftAvatar, setDraftAvatar] = useState(state.user.avatar);
+  const [lexiconOpen, setLexiconOpen] = useState(false);
 
-  const subjectsCount = state.user.subjects.length;
-  const chaptersDone = countDoneChapters(state.completedChapters);
-  // Distinct from "cartes maîtrisées" (shown on Aura) — this is raw effort, every card ever
-  // opened in Réviser, mastered or not. Real apps show volume and mastery as two separate
-  // numbers; until now this page only ever showed the second one.
-  const cardsSeenCount = Object.keys(state.cardReviews).length;
-  const badgeUnlocked = computeUnlockedBadges(state);
-  const badgeUnlockedCount = Object.values(badgeUnlocked).filter(Boolean).length;
-  const rankInfo = getRankInfo(state.xp);
-  const rank = rankInfo.current;
-  const animatedXp = useCountUp(state.xp);
-  const rankName = rank.name;
-
-  // Prochain avatar à débloquer — sert de sous-titre au rail : une raison de revenir, sans
-  // recopier un seul chiffre de l'Aura.
-  const nextAvatarHint = useMemo(() => {
-    const next = AVATARS.find((a) => a.minRankId && !isAvatarUnlocked(a.minRankId, rank.id));
-    if (!next) return null;
-    const required = RANKS.find((r) => r.id === next.minRankId);
-    return `${getAvatarName(next.emoji)} se débloque au rang ${required?.name}.`;
-  }, [rank.id]);
-
-  // Memoized on the real facts it depends on, not re-rolled on every render (e.g. opening the
-  // identity editor or toggling a subject chip) — only changes when something Braise would
-  // actually react to differently changes.
-  const braiseTake = useMemo(
-    () =>
-      profileReactionLine(
-        { personality: state.user.personality, age: getAgeGroup(state.user.level) },
-        {
-          rankName,
-          streak: state.streak,
-          badgesUnlocked: badgeUnlockedCount,
-          badgesTotal: BADGES.length,
-        },
-      ),
-    [state.user.personality, state.user.level, rankName, state.streak, badgeUnlockedCount],
+  const rank = getRankInfo(state.xp).current;
+  const wornName = getAvatarName(state.user.avatar);
+  const unlockedCount = useMemo(
+    () => AVATARS.filter((a) => isAvatarUnlocked(a.minRankId, rank.id)).length,
+    [rank.id],
   );
+  const goalIndex = Math.max(
+    0,
+    GOALS.findIndex((g) => g.id === state.user.goal),
+  );
+  const goalTargetXp = GOAL_TARGETS[state.user.goal];
 
-  const openIdentityEdit = () => {
-    sfx.tap(state.soundOn);
-    setDraftName(state.user.name);
-    setDraftAvatar(state.user.avatar);
-    setEditingIdentity(true);
+  const tap = () => sfx.tap(state.soundOn);
+
+  const saveName = () => {
+    tap();
+    setUser({ ...state.user, name: draftName.trim() || state.user.name });
+    setEditingName(false);
   };
 
-  const saveIdentity = () => {
-    sfx.tap(state.soundOn);
-    setUser({ ...state.user, name: draftName.trim() || state.user.name, avatar: draftAvatar });
-    setEditingIdentity(false);
+  const chooseAvatar = (id: string) => {
+    tap();
+    setUser({ ...state.user, avatar: id });
   };
 
-  const toggleUserSubject = (id: string) => {
-    sfx.tap(state.soundOn);
-    const has = state.user.subjects.includes(id);
-    const next = has ? state.user.subjects.filter((s) => s !== id) : [...state.user.subjects, id];
-    setUser({ ...state.user, subjects: next });
+  const chooseGoal = (id: string) => {
+    tap();
+    setUser({ ...state.user, goal: id });
   };
 
-  return (
-    <div>
-      <motion.div
-        className="view is-active"
-        variants={staggerContainer}
-        initial="hidden"
-        animate="show"
-      >
-        <PageHeader kicker="Moi" title="Ton profil" />
-        {!editingIdentity ? (
-          <motion.div className="profile-hero-card" variants={staggerItem}>
-            {/* Le "pass BRAISE" : une vraie carte d'accès plutôt qu'un bandeau décoratif —
-                bande perforée en haut (les deux trous suggèrent le cordon), identité alignée
-                à gauche comme sur un badge, rien de centré ni de générique. */}
-            <div
-              className="profile-pass-strip"
-              style={{ background: `linear-gradient(125deg, ${rank.colorFrom}, ${rank.colorTo})` }}
-            >
-              <span className="profile-pass-punch" aria-hidden="true" />
-              <span className="profile-hero-rank-pill">
-                <RankIcon rankId={rank.id} color="#fff" size={12} />
-                {rank.name}
-              </span>
-            </div>
-            <div className="profile-hero-body">
-              <div className="profile-hero-identity">
-                <div className="profile-hero-avatar-stage">
-                  <div
-                    className="profile-hero-avatar-glow"
-                    style={{
-                      background: `radial-gradient(circle, ${rank.colorTo}80, transparent 70%)`,
-                    }}
-                  />
-                  <button
-                    type="button"
-                    className="profile-hero-avatar"
-                    onClick={openIdentityEdit}
-                    aria-label="Modifier ton avatar et ton prénom"
-                  >
-                    <AvatarGlyph id={state.user.avatar} rankId={rank.id} size={58} />
-                    <span className="profile-hero-edit-badge" aria-hidden="true">
-                      <Pencil size={11} />
-                    </span>
-                  </button>
-                </div>
-                <div className="profile-hero-identity-main">
-                  <h2 className="profile-hero-name">{state.user.name}</h2>
-                  {state.user.joinedAt && (
-                    <p className="profile-joined">
-                      Membre depuis le {formatShortDate(state.user.joinedAt)}
-                    </p>
-                  )}
-                </div>
-              </div>
+  const chooseLevel = (l: Level) => {
+    tap();
+    setUser({ ...state.user, level: l.id, levelLabel: l.label });
+  };
 
-              {/* Braise's take — real facts (rank/série/badges), never generic filler; changes
-                  when they actually change, so there's a real reason to come back and see what
-                  he says now. `sleepy` at streak 0 (not `happy`) — resting and waiting for you,
-                  never disappointed; the copy in profileReactionLine was rewritten to match
-                  (always ends on an open door, never a flat diss). The "reprendre" link is the
-                  actual door: a real jump into Révisions, not just a line with nowhere to go. */}
-              <div className="profile-hero-bubble">
-                <span className="profile-hero-bubble-icon" aria-hidden="true">
-                  <BraiseMascot size={26} mood={state.streak > 0 ? "proud" : "sleepy"} />
-                </span>
-                <div>
-                  <p>{braiseTake}</p>
-                  {state.streak === 0 && (
-                    <button
-                      type="button"
-                      className="profile-hero-bubble-cta"
-                      onClick={() => {
-                        sfx.tap(state.soundOn);
-                        setTab("revisions");
-                      }}
-                    >
-                      Réviser une carte →
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Un seul renvoi vers Aura — ni XP géant, ni ligne de stats ici : la progression
-                  (XP, série, cartes, badges, rang) vit entièrement sur Ton Aura. Profil garde
-                  l'identité et les réglages qui changent le comportement de l'appli. */}
-              <button
-                type="button"
-                className="profile-aura-link"
-                onClick={() => {
-                  sfx.tap(state.soundOn);
-                  setView("progres");
-                }}
-              >
-                <span className="profile-aura-link-badge" aria-hidden="true">
-                  <RankIcon rankId={rank.id} color={rank.colorFrom} size={16} />
-                </span>
-                <span className="profile-aura-link-main">
-                  <span className="profile-aura-link-label">Rang {rank.name}</span>
-                  <span className="profile-aura-link-sub">{animatedXp} XP · voir ton parcours</span>
-                </span>
-                <ChevronRight size={18} />
-              </button>
-            </div>
-          </motion.div>
-        ) : (
-          <div className="profile-identity-edit">
-            <div className="profile-avatar-picker">
-              {AVATARS.map((a) => {
-                const unlocked = isAvatarUnlocked(a.minRankId, rank.id);
-                const requiredRank = a.minRankId ? RANKS.find((r) => r.id === a.minRankId) : null;
-                return (
-                  <button
-                    key={a.emoji}
-                    type="button"
-                    className={`profile-avatar-option ${draftAvatar === a.emoji ? "is-selected" : ""} ${unlocked ? "" : "is-locked"}`}
-                    onClick={() => {
-                      if (!unlocked) return;
-                      sfx.tap(state.soundOn);
-                      setDraftAvatar(a.emoji);
-                    }}
-                    disabled={!unlocked}
-                    aria-label={
-                      unlocked
-                        ? `Choisir l'avatar ${getAvatarName(a.emoji)}`
-                        : `Avatar verrouillé — débloqué au rang ${requiredRank?.name}`
-                    }
-                  >
-                    <AvatarGlyph id={a.emoji} rankId={rank.id} size={30} />
-                    {!unlocked && (
-                      <span className="profile-avatar-option-lock" aria-hidden="true">
-                        <RankIcon rankId="" color="" locked size={11} />
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-            {(() => {
-              const nextLockedAvatar = AVATARS.find(
-                (a) => a.minRankId && !isAvatarUnlocked(a.minRankId, rank.id),
-              );
-              if (!nextLockedAvatar) return null;
-              const requiredRank = RANKS.find((r) => r.id === nextLockedAvatar.minRankId);
-              return (
-                <p className="profile-avatar-unlock-hint">
-                  {getAvatarName(nextLockedAvatar.emoji)} débloqué au rang {requiredRank?.name}
-                </p>
-              );
-            })()}
-            <input
-              type="text"
-              className="profile-name-input"
-              value={draftName}
-              onChange={(e) => setDraftName(e.target.value)}
-              placeholder="Ton prénom"
-              maxLength={20}
-              autoFocus
-            />
-            <div className="profile-identity-actions">
-              <button
-                type="button"
-                className="profile-identity-cancel"
-                onClick={() => {
-                  sfx.tap(state.soundOn);
-                  setEditingIdentity(false);
-                }}
-              >
-                <X size={15} /> Annuler
-              </button>
-              <button type="button" className="profile-identity-save" onClick={saveIdentity}>
-                <Check size={15} /> Enregistrer
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Unified card — badges/ton de Braise/matières as quiet settings-style rows instead of
-            three separately bordered+shadowed blocks. Only the hero above gets the bold-border
-            treatment; everything here stays deliberately calm by comparison. */}
-        {/* No rank-progress bar and no "Parcours" badge timeline here anymore — both moved to
-            Ton Aura, the one place progression/achievement now lives. Profil's own job is
-            identity + how the app behaves for you, not a second copy of "how am I doing". */}
-        {/* Choix de tête — sorti de la carte de réglages : c'est de l'identité, ça appartient
-            juste sous le pass. Les avatars verrouillés montrent qu'il y a quelque chose à
-            gagner en montant de rang, sans recopier un chiffre de l'Aura. */}
-        <motion.section className="profile-face-card" variants={staggerItem}>
-          <div className="profile-face-head">
-            <span className="profile-face-label">Ta tête</span>
-            <span className="profile-face-sub">
-              {nextAvatarHint ?? "Tout est débloqué. Respect."}
-            </span>
-          </div>
-          <div className="profile-avatar-rail">
+  // La collection : un écran à part entière, pas un rail de 32 px coupé au bord. C'est le seul
+  // ressort de jeu de la page, et le seul compatible avec "aucune comparaison entre élèves" —
+  // c'est toi contre le parcours, il n'y a rien à acheter et personne à battre.
+  if (collectionOpen) {
+    return (
+      <div>
+        <TopBar
+          title="Ma collection"
+          onBack={() => {
+            tap();
+            setCollectionOpen(false);
+          }}
+        />
+        <div className="view is-active">
+          <p className="moi-kicker">Ta collection</p>
+          <h2 className="moi-collection-title">
+            {unlockedCount} Flambés sur {AVATARS.length}
+          </h2>
+          <div className="moi-plate">
             {AVATARS.map((a) => {
               const unlocked = isAvatarUnlocked(a.minRankId, rank.id);
               const requiredRank = a.minRankId ? RANKS.find((r) => r.id === a.minRankId) : null;
+              const worn = state.user.avatar === a.emoji;
               return (
                 <button
                   key={a.emoji}
                   type="button"
-                  className={`profile-avatar-option ${state.user.avatar === a.emoji ? "is-selected" : ""} ${unlocked ? "" : "is-locked"}`}
-                  onClick={() => {
-                    if (!unlocked) return;
-                    sfx.tap(state.soundOn);
-                    setUser({ ...state.user, avatar: a.emoji });
-                  }}
+                  className={`moi-head-card ${worn ? "is-worn" : ""} ${unlocked ? "" : "is-locked"}`}
                   disabled={!unlocked}
+                  aria-pressed={worn}
                   aria-label={
                     unlocked
-                      ? `Choisir l'avatar ${getAvatarName(a.emoji)}`
-                      : `Avatar verrouillé — débloqué au rang ${requiredRank?.name}`
+                      ? `Porter ${getAvatarName(a.emoji)}`
+                      : `${getAvatarName(a.emoji)} — débloqué au rang ${requiredRank?.name}`
                   }
+                  onClick={() => chooseAvatar(a.emoji)}
                 >
-                  <AvatarGlyph id={a.emoji} rankId={rank.id} size={32} />
-                  {!unlocked && (
-                    <span className="profile-avatar-option-lock" aria-hidden="true">
-                      <RankIcon rankId="" color="" locked size={11} />
+                  {unlocked ? (
+                    <AvatarGlyph id={a.emoji} rankId={rank.id} size={52} />
+                  ) : (
+                    <span className="moi-head-locked" aria-hidden="true">
+                      <Lock size={20} />
                     </span>
                   )}
+                  <b>{getAvatarName(a.emoji)}</b>
+                  {worn && <em>Portée</em>}
+                  {!unlocked && <em>{requiredRank?.name}</em>}
                 </button>
               );
             })}
           </div>
-        </motion.section>
+          <p className="moi-note">
+            Les dernières arrivent avec le rang. Rien à acheter, personne à battre.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
-        <motion.div className="uni-card" variants={staggerItem}>
-          <div className="uni-row">
-            <div className="uni-row-main">
-              <span className="uni-row-label">Ton Braise</span>
-              <span className="uni-row-sub">
-                {PERSONAS.find((p) => p.id === state.user.personality)?.sub}
-              </span>
-            </div>
-            <div className="seg-track">
-              <div
-                className={`seg-thumb ${state.user.personality === "savage" ? "is-right" : ""}`}
-                aria-hidden="true"
+  return (
+    <div>
+      <motion.div
+        className="view is-active moi"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="show"
+      >
+        {/* 1 · Qui tu es. Le prénom EST le titre de la page : l'onglet dit déjà "Moi", un
+            second titre "Ton profil" ne faisait que le répéter. */}
+        <motion.header className="moi-identity" variants={staggerItem}>
+          {editingName ? (
+            <div className="moi-rename">
+              <input
+                type="text"
+                value={draftName}
+                onChange={(e) => setDraftName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") saveName();
+                  if (e.key === "Escape") setEditingName(false);
+                }}
+                maxLength={20}
+                aria-label="Ton prénom"
+                autoFocus
               />
-              {PERSONAS.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  className={`seg-opt ${state.user.personality === p.id ? "is-active" : ""}`}
-                  onClick={() => {
-                    sfx.tap(state.soundOn);
-                    setPersonality(p.id);
-                  }}
-                  aria-pressed={state.user.personality === p.id}
-                >
-                  {p.id === "chill" ? "Chill" : "Savage"}
-                </button>
-              ))}
+              <button type="button" onClick={saveName} aria-label="Enregistrer ton prénom">
+                <Check size={17} />
+              </button>
+              <button
+                type="button"
+                className="is-ghost"
+                onClick={() => setEditingName(false)}
+                aria-label="Annuler"
+              >
+                <X size={17} />
+              </button>
             </div>
-          </div>
+          ) : (
+            <h1 className="moi-name">
+              {state.user.name}
+              <button
+                type="button"
+                className="moi-rename-btn"
+                onClick={() => {
+                  tap();
+                  setDraftName(state.user.name);
+                  setEditingName(true);
+                }}
+                aria-label="Modifier ton prénom"
+              >
+                <Pencil size={14} />
+              </button>
+            </h1>
+          )}
+          <p className="moi-sub">
+            {state.user.levelLabel} · {wornName}
+          </p>
+        </motion.header>
 
-          {/* Matières — real toggles, not a static recap: these picks weight which cards come up
-              more often in Réviser (see RevisionsView's priority scoring), so showing them as
-              inert text would hide a real effect from the one person it affects. */}
-          <div className="uni-row stacked">
-            <div className="uni-row-main">
-              <span className="uni-row-label">Mes matières ({subjectsCount})</span>
-              <span className="uni-row-sub">
-                Favorisées pendant tes révisions — touche pour changer.
-              </span>
-            </div>
-            <div className="uni-chips">
-              {SUBJECTS.map((s) => {
-                const active = state.user.subjects.includes(s.id);
-                return (
-                  <button
-                    key={s.id}
-                    type="button"
-                    className={`profile-subject-chip ${active ? "is-active" : ""}`}
-                    onClick={() => toggleUserSubject(s.id)}
-                    aria-pressed={active}
-                  >
-                    <SubjectIcon subjectId={s.id} color={s.color} size={15} /> {s.name}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Settings link — the one bridge Profil keeps: Paramètres is the deeper configuration
-            layer (son, thème, dyslexie), Profil itself only holds identity + the two preferences
-            that affect Braise directly (ton, matières). Sharing moved to Aura too — showing off
-            what you've accomplished belongs with the page that IS accomplishment, not here. */}
-        <motion.div variants={staggerItem} className="space-y-3">
+        {/* La tête portée, mise en scène : panneau orange tramé, cercle crème, et la
+            pastille de collection qui chevauche la pliure. C'est le seul endroit de la page
+            qui a le droit d'être spectaculaire — et le seul sélecteur de têtes de l'app. */}
+        <motion.div className="moi-hero" variants={staggerItem}>
           <button
             type="button"
-            className="profile-settings-link"
+            className="moi-portrait"
             onClick={() => {
-              sfx.tap(state.soundOn);
+              tap();
+              setCollectionOpen(true);
+            }}
+            aria-label={`${wornName} — changer de tête`}
+          >
+            <span className="moi-portrait-ring">
+              <AvatarGlyph id={state.user.avatar} rankId={rank.id} size={116} />
+            </span>
+          </button>
+          <button
+            type="button"
+            className="moi-collection-link"
+            onClick={() => {
+              tap();
+              setCollectionOpen(true);
+            }}
+          >
+            <b>
+              {unlockedCount} Flambés sur {AVATARS.length}
+            </b>
+            <ChevronRight size={17} />
+          </button>
+        </motion.div>
+
+        {/* 2 · Comment l'app se comporte avec toi. Tout se règle ici, sur place. */}
+        <motion.section variants={staggerItem}>
+          <h2 className="moi-section">
+            <span>Comment il te parle</span>
+          </h2>
+          <div className="moi-rows">
+            <div className="moi-row">
+              <span className="moi-row-main">
+                <b>Son ton</b>
+                <small>
+                  {state.user.personality === "savage"
+                    ? "Il te chambre quand tu te plantes."
+                    : "Encourageant, zéro pression."}
+                </small>
+              </span>
+              <div className="moi-seg" role="group" aria-label="Le ton de Braise">
+                <span
+                  className="moi-seg-thumb"
+                  style={{
+                    left: `calc(3px + ${PERSONAS.findIndex((p) => p.id === state.user.personality)} * (100% - 6px) / ${PERSONAS.length})`,
+                    width: `calc((100% - 6px) / ${PERSONAS.length})`,
+                  }}
+                  aria-hidden="true"
+                />
+                {PERSONAS.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className={`moi-seg-opt ${state.user.personality === p.id ? "is-active" : ""}`}
+                    aria-pressed={state.user.personality === p.id}
+                    onClick={() => {
+                      tap();
+                      setPersonality(p.id);
+                    }}
+                  >
+                    {p.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Le rythme : la question posée à l'onboarding qu'on ne pouvait plus jamais
+                rouvrir. Elle fixe l'objectif quotidien, alors elle l'affiche. */}
+            <div className="moi-row is-stacked">
+              <span className="moi-row-main">
+                <b>Ton rythme</b>
+                <small>
+                  {GOALS[goalIndex]?.desc}
+                  {goalTargetXp ? ` Objectif ${goalTargetXp} XP par jour.` : ""}
+                </small>
+              </span>
+              <div className="moi-seg is-wide" role="group" aria-label="Ton rythme">
+                <span
+                  className="moi-seg-thumb"
+                  style={{
+                    left: `calc(3px + ${goalIndex} * (100% - 6px) / ${GOALS.length})`,
+                    width: `calc((100% - 6px) / ${GOALS.length})`,
+                  }}
+                  aria-hidden="true"
+                />
+                {GOALS.map((g) => (
+                  <button
+                    key={g.id}
+                    type="button"
+                    className={`moi-seg-opt ${state.user.goal === g.id ? "is-active" : ""}`}
+                    aria-pressed={state.user.goal === g.id}
+                    onClick={() => chooseGoal(g.id)}
+                  >
+                    {g.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.section>
+
+        <motion.section variants={staggerItem}>
+          <h2 className="moi-section">
+            <span>Comment tu lis</span>
+          </h2>
+          <div className="moi-rows">
+            <div className="moi-row">
+              <span className="moi-row-main">
+                <b>Taille du texte</b>
+              </span>
+              <div className="moi-sizes" role="group" aria-label="Taille du texte">
+                {TEXT_SIZES.map((size) => (
+                  <button
+                    key={size.id}
+                    type="button"
+                    className={`moi-size ${state.textSize === size.id ? "is-active" : ""}`}
+                    style={{ fontSize: size.preview }}
+                    aria-pressed={state.textSize === size.id}
+                    aria-label={size.label}
+                    onClick={() => {
+                      tap();
+                      setTextSize(size.id);
+                    }}
+                  >
+                    Aa
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="moi-row">
+              <span className="moi-row-main">
+                <b>Mode dyslexie</b>
+                <small>Lettres espacées, lignes aérées.</small>
+              </span>
+              <Switch
+                checked={state.dyslexiaMode}
+                onChange={toggleDyslexia}
+                aria-label="Mode dyslexie"
+              />
+            </div>
+            <div className="moi-row">
+              <span className="moi-row-main">
+                <b>Mode sombre</b>
+              </span>
+              <Switch checked={state.darkMode} onChange={toggleDark} aria-label="Mode sombre" />
+            </div>
+          </div>
+        </motion.section>
+
+        <motion.section variants={staggerItem}>
+          <h2 className="moi-section">
+            <span>Ce qu'on entend</span>
+          </h2>
+          <div className="moi-rows">
+            <div className="moi-row">
+              <span className="moi-row-main">
+                <b>Sons</b>
+              </span>
+              <Switch checked={state.soundOn} onChange={toggleSound} aria-label="Sons" />
+            </div>
+            {CAN_VIBRATE && (
+              <div className="moi-row">
+                <span className="moi-row-main">
+                  <b>Vibrations</b>
+                </span>
+                <Switch
+                  checked={state.hapticsOn}
+                  onChange={() => {
+                    toggleHaptics();
+                    // Un seul buzz à l'allumage, pour montrer ce que c'est. Jamais à l'extinction.
+                    if (!state.hapticsOn) {
+                      setHaptics(true);
+                      sfx.tap(false);
+                    }
+                  }}
+                  aria-label="Vibrations"
+                />
+              </div>
+            )}
+          </div>
+        </motion.section>
+
+        {/* La classe commande tout le contenu, et elle doit pouvoir changer à la rentrée. Elle
+            était enterrée dans Paramètres › Compte. */}
+        <motion.section variants={staggerItem}>
+          <h2 className="moi-section">
+            <span>Ta classe</span>
+          </h2>
+          <div className="moi-chips" role="group" aria-label="Ta classe">
+            {LEVELS.map((l) => (
+              <button
+                key={l.id}
+                type="button"
+                className={`moi-chip ${state.user.level === l.id ? "is-active" : ""}`}
+                aria-pressed={state.user.level === l.id}
+                onClick={() => chooseLevel(l)}
+              >
+                {l.label}
+              </button>
+            ))}
+          </div>
+          <p className="moi-note">{CONTENT_LEVEL_NOTE}</p>
+        </motion.section>
+
+        {/* 3 · Les deux sorties, discrètes, puis la ligne sur les données. Aucun bouton
+            d'action : l'onglet Réviser est déjà dans la barre, juste en dessous. */}
+        <motion.div className="moi-doors" variants={staggerItem}>
+          <button
+            type="button"
+            className="moi-door"
+            onClick={() => {
+              tap();
               setLexiconOpen(true);
             }}
           >
-            <span className="profile-settings-link-label">
+            <span>
               <HelpCircle size={18} color="var(--ink-soft)" />
               Le lexique de Braise
             </span>
@@ -415,19 +467,23 @@ export function ProfileView() {
           </button>
           <button
             type="button"
-            className="profile-settings-link"
+            className="moi-door"
             onClick={() => {
-              sfx.tap(state.soundOn);
+              tap();
               setView("settings");
             }}
           >
-            <span className="profile-settings-link-label">
+            <span>
               <Settings size={18} color="var(--ink-soft)" />
               Paramètres
             </span>
             <ChevronRight size={18} color="var(--ink-soft)" />
           </button>
         </motion.div>
+
+        <motion.p className="moi-privacy" variants={staggerItem}>
+          Tout reste sur ton téléphone
+        </motion.p>
       </motion.div>
       {lexiconOpen && <GlossarySheet onClose={() => setLexiconOpen(false)} />}
     </div>

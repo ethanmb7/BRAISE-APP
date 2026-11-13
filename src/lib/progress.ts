@@ -10,7 +10,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 // In real XP — the same unit as the header badge, Aura and everything else. Sized to what a
 // student actually does in a sitting, so the goal is reachable without grinding: one Déclic (50)
 // is nearly a "tranquille" day by itself, a Déclic and a few new cards is a "régulier" one.
-const GOAL_TARGETS: Record<string, number> = {
+export const GOAL_TARGETS: Record<string, number> = {
   tranquille: 40,
   regulier: 80,
   "a-fond": 150,

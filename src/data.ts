@@ -19,6 +19,15 @@ export const LEVELS: Level[] = [
 // changes Braise's voice, never the content, so every screen that shows the level says this out
 // loud instead of letting a Terminale student assume the chapters are theirs.
 export const CONTENT_LEVEL_ID = "2nde";
+// Les trois rythmes, partagés par l'onboarding (qui pose la question) et par Moi (qui permet
+// enfin d'en changer). L'objectif quotidien associé vit dans progress.ts (GOAL_TARGETS) : les
+// deux fichiers se lisent ensemble, personne ne réécrit un chiffre à la main.
+export const GOALS: { id: string; title: string; desc: string }[] = [
+  { id: "tranquille", title: "Tranquille", desc: "Un peu chaque jour, sans prise de tête." },
+  { id: "regulier", title: "Régulier", desc: "Le bon rythme pour progresser." },
+  { id: "a-fond", title: "À fond", desc: "Tu sais ce que tu fais." },
+];
+
 export const CONTENT_LEVEL_NOTE = "BRAISE couvre pour l'instant les bases de la 2nde.";
 
 // The short form for tight spots (a chip on the Pioche card, the tag on a review card), where
