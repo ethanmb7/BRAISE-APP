@@ -67,6 +67,63 @@ function isAvatarUnlocked(minRankId: string | undefined, currentRankId: string):
   return currentIdx >= minIdx;
 }
 
+/** Les trois mises en page de Moi, commutables comme les peaux de l'onboarding :
+ *  `localStorage.braise_moi` = "poster" (par défaut) | "pass" | "tableau".
+ *  Même contenu, même règles, trois architectures — on tranche sur le téléphone, pas sur
+ *  une maquette. */
+export const MOI_SKIN_KEY = "braise_moi";
+type MoiSkin = "poster" | "pass" | "tableau";
+function readMoiSkin(): MoiSkin {
+  try {
+    const v = localStorage.getItem(MOI_SKIN_KEY);
+    return v === "pass" || v === "tableau" ? v : "poster";
+  } catch {
+    return "poster";
+  }
+}
+
+/** Le contrôle segmenté, à N options : la pastille se place en pourcentage, donc le même
+ *  composant sert au ton (2 options) et au rythme (3). */
+function Seg({
+  options,
+  activeId,
+  onPick,
+  label,
+}: {
+  options: { id: string; title: string }[];
+  activeId: string;
+  onPick: (id: string) => void;
+  label: string;
+}) {
+  const index = Math.max(
+    0,
+    options.findIndex((o) => o.id === activeId),
+  );
+  return (
+    <div className="moi-seg is-wide" role="group" aria-label={label}>
+      <span
+        className="moi-seg-thumb"
+        style={{
+          left: `calc(3px + ${index} * (100% - 6px) / ${options.length})`,
+          width: `calc((100% - 6px) / ${options.length})`,
+        }}
+        aria-hidden="true"
+      />
+      {options.map((o) => (
+        <button
+          key={o.id}
+          type="button"
+          className={`moi-seg-opt ${o.id === activeId ? "is-active" : ""}`}
+          aria-pressed={o.id === activeId}
+          onClick={() => onPick(o.id)}
+        >
+          {o.title}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 const staggerContainer = {
   hidden: {},
   show: { transition: { staggerChildren: 0.06, delayChildren: 0.03 } },
@@ -96,6 +153,7 @@ export function ProfileView() {
   const [editingName, setEditingName] = useState(false);
   const [draftName, setDraftName] = useState(state.user.name);
   const [lexiconOpen, setLexiconOpen] = useState(false);
+  const [skin] = useState<MoiSkin>(readMoiSkin);
 
   const rank = getRankInfo(state.xp).current;
   const wornName = getAvatarName(state.user.avatar);
@@ -131,6 +189,114 @@ export function ProfileView() {
     tap();
     setUser({ ...state.user, level: l.id, levelLabel: l.label });
   };
+
+  const personaTitle = PERSONAS.find((p) => p.id === state.user.personality)?.title;
+  const personaDesc =
+    state.user.personality === "savage"
+      ? "Il te chambre quand tu te plantes."
+      : "Encourageant, zéro pression.";
+
+  // Les briques partagées par les trois architectures : mêmes contrôles, mêmes libellés,
+  // seule leur mise en scène change.
+  const tonSeg = (
+    <Seg
+      options={PERSONAS}
+      activeId={state.user.personality}
+      label="Le ton de Braise"
+      onPick={(id) => {
+        tap();
+        setPersonality(id as Personality);
+      }}
+    />
+  );
+  const rythmeSeg = (
+    <Seg options={GOALS} activeId={state.user.goal} label="Ton rythme" onPick={chooseGoal} />
+  );
+
+  const nameBlock = editingName ? (
+    <div className="moi-rename">
+      <input
+        type="text"
+        value={draftName}
+        onChange={(e) => setDraftName(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") saveName();
+          if (e.key === "Escape") setEditingName(false);
+        }}
+        maxLength={20}
+        aria-label="Ton prénom"
+        autoFocus
+      />
+      <button type="button" onClick={saveName} aria-label="Enregistrer ton prénom">
+        <Check size={17} />
+      </button>
+      <button
+        type="button"
+        className="is-ghost"
+        onClick={() => setEditingName(false)}
+        aria-label="Annuler"
+      >
+        <X size={17} />
+      </button>
+    </div>
+  ) : (
+    <h1 className="moi-name">
+      {state.user.name}
+      <button
+        type="button"
+        className="moi-rename-btn"
+        onClick={() => {
+          tap();
+          setDraftName(state.user.name);
+          setEditingName(true);
+        }}
+        aria-label="Modifier ton prénom"
+      >
+        <Pencil size={14} />
+      </button>
+    </h1>
+  );
+
+  const tagsBlock = (
+    <>
+      <div className="moi-tags">
+        <button
+          type="button"
+          className={`moi-tag is-button ${levelOpen ? "is-open" : ""}`}
+          onClick={() => {
+            tap();
+            setLevelOpen(!levelOpen);
+          }}
+          aria-expanded={levelOpen}
+        >
+          {state.user.levelLabel}
+          <ChevronDown size={14} />
+        </button>
+        <span className="moi-tag is-sticker">{wornName}</span>
+      </div>
+      {levelOpen && (
+        <div className="moi-level">
+          <div className="moi-chips" role="group" aria-label="Ta classe">
+            {LEVELS.map((l) => (
+              <button
+                key={l.id}
+                type="button"
+                className={`moi-chip ${state.user.level === l.id ? "is-active" : ""}`}
+                aria-pressed={state.user.level === l.id}
+                onClick={() => {
+                  chooseLevel(l);
+                  setLevelOpen(false);
+                }}
+              >
+                {l.label}
+              </button>
+            ))}
+          </div>
+          <p className="moi-level-note">{CONTENT_LEVEL_NOTE}</p>
+        </div>
+      )}
+    </>
+  );
 
   // La collection : un écran à part entière, pas un rail de 32 px coupé au bord. C'est le seul
   // ressort de jeu de la page, et le seul compatible avec "aucune comparaison entre élèves" —
@@ -199,263 +365,354 @@ export function ProfileView() {
         initial="hidden"
         animate="show"
       >
-        {/* 1 · Qui tu es.
-            La zone d'identité sort des marges et touche les bords de l'écran : c'est
-            l'architecture commune aux références rassemblées par le propriétaire (l'app de
-            quiz bleue, l'écran de série au pingouin, et son propre pass d'onboarding). Le
-            personnage est posé dans un éclat de flamme, le prénom vit SUR la couleur, et le
-            reste de la page remonte par-dessus sur une feuille crème arrondie. */}
-        <motion.header className="moi-top" variants={staggerItem}>
-          <button
-            type="button"
-            className="moi-gear"
-            onClick={() => {
-              tap();
-              setView("settings");
-            }}
-            aria-label="Paramètres"
-          >
-            <Settings size={19} />
-          </button>
+        {/* Les trois architectures partagent le contenu arrêté avec le propriétaire et
+            toutes les règles : aucun chiffre de progression, aucune comparaison, le rang cité
+            uniquement sur une tête verrouillée, et chaque réglage manipulable sur place.
+            Elles ne diffèrent que par la façon dont l'identité et les deux réglages qui
+            définissent la relation sont mis en scène. */}
 
-          <button
-            type="button"
-            className="moi-portrait"
-            onClick={() => {
-              tap();
-              setCollectionOpen(true);
-            }}
-            aria-label={`${wornName} — changer de tête`}
-          >
-            <span className="moi-rays" aria-hidden="true">
-              <svg viewBox="0 0 220 220">
-                <g stroke="#151821" strokeWidth="6.5" strokeLinecap="round" opacity="0.42">
-                  <path d="M110 2v26M110 192v26M2 110h26M192 110h26" />
-                  <path d="M31 31l19 19M170 170l19 19M189 31l-19 19M50 170l-19 19" />
-                </g>
-              </svg>
-            </span>
-            <span className="moi-portrait-ring">
-              <AvatarGlyph id={state.user.avatar} rankId={rank.id} size={112} />
-              <span className="moi-portrait-edit" aria-hidden="true">
-                <Pencil size={15} />
-              </span>
-            </span>
-          </button>
-
-          {editingName ? (
-            <div className="moi-rename">
-              <input
-                type="text"
-                value={draftName}
-                onChange={(e) => setDraftName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") saveName();
-                  if (e.key === "Escape") setEditingName(false);
-                }}
-                maxLength={20}
-                aria-label="Ton prénom"
-                autoFocus
-              />
-              <button type="button" onClick={saveName} aria-label="Enregistrer ton prénom">
-                <Check size={17} />
-              </button>
-              <button
-                type="button"
-                className="is-ghost"
-                onClick={() => setEditingName(false)}
-                aria-label="Annuler"
-              >
-                <X size={17} />
-              </button>
-            </div>
-          ) : (
-            <h1 className="moi-name">
-              {state.user.name}
-              <button
-                type="button"
-                className="moi-rename-btn"
-                onClick={() => {
-                  tap();
-                  setDraftName(state.user.name);
-                  setEditingName(true);
-                }}
-                aria-label="Modifier ton prénom"
-              >
-                <Pencil size={14} />
-              </button>
-            </h1>
-          )}
-
-          <div className="moi-tags">
+        {/* ---- A · LE POSTER — le personnage dans un éclat, le prénom sur la couleur.
+             Emprunté à l'écran de série au pingouin et à l'app de quiz bleue. ---- */}
+        {skin === "poster" && (
+          <motion.header className="moi-top" variants={staggerItem}>
             <button
               type="button"
-              className={`moi-tag is-button ${levelOpen ? "is-open" : ""}`}
+              className="moi-gear"
               onClick={() => {
                 tap();
-                setLevelOpen(!levelOpen);
+                setView("settings");
               }}
-              aria-expanded={levelOpen}
+              aria-label="Paramètres"
             >
-              {state.user.levelLabel}
-              <ChevronDown size={14} />
+              <Settings size={19} />
             </button>
-            <span className="moi-tag is-sticker">{wornName}</span>
-          </div>
-          {levelOpen && (
-            <div className="moi-level">
-              <div className="moi-chips" role="group" aria-label="Ta classe">
-                {LEVELS.map((l) => (
+            <button
+              type="button"
+              className="moi-portrait"
+              onClick={() => {
+                tap();
+                setCollectionOpen(true);
+              }}
+              aria-label={`${wornName} — changer de tête`}
+            >
+              <span className="moi-rays" aria-hidden="true">
+                <svg viewBox="0 0 220 220">
+                  <g stroke="#151821" strokeWidth="6.5" strokeLinecap="round" opacity="0.42">
+                    <path d="M110 2v26M110 192v26M2 110h26M192 110h26" />
+                    <path d="M31 31l19 19M170 170l19 19M189 31l-19 19M50 170l-19 19" />
+                  </g>
+                </svg>
+              </span>
+              <span className="moi-portrait-ring">
+                <AvatarGlyph id={state.user.avatar} rankId={rank.id} size={112} />
+                <span className="moi-portrait-edit" aria-hidden="true">
+                  <Pencil size={15} />
+                </span>
+              </span>
+            </button>
+            {nameBlock}
+            {tagsBlock}
+          </motion.header>
+        )}
+
+        {/* ---- B · LE PASS — l'objet construit pendant l'onboarding, devenu la page.
+             Chaque ligne porte sa valeur en étiquette et s'ouvre sur place. ---- */}
+        {skin === "pass" && (
+          <motion.header className="moi-top is-pass" variants={staggerItem}>
+            <button
+              type="button"
+              className="moi-gear"
+              onClick={() => {
+                tap();
+                setView("settings");
+              }}
+              aria-label="Paramètres"
+            >
+              <Settings size={19} />
+            </button>
+            <button
+              type="button"
+              className="moi-pass-head"
+              onClick={() => {
+                tap();
+                setCollectionOpen(true);
+              }}
+              aria-label={`${wornName} — changer de tête`}
+            >
+              <AvatarGlyph id={state.user.avatar} rankId={rank.id} size={96} />
+              <span className="moi-portrait-edit" aria-hidden="true">
+                <Pencil size={14} />
+              </span>
+            </button>
+            <div className="moi-pass">
+              <div className="moi-pass-k">
+                <span>Ton pass Braise</span>
+                <b>
+                  {unlockedCount}/{AVATARS.length}
+                </b>
+              </div>
+              <div className="moi-pass-row">
+                <dt>ton prénom</dt>
+                {editingName ? (
+                  nameBlock
+                ) : (
                   <button
-                    key={l.id}
                     type="button"
-                    className={`moi-chip ${state.user.level === l.id ? "is-active" : ""}`}
-                    aria-pressed={state.user.level === l.id}
+                    className="moi-stick"
                     onClick={() => {
-                      chooseLevel(l);
-                      setLevelOpen(false);
+                      tap();
+                      setDraftName(state.user.name);
+                      setEditingName(true);
                     }}
                   >
-                    {l.label}
+                    {state.user.name}
+                    <Pencil size={13} />
                   </button>
-                ))}
+                )}
               </div>
-              <p className="moi-level-note">{CONTENT_LEVEL_NOTE}</p>
-            </div>
-          )}
-        </motion.header>
-
-        {/* La feuille crème remonte sur la couleur, et la pastille de collection est posée à
-            cheval sur la couture — le seul endroit où l'œil doit s'arrêter entre les deux. */}
-        <div className="moi-sheet">
-          <motion.button
-            type="button"
-            className="moi-collection-link"
-            variants={staggerItem}
-            onClick={() => {
-              tap();
-              setCollectionOpen(true);
-            }}
-          >
-            <b>
-              {unlockedCount} Flambés sur {AVATARS.length}
-            </b>
-            <ChevronRight size={17} />
-          </motion.button>
-
-          {/* 2 · La strate qui définit la relation.
-              Deux réglages seulement — le ton et le rythme — mais ce sont EUX qui décident de
-              ce que l'app est pour toi. Ils ont donc le poids visuel d'une carte, leur valeur
-              en gros, et la phrase qui dit ce que ça change. Ils se déplient sur place : on
-              ne quitte jamais la page pour répondre à « il me parle comment ». */}
-          <motion.h2 className="moi-section" variants={staggerItem}>
-            <span>Braise avec toi</span>
-          </motion.h2>
-          <motion.div className="moi-tiles" variants={staggerItem}>
-            <div className={`moi-tile ${openTile === "ton" ? "is-open" : ""}`}>
-              <button
-                type="button"
-                className="moi-tile-head"
-                aria-expanded={openTile === "ton"}
-                onClick={() => {
-                  tap();
-                  setOpenTile(openTile === "ton" ? null : "ton");
-                }}
-              >
-                <span className="moi-tile-k">Il te parle</span>
-                <span className="moi-tile-v">
-                  {PERSONAS.find((p) => p.id === state.user.personality)?.title}
-                </span>
-                <span className="moi-tile-d">
-                  {state.user.personality === "savage"
-                    ? "Il te chambre quand tu te plantes."
-                    : "Encourageant, zéro pression."}
-                </span>
-                <span className="moi-tile-chev" aria-hidden="true">
-                  <ChevronDown size={20} />
-                </span>
-              </button>
-              {openTile === "ton" && (
-                <div className="moi-tile-body">
-                  <div className="moi-seg is-wide" role="group" aria-label="Le ton de Braise">
-                    <span
-                      className="moi-seg-thumb"
-                      style={{
-                        left: `calc(3px + ${PERSONAS.findIndex((p) => p.id === state.user.personality)} * (100% - 6px) / ${PERSONAS.length})`,
-                        width: `calc((100% - 6px) / ${PERSONAS.length})`,
-                      }}
-                      aria-hidden="true"
-                    />
-                    {PERSONAS.map((p) => (
+              <div className="moi-pass-row">
+                <dt>ta classe</dt>
+                <button
+                  type="button"
+                  className="moi-stick"
+                  aria-expanded={levelOpen}
+                  onClick={() => {
+                    tap();
+                    setLevelOpen(!levelOpen);
+                    setOpenTile(null);
+                  }}
+                >
+                  {state.user.levelLabel}
+                  <ChevronDown size={13} />
+                </button>
+              </div>
+              {levelOpen && (
+                <div className="moi-pass-body">
+                  <div className="moi-chips" role="group" aria-label="Ta classe">
+                    {LEVELS.map((l) => (
                       <button
-                        key={p.id}
+                        key={l.id}
                         type="button"
-                        className={`moi-seg-opt ${state.user.personality === p.id ? "is-active" : ""}`}
-                        aria-pressed={state.user.personality === p.id}
+                        className={`moi-chip ${state.user.level === l.id ? "is-active" : ""}`}
+                        aria-pressed={state.user.level === l.id}
                         onClick={() => {
-                          tap();
-                          setPersonality(p.id);
+                          chooseLevel(l);
+                          setLevelOpen(false);
                         }}
                       >
-                        {p.title}
+                        {l.label}
                       </button>
                     ))}
                   </div>
+                  <p className="moi-level-note">{CONTENT_LEVEL_NOTE}</p>
                 </div>
               )}
-            </div>
-
-            <div className={`moi-tile ${openTile === "rythme" ? "is-open" : ""}`}>
-              <button
-                type="button"
-                className="moi-tile-head"
-                aria-expanded={openTile === "rythme"}
-                onClick={() => {
-                  tap();
-                  setOpenTile(openTile === "rythme" ? null : "rythme");
-                }}
-              >
-                <span className="moi-tile-k">Tu viens le voir</span>
-                <span className="moi-tile-v">{GOALS[goalIndex]?.title}</span>
-                <span className="moi-tile-d">
-                  {goalTargetXp ? `Objectif ${goalTargetXp} XP par jour.` : GOALS[goalIndex]?.desc}
-                </span>
-                <span className="moi-tile-chev" aria-hidden="true">
-                  <ChevronDown size={20} />
-                </span>
-              </button>
+              <div className="moi-pass-row">
+                <dt>il te parle</dt>
+                <button
+                  type="button"
+                  className="moi-stick"
+                  aria-expanded={openTile === "ton"}
+                  onClick={() => {
+                    tap();
+                    setOpenTile(openTile === "ton" ? null : "ton");
+                    setLevelOpen(false);
+                  }}
+                >
+                  {personaTitle}
+                  <ChevronDown size={13} />
+                </button>
+              </div>
+              {openTile === "ton" && <div className="moi-pass-body">{tonSeg}</div>}
+              <div className="moi-pass-row">
+                <dt>ton rythme</dt>
+                <button
+                  type="button"
+                  className="moi-stick"
+                  aria-expanded={openTile === "rythme"}
+                  onClick={() => {
+                    tap();
+                    setOpenTile(openTile === "rythme" ? null : "rythme");
+                    setLevelOpen(false);
+                  }}
+                >
+                  {GOALS[goalIndex]?.title}
+                  <ChevronDown size={13} />
+                </button>
+              </div>
               {openTile === "rythme" && (
-                <div className="moi-tile-body">
-                  <div className="moi-seg is-wide" role="group" aria-label="Ton rythme">
-                    <span
-                      className="moi-seg-thumb"
-                      style={{
-                        left: `calc(3px + ${goalIndex} * (100% - 6px) / ${GOALS.length})`,
-                        width: `calc((100% - 6px) / ${GOALS.length})`,
-                      }}
-                      aria-hidden="true"
-                    />
-                    {GOALS.map((g) => (
-                      <button
-                        key={g.id}
-                        type="button"
-                        className={`moi-seg-opt ${state.user.goal === g.id ? "is-active" : ""}`}
-                        aria-pressed={state.user.goal === g.id}
-                        onClick={() => chooseGoal(g.id)}
-                      >
-                        {g.title}
-                      </button>
-                    ))}
-                  </div>
+                <div className="moi-pass-body">
+                  {rythmeSeg}
+                  <p className="moi-level-note is-dark">Objectif {goalTargetXp} XP par jour.</p>
                 </div>
               )}
+              <div className="moi-pass-row is-last">
+                <dt>ta tête</dt>
+                <button
+                  type="button"
+                  className="moi-stick is-sticker"
+                  onClick={() => {
+                    tap();
+                    setCollectionOpen(true);
+                  }}
+                >
+                  {wornName}
+                  <ChevronRight size={13} />
+                </button>
+              </div>
             </div>
-          </motion.div>
+          </motion.header>
+        )}
 
-          {/* 3 · La strate machine. Volontairement plus calme : ces réglages se font une fois
-              et s'oublient. Leur donner le même poids que le ton de Braise, comme c'était le
-              cas avant, c'était dire qu'un interrupteur de vibration compte autant que la
-              personnalité de l'app. */}
+        {/* ---- C · LE TABLEAU — en-tête compact, puis un bloc coloré qui groupe les deux
+             réglages de la relation en tuiles. Emprunté à la carte « Track your streak »
+             et à la rangée de tuiles de l'app de quiz. ---- */}
+        {skin === "tableau" && (
+          <motion.header className="moi-compact" variants={staggerItem}>
+            <button
+              type="button"
+              className="moi-compact-head"
+              onClick={() => {
+                tap();
+                setCollectionOpen(true);
+              }}
+              aria-label={`${wornName} — changer de tête`}
+            >
+              <AvatarGlyph id={state.user.avatar} rankId={rank.id} size={52} />
+              <span className="moi-portrait-edit" aria-hidden="true">
+                <Pencil size={12} />
+              </span>
+            </button>
+            <div className="moi-compact-main">
+              {nameBlock}
+              {tagsBlock}
+            </div>
+            <button
+              type="button"
+              className="moi-gear is-static"
+              onClick={() => {
+                tap();
+                setView("settings");
+              }}
+              aria-label="Paramètres"
+            >
+              <Settings size={19} />
+            </button>
+          </motion.header>
+        )}
+
+        <div className={`moi-sheet ${skin !== "poster" ? "is-flat" : ""}`}>
+          {skin !== "pass" && (
+            <motion.button
+              type="button"
+              className="moi-collection-link"
+              variants={staggerItem}
+              onClick={() => {
+                tap();
+                setCollectionOpen(true);
+              }}
+            >
+              <b>
+                {unlockedCount} Flambés sur {AVATARS.length}
+              </b>
+              <ChevronRight size={17} />
+            </motion.button>
+          )}
+
+          {skin === "poster" && (
+            <>
+              <motion.h2 className="moi-section" variants={staggerItem}>
+                <span>Braise avec toi</span>
+              </motion.h2>
+              <motion.div className="moi-tiles" variants={staggerItem}>
+                <div className={`moi-tile ${openTile === "ton" ? "is-open" : ""}`}>
+                  <button
+                    type="button"
+                    className="moi-tile-head"
+                    aria-expanded={openTile === "ton"}
+                    onClick={() => {
+                      tap();
+                      setOpenTile(openTile === "ton" ? null : "ton");
+                    }}
+                  >
+                    <span className="moi-tile-k">Il te parle</span>
+                    <span className="moi-tile-v">{personaTitle}</span>
+                    <span className="moi-tile-d">{personaDesc}</span>
+                    <span className="moi-tile-chev" aria-hidden="true">
+                      <ChevronDown size={20} />
+                    </span>
+                  </button>
+                  {openTile === "ton" && <div className="moi-tile-body">{tonSeg}</div>}
+                </div>
+                <div className={`moi-tile ${openTile === "rythme" ? "is-open" : ""}`}>
+                  <button
+                    type="button"
+                    className="moi-tile-head"
+                    aria-expanded={openTile === "rythme"}
+                    onClick={() => {
+                      tap();
+                      setOpenTile(openTile === "rythme" ? null : "rythme");
+                    }}
+                  >
+                    <span className="moi-tile-k">Tu viens le voir</span>
+                    <span className="moi-tile-v">{GOALS[goalIndex]?.title}</span>
+                    <span className="moi-tile-d">Objectif {goalTargetXp} XP par jour.</span>
+                    <span className="moi-tile-chev" aria-hidden="true">
+                      <ChevronDown size={20} />
+                    </span>
+                  </button>
+                  {openTile === "rythme" && <div className="moi-tile-body">{rythmeSeg}</div>}
+                </div>
+              </motion.div>
+            </>
+          )}
+
+          {skin === "tableau" && (
+            <motion.div className="moi-group" variants={staggerItem}>
+              <p className="moi-group-k">Braise avec toi</p>
+              <div className="moi-duo">
+                <button
+                  type="button"
+                  className={`moi-duo-tile ${openTile === "ton" ? "is-open" : ""}`}
+                  aria-expanded={openTile === "ton"}
+                  onClick={() => {
+                    tap();
+                    setOpenTile(openTile === "ton" ? null : "ton");
+                  }}
+                >
+                  <span className="moi-tile-k">Il te parle</span>
+                  <span className="moi-tile-v">{personaTitle}</span>
+                </button>
+                <button
+                  type="button"
+                  className={`moi-duo-tile ${openTile === "rythme" ? "is-open" : ""}`}
+                  aria-expanded={openTile === "rythme"}
+                  onClick={() => {
+                    tap();
+                    setOpenTile(openTile === "rythme" ? null : "rythme");
+                  }}
+                >
+                  <span className="moi-tile-k">Tu viens le voir</span>
+                  <span className="moi-tile-v">{GOALS[goalIndex]?.title}</span>
+                </button>
+              </div>
+              {openTile === "ton" && (
+                <div className="moi-group-body">
+                  <p className="moi-tile-d">{personaDesc}</p>
+                  {tonSeg}
+                </div>
+              )}
+              {openTile === "rythme" && (
+                <div className="moi-group-body">
+                  <p className="moi-tile-d">Objectif {goalTargetXp} XP par jour.</p>
+                  {rythmeSeg}
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          {/* La strate machine, identique dans les trois : volontairement plus calme, ces
+              réglages se font une fois et s'oublient. */}
           <motion.p className="moi-strata" variants={staggerItem}>
             Les réglages
           </motion.p>
