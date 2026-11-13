@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Check,
@@ -96,24 +96,11 @@ export function ProfileView() {
 
   const rank = getRankInfo(state.xp).current;
   const wornName = getAvatarName(state.user.avatar);
-  const unlockedCount = useMemo(
-    () => AVATARS.filter((a) => isAvatarUnlocked(a.minRankId, rank.id)).length,
-    [rank.id],
-  );
   const goalIndex = Math.max(
     0,
     GOALS.findIndex((g) => g.id === state.user.goal),
   );
   const goalTargetXp = GOAL_TARGETS[state.user.goal];
-
-  // La seule ligne de la page qui regarde devant : ce qui ouvre la prochaine tête. Le rang
-  // n'est cité qu'ici, et uniquement pour dire ce qui ouvre une porte — jamais comme un score.
-  const nextHeadHint = useMemo(() => {
-    const next = AVATARS.find((a) => a.minRankId && !isAvatarUnlocked(a.minRankId, rank.id));
-    if (!next) return "Toutes les têtes sont à toi.";
-    const required = RANKS.find((r) => r.id === next.minRankId);
-    return `${getAvatarName(next.emoji)} arrive au rang ${required?.name}.`;
-  }, [rank.id]);
 
   const tap = () => sfx.tap(state.soundOn);
 
@@ -302,7 +289,6 @@ export function ProfileView() {
               {state.user.levelLabel}
               <ChevronDown size={14} />
             </button>
-            <span className="moi-tag is-sticker">{wornName}</span>
           </div>
           {levelOpen && (
             <div className="moi-level">
@@ -330,26 +316,6 @@ export function ProfileView() {
         {/* La feuille crème remonte sur la couleur, et la pastille de collection est posée à
             cheval sur la couture — le seul endroit où l'œil doit s'arrêter entre les deux. */}
         <div className="moi-sheet">
-          <motion.button
-            type="button"
-            className="moi-collection-link"
-            variants={staggerItem}
-            onClick={() => {
-              tap();
-              setCollectionOpen(true);
-            }}
-          >
-            <b>
-              {unlockedCount} Flambés sur {AVATARS.length}
-            </b>
-            <ChevronRight size={17} />
-          </motion.button>
-          {nextHeadHint && (
-            <motion.p className="moi-next" variants={staggerItem}>
-              {nextHeadHint}
-            </motion.p>
-          )}
-
           {/* 2 · Comment l'app se comporte avec toi. Tout se règle ici, sur place. */}
           <motion.section variants={staggerItem}>
             <h2 className="moi-section">
