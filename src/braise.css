@@ -6318,30 +6318,32 @@ select {
   position: relative;
   display: flex;
   flex: 0 0 auto;
-  padding: 3px;
+  padding: 4px;
   border: 2.5px solid var(--neo-ink);
   border-radius: 999px;
-  background: var(--bg);
+  background: color-mix(in srgb, var(--ink) 6%, var(--bg));
 }
 .moi-seg.is-wide {
   width: 100%;
 }
 .moi-seg-thumb {
   position: absolute;
-  top: 3px;
-  bottom: 3px;
+  top: 4px;
+  bottom: 4px;
   border: 2px solid var(--neo-ink);
   border-radius: 999px;
   background: #ffd43b;
-  transition: left 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 2px 2px 0 var(--neo-ink);
+  transition: left 200ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .moi-seg-opt {
   position: relative;
   z-index: 1;
   flex: 1;
+  min-height: 42px;
   padding: 8px 14px;
   font-family: "Baloo 2", sans-serif;
-  font-size: 0.86rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--ink-soft);
   white-space: nowrap;
@@ -6617,28 +6619,6 @@ select {
   color: var(--ink-soft);
 }
 
-/* Sa réplique, dans le ton choisi : on entend le réglage au lieu de le lire. Même bulle que
-   celle de l'onboarding au moment où il pose la question — coin bas-gauche cassé, comme une
-   parole qui sort de quelqu'un. */
-.moi-bubble {
-  margin-bottom: 11px;
-  padding: 13px 15px;
-  border: 2.5px solid var(--neo-ink);
-  border-radius: 18px 18px 18px 5px;
-  background: var(--paper);
-  box-shadow: 3px 3px 0 var(--neo-ink);
-  color: var(--ink);
-  font-family: "Baloo 2", sans-serif;
-  font-size: 1.05rem;
-  font-weight: 700;
-  line-height: 1.3;
-}
-.moi-bubble::before {
-  content: "« ";
-}
-.moi-bubble::after {
-  content: " »";
-}
 /* Ce qu'il répond une fois le rythme choisi. */
 .moi-after {
   margin-top: 10px;
@@ -6655,7 +6635,54 @@ select {
   font-size: 0.84rem;
   font-weight: 600;
 }
-.dark .moi-bubble {
+
+/* Les interrupteurs de Moi parlent enfin la langue de l'app.
+   Le composant Switch partagé est un interrupteur générique : pas de bord noir, pas d'ombre
+   dure, un bleu qui n'appartient à aucune de nos familles de couleur. Sur cette page, où
+   tout le reste a un contour d'encre et une ombre portée, c'était le seul élément qui
+   semblait venir d'une autre application. On le rhabille ici sans toucher aux autres écrans ;
+   si le rendu convient, le même traitement pourra remonter dans le composant partagé. */
+.moi-row .switch {
+  width: 52px;
+  height: 30px;
+}
+.moi-row .slider {
+  border: 2.5px solid var(--neo-ink);
+  background: color-mix(in srgb, var(--ink) 12%, var(--paper));
+  box-shadow: 2px 2px 0 var(--neo-ink);
+}
+.moi-row .slider::before {
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  top: 3px;
+  border: 2px solid var(--neo-ink);
+  background: #fff;
+}
+.moi-row .switch input:checked + .slider {
+  background: var(--mint);
+}
+.moi-row .switch input:checked + .slider::before {
+  transform: translateX(22px);
+}
+.dark .moi-row .slider {
   border-color: rgba(234, 241, 255, 0.55);
-  box-shadow: 3px 3px 0 #000;
+  box-shadow: 2px 2px 0 #000;
+}
+
+/* Les trois Aa : des cibles, pas des vignettes. */
+.moi-size {
+  width: 46px;
+  height: 46px;
+}
+
+/* Un peu plus d'air entre une question et sa réponse, et entre les lignes. */
+.moi-section {
+  margin: 30px 0 12px;
+}
+.moi-row {
+  min-height: 60px;
+}
+.moi-after {
+  margin-top: 12px;
 }

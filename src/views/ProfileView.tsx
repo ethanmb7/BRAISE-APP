@@ -19,7 +19,7 @@ import { TopBar } from "@/components/TopBar";
 import { AvatarGlyph } from "@/components/AvatarGlyph";
 import { getAvatarName } from "@/components/avatarGlyphs";
 import { Switch } from "@/components/Switch";
-import { AVATARS, CONTENT_LEVEL_NOTE, GOALS, LEVELS, TONE_SAMPLES } from "@/data";
+import { AVATARS, CONTENT_LEVEL_NOTE, GOALS, LEVELS } from "@/data";
 import type { Level, Personality, TextSize } from "@/types";
 
 // Ce que cette page est, et ce qu'elle n'est pas.
@@ -327,9 +327,6 @@ export function ProfileView() {
             <h2 className="moi-section">
               <span>Je te parle comment&nbsp;?</span>
             </h2>
-            {/* Sa réplique, dans le ton choisi. On entend le réglage au lieu de le lire —
-                exactement ce que fait l'onboarding au moment de poser la question. */}
-            <p className="moi-bubble">{TONE_SAMPLES[state.user.personality]}</p>
             <div className="moi-seg is-wide" role="group" aria-label="Le ton de Braise">
               <span
                 className="moi-seg-thumb"
@@ -381,9 +378,7 @@ export function ProfileView() {
                 </button>
               ))}
             </div>
-            <p className="moi-after">
-              Je te mets {goalTargetXp} XP par jour. Tu peux changer quand tu veux.
-            </p>
+            <p className="moi-after">Je te mets {goalTargetXp} XP par jour.</p>
           </motion.section>
 
           {/* Les libellés disent ce que ça FAIT, plus le nom technique du réglage.
@@ -421,7 +416,7 @@ export function ProfileView() {
               <div className="moi-row">
                 <span className="moi-row-main">
                   <b>Les lettres plus espacées</b>
-                  <small>Le mode dyslexie : plus d'air entre les lettres et les lignes.</small>
+                  <small>Mode dyslexie</small>
                 </span>
                 <Switch
                   checked={state.dyslexiaMode}
