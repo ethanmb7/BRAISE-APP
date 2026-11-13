@@ -298,207 +298,207 @@ export function ProfileView() {
             <ChevronRight size={17} />
           </motion.button>
 
-        {/* 2 · Comment l'app se comporte avec toi. Tout se règle ici, sur place. */}
-        <motion.section variants={staggerItem}>
-          <h2 className="moi-section">
-            <span>Comment il te parle</span>
-          </h2>
-          <div className="moi-rows">
-            <div className="moi-row">
-              <span className="moi-row-main">
-                <b>Son ton</b>
-                <small>
-                  {state.user.personality === "savage"
-                    ? "Il te chambre quand tu te plantes."
-                    : "Encourageant, zéro pression."}
-                </small>
-              </span>
-              <div className="moi-seg" role="group" aria-label="Le ton de Braise">
-                <span
-                  className="moi-seg-thumb"
-                  style={{
-                    left: `calc(3px + ${PERSONAS.findIndex((p) => p.id === state.user.personality)} * (100% - 6px) / ${PERSONAS.length})`,
-                    width: `calc((100% - 6px) / ${PERSONAS.length})`,
-                  }}
-                  aria-hidden="true"
-                />
-                {PERSONAS.map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    className={`moi-seg-opt ${state.user.personality === p.id ? "is-active" : ""}`}
-                    aria-pressed={state.user.personality === p.id}
-                    onClick={() => {
-                      tap();
-                      setPersonality(p.id);
-                    }}
-                  >
-                    {p.title}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Le rythme : la question posée à l'onboarding qu'on ne pouvait plus jamais
-                rouvrir. Elle fixe l'objectif quotidien, alors elle l'affiche. */}
-            <div className="moi-row is-stacked">
-              <span className="moi-row-main">
-                <b>Ton rythme</b>
-                <small>
-                  {GOALS[goalIndex]?.desc}
-                  {goalTargetXp ? ` Objectif ${goalTargetXp} XP par jour.` : ""}
-                </small>
-              </span>
-              <div className="moi-seg is-wide" role="group" aria-label="Ton rythme">
-                <span
-                  className="moi-seg-thumb"
-                  style={{
-                    left: `calc(3px + ${goalIndex} * (100% - 6px) / ${GOALS.length})`,
-                    width: `calc((100% - 6px) / ${GOALS.length})`,
-                  }}
-                  aria-hidden="true"
-                />
-                {GOALS.map((g) => (
-                  <button
-                    key={g.id}
-                    type="button"
-                    className={`moi-seg-opt ${state.user.goal === g.id ? "is-active" : ""}`}
-                    aria-pressed={state.user.goal === g.id}
-                    onClick={() => chooseGoal(g.id)}
-                  >
-                    {g.title}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </motion.section>
-
-        <motion.section variants={staggerItem}>
-          <h2 className="moi-section">
-            <span>Comment tu lis</span>
-          </h2>
-          <div className="moi-rows">
-            <div className="moi-row">
-              <span className="moi-row-main">
-                <b>Taille du texte</b>
-              </span>
-              <div className="moi-sizes" role="group" aria-label="Taille du texte">
-                {TEXT_SIZES.map((size) => (
-                  <button
-                    key={size.id}
-                    type="button"
-                    className={`moi-size ${state.textSize === size.id ? "is-active" : ""}`}
-                    style={{ fontSize: size.preview }}
-                    aria-pressed={state.textSize === size.id}
-                    aria-label={size.label}
-                    onClick={() => {
-                      tap();
-                      setTextSize(size.id);
-                    }}
-                  >
-                    Aa
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="moi-row">
-              <span className="moi-row-main">
-                <b>Mode dyslexie</b>
-                <small>Lettres espacées, lignes aérées.</small>
-              </span>
-              <Switch
-                checked={state.dyslexiaMode}
-                onChange={toggleDyslexia}
-                aria-label="Mode dyslexie"
-              />
-            </div>
-            <div className="moi-row">
-              <span className="moi-row-main">
-                <b>Mode sombre</b>
-              </span>
-              <Switch checked={state.darkMode} onChange={toggleDark} aria-label="Mode sombre" />
-            </div>
-          </div>
-        </motion.section>
-
-        <motion.section variants={staggerItem}>
-          <h2 className="moi-section">
-            <span>Ce qu'on entend</span>
-          </h2>
-          <div className="moi-rows">
-            <div className="moi-row">
-              <span className="moi-row-main">
-                <b>Sons</b>
-              </span>
-              <Switch checked={state.soundOn} onChange={toggleSound} aria-label="Sons" />
-            </div>
-            {CAN_VIBRATE && (
+          {/* 2 · Comment l'app se comporte avec toi. Tout se règle ici, sur place. */}
+          <motion.section variants={staggerItem}>
+            <h2 className="moi-section">
+              <span>Comment il te parle</span>
+            </h2>
+            <div className="moi-rows">
               <div className="moi-row">
                 <span className="moi-row-main">
-                  <b>Vibrations</b>
+                  <b>Son ton</b>
+                  <small>
+                    {state.user.personality === "savage"
+                      ? "Il te chambre quand tu te plantes."
+                      : "Encourageant, zéro pression."}
+                  </small>
+                </span>
+                <div className="moi-seg" role="group" aria-label="Le ton de Braise">
+                  <span
+                    className="moi-seg-thumb"
+                    style={{
+                      left: `calc(3px + ${PERSONAS.findIndex((p) => p.id === state.user.personality)} * (100% - 6px) / ${PERSONAS.length})`,
+                      width: `calc((100% - 6px) / ${PERSONAS.length})`,
+                    }}
+                    aria-hidden="true"
+                  />
+                  {PERSONAS.map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      className={`moi-seg-opt ${state.user.personality === p.id ? "is-active" : ""}`}
+                      aria-pressed={state.user.personality === p.id}
+                      onClick={() => {
+                        tap();
+                        setPersonality(p.id);
+                      }}
+                    >
+                      {p.title}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Le rythme : la question posée à l'onboarding qu'on ne pouvait plus jamais
+                rouvrir. Elle fixe l'objectif quotidien, alors elle l'affiche. */}
+              <div className="moi-row is-stacked">
+                <span className="moi-row-main">
+                  <b>Ton rythme</b>
+                  <small>
+                    {GOALS[goalIndex]?.desc}
+                    {goalTargetXp ? ` Objectif ${goalTargetXp} XP par jour.` : ""}
+                  </small>
+                </span>
+                <div className="moi-seg is-wide" role="group" aria-label="Ton rythme">
+                  <span
+                    className="moi-seg-thumb"
+                    style={{
+                      left: `calc(3px + ${goalIndex} * (100% - 6px) / ${GOALS.length})`,
+                      width: `calc((100% - 6px) / ${GOALS.length})`,
+                    }}
+                    aria-hidden="true"
+                  />
+                  {GOALS.map((g) => (
+                    <button
+                      key={g.id}
+                      type="button"
+                      className={`moi-seg-opt ${state.user.goal === g.id ? "is-active" : ""}`}
+                      aria-pressed={state.user.goal === g.id}
+                      onClick={() => chooseGoal(g.id)}
+                    >
+                      {g.title}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.section>
+
+          <motion.section variants={staggerItem}>
+            <h2 className="moi-section">
+              <span>Comment tu lis</span>
+            </h2>
+            <div className="moi-rows">
+              <div className="moi-row">
+                <span className="moi-row-main">
+                  <b>Taille du texte</b>
+                </span>
+                <div className="moi-sizes" role="group" aria-label="Taille du texte">
+                  {TEXT_SIZES.map((size) => (
+                    <button
+                      key={size.id}
+                      type="button"
+                      className={`moi-size ${state.textSize === size.id ? "is-active" : ""}`}
+                      style={{ fontSize: size.preview }}
+                      aria-pressed={state.textSize === size.id}
+                      aria-label={size.label}
+                      onClick={() => {
+                        tap();
+                        setTextSize(size.id);
+                      }}
+                    >
+                      Aa
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="moi-row">
+                <span className="moi-row-main">
+                  <b>Mode dyslexie</b>
+                  <small>Lettres espacées, lignes aérées.</small>
                 </span>
                 <Switch
-                  checked={state.hapticsOn}
-                  onChange={() => {
-                    toggleHaptics();
-                    // Un seul buzz à l'allumage, pour montrer ce que c'est. Jamais à l'extinction.
-                    if (!state.hapticsOn) {
-                      setHaptics(true);
-                      sfx.tap(false);
-                    }
-                  }}
-                  aria-label="Vibrations"
+                  checked={state.dyslexiaMode}
+                  onChange={toggleDyslexia}
+                  aria-label="Mode dyslexie"
                 />
               </div>
-            )}
-          </div>
-        </motion.section>
+              <div className="moi-row">
+                <span className="moi-row-main">
+                  <b>Mode sombre</b>
+                </span>
+                <Switch checked={state.darkMode} onChange={toggleDark} aria-label="Mode sombre" />
+              </div>
+            </div>
+          </motion.section>
 
-        {/* La classe commande tout le contenu, et elle doit pouvoir changer à la rentrée. Elle
+          <motion.section variants={staggerItem}>
+            <h2 className="moi-section">
+              <span>Ce qu'on entend</span>
+            </h2>
+            <div className="moi-rows">
+              <div className="moi-row">
+                <span className="moi-row-main">
+                  <b>Sons</b>
+                </span>
+                <Switch checked={state.soundOn} onChange={toggleSound} aria-label="Sons" />
+              </div>
+              {CAN_VIBRATE && (
+                <div className="moi-row">
+                  <span className="moi-row-main">
+                    <b>Vibrations</b>
+                  </span>
+                  <Switch
+                    checked={state.hapticsOn}
+                    onChange={() => {
+                      toggleHaptics();
+                      // Un seul buzz à l'allumage, pour montrer ce que c'est. Jamais à l'extinction.
+                      if (!state.hapticsOn) {
+                        setHaptics(true);
+                        sfx.tap(false);
+                      }
+                    }}
+                    aria-label="Vibrations"
+                  />
+                </div>
+              )}
+            </div>
+          </motion.section>
+
+          {/* La classe commande tout le contenu, et elle doit pouvoir changer à la rentrée. Elle
             était enterrée dans Paramètres › Compte. */}
-        <motion.section variants={staggerItem}>
-          <h2 className="moi-section">
-            <span>Ta classe</span>
-          </h2>
-          <div className="moi-chips" role="group" aria-label="Ta classe">
-            {LEVELS.map((l) => (
-              <button
-                key={l.id}
-                type="button"
-                className={`moi-chip ${state.user.level === l.id ? "is-active" : ""}`}
-                aria-pressed={state.user.level === l.id}
-                onClick={() => chooseLevel(l)}
-              >
-                {l.label}
-              </button>
-            ))}
-          </div>
-          <p className="moi-note">{CONTENT_LEVEL_NOTE}</p>
-        </motion.section>
+          <motion.section variants={staggerItem}>
+            <h2 className="moi-section">
+              <span>Ta classe</span>
+            </h2>
+            <div className="moi-chips" role="group" aria-label="Ta classe">
+              {LEVELS.map((l) => (
+                <button
+                  key={l.id}
+                  type="button"
+                  className={`moi-chip ${state.user.level === l.id ? "is-active" : ""}`}
+                  aria-pressed={state.user.level === l.id}
+                  onClick={() => chooseLevel(l)}
+                >
+                  {l.label}
+                </button>
+              ))}
+            </div>
+            <p className="moi-note">{CONTENT_LEVEL_NOTE}</p>
+          </motion.section>
 
-        {/* 3 · Les deux sorties, discrètes, puis la ligne sur les données. Aucun bouton
+          {/* 3 · Les deux sorties, discrètes, puis la ligne sur les données. Aucun bouton
             d'action : l'onglet Réviser est déjà dans la barre, juste en dessous. */}
-        <motion.div className="moi-doors" variants={staggerItem}>
-          <button
-            type="button"
-            className="moi-door"
-            onClick={() => {
-              tap();
-              setLexiconOpen(true);
-            }}
-          >
-            <span>
-              <HelpCircle size={18} color="var(--ink-soft)" />
-              Le lexique de Braise
-            </span>
-            <ChevronRight size={18} color="var(--ink-soft)" />
-          </button>
-        </motion.div>
+          <motion.div className="moi-doors" variants={staggerItem}>
+            <button
+              type="button"
+              className="moi-door"
+              onClick={() => {
+                tap();
+                setLexiconOpen(true);
+              }}
+            >
+              <span>
+                <HelpCircle size={18} color="var(--ink-soft)" />
+                Le lexique de Braise
+              </span>
+              <ChevronRight size={18} color="var(--ink-soft)" />
+            </button>
+          </motion.div>
 
-        <motion.p className="moi-privacy" variants={staggerItem}>
-          Tout reste sur ton téléphone
-        </motion.p>
+          <motion.p className="moi-privacy" variants={staggerItem}>
+            Tout reste sur ton téléphone
+          </motion.p>
         </div>
       </motion.div>
       {lexiconOpen && <GlossarySheet onClose={() => setLexiconOpen(false)} />}
