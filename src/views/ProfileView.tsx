@@ -1,16 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Check,
-  ChevronDown,
-  ChevronRight,
-  HelpCircle,
-  Lock,
-  Pencil,
-  Settings,
-  X,
-} from "lucide-react";
-import { GlossarySheet } from "@/components/GlossarySheet";
+import { Check, ChevronDown, ChevronRight, Lock, Pencil, Settings, X } from "lucide-react";
 import { useApp } from "@/store";
 import { sfx, setHaptics } from "@/lib/sound";
 import { getRankInfo, RANKS } from "@/lib/aura";
@@ -92,7 +82,6 @@ export function ProfileView() {
   const [levelOpen, setLevelOpen] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [draftName, setDraftName] = useState(state.user.name);
-  const [lexiconOpen, setLexiconOpen] = useState(false);
 
   const rank = getRankInfo(state.xp).current;
   const wornName = getAvatarName(state.user.avatar);
@@ -466,31 +455,11 @@ export function ProfileView() {
             </div>
           </motion.section>
 
-          {/* 3 · Les deux sorties, discrètes, puis la ligne sur les données. Aucun bouton
-            d'action : l'onglet Réviser est déjà dans la barre, juste en dessous. */}
-          <motion.div className="moi-doors" variants={staggerItem}>
-            <button
-              type="button"
-              className="moi-door"
-              onClick={() => {
-                tap();
-                setLexiconOpen(true);
-              }}
-            >
-              <span>
-                <HelpCircle size={18} color="var(--ink-soft)" />
-                Le lexique de Braise
-              </span>
-              <ChevronRight size={18} color="var(--ink-soft)" />
-            </button>
-          </motion.div>
-
           <motion.p className="moi-privacy" variants={staggerItem}>
             Tout reste sur ton téléphone. Rien n'en sort.
           </motion.p>
         </div>
       </motion.div>
-      {lexiconOpen && <GlossarySheet onClose={() => setLexiconOpen(false)} />}
     </div>
   );
 }

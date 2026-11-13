@@ -6417,39 +6417,6 @@ select {
   margin: -4px 0 10px;
 }
 
-.moi-doors {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 26px;
-}
-.moi-door {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-  min-height: 56px;
-  padding: 12px 16px;
-  border: 2.5px solid var(--neo-ink);
-  border-radius: 18px;
-  background: var(--paper);
-  box-shadow: 3px 3px 0 var(--neo-ink);
-  color: var(--ink);
-  font-family: "Baloo 2", sans-serif;
-  font-size: 1rem;
-  font-weight: 700;
-}
-.moi-door span {
-  display: inline-flex;
-  align-items: center;
-  gap: 11px;
-}
-.moi-door:active {
-  transform: translate(3px, 3px);
-  box-shadow: none;
-}
-
 .moi-privacy {
   margin-top: 18px;
   text-align: center;
