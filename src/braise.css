@@ -5940,11 +5940,7 @@ select {
   color: var(--ink-soft);
 }
 
-.moi-identity {
-  position: relative;
-  padding-top: 6px;
-  padding-right: 54px;
-}
+
 /* Les réglages en haut à droite. Dans cinq des références relevées (Duolingo, Upfire,
    kaiik'it…) c'est une destination permanente, atteignable sans défiler — pas une ligne
    qu'on va chercher tout en bas. */
@@ -6036,35 +6032,65 @@ select {
   color: var(--ink-soft);
 }
 
-/* Le héros. Un panneau orange tramé — la seule surface spectaculaire de la page — avec la
-   tête dans un cercle crème, et la pastille de collection posée à cheval sur la pliure.
-   La trame de points donne de la profondeur sans un seul dégradé : l'app n'en a aucun. */
-.moi-hero {
+/* La zone d'identité, pleine largeur.
+   Elle sort des marges de la vue (--page-gutter) et monte jusqu'au bord haut : c'est
+   l'architecture qui revient dans les références — une couleur pleine qui tient le
+   personnage et le prénom, puis le contenu qui remonte dessus. La trame de points donne
+   la profondeur ; l'app n'a aucun dégradé et n'en aura pas. */
+.moi-top {
   position: relative;
-  margin-top: 18px;
-  padding-bottom: 20px;
-}
-.moi-portrait {
+  margin: -8px calc(-1 * var(--page-gutter)) 0;
+  padding: 26px 20px 46px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  padding: 22px 0 48px;
-  border: 3px solid var(--neo-ink);
-  border-radius: 26px;
   background-color: var(--neo-orange);
-  background-image: radial-gradient(rgba(21, 24, 33, 0.17) 1.7px, transparent 1.8px);
-  background-size: 14px 14px;
-  box-shadow: 6px 6px 0 var(--neo-ink);
+  background-image: radial-gradient(rgba(21, 24, 33, 0.16) 1.7px, transparent 1.8px);
+  background-size: 15px 15px;
 }
-/* L'anneau en pointillé et la pastille au crayon : c'est le signe, commun à presque toutes
-   les références, qui dit « cette tête se change ». Avant, seul un aria-label le disait. */
+.moi-gear {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 15px;
+  background: #fffdf8;
+  color: var(--neo-ink);
+  box-shadow: 3px 3px 0 var(--neo-ink);
+}
+.moi-gear:active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+
+/* L'éclat derrière la tête : huit traits, pas une lueur. Même geste que l'écran de série au
+   pingouin, transposé au trait épais de BRAISE. */
+.moi-portrait {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 190px;
+  height: 190px;
+}
+.moi-rays {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.moi-rays svg {
+  width: 100%;
+  height: 100%;
+}
 .moi-portrait-ring {
   position: relative;
   display: grid;
   place-items: center;
-  width: 150px;
-  height: 150px;
+  width: 148px;
+  height: 148px;
   border: 3px dashed var(--neo-ink);
   border-radius: 50%;
   background: #fff7e8;
@@ -6072,7 +6098,7 @@ select {
 }
 .moi-portrait-edit {
   position: absolute;
-  right: 2px;
+  right: 0;
   bottom: 2px;
   display: grid;
   place-items: center;
@@ -6084,37 +6110,117 @@ select {
   color: var(--neo-ink);
   box-shadow: 2px 2px 0 var(--neo-ink);
 }
-/* L'étiquette jaune du pass d'onboarding, réutilisée telle quelle : le nom du Flambé est une
-   valeur choisie, donc il porte la couleur de ce qui est choisi. */
-.moi-sticker {
-  display: inline-flex;
-  align-items: center;
-  margin-top: 14px;
-  padding: 6px 15px;
-  border: 2.5px solid var(--neo-ink);
-  border-radius: 999px;
-  background: #ffd43b;
-  box-shadow: 3px 3px 0 var(--neo-ink);
-  color: var(--neo-ink);
-  font-family: "Baloo 2", sans-serif;
-  font-size: 1rem;
-  font-weight: 800;
-}
-.moi-portrait:active {
+.moi-portrait:active .moi-portrait-ring {
   transform: translate(3px, 3px);
-  box-shadow: 3px 3px 0 var(--neo-ink);
+  box-shadow: 1px 2px 0 var(--neo-ink);
 }
 
+/* Le prénom vit sur la couleur. L'encre, jamais le blanc : c'est la règle de contraste de
+   l'app pour tout ce qui est écrit sur l'orange vif. */
+.moi-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  font-family: "Baloo 2", sans-serif;
+  font-weight: 800;
+  font-size: 2.3rem;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  color: var(--neo-ink);
+}
+.moi-rename-btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 50%;
+  background: #fffdf8;
+  color: var(--neo-ink);
+  box-shadow: 2px 2px 0 var(--neo-ink);
+}
+.moi-rename-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+.moi-rename {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+}
+.moi-rename input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 14px;
+  background: #fffdf8;
+  color: var(--neo-ink);
+  font-family: "Baloo 2", sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+.moi-rename button {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 14px;
+  background: var(--mint);
+  color: #06281c;
+  box-shadow: 3px 3px 0 var(--neo-ink);
+}
+.moi-rename button.is-ghost {
+  background: #fffdf8;
+  color: var(--neo-ink);
+}
+
+/* Deux étiquettes, pas une phrase : la classe et le Flambé porté. Le jaune marque celle
+   qui se gagne, le blanc celle qui se déclare. */
+.moi-tags {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.moi-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border: 2.5px solid var(--neo-ink);
+  border-radius: 999px;
+  background: #fffdf8;
+  box-shadow: 2px 2px 0 var(--neo-ink);
+  color: var(--neo-ink);
+  font-family: "Baloo 2", sans-serif;
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+.moi-tag.is-sticker {
+  background: #ffd43b;
+}
+
+/* La feuille remonte sur la couleur. */
+.moi-sheet {
+  position: relative;
+  margin: -26px calc(-1 * var(--page-gutter)) 0;
+  padding: 0 var(--page-gutter) 4px;
+  border-top: 3px solid var(--neo-ink);
+  border-radius: 28px 28px 0 0;
+  background: var(--bg);
+}
 .moi-collection-link {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  transform: translateX(-50%);
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 44px;
-  padding: 8px 10px 8px 18px;
+  min-height: 46px;
+  margin: -25px auto 6px;
+  padding: 8px 12px 8px 18px;
   border: 2.5px solid var(--neo-ink);
   border-radius: 999px;
   background: #ffd43b;
@@ -6122,13 +6228,17 @@ select {
   color: var(--neo-ink);
   white-space: nowrap;
 }
+.moi-sheet > .moi-collection-link {
+  display: flex;
+  width: fit-content;
+}
 .moi-collection-link b {
   font-family: "Baloo 2", sans-serif;
   font-size: 0.98rem;
   font-weight: 800;
 }
 .moi-collection-link:active {
-  transform: translateX(-50%) translate(3px, 3px);
+  transform: translate(3px, 3px);
   box-shadow: none;
 }
 

@@ -186,9 +186,13 @@ export function ProfileView() {
         initial="hidden"
         animate="show"
       >
-        {/* 1 · Qui tu es. Le prénom EST le titre de la page : l'onglet dit déjà "Moi", un
-            second titre "Ton profil" ne faisait que le répéter. */}
-        <motion.header className="moi-identity" variants={staggerItem}>
+        {/* 1 · Qui tu es.
+            La zone d'identité sort des marges et touche les bords de l'écran : c'est
+            l'architecture commune aux références rassemblées par le propriétaire (l'app de
+            quiz bleue, l'écran de série au pingouin, et son propre pass d'onboarding). Le
+            personnage est posé dans un éclat de flamme, le prénom vit SUR la couleur, et le
+            reste de la page remonte par-dessus sur une feuille crème arrondie. */}
+        <motion.header className="moi-top" variants={staggerItem}>
           <button
             type="button"
             className="moi-gear"
@@ -200,6 +204,32 @@ export function ProfileView() {
           >
             <Settings size={19} />
           </button>
+
+          <button
+            type="button"
+            className="moi-portrait"
+            onClick={() => {
+              tap();
+              setCollectionOpen(true);
+            }}
+            aria-label={`${wornName} — changer de tête`}
+          >
+            <span className="moi-rays" aria-hidden="true">
+              <svg viewBox="0 0 220 220">
+                <g stroke="#151821" strokeWidth="6.5" strokeLinecap="round" opacity="0.42">
+                  <path d="M110 2v26M110 192v26M2 110h26M192 110h26" />
+                  <path d="M31 31l19 19M170 170l19 19M189 31l-19 19M50 170l-19 19" />
+                </g>
+              </svg>
+            </span>
+            <span className="moi-portrait-ring">
+              <AvatarGlyph id={state.user.avatar} rankId={rank.id} size={112} />
+              <span className="moi-portrait-edit" aria-hidden="true">
+                <Pencil size={15} />
+              </span>
+            </span>
+          </button>
+
           {editingName ? (
             <div className="moi-rename">
               <input
@@ -243,33 +273,20 @@ export function ProfileView() {
               </button>
             </h1>
           )}
-          <p className="moi-sub">{state.user.levelLabel}</p>
+
+          <div className="moi-tags">
+            <span className="moi-tag">{state.user.levelLabel}</span>
+            <span className="moi-tag is-sticker">{wornName}</span>
+          </div>
         </motion.header>
 
-        {/* La tête portée, mise en scène : panneau orange tramé, cercle crème, et la
-            pastille de collection qui chevauche la pliure. C'est le seul endroit de la page
-            qui a le droit d'être spectaculaire — et le seul sélecteur de têtes de l'app. */}
-        <motion.div className="moi-hero" variants={staggerItem}>
-          <button
-            type="button"
-            className="moi-portrait"
-            onClick={() => {
-              tap();
-              setCollectionOpen(true);
-            }}
-            aria-label={`${wornName} — changer de tête`}
-          >
-            <span className="moi-portrait-ring">
-              <AvatarGlyph id={state.user.avatar} rankId={rank.id} size={116} />
-              <span className="moi-portrait-edit" aria-hidden="true">
-                <Pencil size={15} />
-              </span>
-            </span>
-            <span className="moi-sticker">{wornName}</span>
-          </button>
-          <button
+        {/* La feuille crème remonte sur la couleur, et la pastille de collection est posée à
+            cheval sur la couture — le seul endroit où l'œil doit s'arrêter entre les deux. */}
+        <div className="moi-sheet">
+          <motion.button
             type="button"
             className="moi-collection-link"
+            variants={staggerItem}
             onClick={() => {
               tap();
               setCollectionOpen(true);
@@ -279,8 +296,7 @@ export function ProfileView() {
               {unlockedCount} Flambés sur {AVATARS.length}
             </b>
             <ChevronRight size={17} />
-          </button>
-        </motion.div>
+          </motion.button>
 
         {/* 2 · Comment l'app se comporte avec toi. Tout se règle ici, sur place. */}
         <motion.section variants={staggerItem}>
@@ -483,6 +499,7 @@ export function ProfileView() {
         <motion.p className="moi-privacy" variants={staggerItem}>
           Tout reste sur ton téléphone
         </motion.p>
+        </div>
       </motion.div>
       {lexiconOpen && <GlossarySheet onClose={() => setLexiconOpen(false)} />}
     </div>
