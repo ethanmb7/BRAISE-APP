@@ -189,6 +189,17 @@ export function ProfileView() {
         {/* 1 · Qui tu es. Le prénom EST le titre de la page : l'onglet dit déjà "Moi", un
             second titre "Ton profil" ne faisait que le répéter. */}
         <motion.header className="moi-identity" variants={staggerItem}>
+          <button
+            type="button"
+            className="moi-gear"
+            onClick={() => {
+              tap();
+              setView("settings");
+            }}
+            aria-label="Paramètres"
+          >
+            <Settings size={19} />
+          </button>
           {editingName ? (
             <div className="moi-rename">
               <input
@@ -232,9 +243,7 @@ export function ProfileView() {
               </button>
             </h1>
           )}
-          <p className="moi-sub">
-            {state.user.levelLabel} · {wornName}
-          </p>
+          <p className="moi-sub">{state.user.levelLabel}</p>
         </motion.header>
 
         {/* La tête portée, mise en scène : panneau orange tramé, cercle crème, et la
@@ -252,7 +261,11 @@ export function ProfileView() {
           >
             <span className="moi-portrait-ring">
               <AvatarGlyph id={state.user.avatar} rankId={rank.id} size={116} />
+              <span className="moi-portrait-edit" aria-hidden="true">
+                <Pencil size={15} />
+              </span>
             </span>
+            <span className="moi-sticker">{wornName}</span>
           </button>
           <button
             type="button"
@@ -462,20 +475,6 @@ export function ProfileView() {
             <span>
               <HelpCircle size={18} color="var(--ink-soft)" />
               Le lexique de Braise
-            </span>
-            <ChevronRight size={18} color="var(--ink-soft)" />
-          </button>
-          <button
-            type="button"
-            className="moi-door"
-            onClick={() => {
-              tap();
-              setView("settings");
-            }}
-          >
-            <span>
-              <Settings size={18} color="var(--ink-soft)" />
-              Paramètres
             </span>
             <ChevronRight size={18} color="var(--ink-soft)" />
           </button>
