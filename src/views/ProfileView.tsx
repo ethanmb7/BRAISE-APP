@@ -1,6 +1,15 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Check, ChevronRight, HelpCircle, Lock, Pencil, Settings, X } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  ChevronRight,
+  HelpCircle,
+  Lock,
+  Pencil,
+  Settings,
+  X,
+} from "lucide-react";
 import { GlossarySheet } from "@/components/GlossarySheet";
 import { useApp } from "@/store";
 import { sfx, setHaptics } from "@/lib/sound";
@@ -80,6 +89,7 @@ export function ProfileView() {
     toggleHaptics,
   } = useApp();
   const [collectionOpen, setCollectionOpen] = useState(false);
+  const [levelOpen, setLevelOpen] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [draftName, setDraftName] = useState(state.user.name);
   const [lexiconOpen, setLexiconOpen] = useState(false);
@@ -95,6 +105,15 @@ export function ProfileView() {
     GOALS.findIndex((g) => g.id === state.user.goal),
   );
   const goalTargetXp = GOAL_TARGETS[state.user.goal];
+
+  // La seule ligne de la page qui regarde devant : ce qui ouvre la prochaine tête. Le rang
+  // n'est cité qu'ici, et uniquement pour dire ce qui ouvre une porte — jamais comme un score.
+  const nextHeadHint = useMemo(() => {
+    const next = AVATARS.find((a) => a.minRankId && !isAvatarUnlocked(a.minRankId, rank.id));
+    if (!next) return "Toutes les têtes sont à toi.";
+    const required = RANKS.find((r) => r.id === next.minRankId);
+    return `${getAvatarName(next.emoji)} arrive au rang ${required?.name}.`;
+  }, [rank.id]);
 
   const tap = () => sfx.tap(state.soundOn);
 
@@ -271,9 +290,41 @@ export function ProfileView() {
           )}
 
           <div className="moi-tags">
-            <span className="moi-tag">{state.user.levelLabel}</span>
+            <button
+              type="button"
+              className={`moi-tag is-button ${levelOpen ? "is-open" : ""}`}
+              onClick={() => {
+                tap();
+                setLevelOpen(!levelOpen);
+              }}
+              aria-expanded={levelOpen}
+            >
+              {state.user.levelLabel}
+              <ChevronDown size={14} />
+            </button>
             <span className="moi-tag is-sticker">{wornName}</span>
           </div>
+          {levelOpen && (
+            <div className="moi-level">
+              <div className="moi-chips" role="group" aria-label="Ta classe">
+                {LEVELS.map((l) => (
+                  <button
+                    key={l.id}
+                    type="button"
+                    className={`moi-chip ${state.user.level === l.id ? "is-active" : ""}`}
+                    aria-pressed={state.user.level === l.id}
+                    onClick={() => {
+                      chooseLevel(l);
+                      setLevelOpen(false);
+                    }}
+                  >
+                    {l.label}
+                  </button>
+                ))}
+              </div>
+              <p className="moi-level-note">{CONTENT_LEVEL_NOTE}</p>
+            </div>
+          )}
         </motion.header>
 
         {/* La feuille crème remonte sur la couleur, et la pastille de collection est posée à
@@ -293,6 +344,11 @@ export function ProfileView() {
             </b>
             <ChevronRight size={17} />
           </motion.button>
+          {nextHeadHint && (
+            <motion.p className="moi-next" variants={staggerItem}>
+              {nextHeadHint}
+            </motion.p>
+          )}
 
           {/* 2 · Comment l'app se comporte avec toi. Tout se règle ici, sur place. */}
           <motion.section variants={staggerItem}>
@@ -449,28 +505,6 @@ export function ProfileView() {
                 </div>
               )}
             </div>
-          </motion.section>
-
-          {/* La classe commande tout le contenu, et elle doit pouvoir changer à la rentrée. Elle
-            était enterrée dans Paramètres › Compte. */}
-          <motion.section variants={staggerItem}>
-            <h2 className="moi-section">
-              <span>Ta classe</span>
-            </h2>
-            <div className="moi-chips" role="group" aria-label="Ta classe">
-              {LEVELS.map((l) => (
-                <button
-                  key={l.id}
-                  type="button"
-                  className={`moi-chip ${state.user.level === l.id ? "is-active" : ""}`}
-                  aria-pressed={state.user.level === l.id}
-                  onClick={() => chooseLevel(l)}
-                >
-                  {l.label}
-                </button>
-              ))}
-            </div>
-            <p className="moi-note">{CONTENT_LEVEL_NOTE}</p>
           </motion.section>
 
           {/* 3 · Les deux sorties, discrètes, puis la ligne sur les données. Aucun bouton

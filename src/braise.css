@@ -6572,3 +6572,47 @@ select {
   border-color: rgba(234, 241, 255, 0.3);
   box-shadow: none;
 }
+
+/* La classe se règle là où elle se lit : dans l'identité. Elle était affichée en étiquette en
+   haut et réglée en section tout en bas, parmi les réglages machine — une information à deux
+   endroits, et le mauvais des deux la rangeait avec les interrupteurs. */
+.moi-tag.is-button {
+  gap: 5px;
+}
+.moi-tag.is-button.is-open {
+  background: #ffd43b;
+}
+.moi-level {
+  margin-top: 12px;
+  text-align: center;
+  animation: moiOpen 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.moi-level .moi-chips {
+  justify-content: center;
+}
+.moi-level-note {
+  margin-top: 9px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  /* Pleine opacité : sur l'orange vif, l'encre est le seul couple lisible. */
+  color: var(--neo-ink);
+}
+@keyframes moiOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* L'indice de déblocage, sous la pastille de collection. */
+.moi-next {
+  margin: 2px 0 4px;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
