@@ -19,7 +19,7 @@ import { TopBar } from "@/components/TopBar";
 import { AvatarGlyph } from "@/components/AvatarGlyph";
 import { getAvatarName } from "@/components/avatarGlyphs";
 import { Switch } from "@/components/Switch";
-import { AVATARS, CONTENT_LEVEL_NOTE, GOALS, LEVELS } from "@/data";
+import { AVATARS, CONTENT_LEVEL_NOTE, GOALS, LEVELS, TONE_SAMPLES } from "@/data";
 import type { Level, Personality, TextSize } from "@/types";
 
 // Ce que cette page est, et ce qu'elle n'est pas.
@@ -316,90 +316,88 @@ export function ProfileView() {
         {/* La feuille crème remonte sur la couleur, et la pastille de collection est posée à
             cheval sur la couture — le seul endroit où l'œil doit s'arrêter entre les deux. */}
         <div className="moi-sheet">
-          {/* 2 · Comment l'app se comporte avec toi. Tout se règle ici, sur place. */}
+          {/* 2 · La page pose les questions de l'onboarding, dans les mots de l'onboarding.
+              C'est la correction qui compte le plus : la page parlait de Braise à la
+              troisième personne — « son ton », « comment il te parle » — c'est-à-dire la
+              langue d'un panneau de configuration. Le principe écrit de l'app, c'est qu'il
+              te parle À TOI. Il repose donc ses propres questions, et chaque réglage répond
+              à l'une d'elles. Aucun contrôle n'a changé : seuls les mots ont changé de
+              personne, et ça suffit à faire tomber le registre scolaire. */}
           <motion.section variants={staggerItem}>
             <h2 className="moi-section">
-              <span>Comment il te parle</span>
+              <span>Je te parle comment&nbsp;?</span>
             </h2>
-            <div className="moi-rows">
-              <div className="moi-row">
-                <span className="moi-row-main">
-                  <b>Son ton</b>
-                  <small>
-                    {state.user.personality === "savage"
-                      ? "Il te chambre quand tu te plantes."
-                      : "Encourageant, zéro pression."}
-                  </small>
-                </span>
-                <div className="moi-seg" role="group" aria-label="Le ton de Braise">
-                  <span
-                    className="moi-seg-thumb"
-                    style={{
-                      left: `calc(3px + ${PERSONAS.findIndex((p) => p.id === state.user.personality)} * (100% - 6px) / ${PERSONAS.length})`,
-                      width: `calc((100% - 6px) / ${PERSONAS.length})`,
-                    }}
-                    aria-hidden="true"
-                  />
-                  {PERSONAS.map((p) => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      className={`moi-seg-opt ${state.user.personality === p.id ? "is-active" : ""}`}
-                      aria-pressed={state.user.personality === p.id}
-                      onClick={() => {
-                        tap();
-                        setPersonality(p.id);
-                      }}
-                    >
-                      {p.title}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Le rythme : la question posée à l'onboarding qu'on ne pouvait plus jamais
-                rouvrir. Elle fixe l'objectif quotidien, alors elle l'affiche. */}
-              <div className="moi-row is-stacked">
-                <span className="moi-row-main">
-                  <b>Ton rythme</b>
-                  <small>
-                    {GOALS[goalIndex]?.desc}
-                    {goalTargetXp ? ` Objectif ${goalTargetXp} XP par jour.` : ""}
-                  </small>
-                </span>
-                <div className="moi-seg is-wide" role="group" aria-label="Ton rythme">
-                  <span
-                    className="moi-seg-thumb"
-                    style={{
-                      left: `calc(3px + ${goalIndex} * (100% - 6px) / ${GOALS.length})`,
-                      width: `calc((100% - 6px) / ${GOALS.length})`,
-                    }}
-                    aria-hidden="true"
-                  />
-                  {GOALS.map((g) => (
-                    <button
-                      key={g.id}
-                      type="button"
-                      className={`moi-seg-opt ${state.user.goal === g.id ? "is-active" : ""}`}
-                      aria-pressed={state.user.goal === g.id}
-                      onClick={() => chooseGoal(g.id)}
-                    >
-                      {g.title}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            {/* Sa réplique, dans le ton choisi. On entend le réglage au lieu de le lire —
+                exactement ce que fait l'onboarding au moment de poser la question. */}
+            <p className="moi-bubble">{TONE_SAMPLES[state.user.personality]}</p>
+            <div className="moi-seg is-wide" role="group" aria-label="Le ton de Braise">
+              <span
+                className="moi-seg-thumb"
+                style={{
+                  left: `calc(3px + ${PERSONAS.findIndex((p) => p.id === state.user.personality)} * (100% - 6px) / ${PERSONAS.length})`,
+                  width: `calc((100% - 6px) / ${PERSONAS.length})`,
+                }}
+                aria-hidden="true"
+              />
+              {PERSONAS.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  className={`moi-seg-opt ${state.user.personality === p.id ? "is-active" : ""}`}
+                  aria-pressed={state.user.personality === p.id}
+                  onClick={() => {
+                    tap();
+                    setPersonality(p.id);
+                  }}
+                >
+                  {p.title}
+                </button>
+              ))}
             </div>
           </motion.section>
 
           <motion.section variants={staggerItem}>
             <h2 className="moi-section">
-              <span>Comment tu lis</span>
+              <span>Tu viens me voir souvent&nbsp;?</span>
+            </h2>
+            <div className="moi-seg is-wide" role="group" aria-label="Ton rythme">
+              <span
+                className="moi-seg-thumb"
+                style={{
+                  left: `calc(3px + ${goalIndex} * (100% - 6px) / ${GOALS.length})`,
+                  width: `calc((100% - 6px) / ${GOALS.length})`,
+                }}
+                aria-hidden="true"
+              />
+              {GOALS.map((g) => (
+                <button
+                  key={g.id}
+                  type="button"
+                  className={`moi-seg-opt ${state.user.goal === g.id ? "is-active" : ""}`}
+                  aria-pressed={state.user.goal === g.id}
+                  onClick={() => chooseGoal(g.id)}
+                >
+                  {g.title}
+                </button>
+              ))}
+            </div>
+            <p className="moi-after">
+              Je te mets {goalTargetXp} XP par jour. Tu peux changer quand tu veux.
+            </p>
+          </motion.section>
+
+          {/* Les libellés disent ce que ça FAIT, plus le nom technique du réglage.
+              « Mode dyslexie » est le mot d'un formulaire ; « les lettres plus espacées »
+              est ce que l'élève verra. Le terme clinique reste en sous-ligne, parce qu'un
+              élève à qui on a dit « il y a un mode dyslexie » doit le retrouver. */}
+          <motion.section variants={staggerItem}>
+            <h2 className="moi-section">
+              <span>Tu lis comment&nbsp;?</span>
             </h2>
             <div className="moi-rows">
               <div className="moi-row">
                 <span className="moi-row-main">
-                  <b>Taille du texte</b>
+                  <b>La taille du texte</b>
                 </span>
                 <div className="moi-sizes" role="group" aria-label="Taille du texte">
                   {TEXT_SIZES.map((size) => (
@@ -422,8 +420,8 @@ export function ProfileView() {
               </div>
               <div className="moi-row">
                 <span className="moi-row-main">
-                  <b>Mode dyslexie</b>
-                  <small>Lettres espacées, lignes aérées.</small>
+                  <b>Les lettres plus espacées</b>
+                  <small>Le mode dyslexie : plus d'air entre les lettres et les lignes.</small>
                 </span>
                 <Switch
                   checked={state.dyslexiaMode}
@@ -433,7 +431,7 @@ export function ProfileView() {
               </div>
               <div className="moi-row">
                 <span className="moi-row-main">
-                  <b>Mode sombre</b>
+                  <b>L'écran en mode nuit</b>
                 </span>
                 <Switch checked={state.darkMode} onChange={toggleDark} aria-label="Mode sombre" />
               </div>
@@ -442,19 +440,19 @@ export function ProfileView() {
 
           <motion.section variants={staggerItem}>
             <h2 className="moi-section">
-              <span>Ce qu'on entend</span>
+              <span>Je fais du bruit&nbsp;?</span>
             </h2>
             <div className="moi-rows">
               <div className="moi-row">
                 <span className="moi-row-main">
-                  <b>Sons</b>
+                  <b>Les petits sons</b>
                 </span>
                 <Switch checked={state.soundOn} onChange={toggleSound} aria-label="Sons" />
               </div>
               {CAN_VIBRATE && (
                 <div className="moi-row">
                   <span className="moi-row-main">
-                    <b>Vibrations</b>
+                    <b>Les vibrations</b>
                   </span>
                   <Switch
                     checked={state.hapticsOn}
@@ -493,7 +491,7 @@ export function ProfileView() {
           </motion.div>
 
           <motion.p className="moi-privacy" variants={staggerItem}>
-            Tout reste sur ton téléphone
+            Tout reste sur ton téléphone. Rien n'en sort.
           </motion.p>
         </div>
       </motion.div>

@@ -23,7 +23,7 @@ import { StreakFlameIcon } from "@/components/StreakFlameIcon";
 import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
 import { fireConfetti } from "@/lib/confetti";
-import { CONTENT_LEVEL_NOTE, LEVELS } from "@/data";
+import { CONTENT_LEVEL_NOTE, LEVELS, TONE_SAMPLES } from "@/data";
 import { COPY } from "@/lib/copy";
 import { DEFAULT_TONE, pickLine } from "@/lib/tone";
 import type { Level, Personality } from "@/types";
@@ -65,14 +65,14 @@ const TONES: { id: Personality; title: string; desc: string; sample: string; moo
     id: "chill",
     title: "Pote Chill",
     desc: "Doux, rassurant, zéro pression.",
-    sample: "Pas de stress. On y va tranquille.",
+    sample: TONE_SAMPLES.chill,
     mood: "happy",
   },
   {
     id: "savage",
     title: "Coach énergie",
     desc: "Direct, énergique, second degré.",
-    sample: "Ce piège attrape tout le monde. Pas toi.",
+    sample: TONE_SAMPLES.savage,
     mood: "cool",
   },
 ];

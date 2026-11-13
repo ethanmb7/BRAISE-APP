@@ -22,6 +22,14 @@ export const CONTENT_LEVEL_ID = "2nde";
 // Les trois rythmes, partagés par l'onboarding (qui pose la question) et par Moi (qui permet
 // enfin d'en changer). L'objectif quotidien associé vit dans progress.ts (GOAL_TARGETS) : les
 // deux fichiers se lisent ensemble, personne ne réécrit un chiffre à la main.
+// Ce que Braise dit dans chacun de ses deux tons. Une voix se choisit en la LISANT, pas en
+// lisant l'adjectif qui la décrit : l'onboarding le fait déjà, et la page Moi rouvre la même
+// question, donc elle doit la rouvrir avec les mêmes mots.
+export const TONE_SAMPLES: Record<string, string> = {
+  chill: "Pas de stress. On y va tranquille.",
+  savage: "Ce piège attrape tout le monde. Pas toi.",
+};
+
 export const GOALS: { id: string; title: string; desc: string }[] = [
   { id: "tranquille", title: "Tranquille", desc: "Un peu chaque jour, sans prise de tête." },
   { id: "regulier", title: "Régulier", desc: "Le bon rythme pour progresser." },
