@@ -1,6 +1,15 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Check, ChevronRight, HelpCircle, Lock, Pencil, Settings, X } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  ChevronRight,
+  HelpCircle,
+  Lock,
+  Pencil,
+  Settings,
+  X,
+} from "lucide-react";
 import { GlossarySheet } from "@/components/GlossarySheet";
 import { useApp } from "@/store";
 import { sfx, setHaptics } from "@/lib/sound";
@@ -80,6 +89,10 @@ export function ProfileView() {
     toggleHaptics,
   } = useApp();
   const [collectionOpen, setCollectionOpen] = useState(false);
+  const [levelOpen, setLevelOpen] = useState(false);
+  // Un seul volet ouvert à la fois : deux contrôles dépliés en même temps font perdre le fil
+  // de ce qu'on était venu changer.
+  const [openTile, setOpenTile] = useState<null | "ton" | "rythme">(null);
   const [editingName, setEditingName] = useState(false);
   const [draftName, setDraftName] = useState(state.user.name);
   const [lexiconOpen, setLexiconOpen] = useState(false);
@@ -275,9 +288,41 @@ export function ProfileView() {
           )}
 
           <div className="moi-tags">
-            <span className="moi-tag">{state.user.levelLabel}</span>
+            <button
+              type="button"
+              className={`moi-tag is-button ${levelOpen ? "is-open" : ""}`}
+              onClick={() => {
+                tap();
+                setLevelOpen(!levelOpen);
+              }}
+              aria-expanded={levelOpen}
+            >
+              {state.user.levelLabel}
+              <ChevronDown size={14} />
+            </button>
             <span className="moi-tag is-sticker">{wornName}</span>
           </div>
+          {levelOpen && (
+            <div className="moi-level">
+              <div className="moi-chips" role="group" aria-label="Ta classe">
+                {LEVELS.map((l) => (
+                  <button
+                    key={l.id}
+                    type="button"
+                    className={`moi-chip ${state.user.level === l.id ? "is-active" : ""}`}
+                    aria-pressed={state.user.level === l.id}
+                    onClick={() => {
+                      chooseLevel(l);
+                      setLevelOpen(false);
+                    }}
+                  >
+                    {l.label}
+                  </button>
+                ))}
+              </div>
+              <p className="moi-level-note">{CONTENT_LEVEL_NOTE}</p>
+            </div>
+          )}
         </motion.header>
 
         {/* La feuille crème remonte sur la couleur, et la pastille de collection est posée à
@@ -298,184 +343,189 @@ export function ProfileView() {
             <ChevronRight size={17} />
           </motion.button>
 
-          {/* 2 · Comment l'app se comporte avec toi. Tout se règle ici, sur place. */}
-          <motion.section variants={staggerItem}>
-            <h2 className="moi-section">
-              <span>Comment il te parle</span>
-            </h2>
-            <div className="moi-rows">
-              <div className="moi-row">
-                <span className="moi-row-main">
-                  <b>Son ton</b>
-                  <small>
-                    {state.user.personality === "savage"
-                      ? "Il te chambre quand tu te plantes."
-                      : "Encourageant, zéro pression."}
-                  </small>
+          {/* 2 · La strate qui définit la relation.
+              Deux réglages seulement — le ton et le rythme — mais ce sont EUX qui décident de
+              ce que l'app est pour toi. Ils ont donc le poids visuel d'une carte, leur valeur
+              en gros, et la phrase qui dit ce que ça change. Ils se déplient sur place : on
+              ne quitte jamais la page pour répondre à « il me parle comment ». */}
+          <motion.h2 className="moi-section" variants={staggerItem}>
+            <span>Braise avec toi</span>
+          </motion.h2>
+          <motion.div className="moi-tiles" variants={staggerItem}>
+            <div className={`moi-tile ${openTile === "ton" ? "is-open" : ""}`}>
+              <button
+                type="button"
+                className="moi-tile-head"
+                aria-expanded={openTile === "ton"}
+                onClick={() => {
+                  tap();
+                  setOpenTile(openTile === "ton" ? null : "ton");
+                }}
+              >
+                <span className="moi-tile-k">Il te parle</span>
+                <span className="moi-tile-v">
+                  {PERSONAS.find((p) => p.id === state.user.personality)?.title}
                 </span>
-                <div className="moi-seg" role="group" aria-label="Le ton de Braise">
-                  <span
-                    className="moi-seg-thumb"
-                    style={{
-                      left: `calc(3px + ${PERSONAS.findIndex((p) => p.id === state.user.personality)} * (100% - 6px) / ${PERSONAS.length})`,
-                      width: `calc((100% - 6px) / ${PERSONAS.length})`,
-                    }}
-                    aria-hidden="true"
-                  />
-                  {PERSONAS.map((p) => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      className={`moi-seg-opt ${state.user.personality === p.id ? "is-active" : ""}`}
-                      aria-pressed={state.user.personality === p.id}
-                      onClick={() => {
-                        tap();
-                        setPersonality(p.id);
+                <span className="moi-tile-d">
+                  {state.user.personality === "savage"
+                    ? "Il te chambre quand tu te plantes."
+                    : "Encourageant, zéro pression."}
+                </span>
+                <span className="moi-tile-chev" aria-hidden="true">
+                  <ChevronDown size={20} />
+                </span>
+              </button>
+              {openTile === "ton" && (
+                <div className="moi-tile-body">
+                  <div className="moi-seg is-wide" role="group" aria-label="Le ton de Braise">
+                    <span
+                      className="moi-seg-thumb"
+                      style={{
+                        left: `calc(3px + ${PERSONAS.findIndex((p) => p.id === state.user.personality)} * (100% - 6px) / ${PERSONAS.length})`,
+                        width: `calc((100% - 6px) / ${PERSONAS.length})`,
                       }}
-                    >
-                      {p.title}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Le rythme : la question posée à l'onboarding qu'on ne pouvait plus jamais
-                rouvrir. Elle fixe l'objectif quotidien, alors elle l'affiche. */}
-              <div className="moi-row is-stacked">
-                <span className="moi-row-main">
-                  <b>Ton rythme</b>
-                  <small>
-                    {GOALS[goalIndex]?.desc}
-                    {goalTargetXp ? ` Objectif ${goalTargetXp} XP par jour.` : ""}
-                  </small>
-                </span>
-                <div className="moi-seg is-wide" role="group" aria-label="Ton rythme">
-                  <span
-                    className="moi-seg-thumb"
-                    style={{
-                      left: `calc(3px + ${goalIndex} * (100% - 6px) / ${GOALS.length})`,
-                      width: `calc((100% - 6px) / ${GOALS.length})`,
-                    }}
-                    aria-hidden="true"
-                  />
-                  {GOALS.map((g) => (
-                    <button
-                      key={g.id}
-                      type="button"
-                      className={`moi-seg-opt ${state.user.goal === g.id ? "is-active" : ""}`}
-                      aria-pressed={state.user.goal === g.id}
-                      onClick={() => chooseGoal(g.id)}
-                    >
-                      {g.title}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </motion.section>
-
-          <motion.section variants={staggerItem}>
-            <h2 className="moi-section">
-              <span>Comment tu lis</span>
-            </h2>
-            <div className="moi-rows">
-              <div className="moi-row">
-                <span className="moi-row-main">
-                  <b>Taille du texte</b>
-                </span>
-                <div className="moi-sizes" role="group" aria-label="Taille du texte">
-                  {TEXT_SIZES.map((size) => (
-                    <button
-                      key={size.id}
-                      type="button"
-                      className={`moi-size ${state.textSize === size.id ? "is-active" : ""}`}
-                      style={{ fontSize: size.preview }}
-                      aria-pressed={state.textSize === size.id}
-                      aria-label={size.label}
-                      onClick={() => {
-                        tap();
-                        setTextSize(size.id);
-                      }}
-                    >
-                      Aa
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="moi-row">
-                <span className="moi-row-main">
-                  <b>Mode dyslexie</b>
-                  <small>Lettres espacées, lignes aérées.</small>
-                </span>
-                <Switch
-                  checked={state.dyslexiaMode}
-                  onChange={toggleDyslexia}
-                  aria-label="Mode dyslexie"
-                />
-              </div>
-              <div className="moi-row">
-                <span className="moi-row-main">
-                  <b>Mode sombre</b>
-                </span>
-                <Switch checked={state.darkMode} onChange={toggleDark} aria-label="Mode sombre" />
-              </div>
-            </div>
-          </motion.section>
-
-          <motion.section variants={staggerItem}>
-            <h2 className="moi-section">
-              <span>Ce qu'on entend</span>
-            </h2>
-            <div className="moi-rows">
-              <div className="moi-row">
-                <span className="moi-row-main">
-                  <b>Sons</b>
-                </span>
-                <Switch checked={state.soundOn} onChange={toggleSound} aria-label="Sons" />
-              </div>
-              {CAN_VIBRATE && (
-                <div className="moi-row">
-                  <span className="moi-row-main">
-                    <b>Vibrations</b>
-                  </span>
-                  <Switch
-                    checked={state.hapticsOn}
-                    onChange={() => {
-                      toggleHaptics();
-                      // Un seul buzz à l'allumage, pour montrer ce que c'est. Jamais à l'extinction.
-                      if (!state.hapticsOn) {
-                        setHaptics(true);
-                        sfx.tap(false);
-                      }
-                    }}
-                    aria-label="Vibrations"
-                  />
+                      aria-hidden="true"
+                    />
+                    {PERSONAS.map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        className={`moi-seg-opt ${state.user.personality === p.id ? "is-active" : ""}`}
+                        aria-pressed={state.user.personality === p.id}
+                        onClick={() => {
+                          tap();
+                          setPersonality(p.id);
+                        }}
+                      >
+                        {p.title}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
-          </motion.section>
 
-          {/* La classe commande tout le contenu, et elle doit pouvoir changer à la rentrée. Elle
-            était enterrée dans Paramètres › Compte. */}
-          <motion.section variants={staggerItem}>
-            <h2 className="moi-section">
-              <span>Ta classe</span>
-            </h2>
-            <div className="moi-chips" role="group" aria-label="Ta classe">
-              {LEVELS.map((l) => (
-                <button
-                  key={l.id}
-                  type="button"
-                  className={`moi-chip ${state.user.level === l.id ? "is-active" : ""}`}
-                  aria-pressed={state.user.level === l.id}
-                  onClick={() => chooseLevel(l)}
-                >
-                  {l.label}
-                </button>
-              ))}
+            <div className={`moi-tile ${openTile === "rythme" ? "is-open" : ""}`}>
+              <button
+                type="button"
+                className="moi-tile-head"
+                aria-expanded={openTile === "rythme"}
+                onClick={() => {
+                  tap();
+                  setOpenTile(openTile === "rythme" ? null : "rythme");
+                }}
+              >
+                <span className="moi-tile-k">Tu viens le voir</span>
+                <span className="moi-tile-v">{GOALS[goalIndex]?.title}</span>
+                <span className="moi-tile-d">
+                  {goalTargetXp ? `Objectif ${goalTargetXp} XP par jour.` : GOALS[goalIndex]?.desc}
+                </span>
+                <span className="moi-tile-chev" aria-hidden="true">
+                  <ChevronDown size={20} />
+                </span>
+              </button>
+              {openTile === "rythme" && (
+                <div className="moi-tile-body">
+                  <div className="moi-seg is-wide" role="group" aria-label="Ton rythme">
+                    <span
+                      className="moi-seg-thumb"
+                      style={{
+                        left: `calc(3px + ${goalIndex} * (100% - 6px) / ${GOALS.length})`,
+                        width: `calc((100% - 6px) / ${GOALS.length})`,
+                      }}
+                      aria-hidden="true"
+                    />
+                    {GOALS.map((g) => (
+                      <button
+                        key={g.id}
+                        type="button"
+                        className={`moi-seg-opt ${state.user.goal === g.id ? "is-active" : ""}`}
+                        aria-pressed={state.user.goal === g.id}
+                        onClick={() => chooseGoal(g.id)}
+                      >
+                        {g.title}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-            <p className="moi-note">{CONTENT_LEVEL_NOTE}</p>
-          </motion.section>
+          </motion.div>
+
+          {/* 3 · La strate machine. Volontairement plus calme : ces réglages se font une fois
+              et s'oublient. Leur donner le même poids que le ton de Braise, comme c'était le
+              cas avant, c'était dire qu'un interrupteur de vibration compte autant que la
+              personnalité de l'app. */}
+          <motion.p className="moi-strata" variants={staggerItem}>
+            Les réglages
+          </motion.p>
+          <motion.div className="moi-card" variants={staggerItem}>
+            <div className="moi-row">
+              <span className="moi-row-main">
+                <b>Taille du texte</b>
+              </span>
+              <div className="moi-sizes" role="group" aria-label="Taille du texte">
+                {TEXT_SIZES.map((size) => (
+                  <button
+                    key={size.id}
+                    type="button"
+                    className={`moi-size ${state.textSize === size.id ? "is-active" : ""}`}
+                    style={{ fontSize: size.preview }}
+                    aria-pressed={state.textSize === size.id}
+                    aria-label={size.label}
+                    onClick={() => {
+                      tap();
+                      setTextSize(size.id);
+                    }}
+                  >
+                    Aa
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="moi-row">
+              <span className="moi-row-main">
+                <b>Mode dyslexie</b>
+                <small>Lettres espacées, lignes aérées.</small>
+              </span>
+              <Switch
+                checked={state.dyslexiaMode}
+                onChange={toggleDyslexia}
+                aria-label="Mode dyslexie"
+              />
+            </div>
+            <div className="moi-row">
+              <span className="moi-row-main">
+                <b>Mode sombre</b>
+              </span>
+              <Switch checked={state.darkMode} onChange={toggleDark} aria-label="Mode sombre" />
+            </div>
+            <div className="moi-row">
+              <span className="moi-row-main">
+                <b>Sons</b>
+              </span>
+              <Switch checked={state.soundOn} onChange={toggleSound} aria-label="Sons" />
+            </div>
+            {CAN_VIBRATE && (
+              <div className="moi-row">
+                <span className="moi-row-main">
+                  <b>Vibrations</b>
+                </span>
+                <Switch
+                  checked={state.hapticsOn}
+                  onChange={() => {
+                    toggleHaptics();
+                    // Un seul buzz à l'allumage, pour montrer ce que c'est. Jamais à l'extinction.
+                    if (!state.hapticsOn) {
+                      setHaptics(true);
+                      sfx.tap(false);
+                    }
+                  }}
+                  aria-label="Vibrations"
+                />
+              </div>
+            )}
+          </motion.div>
 
           {/* 3 · Les deux sorties, discrètes, puis la ligne sur les données. Aucun bouton
             d'action : l'onglet Réviser est déjà dans la barre, juste en dessous. */}
