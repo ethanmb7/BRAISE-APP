@@ -6653,3 +6653,46 @@ select {
 .moi-after {
   margin-top: 12px;
 }
+
+/* Fini de la page Moi — les détails qui manquaient au système.
+   Vérifié avant d'écrire : la page tient en sombre, en texte très grand et en mode
+   dyslexie, y compris les trois combinés. Il ne restait donc que du fini, et le fini
+   ici c'est la cohérence avec la grammaire tactile de l'app. */
+
+/* Le contrôle segmenté était le seul élément interactif de la page à ne pas répondre au
+   doigt : tous les autres s'enfoncent de 2 à 3 px en raccourcissant leur ombre. L'option
+   touchée se tasse, et la piste entière s'enfonce — on sent qu'on appuie sur un objet. */
+.moi-seg-opt:active {
+  transform: scale(0.95);
+}
+.moi-seg:active {
+  box-shadow: 1px 1px 0 var(--neo-ink);
+  transform: translate(1px, 1px);
+}
+.moi-seg {
+  box-shadow: 2px 2px 0 var(--neo-ink);
+  transition:
+    transform 90ms ease,
+    box-shadow 90ms ease;
+}
+.dark .moi-seg {
+  box-shadow: 2px 2px 0 #000;
+}
+.dark .moi-seg:active {
+  box-shadow: 1px 1px 0 #000;
+}
+
+/* Sa réponse appartient au contrôle qu'elle commente : collée dessous, pas flottante au
+   milieu de deux questions. */
+.moi-after {
+  margin-top: 9px;
+  padding-left: 2px;
+}
+
+/* La page se terminait sur une ligne suspendue. Un filet la rattache au reste et lui
+   donne une fin, au lieu de s'arrêter. */
+.moi-privacy {
+  margin-top: 26px;
+  padding-top: 18px;
+  border-top: 1.5px solid var(--line);
+}
