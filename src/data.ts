@@ -1,4 +1,4 @@
-import type { Level, Subject, Flashcard, Badge, UserProfile } from "./types";
+import type { Level, Subject, Flashcard, Badge, Personality, UserProfile } from "./types";
 
 // Chapter `status` below is only the fresh-install baseline (chapter 0 of each subject is the
 // suggested one, the rest are open — nothing is ever locked) — same logic as
@@ -19,21 +19,51 @@ export const LEVELS: Level[] = [
 // changes Braise's voice, never the content, so every screen that shows the level says this out
 // loud instead of letting a Terminale student assume the chapters are theirs.
 export const CONTENT_LEVEL_ID = "2nde";
-// Les trois rythmes, partagés par l'onboarding (qui pose la question) et par Moi (qui permet
-// enfin d'en changer). L'objectif quotidien associé vit dans progress.ts (GOAL_TARGETS) : les
-// deux fichiers se lisent ensemble, personne ne réécrit un chiffre à la main.
-// Ce que Braise dit dans chacun de ses deux tons. Une voix se choisit en la LISANT, pas en
-// lisant l'adjectif qui la décrit : l'onboarding le fait déjà, et la page Moi rouvre la même
-// question, donc elle doit la rouvrir avec les mêmes mots.
-export const TONE_SAMPLES: Record<string, string> = {
-  chill: "Pas de stress. On y va tranquille.",
-  savage: "Ce piège attrape tout le monde. Pas toi.",
-};
+// Les deux tons de Braise, et les trois rythmes. UNE seule définition pour chacun, parce que
+// l'onboarding pose la question et que Moi la rouvre : si les deux listes vivaient chacune dans
+// son fichier, elles divergeraient — et elles avaient divergé. Un élève choisissait « Coach
+// énergie » à l'ouverture et retrouvait « Cash » coché dans Moi, pour le même réglage. Toute
+// nouvelle surface qui propose ces choix lit ces listes-ci, elle n'en recopie pas les mots.
+//
+// `title` est le nom du ton partout où on le choisit. `desc` dit ce qu'il fait, `sample` est une
+// phrase DITE dans ce ton-là : une voix se choisit en la lisant, pas en lisant l'adjectif qui la
+// décrit. `emoji` est le visage collé sur le pass de l'onboarding une fois le ton choisi.
+export const TONES: {
+  id: Personality;
+  title: string;
+  desc: string;
+  sample: string;
+  emoji: string;
+}[] = [
+  {
+    id: "chill",
+    title: "Pote Chill",
+    desc: "Doux, rassurant, zéro pression.",
+    sample: "Pas de stress. On y va tranquille.",
+    emoji: "😌",
+  },
+  {
+    id: "savage",
+    title: "Coach énergie",
+    desc: "Direct, énergique, second degré.",
+    sample: "Ce piège attrape tout le monde. Pas toi.",
+    emoji: "😈",
+  },
+];
 
-export const GOALS: { id: string; title: string; desc: string }[] = [
-  { id: "tranquille", title: "Tranquille", desc: "Un peu chaque jour, sans prise de tête." },
-  { id: "regulier", title: "Régulier", desc: "Le bon rythme pour progresser." },
-  { id: "a-fond", title: "À fond", desc: "Tu sais ce que tu fais." },
+// L'objectif quotidien associé à chaque rythme vit dans progress.ts (GOAL_TARGETS) : les deux
+// fichiers se lisent ensemble, personne ne réécrit un chiffre à la main. `desc` dit À QUOI sert
+// le rythme — c'est ce que l'élève a besoin de savoir au moment de choisir, puisque ce choix fixe
+// son objectif quotidien. `flames` est l'intensité, de 1 à 3.
+export const GOALS: { id: string; title: string; desc: string; flames: number }[] = [
+  {
+    id: "tranquille",
+    title: "Tranquille",
+    desc: "Un peu chaque jour, sans prise de tête.",
+    flames: 1,
+  },
+  { id: "regulier", title: "Régulier", desc: "Le bon rythme pour progresser.", flames: 2 },
+  { id: "a-fond", title: "À fond", desc: "Pour les périodes de contrôles.", flames: 3 },
 ];
 
 export const CONTENT_LEVEL_NOTE = "BRAISE couvre pour l'instant les bases de la 2nde.";

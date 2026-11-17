@@ -1,6 +1,7 @@
 // The model of Braise's reminders (see NOTIFICATIONS.md): what she sends, when, and what she never does.
 // Pure: it takes the state of the student and the clock, and returns a plan. Nothing here knows about the
 // screen or about how a notification is delivered, so every rule is tested.
+import { GOALS } from "@/data";
 import type { Personality } from "@/types";
 import { renderNotification } from "./copy";
 
@@ -18,21 +19,36 @@ export const MOMENTS: Record<MomentId, { label: string; hint: string; time: stri
   morning: { label: "Dans le bus", hint: "vers 7 h 40", time: "07:40" },
 };
 
+/** Quel rythme de l'élève donne quelle fréquence. Les deux réglages portent les mêmes mots à
+ *  dessein — l'élève doit reconnaître SON rythme quand il règle les rappels — ce qui veut dire
+ *  qu'ils doivent rester les mêmes mots : le libellé est donc lu dans GOALS (data.ts), pas
+ *  recopié ici. Renommer un rythme renomme la fréquence avec lui. */
+const GOAL_OF_FREQUENCY: Record<Frequency, string> = {
+  rare: "tranquille",
+  normal: "regulier",
+  souvent: "a-fond",
+};
+
+function goalLabel(frequency: Frequency): string {
+  return GOALS.find((g) => g.id === GOAL_OF_FREQUENCY[frequency])!.title;
+}
+
 /** The most Braise sends in a week, and the least time between two. */
 export const FREQUENCIES: Record<
   Frequency,
   { label: string; hint: string; perWeek: number; gapDays: number }
 > = {
-  rare: { label: "Tranquille", hint: "2 par semaine au plus", perWeek: 2, gapDays: 4 },
-  normal: { label: "Régulier", hint: "4 par semaine au plus", perWeek: 4, gapDays: 2 },
-  souvent: { label: "À fond", hint: "1 par jour au plus", perWeek: 7, gapDays: 1 },
+  rare: { label: goalLabel("rare"), hint: "2 par semaine au plus", perWeek: 2, gapDays: 4 },
+  normal: { label: goalLabel("normal"), hint: "4 par semaine au plus", perWeek: 4, gapDays: 2 },
+  souvent: { label: goalLabel("souvent"), hint: "1 par jour au plus", perWeek: 7, gapDays: 1 },
 };
 
 /** The rhythm the student chose at the start ("tranquille", "regulier", "a-fond") sets the starting one. */
 export function frequencyFromGoal(goal: string | undefined): Frequency {
-  if (goal === "a-fond") return "souvent";
-  if (goal === "tranquille") return "rare";
-  return "normal";
+  const match = (Object.keys(GOAL_OF_FREQUENCY) as Frequency[]).find(
+    (f) => GOAL_OF_FREQUENCY[f] === goal,
+  );
+  return match ?? "normal";
 }
 
 export type NotifPrefs = {

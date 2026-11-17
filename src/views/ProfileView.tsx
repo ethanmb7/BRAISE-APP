@@ -9,7 +9,7 @@ import { TopBar } from "@/components/TopBar";
 import { AvatarGlyph } from "@/components/AvatarGlyph";
 import { getAvatarName } from "@/components/avatarGlyphs";
 import { Switch } from "@/components/Switch";
-import { AVATARS, CONTENT_LEVEL_NOTE, GOALS, LEVELS } from "@/data";
+import { AVATARS, CONTENT_LEVEL_NOTE, GOALS, LEVELS, TONES } from "@/data";
 import type { Level, Personality, TextSize } from "@/types";
 
 // Ce que cette page est, et ce qu'elle n'est pas.
@@ -30,11 +30,6 @@ import type { Level, Personality, TextSize } from "@/types";
 //     Ce sont les réglages de l'élève que le cours classique a déjà perdu : ils ne peuvent pas
 //     rester à deux écrans de profondeur. Paramètres garde la plomberie (notifications,
 //     sauvegarde, tout effacer, démo).
-
-const PERSONAS: { id: Personality; title: string }[] = [
-  { id: "chill", title: "Chill" },
-  { id: "savage", title: "Cash" },
-];
 
 // `preview` est en px à dessein : les "Aa" témoins ne doivent pas grandir avec le réglage
 // qu'ils commandent.
@@ -320,12 +315,12 @@ export function ProfileView() {
               <span
                 className="moi-seg-thumb"
                 style={{
-                  left: `calc(3px + ${PERSONAS.findIndex((p) => p.id === state.user.personality)} * (100% - 6px) / ${PERSONAS.length})`,
-                  width: `calc((100% - 6px) / ${PERSONAS.length})`,
+                  left: `calc(3px + ${TONES.findIndex((t) => t.id === state.user.personality)} * (100% - 6px) / ${TONES.length})`,
+                  width: `calc((100% - 6px) / ${TONES.length})`,
                 }}
                 aria-hidden="true"
               />
-              {PERSONAS.map((p) => (
+              {TONES.map((p) => (
                 <button
                   key={p.id}
                   type="button"

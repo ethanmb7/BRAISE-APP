@@ -23,7 +23,7 @@ import { StreakFlameIcon } from "@/components/StreakFlameIcon";
 import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
 import { fireConfetti } from "@/lib/confetti";
-import { CONTENT_LEVEL_NOTE, LEVELS, TONE_SAMPLES } from "@/data";
+import { CONTENT_LEVEL_NOTE, GOALS, LEVELS, TONES as SHARED_TONES } from "@/data";
 import { COPY } from "@/lib/copy";
 import { DEFAULT_TONE, pickLine } from "@/lib/tone";
 import type { Level, Personality } from "@/types";
@@ -60,48 +60,22 @@ const LEVEL_INFO: Record<string, { tag: string; icon: string }> = {
   },
 };
 
-const TONES: { id: Personality; title: string; desc: string; sample: string; mood: Mood }[] = [
-  {
-    id: "chill",
-    title: "Pote Chill",
-    desc: "Doux, rassurant, zéro pression.",
-    sample: TONE_SAMPLES.chill,
-    mood: "happy",
-  },
-  {
-    id: "savage",
-    title: "Coach énergie",
-    desc: "Direct, énergique, second degré.",
-    sample: TONE_SAMPLES.savage,
-    mood: "cool",
-  },
-];
+// Les tons et les rythmes viennent de data.ts et de nulle part ailleurs : l'onboarding pose la
+// question, Moi la rouvre, et les deux écrans doivent employer exactement les mêmes mots. Ce
+// fichier n'ajoute que ce qui lui est propre — le visage que Braise prend pour dire chaque ton.
+const TONE_MOODS: Record<Personality, Mood> = { chill: "happy", savage: "cool" };
 
-const RHYTHMS = [
-  {
-    id: "tranquille",
-    title: "Tranquille",
-    desc: "Un peu chaque jour, sans prise de tête.",
-    flames: 1,
-  },
-  {
-    id: "regulier",
-    title: "Régulier",
-    desc: "Le bon rythme pour progresser.",
-    flames: 2,
-  },
-  {
-    id: "a-fond",
-    title: "À fond",
-    desc: "Pour les périodes de contrôles.",
-    flames: 3,
-  },
-];
+const TONES: { id: Personality; title: string; desc: string; sample: string; mood: Mood }[] =
+  SHARED_TONES.map((t) => ({ ...t, mood: TONE_MOODS[t.id] }));
+
+const RHYTHMS = GOALS;
 
 const SPRING = { type: "spring", stiffness: 380, damping: 32 } as const;
 
 /** Le visage de chaque ton, pour le coller en sticker sur le pass une fois choisi. */
-const TONE_EMOJI: Record<Personality, string> = { chill: "😌", savage: "😈" };
+const TONE_EMOJI: Record<Personality, string> = Object.fromEntries(
+  SHARED_TONES.map((t) => [t.id, t.emoji]),
+) as Record<Personality, string>;
 
 // Onboarding as a first conversation with Braise, not a form: one question per screen, Braise types
 // its lines and reacts to every answer — the tone choice literally switches how it talks. Ends on a

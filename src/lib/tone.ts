@@ -1,6 +1,8 @@
 // BRAISE's tone system, in one place. The student picks a Braise at onboarding (and can change it
-// in Moi): "Pote Chill" (soft, no pressure) or "Coach Savage" (direct, second degree, friendly
-// jabs). This file is the mechanism; what each tone SAYS lives in lib/copy.ts (the app's own
+// in Moi); the two tones, and the words they are named with on screen, are defined once in
+// data.ts (TONES) — this comment named a third variant of its own for a while, which is how the
+// drift started. Read the names there, never here.
+// This file is the mechanism; what each tone SAYS lives in lib/copy.ts (the app's own
 // lines), lib/braiseVoice.ts (reactions that vary and are drawn at random) and, for lessons, in
 // the optional `@savage` lines of src/content/declic/*.txt.
 //

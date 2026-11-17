@@ -130,30 +130,43 @@ export function PassOnboarding({ model }: { model: OnbModel }) {
                           // Tranquille → Régulier → À fond se lisent dans l'ordre. Le contrôle
                           // segmenté le dit par sa forme, tient sur une rangée quoi qu'il arrive,
                           // et c'est déjà celui que Profil utilise pour une préférence.
-                          <div className="onbp-seg" role="group" aria-label={f.ask}>
-                            {scaleIndex >= 0 && (
-                              <span
-                                className="onbp-seg-thumb"
-                                style={{
-                                  left: `calc(3px + ${scaleIndex} * (100% - 6px) / ${options.length})`,
-                                  width: `calc((100% - 6px) / ${options.length})`,
-                                }}
-                                aria-hidden="true"
-                              />
-                            )}
-                            {options.map((o) => (
-                              <button
-                                key={o.id}
-                                type="button"
-                                className={`onbp-seg-opt ${o.selected ? "is-active" : ""}`}
-                                aria-pressed={o.selected}
-                                aria-label={o.desc ? `${o.title} — ${o.desc}` : o.title}
-                                onClick={o.onSelect}
-                              >
-                                <span aria-hidden="true">{o.title}</span>
-                              </button>
-                            ))}
-                          </div>
+                          <>
+                            <div className="onbp-seg" role="group" aria-label={f.ask}>
+                              {scaleIndex >= 0 && (
+                                <span
+                                  className="onbp-seg-thumb"
+                                  style={{
+                                    left: `calc(3px + ${scaleIndex} * (100% - 6px) / ${options.length})`,
+                                    width: `calc((100% - 6px) / ${options.length})`,
+                                  }}
+                                  aria-hidden="true"
+                                />
+                              )}
+                              {options.map((o) => (
+                                <button
+                                  key={o.id}
+                                  type="button"
+                                  className={`onbp-seg-opt ${o.selected ? "is-active" : ""}`}
+                                  aria-pressed={o.selected}
+                                  aria-label={o.desc ? `${o.title} — ${o.desc}` : o.title}
+                                  onClick={o.onSelect}
+                                >
+                                  <span aria-hidden="true">{o.title}</span>
+                                </button>
+                              ))}
+                            </div>
+                            {/* Trois mots seuls — Tranquille, Régulier, À fond — ne disent pas ce
+                                qu'on choisit, alors que ce choix-là fixe l'objectif quotidien. La
+                                description existait déjà, mais seulement dans l'aria-label : un
+                                lecteur d'écran l'entendait, l'élève qui regarde l'écran ne la
+                                voyait pas. Elle se lit maintenant sous le contrôle, et elle change
+                                avec l'option — même geste que `.moi-after` sur la page Moi, qui
+                                rouvre cette question. La ligne est réservée dès le départ pour que
+                                la carte ne saute pas au premier choix. */}
+                            <p className="onbp-seg-note" aria-hidden="true">
+                              {options.find((o) => o.selected)?.desc ?? "\u00a0"}
+                            </p>
+                          </>
                         ) : (
                           options.map((o) => (
                             <button
