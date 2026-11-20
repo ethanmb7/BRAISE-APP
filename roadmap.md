@@ -3,7 +3,7 @@
 ## Cap produit
 
 - [x] Formaliser la promesse, l'architecture cible et la boucle propriétaire dans `PRODUCT_VISION.md`
-- [ ] Tester la promesse et l'architecture « Aujourd'hui / Réviser / Aura / Moi » avec 8 à 12 élèves _(protocole prêt : `propositions-braise/protocole-test-lyceens.md`)_
+- [ ] Tester la promesse et l'architecture « Aujourd'hui / Réviser / Aura / Moi » avec 8 à 12 élèves _(protocole prêt : `docs/test-lyceens.html`, à imprimer — séance de 40 min, fiche d'observation, consentement)_
 - [ ] Prototyper une conversation « Capte » complète sur une seule notion
 - [ ] Faire valider le prototype par des élèves dyslexiques/TDAH et un expert pédagogique
 
