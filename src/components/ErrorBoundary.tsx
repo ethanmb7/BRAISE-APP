@@ -40,7 +40,11 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="flex min-h-[60vh] flex-col items-center justify-center gap-2 bg-[var(--bg)] px-8 text-center">
           <BraiseMascot size={72} mood="hesitant" />
-          <p className="mt-3 font-display text-[1.15rem] font-extrabold text-[var(--neo-ink)]">
+          {/* --ink, pas --neo-ink : l'encre fixe foncée sur --bg, qui passe au bleu nuit, donnait
+              1.01:1 — le titre de l'écran de panne était invisible en mode sombre, c'est-à-dire
+              exactement au moment où quelqu'un a besoin de lire. La phrase en dessous utilisait
+              déjà le jeton qui suit le thème. */}
+          <p className="mt-3 font-display text-[1.15rem] font-extrabold text-[var(--ink)]">
             Oups, un truc a planté
           </p>
           <p className="max-w-[30ch] text-[0.9rem] leading-relaxed text-[var(--ink-soft)]">

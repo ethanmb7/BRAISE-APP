@@ -22,8 +22,13 @@ const KNOWN = [
   [".fc-watermark", "decorative watermark behind a card"],
   [".aura-sparkle", "decorative sparkle"],
   [".seg-opt", "the label sits on a white thumb that is a separate element behind it"],
+  [".moi-seg-opt", "the label sits on the yellow thumb, a separate element behind it"],
+  ["< h2.moi-section", "the word sits on its own yellow ::before highlighter, painted behind it"],
   [".braise-tab-label", "the label sits on the orange puck, a separate element behind it"],
-  ["text < svg", "an icon glyph: its colour is the SVG's own fill, not `color`"],
+  // Any <text> in an SVG, however deep (it used to say "text < svg" and so missed every glyph
+  // wrapped in a <g> — the chapter numbers on an island emblem, drawn in fixed ink, were read
+  // as the page's inherited `color` and reported as a dark-mode failure they never were).
+  ["text <", "an icon glyph: its colour is the SVG's own fill, not `color`"],
 ];
 const EMOJI_ONLY = /^[\p{Extended_Pictographic}\p{Emoji_Presentation}✦·\s]+$/u;
 

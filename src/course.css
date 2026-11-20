@@ -287,7 +287,12 @@
   padding: 3px 9px;
   border: 2px solid var(--neo-ink);
   border-radius: 999px;
-  background: var(--paper);
+  /* Crème FIXE, pas var(--paper). Le libellé est en encre foncée fixe (comme pour chaque état
+     plus bas) : avec --paper, la pastille suivait le thème et devenait bleu nuit en mode sombre
+     — encre foncée sur fond foncé, 1.16:1, illisible. Ça ne se voyait que sur "À découvrir",
+     le seul état qui n'a pas de fond propre et retombait donc sur celui-ci (mesuré par
+     npm run audit:contrast, écran Cours en sombre). La valeur est celle de --paper en clair. */
+  background: #fffdf8;
   color: var(--neo-ink);
   font:
     800 0.7rem/1.1 "IBM Plex Mono",
