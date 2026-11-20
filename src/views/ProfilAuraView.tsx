@@ -196,12 +196,23 @@ export function ProfilAuraView() {
               ? `Réviser maintenant · ${dueCount} carte${dueCount > 1 ? "s" : ""}`
               : "Réviser une carte"}
           </button>
-          <button className="aura-share-cta" onClick={handleShareOpen}>
-            <span className="aura-share-icon" aria-hidden="true">
-              <TrophyIcon size={19} />
-            </span>
-            Partager mon Aura
-          </button>
+          {/* Rien à partager tant que rien n'a été fait : au premier lancement la carte sortait
+              avec 0 XP, 0 carte en poche, 0 matière et le rang plancher — un objet qu'on
+              n'envoie à personne, et qui apprend au passage que l'app n'a rien à montrer. Un
+              seul XP suffit à la rendre vraie (il ne vient que d'une vraie révision ou d'un
+              Déclic), donc le bouton revient au bout du premier geste, pas au bout d'un palier.
+              La ligne qui le remplace dit ce qui l'ouvre, plutôt que de laisser un bouton mort
+              ou un trou dans la pile. */}
+          {state.xp > 0 ? (
+            <button className="aura-share-cta" onClick={handleShareOpen}>
+              <span className="aura-share-icon" aria-hidden="true">
+                <TrophyIcon size={19} />
+              </span>
+              Partager mon Aura
+            </button>
+          ) : (
+            <p className="aura-share-soon">Ta carte à partager arrive dès ta première révision.</p>
+          )}
         </motion.div>
       </motion.div>
 
@@ -443,7 +454,11 @@ const SubjectMasteryGrid = memo(function SubjectMasteryGrid({
                 className="mastery-tile"
                 role="listitem"
                 onClick={() => onSelect(s.id)}
-                aria-label={`${s.name} : ${s.masteredCount} carte${s.masteredCount > 1 ? "s" : ""} dans la poche, réviser cette matière`}
+                aria-label={
+                  s.started
+                    ? `${s.name} : ${s.masteredCount} carte${s.masteredCount > 1 ? "s" : ""} dans la poche, réviser cette matière`
+                    : `${s.name} : pas encore commencée, réviser cette matière`
+                }
               >
                 <span className="mastery-stack">
                   {[0, 1, 2, 3].map((i) => {
@@ -466,7 +481,15 @@ const SubjectMasteryGrid = memo(function SubjectMasteryGrid({
                   })}
                 </span>
                 <span className="mastery-name">{SHORT_SUBJECT_NAME[s.id] ?? s.name}</span>
-                <span className="mastery-count">{s.masteredCount} en poche</span>
+                {/* Une matière jamais ouverte n'a pas "0 en poche" : elle n'a rien, ce qui n'est
+                    pas la même chose. Au premier lancement la grille affichait six fois "0 en
+                    poche" — un mur de zéros pour quelqu'un qui n'a encore rien raté, et le seul
+                    endroit de l'app où le jour 1 ressemble à un échec. `started` dit si une
+                    carte de la matière a déjà été vue, donc le zéro n'apparaît que quand il est
+                    vrai : tu as commencé, rien n'est encore acquis. */}
+                <span className="mastery-count">
+                  {s.started ? `${s.masteredCount} en poche` : "à découvrir"}
+                </span>
               </button>
             );
           })}

@@ -47,4 +47,15 @@ describe("the voice", () => {
     // The glossary may say there is none ("Aucun classement entre élèves").
     expect(hits.filter((f) => !f.endsWith("glossary.ts"))).toEqual([]);
   });
+
+  // La carte partagée est le seul écran de BRAISE qui sort de l'app et atterrit chez d'autres
+  // élèves, et c'est exactement là que la comparaison était revenue : elle a invité à "battre
+  // mon score" pendant un moment. Un défi lancé à l'autre est un classement à deux, même sans
+  // tableau — l'invitation parle de la carte à avoir, jamais du score à dépasser.
+  it("never challenges another student to beat a score", () => {
+    const BAD =
+      /bats[- ](mon|le|moi)|bats mon score|meilleur score|fais mieux que moi|défie[sz]? tes/i;
+    const hits = files.filter((f) => BAD.test(code(f)));
+    expect(hits).toEqual([]);
+  });
 });

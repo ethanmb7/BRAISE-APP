@@ -1946,6 +1946,18 @@ select {
   transform: translate(2px, 2px);
   box-shadow: 1px 1px 0 #000;
 }
+/* Ce qui prend la place du bouton Partager au tout premier lancement (voir le commentaire au
+   point de montage dans ProfilAuraView) : une phrase calme, pas un bouton désactivé. Elle garde
+   la hauteur de la pile raisonnable et dit ce qui ouvre la carte. */
+.aura-share-soon {
+  margin: 2px 0 0;
+  color: var(--ink-soft);
+  font-family: "Baloo 2", sans-serif;
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+}
 
 /* --- ShareAuraModal — full screen, summoned only while actively sharing. --- */
 .share-modal-overlay {

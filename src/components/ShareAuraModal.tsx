@@ -151,15 +151,53 @@ export function ShareAuraModal({
     const gap = 22;
     const sw = (AW - gap * 2) / 3;
     miniStat(ctx, AX, SY, sw, 170, "#C4B5FD", `${xp}`, "XP");
-    if (streak > 0) miniStat(ctx, AX + sw + gap, SY, sw, 170, "#FFD166", `${streak}`, "JOURS");
-    else miniStat(ctx, AX + sw + gap, SY, sw, 170, "#FFD166", `${masteredCards}`, "SUES");
-    miniStat(ctx, AX + (sw + gap) * 2, SY, sw, 170, "#A7F3D0", `${subjectsCount}`, "MATIÈRES");
+    if (streak > 0)
+      miniStat(
+        ctx,
+        AX + sw + gap,
+        SY,
+        sw,
+        170,
+        "#FFD166",
+        `${streak}`,
+        streak > 1 ? "JOURS" : "JOUR",
+      );
+    else
+      miniStat(
+        ctx,
+        AX + sw + gap,
+        SY,
+        sw,
+        170,
+        "#FFD166",
+        `${masteredCards}`,
+        masteredCards > 1 ? "SUES" : "SUE",
+      );
+    miniStat(
+      ctx,
+      AX + (sw + gap) * 2,
+      SY,
+      sw,
+      170,
+      "#A7F3D0",
+      `${subjectsCount}`,
+      subjectsCount > 1 ? "MATIÈRES" : "MATIÈRE",
+    );
 
     // Card footer: real proof + real date, like a serial line.
     ctx.textAlign = "left";
     ctx.fillStyle = "#5B6172";
     ctx.font = '700 26px "IBM Plex Mono", monospace';
-    ctx.fillText(`${masteredCards} CARTES MAÎTRISÉES`, AX, CY + CH - 34);
+    // La ligne de preuve, seulement quand il y a une preuve : "0 CARTES MAÎTRISÉES" imprimé en
+    // bas d'une carte qu'on envoie à ses potes est une affirmation vide, et le reste de la carte
+    // (XP, série, matières) dit déjà la vérité du jour 1 sans ce zéro.
+    if (masteredCards > 0) {
+      ctx.fillText(
+        `${masteredCards} CARTE${masteredCards > 1 ? "S" : ""} MAÎTRISÉE${masteredCards > 1 ? "S" : ""}`,
+        AX,
+        CY + CH - 34,
+      );
+    }
     ctx.textAlign = "right";
     ctx.fillText(editionCode(), AX + AW, CY + CH - 34);
 
@@ -171,7 +209,12 @@ export function ShareAuraModal({
     ctx.textAlign = "center";
     ctx.fillStyle = "#FDF7EF";
     ctx.font = '800 46px "Baloo 2", sans-serif';
-    ctx.fillText("BATS MON SCORE SUR", CANVAS_W / 2, ctaY + 68);
+    // L'invitation ne compare pas. Elle a dit "BATS MON SCORE SUR BRAISE" pendant un moment :
+    // c'est un classement entre élèves, exactement ce que l'app refuse de faire (aucun
+    // classement, nulle part — c'est une règle produit, pas un détail de formulation). Et c'est
+    // un mauvais calcul en plus : un score à battre ne donne envie qu'à ceux qui pensent pouvoir
+    // gagner. Une carte à avoir donne envie à tout le monde, et c'est ce que la carte EST.
+    ctx.fillText("FAIS-TOI LA TIENNE SUR", CANVAS_W / 2, ctaY + 68);
     ctx.fillStyle = "#FF7A1A";
     ctx.font = '800 56px "Baloo 2", sans-serif';
     ctx.fillText("BRAISE →", CANVAS_W / 2, ctaY + 130);
@@ -201,7 +244,7 @@ export function ShareAuraModal({
           await nav.share({
             files: [file],
             title: "Mon Aura Braise",
-            text: "Bats mon score sur Braise !",
+            text: "Ma carte Braise. Fais-toi la tienne.",
           });
           return;
         } catch (err) {
@@ -251,7 +294,7 @@ export function ShareAuraModal({
 function hookText(rank: Rank, streak: number): string {
   if (streak >= 7) return `${streak} JOURS DE SUITE. INARRÊTABLE.`;
   if (rank.id === "bronze") return "LA MONTÉE COMMENCE ICI.";
-  return `RANG ${rank.name.toUpperCase()}. VENEZ ME CHERCHER.`;
+  return `RANG ${rank.name.toUpperCase()}. ET ÇA MONTE ENCORE.`;
 }
 
 // Rarity mirrors the real rank — nothing decorative: a Bronze card cannot claim to be rare.
