@@ -35,3 +35,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Build embarqué dans les apps iOS/Android (régénéré par `npm run build:native`)
+dist-native
+
+# Rendus jetables des icônes à comparer
+scratch-icons

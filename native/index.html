@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <!-- viewport-fit=cover : sans lui, iOS laisse des bandes blanches sous l'encoche et au-dessus
+         de la barre de geste, et les env(safe-area-inset-*) que le CSS utilise déjà valent 0. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1"
+    />
+    <meta name="theme-color" content="#ff4500" />
+    <meta name="color-scheme" content="light dark" />
+    <title>BRAISE</title>
+    <link rel="icon" type="image/png" href="favicon.png" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="../src/native/main.tsx"></script>
+  </body>
+</html>

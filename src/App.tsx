@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { setHaptics } from "@/lib/sound";
+import { registerBackHandler } from "@/lib/nativeBack";
 import { AppProvider, useApp } from "@/store";
 import { TabBar } from "@/components/TabBar";
 import { useScrollMemory } from "@/lib/world/useScroll";
@@ -25,13 +26,27 @@ import { ProfileView } from "@/views/ProfileView";
 import { SettingsView } from "@/views/SettingsView";
 
 function Screen() {
-  const { state, setTab, loaded } = useApp();
+  const { state, setTab, loaded, goBack } = useApp();
   const courseMastery = useCourseMastery();
   // Mounted regardless of which view is active — a rank-up or badge unlock can be earned from
   // LessonView or RevisionsView just as easily as from Home, and should be celebrated the moment
   // it happens, not only if the student later happens to reopen Profile.
   const { celebration, dismiss } = useMilestoneCelebrations(state, loaded, state.soundOn);
   const [shareOpen, setShareOpen] = useState(false);
+  // Le bouton retour d'Android, dans la coque native (sur le web, personne ne lit ce registre).
+  // La liste d'écrans est celle que `goBack` sait traiter dans store.tsx : ailleurs — sur un
+  // onglet racine — on rend la main, et le geste ferme l'app, ce qui est ce qu'on attend de lui.
+  useEffect(
+    () =>
+      registerBackHandler(() => {
+        if (!["lesson", "complete", "subject", "settings", "share"].includes(state.view)) {
+          return false;
+        }
+        goBack();
+        return true;
+      }),
+    [state.view, goBack],
+  );
   // On <html>, not the shell: every font-size is in rem, which is relative to the root.
   useEffect(() => {
     document.documentElement.dataset.textSize = state.textSize;
