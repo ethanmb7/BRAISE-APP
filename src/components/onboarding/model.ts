@@ -61,6 +61,10 @@ export type OnbModel = {
   line: { text: string; mood: OnbMood };
   /** The choices of this screen; empty on the screens that ask nothing. */
   options: OnbOption[];
+  /** Une précision à lire SOUS les choix, quand le choix seul induirait en erreur. Sert pour la
+   *  classe : les trois niveaux sont proposés, mais les cours sont ceux de seconde, et l'élève
+   *  doit l'apprendre au moment où il choisit — pas après avoir téléchargé l'app. */
+  note: string | null;
   /** Everything already answered, oldest first. */
   history: OnbExchange[];
   name: { value: string; onChange: (v: string) => void };

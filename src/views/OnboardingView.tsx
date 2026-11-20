@@ -249,6 +249,10 @@ export function OnboardingView() {
     questionCount: QUESTION_COUNT,
     line,
     options: optionsFor[stepId] ?? [],
+    // La seule question dont la réponse ne change pas le contenu : BRAISE est écrit pour la
+    // seconde. Un élève de 1ère ou de terminale qui installe l'app depuis un store doit le lire
+    // ici, au moment où il choisit sa classe, et pas le découvrir au troisième chapitre.
+    note: stepId === "level" ? CONTENT_LEVEL_NOTE : null,
     history,
     name: { value: name, onChange: setName },
     // Les lignes du pass : l'étiquette telle qu'elle se lit une fois remplie, la question telle

@@ -168,21 +168,28 @@ export function PassOnboarding({ model }: { model: OnbModel }) {
                             </p>
                           </>
                         ) : (
-                          options.map((o) => (
-                            <button
-                              key={o.id}
-                              type="button"
-                              className={`onbp-chip ${o.selected ? "is-selected" : ""}`}
-                              aria-pressed={o.selected}
-                              aria-label={o.desc ? `${o.title} — ${o.desc}` : o.title}
-                              onClick={o.onSelect}
-                            >
-                              <span aria-hidden="true" className="onbp-chip-aside">
-                                {o.aside}
-                              </span>
-                              <span aria-hidden="true">{o.title}</span>
-                            </button>
-                          ))
+                          <>
+                            {options.map((o) => (
+                              <button
+                                key={o.id}
+                                type="button"
+                                className={`onbp-chip ${o.selected ? "is-selected" : ""}`}
+                                aria-pressed={o.selected}
+                                aria-label={o.desc ? `${o.title} — ${o.desc}` : o.title}
+                                onClick={o.onSelect}
+                              >
+                                <span aria-hidden="true" className="onbp-chip-aside">
+                                  {o.aside}
+                                </span>
+                                <span aria-hidden="true">{o.title}</span>
+                              </button>
+                            ))}
+                            {/* Pas d'aria-hidden ici, contrairement à la note du rythme : ce
+                                texte-là n'est répété dans aucun libellé, c'est une information
+                                neuve, et un élève qui navigue au lecteur d'écran a autant besoin
+                                de l'entendre que les autres de la lire. */}
+                            {model.note && <p className="onbp-ask-note">{model.note}</p>}
+                          </>
                         )}
                       </dd>
                     ) : (

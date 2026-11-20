@@ -664,7 +664,8 @@
    qui s'éclaircirait et disparaîtrait sur le crème. `min-height` réserve la ligne avant le
    premier choix : sans elle, la carte grandit d'un cran au moment où l'élève touche une option,
    et c'est exactement le moment où rien ne doit bouger sous son doigt. */
-.onbp-seg-note {
+.onbp-seg-note,
+.onbp-ask-note {
   /* `.onbp-answers` est une rangée flex qui enveloppe : sans `flex: 1 0 100%` la note n'occupe
      que la largeur de son texte, se centre par rapport à elle-même et non par rapport au
      contrôle, et se retrouve à l'étroit — « Un peu chaque jour, sans prise de tête. » passait sur
@@ -679,6 +680,11 @@
   line-height: 1.3;
   text-align: center;
   opacity: 0.72;
+}
+/* Celle-ci ne change pas avec l'option choisie : elle dit une seule chose, vraie quel que soit
+   le niveau coché, donc elle n'a pas de ligne à réserver — elle est là tout de suite. */
+.onbp-ask-note {
+  margin-top: 11px;
 }
 .onbp-chip:active {
   transform: translate(2px, 2px);

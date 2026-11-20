@@ -34,10 +34,12 @@ ici sont à revérifier sur les pages officielles au moment de s'en servir.
 ## 2 · Mots-clés App Store (100 caractères, séparés par des virgules, sans espaces)
 
 ```
-lycee,revision,bac,seconde,premiere,terminale,maths,fiches,memoire,quiz,reviser,cours
+lycee,seconde,2nde,revision,maths,cours,fiches,memoire,quiz,reviser,apprendre,arithmetique
 ```
 
-Ne pas y remettre « BRAISE » ni « éducation » : le nom et la catégorie sont déjà indexés.
+Ne pas y remettre « BRAISE » ni « éducation » : le nom et la catégorie sont déjà indexés. Plus de
+« premiere » ni « terminale » : attirer un élève dont l'app ne couvre pas le programme, c'est
+acheter une mauvaise note.
 
 ## 3 · Description
 
@@ -75,10 +77,10 @@ Pas de compte à créer. Pas de pub. Pas de données qui partent sur un serveur 
 ton téléphone, et l'app fonctionne sans réseau. Pas de classement entre élèves, jamais.
 
 POUR QUI
-Les lycéens de seconde, première et terminale. Maths, français, histoire-géo, SVT,
-physique-chimie, anglais.
+Les élèves de seconde. Maths, français, histoire-géo, SVT, physique-chimie, anglais.
 
-BRAISE est en test. Les cours couvrent une partie du programme, et s'étoffent.
+BRAISE est en test : les cours suivent le programme de seconde et s'étoffent. Les autres
+niveaux viendront après.
 ```
 
 ### Nouveautés de cette version (What's New)
@@ -143,8 +145,8 @@ attendu : 4+ côté Apple, PEGI 3 / Tous publics côté Play.
 ### Description de la version bêta
 
 ```
-BRAISE est une app de révision pour les lycéens. Tu l'utilises comme tu veux, quand tu veux :
-il n'y a rien à rendre et rien à réussir. Tout reste sur ton téléphone.
+BRAISE est une app de révision pour les élèves de seconde. Tu l'utilises comme tu veux, quand
+tu veux : il n'y a rien à rendre et rien à réussir. Tout reste sur ton téléphone.
 ```
 
 ### Ce qu'on te demande de tester
@@ -193,7 +195,19 @@ est accessible immédiatement. Pas de réseau requis, l'app fonctionne hors-lign
 9. Inviter les élèves. Côté Play, un test fermé d'une douzaine de personnes sur quatorze jours
    est ce qui ouvre ensuite l'accès à la production : ton test utilisateurs sert deux fois.
 
-## 8 · Ce qui reste ouvert
+## 8 · Le périmètre du test
+
+**Seconde uniquement**, décidé le 20 novembre 2026. L'app l'écrivait déjà à deux endroits
+(`CONTENT_LEVEL_NOTE`, visible dans Moi), mais pas là où ça compte : l'onboarding proposait les
+trois niveaux sans rien dire. C'est corrigé — la phrase se lit maintenant sous les trois classes,
+au moment où l'élève choisit la sienne.
+
+Ce que ça implique ailleurs : recruter des 2ndes, le dire dans la fiche (fait ci-dessus), et
+concentrer l'écriture sur un seul chapitre mené jusqu'au bout plutôt que sur une couverture
+large. Les trois niveaux restent proposés dans l'app : un élève de 1ère qui installe quand même
+doit pouvoir entrer et juger — simplement, il sait avant.
+
+## 9 · Ce qui reste ouvert
 
 - **L'identifiant `fr.mearim.braise`** : définitif dès la première publication.
 - **Le fond de l'icône** : crème pour l'instant, trois versions dans `scratch-icons/`.
