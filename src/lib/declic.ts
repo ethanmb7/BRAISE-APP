@@ -90,6 +90,18 @@ for (const [path, raw] of Object.entries(files)) {
   }
 }
 
+/** L'index de la carte suivante, borné à la dernière carte du script.
+ *
+ *  Deux appuis sur « Suite » arrivés dans le même battement poussaient l'index au-delà de la
+ *  dernière carte (12 sur un Déclic qui en compte 11), et le lecteur entier tombait sur l'écran
+ *  « Oups, un truc a planté » au moment exact où l'élève terminait sa notion. La fin d'un Déclic
+ *  est l'endroit où il faut le moins planter : c'est là que la récompense est promise.
+ *  Le lecteur empêche par ailleurs de toucher la carte qui s'en va (voir DeclicMode) ; cette
+ *  borne est la ceinture, pas la bretelle. */
+export function nextCardIndex(index: number, total: number): number {
+  return Math.min(index + 1, Math.max(total - 1, 0));
+}
+
 export function hasDeclicScript(chapterId: string): boolean {
   return chapterId in DECLIC_SCRIPTS;
 }

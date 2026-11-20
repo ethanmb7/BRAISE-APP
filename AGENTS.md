@@ -14,3 +14,6 @@
 - Les pages Matières et parcours utilisent un langage de decks collector néobrutalistes partagé ; cela rend l’exploration cohérente, tactile et adaptée aux lycéens.
 - Le Déclic met Braise en scène comme interlocuteur animé et garde une seule idée par écran ; cela rend la méthode propriétaire vivante sans singer les réseaux sociaux.
 - Réviser feedback uses two scoped paper surfaces with a full-width verdict band and listening control, without a mascot footer; scrollable corrections and fixed actions preserve reading on small mobile screens without changing grading.
+
+- Une carte du Déclic dont le seul geste est « Suite » centre l'idée dans l'espace libre ; celles qui proposent des réponses gardent l'ask en haut et les réponses sous le pouce. Cela supprime le vide d'un seul bloc sans déplacer ce qu'on tape.
+- La carte d'Aura qu'on partage n'invite jamais à battre un score, et n'apparaît pas tant qu'il n'y a rien de vrai dessus ; `voice-guard.test.ts` garde la règle.

@@ -269,6 +269,23 @@
 .declic-stage .declic-ask {
   margin-bottom: auto;
 }
+/* Sauf quand il n'y a rien à mettre sous le pouce. Sur une carte dont le seul geste est
+   "Suite" (la situation qu'on lit, la révélation qu'on encaisse), `margin-bottom: auto` seul
+   laissait 266 px d'un bloc entre la bulle et le bouton — 33 % de l'écran, mesuré à 375 px :
+   la page a l'air inachevée, et l'idée a l'air posée en haut par défaut. Le même vide réparti
+   au-dessus ET en dessous devient une respiration, et l'idée tombe au centre optique. Les
+   cartes à choix ne changent pas : leurs réponses, elles, doivent rester sous le pouce. */
+.declic-stage--situation .declic-ask,
+.declic-stage--reveal .declic-ask {
+  margin-block: auto;
+}
+/* Et puisque l'écran ne porte qu'une idée, elle a le droit d'être grande. Le plancher monte
+   aussi (1.05rem) : à 320 px le texte était déjà au minimum, donc le centrage seul n'aurait
+   rien donné de plus à lire là où l'écran est le plus petit. */
+.declic-stage--situation .declic-bubble,
+.declic-stage--reveal .declic-bubble {
+  font-size: clamp(1.05rem, 4.9vw, 1.32rem);
+}
 
 /* ===== Braise's reminders ===== */
 

@@ -5,7 +5,7 @@ import { ArrowRight, HelpCircle, Sparkles } from "lucide-react";
 import { BraiseMascot } from "@/components/BraiseMascot";
 import { sfx } from "@/lib/sound";
 import { fireConfetti } from "@/lib/confetti";
-import { recordDeclicMemory, type DeclicScript } from "@/lib/declic";
+import { nextCardIndex, recordDeclicMemory, type DeclicScript } from "@/lib/declic";
 import { DeclicTimeline } from "@/components/declic/DeclicTimeline";
 import { DeclicVisualScene } from "@/components/declic/DeclicVisualScene";
 import { DeclicAsk, DeclicTile, ThinkingBubble } from "@/components/declic/shared";
@@ -68,17 +68,22 @@ export function DeclicMode({
 
   // Physical, not just a fade: a card pops in with a little overshoot and gets tossed up and
   // away on the way out, rather than cross-fading into the next one.
+  // `pointerEvents: "none"` à la sortie : avec `mode="wait"`, la carte qui part reste à l'écran
+  // (et cliquable) le temps de son animation, pendant que l'état a déjà changé. Un doigt rapide
+  // tapait donc "Suite" une deuxième fois sur une carte qui n'existait plus logiquement, ce qui
+  // sautait la carte suivante — et, en fin de notion, poussait l'index au-delà de la dernière
+  // carte. On ne peut plus toucher ce qui s'en va.
   const cardMotion = reducedMotion
     ? {
         initial: { opacity: 0 },
         animate: { opacity: 1 },
-        exit: { opacity: 0 },
+        exit: { opacity: 0, pointerEvents: "none" as const },
         transition: { duration: 0.15 },
       }
     : {
         initial: { opacity: 0, y: 26, scale: 0.97 },
         animate: { opacity: 1, y: 0, scale: 1 },
-        exit: { opacity: 0, y: -38, rotate: -2, scale: 0.95 },
+        exit: { opacity: 0, y: -38, rotate: -2, scale: 0.95, pointerEvents: "none" as const },
         transition: CARD_SPRING,
       };
 
@@ -87,7 +92,9 @@ export function DeclicMode({
     setPickedId(null);
     setShowAlt(false);
     setShowNudge(false);
-    setIndex((i) => i + 1);
+    // Jamais au-delà de la dernière carte — voir nextCardIndex : deux "Suite" dans le même
+    // battement faisaient planter la fin du Déclic (reproduit sur h3).
+    setIndex((i) => nextCardIndex(i, script.cards.length));
   };
 
   const pick = (optionId: string, correct: boolean | undefined) => {
@@ -107,7 +114,7 @@ export function DeclicMode({
     if (!reformulation.trim()) return;
     sfx.tap(soundOn);
     recordDeclicMemory(script.chapterId, { reformulation: reformulation.trim(), at: Date.now() });
-    setIndex((i) => i + 1);
+    setIndex((i) => nextCardIndex(i, script.cards.length));
   };
 
   // A screen-reader or keyboard user needs focus to actually move to each new card — without

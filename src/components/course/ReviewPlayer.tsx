@@ -39,11 +39,15 @@ export function ReviewPlayer({
   const card = cards[index];
 
   const motionProps = reducedMotion
-    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
+    ? {
+        initial: { opacity: 0 },
+        animate: { opacity: 1 },
+        exit: { opacity: 0, pointerEvents: "none" as const },
+      }
     : {
         initial: { opacity: 0, y: 26, scale: 0.97 },
         animate: { opacity: 1, y: 0, scale: 1 },
-        exit: { opacity: 0, y: -38, rotate: -2, scale: 0.95 },
+        exit: { opacity: 0, y: -38, rotate: -2, scale: 0.95, pointerEvents: "none" as const },
         transition: CARD_SPRING,
       };
 

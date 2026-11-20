@@ -118,17 +118,20 @@ export function CoursePlayer({
     picked ? `${card.id}:${run.stepIndex}:${run.phase}:${picked.id}` : null,
   );
 
+  // `pointerEvents: "none"` à la sortie : la carte qui part reste à l'écran le temps de son
+  // animation, et un doigt rapide la tapait une fois de trop — ce qui sautait la carte suivante.
+  // Même correctif que DeclicMode, où ce geste finissait par casser la fin de la notion.
   const cardMotion = reducedMotion
     ? {
         initial: { opacity: 0 },
         animate: { opacity: 1 },
-        exit: { opacity: 0 },
+        exit: { opacity: 0, pointerEvents: "none" as const },
         transition: { duration: 0.15 },
       }
     : {
         initial: { opacity: 0, y: 26, scale: 0.97 },
         animate: { opacity: 1, y: 0, scale: 1 },
-        exit: { opacity: 0, y: -38, rotate: -2, scale: 0.95 },
+        exit: { opacity: 0, y: -38, rotate: -2, scale: 0.95, pointerEvents: "none" as const },
         transition: CARD_SPRING,
       };
 
