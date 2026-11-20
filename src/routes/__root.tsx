@@ -79,6 +79,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "author", content: "BRAISE" },
+      { name: "theme-color", content: "#FF4500" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-title", content: "BRAISE" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -92,6 +96,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "icon", type: "image/png", href: "/favicon.png" },
+      // Le même jeu d'icônes que l'app des stores (généré par scripts/make-app-icons.mjs), pour
+      // que « Ajouter à l'écran d'accueil » donne la vraie icône BRAISE en plein écran, sans
+      // barre d'adresse. C'est le filet : une version installable existe même avant que les
+      // stores aient validé quoi que ce soit.
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/icons/icon-192.webp" },
     ],
   }),
   shellComponent: RootShell,
