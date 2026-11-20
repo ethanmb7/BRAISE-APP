@@ -18,7 +18,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "build:native": "vite build --config vite.native.config.ts",
-    "preview:native": "vite preview --config vite.native.config.ts"
+    "preview:native": "vite preview --config vite.native.config.ts",
+    "store:shots": "node scripts/make-store-screenshots.mjs"
   },
   "overrides": {
     "rolldown": "1.2.1"

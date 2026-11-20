@@ -41,3 +41,6 @@ dist-native
 
 # Rendus jetables des icônes à comparer
 scratch-icons
+
+# Captures de fiches store (régénérées par `npm run store:shots`)
+store/captures
