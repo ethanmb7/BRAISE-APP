@@ -6,6 +6,10 @@ trace de la source, pour retrouver d'où vient un texte ou refaire une conversio
 
 ```
 content-briefs/
+  _sources/                  les textes officiels eux-mêmes, archivés tels quels
+    BO26-maths-seconde.pdf   l'annexe de l'arrêté du 26-2-2026 (le programme de 2nde)
+  maths-seconde/
+    00-carte-programme.md    LE relevé du programme : chaque exigence, un identifiant, l'état
   M2-ARI/                    un dossier par chapitre (l'identifiant du chapitre)
     00-chapitre.md           la fiche chapitre : source, exigences du BO, conceptions, plan
     D01.md                   une fiche par Déclic (cartes + validation + résumé + deck)
@@ -13,11 +17,17 @@ content-briefs/
     corrections.md           les corrections demandées après test, datées
 ```
 
+**Avant d'écrire une fiche chapitre, lire `maths-seconde/00-carte-programme.md`.** C'est lui qui
+donne les identifiants d'exigences (`BO26-M2-ARI-CONT-01` et les 165 autres) auxquels les cartes
+se rattachent, et qui dit ce qui est déjà couvert. Les inventer à nouveau dans chaque fiche, ce
+serait se retrouver avec deux registres qui ne se parlent pas.
+
 ## Livrer un chapitre en trois temps
 
 **1. Le plan, d'abord.** `00-chapitre.md` seul : source officielle, **toutes** les exigences du BO,
 les conceptions erronées, et la liste des Déclics avec ce que chacun couvre. Je renvoie un contrôle
 avant que quiconque écrive une carte :
+
 - chaque exigence du BO est couverte par au moins un Déclic (et laquelle ne l'est pas) ;
 - chaque Déclic ne porte bien qu'une idée (trop d'objectifs = à couper en deux) ;
 - l'ordre respecte les prérequis (un Déclic n'en suppose pas un qui vient après) ;
@@ -38,6 +48,7 @@ enregistre ici.
 La progression de chaque élève est enregistrée **par identifiant** (carte, étape, carte de
 révision). Renommer ou renuméroter après coup fait perdre leur avancement aux élèves qui l'ont déjà.
 Donc :
+
 - on garde l'identifiant d'une carte que l'on réécrit ;
 - une carte nouvelle prend un **nouvel** identifiant (on n'en réutilise jamais un) ;
 - une carte supprimée n'est jamais remplacée par une autre sous le même identifiant.
