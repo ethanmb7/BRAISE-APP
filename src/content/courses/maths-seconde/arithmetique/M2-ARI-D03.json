@@ -4,18 +4,13 @@
   "order": 3,
   "title": "Tout le monde a son binôme ?",
   "version": "1.0",
-  "targetDurationSec": [
-    240,
-    360
-  ],
+  "targetDurationSec": [240, 360],
   "difficulty": {
     "level": 1,
     "label": "introduction"
   },
   "objective": "Je sais dire si un entier est pair ou impair, et l’écrire 2k ou 2k + 1 avec k entier.",
-  "prerequisites": [
-    "D02 : une multiplication par un entier."
-  ],
+  "prerequisites": ["D02 : une multiplication par un entier."],
   "detailedObjectives": [
     "reconnaître un entier pair à son écriture 2k, avec k entier",
     "reconnaître un entier impair à son écriture 2k + 1, avec k entier",
@@ -220,11 +215,7 @@
         "kind": "number-line",
         "min": -8,
         "max": 0,
-        "marks": [
-          -8,
-          -7,
-          0
-        ],
+        "marks": [-8, -7, 0],
         "ariaLabel": "Droite graduée de -8 à 0, avec -8, -7, 0 repéré(s)."
       }
     },

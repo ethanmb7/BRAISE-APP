@@ -4,18 +4,13 @@
   "order": 4,
   "title": "Des lots vraiment identiques",
   "version": "1.0",
-  "targetDurationSec": [
-    240,
-    420
-  ],
+  "targetDurationSec": [240, 420],
   "difficulty": {
     "level": 2,
     "label": "Il faut tenir deux conditions à la fois"
   },
   "objective": "Je sais dire combien de lots identiques on peut faire avec plusieurs quantités, en cherchant un diviseur commun.",
-  "prerequisites": [
-    "M2-ARI-D02"
-  ],
+  "prerequisites": ["M2-ARI-D02"],
   "detailedObjectives": [
     "Traduire « des lots identiques, sans reste » par une condition de divisibilité.",
     "Vérifier la condition sur toutes les quantités, pas sur une seule.",
@@ -165,12 +160,7 @@
         "min": 0,
         "max": 20,
         "step": 1,
-        "marks": [
-          1,
-          2,
-          3,
-          6
-        ],
+        "marks": [1, 2, 3, 6],
         "caption": "1, 2, 3, 6 : les diviseurs communs de 12 et 18",
         "ariaLabel": "Droite graduée de 0 à 20 ; 1, 2, 3 et 6 sont mis en évidence."
       }

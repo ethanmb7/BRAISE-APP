@@ -11,9 +11,7 @@
       "answer": "carre",
       "concept": "common_divisor_condition",
       "difficulty": 1,
-      "tags": [
-        "Condition"
-      ],
+      "tags": ["Condition"],
       "feedback": {
         "correct": "C'est la condition de base : chaque quantité doit tomber juste.",
         "incorrect": "Si le nombre de lots ne divise pas une quantité, il en reste, et les lots ne sont plus identiques."
@@ -26,9 +24,7 @@
       "answer": "intox",
       "concept": "checks_both_quantities",
       "difficulty": 2,
-      "tags": [
-        "Deux quantités"
-      ],
+      "tags": ["Deux quantités"],
       "feedback": {
         "correct": "4 divise 12, mais 18 = 4 × 4 + 2 : deux stickers resteraient.",
         "incorrect": "Les stylos tombent juste, pas les stickers : 18 = 4 × 4 + 2."
@@ -43,9 +39,7 @@
       "answer": "intox",
       "concept": "common_divisor_condition",
       "difficulty": 2,
-      "tags": [
-        "Diviseur ou multiple"
-      ],
+      "tags": ["Diviseur ou multiple"],
       "feedback": {
         "correct": "Un multiple serait plus grand que la quantité : des lots vides. On partage, donc on divise.",
         "incorrect": "Un multiple de 12 vaut au moins 12 : 12 lots pour 12 stylos, puis 24, 36… On cherche un diviseur."
@@ -60,9 +54,7 @@
       "answer": "carre",
       "concept": "max_common_divisor",
       "difficulty": 2,
-      "tags": [
-        "Maximum"
-      ],
+      "tags": ["Maximum"],
       "feedback": {
         "correct": "20 = 10 × 2 et 30 = 10 × 3, et rien de plus grand ne divise 20 et 30.",
         "incorrect": "Les diviseurs communs de 20 et 30 sont 1, 2, 5 et 10 : le plus grand est 10."
@@ -75,9 +67,7 @@
       "answer": "intox",
       "concept": "max_common_divisor",
       "difficulty": 3,
-      "tags": [
-        "Plusieurs solutions"
-      ],
+      "tags": ["Plusieurs solutions"],
       "feedback": {
         "correct": "5 divise 20 et 30 : c'est possible, simplement ce n'est pas le maximum.",
         "incorrect": "20 = 5 × 4 et 30 = 5 × 6 : 5 sachets conviennent. Ce n'est pas le plus grand, mais la question n'était pas là."
@@ -92,9 +82,7 @@
       "answer": "intox",
       "concept": "checks_both_quantities",
       "difficulty": 3,
-      "tags": [
-        "Deux quantités"
-      ],
+      "tags": ["Deux quantités"],
       "feedback": {
         "correct": "9 divise 36, mais 24 = 9 × 2 + 6. Chaque quantité se vérifie séparément.",
         "incorrect": "Contre-exemple : 9 divise 36, mais pas 24 (24 = 9 × 2 + 6)."

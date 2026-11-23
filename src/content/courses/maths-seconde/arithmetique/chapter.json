@@ -160,10 +160,5 @@
       "label": "justifier par la taille d’un nombre au lieu de tester la divisibilité"
     }
   ],
-  "declicIds": [
-    "M2-ARI-D01",
-    "M2-ARI-D02",
-    "M2-ARI-D03",
-    "M2-ARI-D04"
-  ]
+  "declicIds": ["M2-ARI-D01", "M2-ARI-D02", "M2-ARI-D03", "M2-ARI-D04"]
 }
