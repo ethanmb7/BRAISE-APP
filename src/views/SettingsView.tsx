@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BookOpen, ChevronRight } from "lucide-react";
+import { BookOpen, ChevronRight, MessageSquare } from "lucide-react";
 import { useApp } from "@/store";
 import { sfx } from "@/lib/sound";
 import { GlossarySheet } from "@/components/GlossarySheet";
@@ -8,6 +8,8 @@ import { DemoSettings } from "@/components/DemoSettings";
 import { ResetSettings } from "@/components/ResetSettings";
 import { NotificationSettings } from "@/components/notifications/NotificationSettings";
 import { BackupSettings } from "@/components/BackupSettings";
+import { APP_VERSION } from "@/lib/appVersion";
+import { CONTACT_EMAIL, feedbackMailto } from "@/lib/contact";
 
 export function SettingsView() {
   const { state, goBack } = useApp();
@@ -48,6 +50,31 @@ export function SettingsView() {
           </button>
         </div>
 
+        {/* Une porte pour dire quelque chose. Elle n'apparaît que si une adresse est renseignée
+            (voir lib/contact.ts) : un bouton qui ne mène nulle part est pire que pas de bouton.
+            Placée avant la plomberie parce qu'un testeur qui vient ici cherche souvent ça. */}
+        {CONTACT_EMAIL && (
+          <>
+            <div className="settings-label">Un truc à dire&nbsp;?</div>
+            <div className="settings-group">
+              <a
+                className="settings-row"
+                style={{ width: "100%", textAlign: "left", textDecoration: "none" }}
+                href={feedbackMailto()}
+                onClick={() => sfx.tap(state.soundOn)}
+              >
+                <span className="settings-row-main">
+                  <span className="settings-row-icon" aria-hidden="true">
+                    <MessageSquare size={18} />
+                  </span>
+                  Écrire à Braise
+                </span>
+                <ChevronRight size={18} color="var(--ink-soft)" />
+              </a>
+            </div>
+          </>
+        )}
+
         <NotificationSettings />
 
         <BackupSettings />
@@ -64,7 +91,7 @@ export function SettingsView() {
             marginTop: 20,
           }}
         >
-          BRAISE v1.0 · Pensée pour apprendre autrement
+          BRAISE v{APP_VERSION} · Pensée pour apprendre autrement
         </p>
       </div>
       {lexiconOpen && <GlossarySheet onClose={() => setLexiconOpen(false)} />}

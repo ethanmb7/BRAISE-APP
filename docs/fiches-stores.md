@@ -10,20 +10,20 @@ ici sont à revérifier sur les pages officielles au moment de s'en servir.
 
 ## 1 · Identité de l'app
 
-|                                    |                                                                                       |
-| ---------------------------------- | ------------------------------------------------------------------------------------- |
-| Nom (30 car. max)                  | `BRAISE`                                                                              |
-| Sous-titre App Store (30 car. max) | `Tes cours, version pote`                                                             |
-| Titre court Play (30 car. max)     | `BRAISE — réviser sans forcer`                                                        |
-| Identifiant (définitif)            | `fr.mearim.braise`                                                                    |
-| Catégorie principale               | Éducation                                                                             |
-| Catégorie secondaire               | Références                                                                            |
-| Langue                             | Français (France)                                                                     |
-| Version                            | `0.1.0` — build `1`                                                                   |
-| Prix                               | Gratuit, sans achat intégré                                                           |
-| Éditeur                            | **À COMPLÉTER** (nom affiché publiquement dans les deux stores)                       |
-| URL d'assistance                   | **À COMPLÉTER** (obligatoire)                                                         |
-| URL de confidentialité             | **À COMPLÉTER** — la page est écrite : `docs/confidentialite.html`, à mettre en ligne |
+|                                    |                                                                                                                                                 |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Nom (30 car. max)                  | `BRAISE`                                                                                                                                        |
+| Sous-titre App Store (30 car. max) | `Tes cours, version pote`                                                                                                                       |
+| Titre court Play (30 car. max)     | `BRAISE — réviser sans forcer`                                                                                                                  |
+| Identifiant (définitif)            | `fr.mearim.braise`                                                                                                                              |
+| Catégorie principale               | Éducation                                                                                                                                       |
+| Catégorie secondaire               | Références                                                                                                                                      |
+| Langue                             | Français (France)                                                                                                                               |
+| Version                            | `0.1.0` — build `1`. Une seule source : `src/lib/appVersion.ts` ; un test refuse qu'elle diverge de package.json, du Gradle et du projet Xcode. |
+| Prix                               | Gratuit, sans achat intégré                                                                                                                     |
+| Éditeur                            | **À COMPLÉTER** (nom affiché publiquement dans les deux stores)                                                                                 |
+| URL d'assistance                   | **À COMPLÉTER** (obligatoire)                                                                                                                   |
+| URL de confidentialité             | **À COMPLÉTER** — la page est écrite : `docs/confidentialite.html`, à mettre en ligne                                                           |
 
 > Le nom affiché et l'adresse de l'éditeur sont **publics** dans l'Union européenne dès que l'app
 > est distribuée comme professionnel. Si tu publies en nom propre, c'est ton nom et ton adresse
@@ -209,6 +209,7 @@ doit pouvoir entrer et juger — simplement, il sait avant.
 
 ## 9 · Ce qui reste ouvert
 
+- **L'adresse qui reçoit les retours des testeurs** : `CONTACT_EMAIL` dans `src/lib/contact.ts` est vide, donc le bouton « Écrire à Braise » n'apparaît pas encore dans Paramètres. C'est une adresse **publique** — tous ceux qui ouvriront l'app la verront — à choisir en conséquence.
 - **L'identifiant `fr.mearim.braise`** : définitif dès la première publication.
 - **Le fond de l'icône** : crème pour l'instant, trois versions dans `scratch-icons/`.
 - **Le statut d'éditeur** (professionnel ou non) et l'adresse publique qui va avec.
