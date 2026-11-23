@@ -1,0 +1,771 @@
+{
+  "id": "M2-ARI-D06",
+  "chapterId": "M2-ARI",
+  "order": 6,
+  "title": "Même fraction, autres nombres",
+  "version": "1.0",
+  "targetDurationSec": [240, 420],
+  "difficulty": {
+    "level": 2,
+    "label": "Deux écritures pour la même part"
+  },
+  "objective": "Je sais simplifier une fraction en divisant ses deux termes par un même diviseur commun, et dire pourquoi la valeur ne change pas.",
+  "prerequisites": ["M2-ARI-D02"],
+  "detailedObjectives": [
+    "Reconnaître que deux écritures différentes peuvent désigner la même part.",
+    "Diviser les deux termes par un même diviseur commun non nul.",
+    "Écarter la soustraction de la même quantité aux deux termes.",
+    "Écarter une transformation appliquée à un seul terme.",
+    "Justifier une simplification en nommant le diviseur commun utilisé."
+  ],
+  "coverage": [
+    {
+      "mappingId": "BO26-M2-ARI-CAP-03",
+      "coverage": "introduced_and_practised"
+    }
+  ],
+  "misconceptionIds": [
+    "different_numbers_different_value",
+    "subtracts_instead_of_divides",
+    "changes_only_one_term",
+    "stops_before_irreducible",
+    "compares_sizes_instead_of_divisibility"
+  ],
+  "cards": [
+    {
+      "id": "M2-ARI-D06-C01",
+      "order": 1,
+      "type": "choice",
+      "beat": "together",
+      "objective": "faire accepter que deux écritures différentes désignent la même part",
+      "text": {
+        "text": "Léa a terminé 12 niveaux sur 18. Son appli, elle, affiche « 2/3 du jeu ». Est-ce que les deux disent la même chose ?",
+        "variants": {
+          "savage": "Léa a fini 12 niveaux sur 18. L'appli affiche « 2/3 du jeu ». Les deux disent la même chose, ou l'appli raconte n'importe quoi ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "Oui, c'est la même part du jeu.",
+          "correct": true,
+          "feedback": {
+            "text": "12 sur 18, c'est 2 paquets de 6 sur 3 paquets de 6 : la même part, comptée autrement. 12/18 et 2/3 sont deux écritures du même nombre.",
+            "variants": {
+              "savage": "Même part, autre comptage : 2 paquets de 6 sur 3. 12/18 et 2/3, c'est le même nombre déguisé."
+            }
+          }
+        },
+        {
+          "id": "B",
+          "label": "Non : 12 et 18 ne sont pas 2 et 3.",
+          "feedback": {
+            "text": "Des nombres différents peuvent écrire la même part : la moitié s'écrit 1/2, 2/4 ou 50/100. Ce qui compte, c'est le rapport entre le haut et le bas.",
+            "variants": {
+              "savage": "La moitié s'écrit 1/2, 2/4 ou 50/100 : des nombres différents, la même part. C'est le rapport qui décide, pas les chiffres."
+            }
+          },
+          "misconceptionId": "different_numbers_different_value"
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D06-C02",
+      "order": 2,
+      "type": "reveal",
+      "beat": "show",
+      "objective": "montrer le regroupement qui fait passer de 12/18 à 2/3",
+      "text": {
+        "text": "Regroupe les niveaux par paquets de 6 : 12 = ==2 × 6== et 18 = ==3 × 6==. Léa a donc fini 2 paquets sur 3. Même part, nombres plus petits.",
+        "variants": {
+          "savage": "Paquets de 6 : 12 = ==2 × 6==, 18 = ==3 × 6==. Deux paquets sur trois. Même part, nombres allégés."
+        }
+      },
+      "visual": {
+        "kind": "groups",
+        "total": 18,
+        "groupSize": 6,
+        "caption": "18 = 3 × 6, et 12 = 2 × 6 : 2 paquets sur 3",
+        "ariaLabel": "18 éléments regroupés en 3 paquets de 6."
+      }
+    },
+    {
+      "id": "M2-ARI-D06-C03",
+      "order": 3,
+      "type": "choice",
+      "beat": "together",
+      "objective": "distinguer diviser les deux termes de leur retirer la même quantité",
+      "text": {
+        "text": "Pour passer de 12/18 à des nombres plus petits, laquelle de ces deux opérations garde la même part ?",
+        "variants": {
+          "savage": "Deux opérations proposées sur 12/18. Une seule garde la même part. Laquelle ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "Enlever 6 en haut et 6 en bas.",
+          "feedback": {
+            "text": "Cela donne 6/12, c'est-à-dire la moitié — alors que 12/18 vaut deux tiers. Retirer la même quantité aux deux termes change la valeur.",
+            "variants": {
+              "savage": "6/12, soit la moitié, alors qu'on était à deux tiers. Soustraire, ça déforme."
+            }
+          },
+          "misconceptionId": "subtracts_instead_of_divides"
+        },
+        {
+          "id": "B",
+          "label": "Diviser le haut et le bas par 6.",
+          "correct": true,
+          "feedback": {
+            "text": "12 ÷ 6 = 2 et 18 ÷ 6 = 3 : on obtient 2/3, la même part. Diviser les deux termes par un même nombre conserve la valeur.",
+            "variants": {
+              "savage": "12 ÷ 6 = 2, 18 ÷ 6 = 3, donc 2/3. Diviser les deux, ça conserve."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D06-C04",
+      "order": 4,
+      "type": "reveal",
+      "beat": "show",
+      "objective": "poser la règle de simplification et sa condition",
+      "text": {
+        "text": "La règle : pour simplifier une fraction, on ==divise ses deux termes par un même diviseur commun==, différent de zéro. La valeur ne bouge pas.\nAjouter ou enlever un nombre, en revanche, change la part.",
+        "variants": {
+          "savage": "La règle : ==diviser les deux termes par un même diviseur commun== non nul. La valeur tient.\nAjouter ou retirer, c'est une autre fraction. Pas la même."
+        }
+      }
+    },
+    {
+      "id": "M2-ARI-D06-C05",
+      "order": 5,
+      "type": "choice",
+      "beat": "trap",
+      "objective": "refuser une transformation appliquée à un seul terme",
+      "text": {
+        "text": "Quelqu'un divise seulement le haut par 2 et écrit 12/18 = 6/18. C'est juste ?",
+        "variants": {
+          "savage": "Quelqu'un divise le haut par 2 et annonce 12/18 = 6/18. Verdict ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "Oui, on a bien divisé par 2.",
+          "feedback": {
+            "text": "Seul le haut a été divisé : 6/18 vaut un tiers, contre deux tiers pour 12/18. La part a été divisée par deux au passage.",
+            "variants": {
+              "savage": "6/18 = un tiers, contre deux tiers au départ. Tu as divisé la part elle-même, pas son écriture."
+            }
+          },
+          "misconceptionId": "changes_only_one_term"
+        },
+        {
+          "id": "B",
+          "label": "Non : il faut diviser les deux termes.",
+          "correct": true,
+          "feedback": {
+            "text": "Exact. En divisant les deux par 2, on obtient 6/9, qui vaut bien 12/18. Toucher à un seul terme change la part.",
+            "variants": {
+              "savage": "Oui : les deux, donc 6/9 — qui vaut bien 12/18. Un seul terme, et la part change."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D06-C06",
+      "order": 6,
+      "type": "reveal",
+      "beat": "show",
+      "objective": "fixer l'image : le même facteur en haut et en bas",
+      "text": {
+        "text": "Retiens l'image : le facteur qu'on retire doit être le ==même en haut et en bas==. C'est pour ça que 12/18, 6/9 et 2/3 sont trois écritures de la même part.",
+        "variants": {
+          "savage": "L'image à garder : ==même facteur en haut et en bas==. D'où 12/18 = 6/9 = 2/3, trois tenues pour la même part."
+        }
+      }
+    },
+    {
+      "id": "M2-ARI-D06-C07",
+      "order": 7,
+      "type": "choice",
+      "beat": "you",
+      "objective": "choisir l'écriture la plus simple parmi des transformations plausibles",
+      "text": {
+        "text": "À toi : quelle est l'écriture la plus simple de 20/30 ?",
+        "variants": {
+          "savage": "À toi. 20/30, version la plus simple ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "10/15",
+          "feedback": {
+            "text": "10/15 est bien égal à 20/30 : les deux termes ont été divisés par 2. Mais on peut encore diviser par 5 et obtenir 2/3.",
+            "variants": {
+              "savage": "Égal, oui. Simplifié jusqu'au bout, non : encore divisible par 5, et on tombe sur 2/3."
+            }
+          },
+          "misconceptionId": "stops_before_irreducible"
+        },
+        {
+          "id": "B",
+          "label": "2/3",
+          "correct": true,
+          "feedback": {
+            "text": "20 ÷ 10 = 2 et 30 ÷ 10 = 3. Plus aucun nombre, à part 1, ne divise 2 et 3 : on ne peut pas aller plus loin.",
+            "variants": {
+              "savage": "20 ÷ 10 = 2, 30 ÷ 10 = 3. Au-delà, plus rien ne divise 2 et 3 : terminus."
+            }
+          }
+        },
+        {
+          "id": "C",
+          "label": "20/3",
+          "feedback": {
+            "text": "Seul le bas a été divisé par 10 : 20/3 vaut plus de 6, alors que 20/30 est inférieur à 1. Les deux termes, toujours.",
+            "variants": {
+              "savage": "20/3 dépasse 6, quand 20/30 ne vaut même pas 1. Tu n'as divisé qu'un côté."
+            }
+          },
+          "misconceptionId": "changes_only_one_term"
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D06-C08",
+      "order": 8,
+      "type": "choice",
+      "beat": "you",
+      "objective": "choisir une justification qui nomme l'opération, pas la taille des nombres",
+      "text": {
+        "text": "Quelle phrase justifie correctement que 12/18 = 2/3 ?",
+        "variants": {
+          "savage": "La phrase pour la copie : pourquoi 12/18 = 2/3 ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "Parce que 2 et 3 sont plus petits que 12 et 18.",
+          "feedback": {
+            "text": "Être plus petit ne prouve rien : 1/2 aussi est fait de petits nombres, et pourtant 12/18 ne vaut pas un demi. Il faut nommer le diviseur commun.",
+            "variants": {
+              "savage": "1/2 aussi est petit, et pourtant ce n'est pas la bonne réponse. Nomme le diviseur, pas la taille."
+            }
+          },
+          "misconceptionId": "compares_sizes_instead_of_divisibility"
+        },
+        {
+          "id": "B",
+          "label": "Parce que 12 et 18 ont été divisés par 6, tous les deux.",
+          "correct": true,
+          "feedback": {
+            "text": "C'est la justification attendue : elle nomme le diviseur commun et précise qu'il s'applique aux deux termes.",
+            "variants": {
+              "savage": "Pile ça : le diviseur commun, et le fait qu'il passe sur les deux termes."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D06-C09",
+      "order": 9,
+      "type": "choice",
+      "beat": "you",
+      "objective": "transférer à un rapport entre deux quantités",
+      "text": {
+        "text": "Dans une classe, 18 élèves prennent le bus et 12 viennent à pied. Le rapport bus / à pied, écrit le plus simplement ?",
+        "variants": {
+          "savage": "18 élèves en bus, 12 à pied. Le rapport bus / à pied, version courte ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "3/2",
+          "correct": true,
+          "feedback": {
+            "text": "18 et 12 se divisent tous les deux par 6 : on obtient 3/2, et plus rien ne les divise ensemble.",
+            "variants": {
+              "savage": "Divisés par 6 tous les deux : 3/2, et plus rien à gratter."
+            }
+          }
+        },
+        {
+          "id": "B",
+          "label": "12/6",
+          "feedback": {
+            "text": "Ici on a retiré la même quantité aux deux termes, et la part a changé. Il fallait les diviser par 6.",
+            "variants": {
+              "savage": "Soustraction repérée : la part a bougé. C'est une division par 6 qu'il fallait."
+            }
+          },
+          "misconceptionId": "subtracts_instead_of_divides"
+        },
+        {
+          "id": "C",
+          "label": "3/12",
+          "feedback": {
+            "text": "Un seul des deux termes a été divisé : le rapport n'est plus le même.",
+            "variants": {
+              "savage": "Un seul terme divisé : le rapport part en vrille."
+            }
+          },
+          "misconceptionId": "changes_only_one_term"
+        }
+      ],
+      "variants": [
+        {
+          "id": "v2",
+          "text": {
+            "text": "Autre classe : 24 élèves en bus, 16 à pied. Le rapport bus / à pied, le plus simplement ?",
+            "variants": {
+              "savage": "Autre classe : 24 en bus, 16 à pied. Rapport le plus simple ?"
+            }
+          },
+          "choices": [
+            {
+              "id": "A",
+              "label": "3/2",
+              "correct": true,
+              "feedback": {
+                "text": "24 et 16 se divisent tous les deux par 8 : on obtient 3/2, et plus rien ne les divise ensemble.",
+                "variants": {
+                  "savage": "Divisés par 8 tous les deux : 3/2, et plus rien à gratter."
+                }
+              }
+            },
+            {
+              "id": "B",
+              "label": "16/8",
+              "feedback": {
+                "text": "Ici on a retiré la même quantité aux deux termes, et la part a changé. Il fallait les diviser par 8.",
+                "variants": {
+                  "savage": "Soustraction repérée : la part a bougé. C'est une division par 8 qu'il fallait."
+                }
+              },
+              "misconceptionId": "subtracts_instead_of_divides"
+            },
+            {
+              "id": "C",
+              "label": "3/16",
+              "feedback": {
+                "text": "Un seul des deux termes a été divisé : le rapport n'est plus le même.",
+                "variants": {
+                  "savage": "Un seul terme divisé : le rapport part en vrille."
+                }
+              },
+              "misconceptionId": "changes_only_one_term"
+            }
+          ]
+        },
+        {
+          "id": "v3",
+          "text": {
+            "text": "Troisième classe : 15 élèves en bus, 25 à pied. Le rapport bus / à pied, le plus simplement ?",
+            "variants": {
+              "savage": "Troisième classe : 15 en bus, 25 à pied. Rapport le plus simple ?"
+            }
+          },
+          "choices": [
+            {
+              "id": "A",
+              "label": "3/5",
+              "correct": true,
+              "feedback": {
+                "text": "15 et 25 se divisent tous les deux par 5 : on obtient 3/5, et plus rien ne les divise ensemble.",
+                "variants": {
+                  "savage": "Divisés par 5 tous les deux : 3/5, et plus rien à gratter."
+                }
+              }
+            },
+            {
+              "id": "B",
+              "label": "10/20",
+              "feedback": {
+                "text": "Ici on a retiré la même quantité aux deux termes, et la part a changé. Il fallait les diviser par 5.",
+                "variants": {
+                  "savage": "Soustraction repérée : la part a bougé. C'est une division par 5 qu'il fallait."
+                }
+              },
+              "misconceptionId": "subtracts_instead_of_divides"
+            },
+            {
+              "id": "C",
+              "label": "3/25",
+              "feedback": {
+                "text": "Un seul des deux termes a été divisé : le rapport n'est plus le même.",
+                "variants": {
+                  "savage": "Un seul terme divisé : le rapport part en vrille."
+                }
+              },
+              "misconceptionId": "changes_only_one_term"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D06-C10",
+      "order": 10,
+      "type": "multi-step-choice",
+      "objective": "valider : reconnaître, comprendre l'effet sur un seul terme, puis simplifier",
+      "text": {
+        "text": "Trois étapes, corrections après tes trois réponses.",
+        "variants": {
+          "savage": "Trois décisions, débrief groupé."
+        }
+      },
+      "feedbackTiming": "after-all",
+      "steps": [
+        {
+          "id": "M2-ARI-D06-C10-V01-E01",
+          "question": {
+            "text": "Quelle écriture est égale à 24/36 ?",
+            "variants": {
+              "savage": "Égal à 24/36 : laquelle ?"
+            }
+          },
+          "options": [
+            {
+              "id": "A",
+              "label": "2/3",
+              "correct": true,
+              "feedback": {
+                "text": "24 ÷ 12 = 2 et 36 ÷ 12 = 3 : les deux termes divisés par le même nombre, donc la même part.",
+                "variants": {
+                  "savage": "24 ÷ 12 = 2, 36 ÷ 12 = 3. Les deux termes, même diviseur, même part."
+                }
+              }
+            },
+            {
+              "id": "B",
+              "label": "12/24",
+              "feedback": {
+                "text": "Ici on a retiré 12 aux deux termes au lieu de les diviser : la part n'est plus la même.",
+                "variants": {
+                  "savage": "On a retiré 12 de chaque côté. Résultat : une autre fraction."
+                }
+              },
+              "misconceptionId": "subtracts_instead_of_divides"
+            }
+          ],
+          "conceptId": "divide_both_terms",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D06-C03",
+            "toCardId": "M2-ARI-D06-C04"
+          }
+        },
+        {
+          "id": "M2-ARI-D06-C10-V01-E02",
+          "discriminating": true,
+          "question": {
+            "text": "On divise seulement le dénominateur d'une fraction par 2. Que devient sa valeur ?",
+            "variants": {
+              "savage": "On divise juste le dénominateur par 2. La valeur fait quoi ?"
+            }
+          },
+          "options": [
+            {
+              "id": "A",
+              "label": "Elle ne change pas.",
+              "feedback": {
+                "text": "Si : diviser le bas par 2 double la fraction. Par exemple 2/6 vaut un tiers, et 2/3 vaut deux tiers. Il faut toucher aux deux termes.",
+                "variants": {
+                  "savage": "Si : 2/6 vaut un tiers, 2/3 vaut deux tiers. Toucher au bas seul, ça double tout."
+                }
+              },
+              "misconceptionId": "changes_only_one_term"
+            },
+            {
+              "id": "B",
+              "label": "Elle double.",
+              "correct": true,
+              "feedback": {
+                "text": "Oui : partager en deux fois moins de parts rend chaque part deux fois plus grande. Seule une division des deux termes conserve la valeur.",
+                "variants": {
+                  "savage": "Oui : moins de parts, donc des parts plus grosses. Seuls les deux termes ensemble conservent la valeur."
+                }
+              }
+            }
+          ],
+          "conceptId": "same_value_other_numbers",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D06-C05",
+            "toCardId": "M2-ARI-D06-C06"
+          }
+        },
+        {
+          "id": "M2-ARI-D06-C10-V01-E03",
+          "question": {
+            "text": "Écris 15/25 le plus simplement possible.",
+            "variants": {
+              "savage": "15/25, version la plus simple ?"
+            }
+          },
+          "options": [
+            {
+              "id": "A",
+              "label": "15/5",
+              "feedback": {
+                "text": "Un seul des deux termes a été divisé : la valeur a changé.",
+                "variants": {
+                  "savage": "Un seul terme divisé, et la valeur s'envole."
+                }
+              },
+              "misconceptionId": "changes_only_one_term"
+            },
+            {
+              "id": "B",
+              "label": "3/5",
+              "correct": true,
+              "feedback": {
+                "text": "15 ÷ 5 = 3 et 25 ÷ 5 = 5 ; ensuite, plus aucun nombre à part 1 ne divise 3 et 5.",
+                "variants": {
+                  "savage": "15 ÷ 5 = 3, 25 ÷ 5 = 5, et au-delà plus rien ne divise les deux. Terminus."
+                }
+              }
+            },
+            {
+              "id": "C",
+              "label": "10/20",
+              "feedback": {
+                "text": "Cette écriture vient d'une soustraction sur les deux termes, pas d'une division : elle ne vaut pas la même chose.",
+                "variants": {
+                  "savage": "Soustraction déguisée en simplification. Ce n'est pas la même part."
+                }
+              },
+              "misconceptionId": "subtracts_instead_of_divides"
+            }
+          ],
+          "conceptId": "irreducible_form",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D06-C07",
+            "toCardId": "M2-ARI-D06-C07"
+          }
+        }
+      ],
+      "variants": [
+        {
+          "id": "v2",
+          "steps": [
+            {
+              "id": "M2-ARI-D06-C10-V02-E01",
+              "question": {
+                "text": "Quelle écriture est égale à 30/45 ?",
+                "variants": {
+                  "savage": "Égal à 30/45 : laquelle ?"
+                }
+              },
+              "options": [
+                {
+                  "id": "A",
+                  "label": "2/3",
+                  "correct": true,
+                  "feedback": {
+                    "text": "30 ÷ 15 = 2 et 45 ÷ 15 = 3 : les deux termes divisés par le même nombre, donc la même part.",
+                    "variants": {
+                      "savage": "30 ÷ 15 = 2, 45 ÷ 15 = 3. Les deux termes, même diviseur, même part."
+                    }
+                  }
+                },
+                {
+                  "id": "B",
+                  "label": "15/30",
+                  "feedback": {
+                    "text": "Ici on a retiré 15 aux deux termes au lieu de les diviser : la part n'est plus la même.",
+                    "variants": {
+                      "savage": "On a retiré 15 de chaque côté. Résultat : une autre fraction."
+                    }
+                  },
+                  "misconceptionId": "subtracts_instead_of_divides"
+                }
+              ],
+              "conceptId": "divide_both_terms",
+              "remediation": {
+                "type": "replay",
+                "fromCardId": "M2-ARI-D06-C03",
+                "toCardId": "M2-ARI-D06-C04"
+              }
+            },
+            {
+              "id": "M2-ARI-D06-C10-V02-E02",
+              "discriminating": true,
+              "question": {
+                "text": "On divise seulement le dénominateur d'une fraction par 2. Que devient sa valeur ?",
+                "variants": {
+                  "savage": "On divise juste le dénominateur par 2. La valeur fait quoi ?"
+                }
+              },
+              "options": [
+                {
+                  "id": "A",
+                  "label": "Elle ne change pas.",
+                  "feedback": {
+                    "text": "Si : diviser le bas par 2 double la fraction. Par exemple 2/6 vaut un tiers, et 2/3 vaut deux tiers. Il faut toucher aux deux termes.",
+                    "variants": {
+                      "savage": "Si : 2/6 vaut un tiers, 2/3 vaut deux tiers. Toucher au bas seul, ça double tout."
+                    }
+                  },
+                  "misconceptionId": "changes_only_one_term"
+                },
+                {
+                  "id": "B",
+                  "label": "Elle double.",
+                  "correct": true,
+                  "feedback": {
+                    "text": "Oui : partager en deux fois moins de parts rend chaque part deux fois plus grande. Seule une division des deux termes conserve la valeur.",
+                    "variants": {
+                      "savage": "Oui : moins de parts, donc des parts plus grosses. Seuls les deux termes ensemble conservent la valeur."
+                    }
+                  }
+                }
+              ],
+              "conceptId": "same_value_other_numbers",
+              "remediation": {
+                "type": "replay",
+                "fromCardId": "M2-ARI-D06-C05",
+                "toCardId": "M2-ARI-D06-C06"
+              }
+            },
+            {
+              "id": "M2-ARI-D06-C10-V02-E03",
+              "question": {
+                "text": "Écris 14/21 le plus simplement possible.",
+                "variants": {
+                  "savage": "14/21, version la plus simple ?"
+                }
+              },
+              "options": [
+                {
+                  "id": "A",
+                  "label": "14/3",
+                  "feedback": {
+                    "text": "Un seul des deux termes a été divisé : la valeur a changé.",
+                    "variants": {
+                      "savage": "Un seul terme divisé, et la valeur s'envole."
+                    }
+                  },
+                  "misconceptionId": "changes_only_one_term"
+                },
+                {
+                  "id": "B",
+                  "label": "2/3",
+                  "correct": true,
+                  "feedback": {
+                    "text": "14 ÷ 7 = 2 et 21 ÷ 7 = 3 ; ensuite, plus aucun nombre à part 1 ne divise 2 et 3.",
+                    "variants": {
+                      "savage": "14 ÷ 7 = 2, 21 ÷ 7 = 3, et au-delà plus rien ne divise les deux. Terminus."
+                    }
+                  }
+                },
+                {
+                  "id": "C",
+                  "label": "7/14",
+                  "feedback": {
+                    "text": "Cette écriture vient d'une soustraction sur les deux termes, pas d'une division : elle ne vaut pas la même chose.",
+                    "variants": {
+                      "savage": "Soustraction déguisée en simplification. Ce n'est pas la même part."
+                    }
+                  },
+                  "misconceptionId": "subtracts_instead_of_divides"
+                }
+              ],
+              "conceptId": "irreducible_form",
+              "remediation": {
+                "type": "replay",
+                "fromCardId": "M2-ARI-D06-C07",
+                "toCardId": "M2-ARI-D06-C07"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D06-C11",
+      "order": 11,
+      "type": "declic-summary",
+      "objective": "garder la règle, la condition et les deux pièges",
+      "text": {
+        "text": "🔥 À garder\nSimplifier une fraction : ==diviser le haut et le bas par un même diviseur commun==, non nul. La valeur ne change pas.\n12/18 = 6/9 = 2/3 : trois écritures de la même part.\n⚠️ Piège contrôle : retirer la même quantité aux deux termes ne simplifie pas, ça change la part — 12/18 n'est pas 6/12. Et diviser un seul terme non plus.",
+        "variants": {
+          "savage": "🔥 Ce qu'on garde\nSimplifier : ==le haut et le bas, par le même diviseur commun== non nul. La valeur tient.\n12/18 = 6/9 = 2/3 : même part, trois tenues.\n⚠️ Piège contrôle : soustraire n'est pas simplifier (12/18 ≠ 6/12), et un seul terme divisé, c'est une autre fraction."
+        }
+      },
+      "actions": [
+        {
+          "id": "done",
+          "label": "J'ai capté 🔥",
+          "kind": "complete"
+        },
+        {
+          "id": "review",
+          "label": "Revoir le point qui me piège",
+          "kind": "menu"
+        }
+      ],
+      "menu": [
+        {
+          "id": "meme-part",
+          "label": "Deux écritures, une même part",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D06-C01",
+            "toCardId": "M2-ARI-D06-C02"
+          }
+        },
+        {
+          "id": "regle",
+          "label": "Diviser les deux termes",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D06-C03",
+            "toCardId": "M2-ARI-D06-C04"
+          }
+        },
+        {
+          "id": "un-seul",
+          "label": "Pourquoi un seul terme ne suffit pas",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D06-C05",
+            "toCardId": "M2-ARI-D06-C06"
+          }
+        },
+        {
+          "id": "simple",
+          "label": "Aller jusqu'à l'écriture la plus simple",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D06-C07",
+            "toCardId": "M2-ARI-D06-C07"
+          }
+        }
+      ]
+    }
+  ],
+  "assessment": {
+    "cardId": "M2-ARI-D06-C10",
+    "understoodMinScore": 2,
+    "requireDiscriminatingStep": true,
+    "understoodMessage": "Deux étapes sur trois au moins, dont celle qui montre l'effet d'une division sur un seul terme : la règle est tenue. Le point restant, s'il y en a un, est noté plus bas.",
+    "needsReinforcementMessage": "La règle n'est pas encore stable. On revoit le point qui coince, puis tu refais une série avec d'autres fractions.",
+    "followUpCount": 2
+  },
+  "mastery": {
+    "requiredDeferredSuccesses": 2,
+    "requiredCardRatio": 0.8
+  },
+  "deckId": "M2-ARI-D06-REV"
+}

@@ -68,6 +68,16 @@
       "id": "BO26-M2-ARI-CAP-02",
       "requirement": "Modéliser et résoudre un problème de parité",
       "type": "direct"
+    },
+    {
+      "id": "BO26-M2-ARI-ALG-02",
+      "type": "direct",
+      "requirement": "Pour des entiers a et b donnés, déterminer le plus grand multiple de a inférieur ou égal à b"
+    },
+    {
+      "id": "BO26-M2-ARI-CAP-03",
+      "type": "direct",
+      "requirement": "Présenter les fractions sous forme irréductible"
     }
   ],
   "misconceptions": [
@@ -158,7 +168,39 @@
     {
       "id": "compares_sizes_instead_of_divisibility",
       "label": "justifier par la taille d’un nombre au lieu de tester la divisibilité"
+    },
+    {
+      "id": "overshoots_the_bound",
+      "label": "dépasser la limite en prenant le multiple suivant"
+    },
+    {
+      "id": "stops_below_the_max",
+      "label": "s’arrêter en dessous du maximum alors qu’il reste de la place"
+    },
+    {
+      "id": "rounds_instead_of_truncating",
+      "label": "arrondir au plus proche au lieu de garder le quotient entier"
+    },
+    {
+      "id": "confuses_rest_with_result",
+      "label": "prendre le reste de la division pour le résultat cherché"
+    },
+    {
+      "id": "different_numbers_different_value",
+      "label": "croire que des nombres différents ne peuvent pas écrire la même part"
+    },
+    {
+      "id": "subtracts_instead_of_divides",
+      "label": "retirer la même quantité aux deux termes au lieu de les diviser"
+    },
+    {
+      "id": "changes_only_one_term",
+      "label": "transformer un seul des deux termes d’une fraction"
+    },
+    {
+      "id": "stops_before_irreducible",
+      "label": "s’arrêter avant l’écriture la plus simple"
     }
   ],
-  "declicIds": ["M2-ARI-D01", "M2-ARI-D02", "M2-ARI-D03", "M2-ARI-D04"]
+  "declicIds": ["M2-ARI-D01", "M2-ARI-D02", "M2-ARI-D03", "M2-ARI-D04", "M2-ARI-D05", "M2-ARI-D06"]
 }

@@ -1,0 +1,92 @@
+{
+  "id": "M2-ARI-D05-REV",
+  "declicId": "M2-ARI-D05",
+  "chapterId": "M2-ARI",
+  "title": "Révision : le maximum sans dépasser",
+  "cards": [
+    {
+      "id": "M2-ARI-D05-REV-01",
+      "order": 1,
+      "statement": "Avec 50 crédits et des packs à 7, on peut prendre 7 packs.",
+      "answer": "carre",
+      "concept": "max_multiple_under_bound",
+      "difficulty": 1,
+      "tags": ["Budget"],
+      "feedback": {
+        "correct": "7 × 7 = 49 ≤ 50, et 8 × 7 = 56 dépasserait.",
+        "incorrect": "7 × 7 = 49 tient dans 50 ; c'est le huitième pack qui ferait dépasser."
+      }
+    },
+    {
+      "id": "M2-ARI-D05-REV-02",
+      "order": 2,
+      "statement": "Si la division ne tombe pas juste, on arrondit au nombre entier le plus proche.",
+      "answer": "intox",
+      "concept": "no_rounding_up",
+      "difficulty": 2,
+      "tags": ["Arrondi"],
+      "feedback": {
+        "correct": "Arrondir vers le haut fait dépasser la limite : on garde toujours l'entier d'en dessous.",
+        "incorrect": "55 ÷ 7 ≈ 7,857 : arrondir donnerait 8 packs, soit 56 crédits pour 55 disponibles."
+      },
+      "correction": "On garde le quotient entier, c'est-à-dire l'entier avant la virgule.",
+      "misconceptionId": "rounds_instead_of_truncating"
+    },
+    {
+      "id": "M2-ARI-D05-REV-03",
+      "order": 3,
+      "statement": "Dans 100 = 12 × 8 + 4, le nombre de cartons pleins est 4.",
+      "answer": "intox",
+      "concept": "integer_quotient",
+      "difficulty": 2,
+      "tags": ["Quotient"],
+      "feedback": {
+        "correct": "4 est le reste. Le nombre de cartons est le quotient, 8.",
+        "incorrect": "Le 4 est ce qui reste en dehors des cartons ; les cartons pleins sont au nombre de 8."
+      },
+      "correction": "Le nombre de cartons pleins est 8 ; 4 est le reste.",
+      "misconceptionId": "confuses_rest_with_result"
+    },
+    {
+      "id": "M2-ARI-D05-REV-04",
+      "order": 4,
+      "statement": "Pour vérifier qu'un résultat est le maximum, il suffit de montrer que le multiple suivant dépasse la limite.",
+      "answer": "carre",
+      "concept": "max_multiple_under_bound",
+      "difficulty": 2,
+      "tags": ["Vérification"],
+      "feedback": {
+        "correct": "C'est exactement la vérification : a × q tient, a × (q + 1) dépasse.",
+        "incorrect": "Si le multiple suivant dépasse déjà, aucun plus grand ne peut tenir : c'est bien le maximum."
+      }
+    },
+    {
+      "id": "M2-ARI-D05-REV-05",
+      "order": 5,
+      "statement": "Avec 48 crédits et des packs à 8, le maximum est 5 packs.",
+      "answer": "intox",
+      "concept": "max_multiple_under_bound",
+      "difficulty": 3,
+      "tags": ["Pile"],
+      "feedback": {
+        "correct": "48 = 8 × 6 exactement : dépenser tout son budget est autorisé.",
+        "incorrect": "8 × 6 = 48, soit exactement le budget. Atteindre la limite est permis ; la dépasser ne l'est pas."
+      },
+      "correction": "Le maximum est 6 packs : 8 × 6 = 48, soit tout le budget.",
+      "misconceptionId": "stops_below_the_max"
+    },
+    {
+      "id": "M2-ARI-D05-REV-06",
+      "order": 6,
+      "statement": "En Python, 55 // 7 vaut 7.",
+      "answer": "carre",
+      "concept": "integer_quotient",
+      "difficulty": 3,
+      "tags": ["Python"],
+      "feedback": {
+        "correct": "// est la division entière : elle rend le quotient, sans la virgule.",
+        "incorrect": "// rend le quotient entier : 55 // 7 vaut 7, et le reste 6 s'obtient avec 55 % 7."
+      }
+    }
+  ]
+}

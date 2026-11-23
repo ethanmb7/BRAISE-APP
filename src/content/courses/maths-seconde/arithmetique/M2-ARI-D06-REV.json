@@ -1,0 +1,92 @@
+{
+  "id": "M2-ARI-D06-REV",
+  "declicId": "M2-ARI-D06",
+  "chapterId": "M2-ARI",
+  "title": "Révision : simplifier une fraction",
+  "cards": [
+    {
+      "id": "M2-ARI-D06-REV-01",
+      "order": 1,
+      "statement": "12/18 et 2/3 représentent la même part.",
+      "answer": "carre",
+      "concept": "same_value_other_numbers",
+      "difficulty": 1,
+      "tags": ["Même part"],
+      "feedback": {
+        "correct": "12 = 2 × 6 et 18 = 3 × 6 : deux paquets sur trois.",
+        "incorrect": "En divisant les deux termes par 6, 12/18 devient 2/3 : c'est la même part."
+      }
+    },
+    {
+      "id": "M2-ARI-D06-REV-02",
+      "order": 2,
+      "statement": "Pour simplifier 12/18, on peut enlever 6 en haut et 6 en bas.",
+      "answer": "intox",
+      "concept": "divide_both_terms",
+      "difficulty": 2,
+      "tags": ["Soustraire"],
+      "feedback": {
+        "correct": "Cela donnerait 6/12, soit la moitié, au lieu de deux tiers.",
+        "incorrect": "Retirer la même quantité change la part : 6/12 vaut un demi, pas deux tiers."
+      },
+      "correction": "On divise les deux termes par 6 : 12/18 = 2/3.",
+      "misconceptionId": "subtracts_instead_of_divides"
+    },
+    {
+      "id": "M2-ARI-D06-REV-03",
+      "order": 3,
+      "statement": "Diviser seulement le numérateur par 2 ne change pas la valeur de la fraction.",
+      "answer": "intox",
+      "concept": "divide_both_terms",
+      "difficulty": 2,
+      "tags": ["Un seul terme"],
+      "feedback": {
+        "correct": "La fraction est alors divisée par deux : 12/18 deviendrait 6/18.",
+        "incorrect": "6/18 vaut un tiers, contre deux tiers pour 12/18 : la valeur a changé."
+      },
+      "correction": "Il faut diviser les deux termes par le même nombre.",
+      "misconceptionId": "changes_only_one_term"
+    },
+    {
+      "id": "M2-ARI-D06-REV-04",
+      "order": 4,
+      "statement": "10/15 est l'écriture la plus simple de 20/30.",
+      "answer": "intox",
+      "concept": "irreducible_form",
+      "difficulty": 3,
+      "tags": ["Jusqu'au bout"],
+      "feedback": {
+        "correct": "10/15 est égal à 20/30, mais on peut encore diviser par 5.",
+        "incorrect": "10 et 15 se divisent encore par 5 : l'écriture la plus simple est 2/3."
+      },
+      "correction": "L'écriture la plus simple de 20/30 est 2/3.",
+      "misconceptionId": "stops_before_irreducible"
+    },
+    {
+      "id": "M2-ARI-D06-REV-05",
+      "order": 5,
+      "statement": "On peut simplifier une fraction en divisant ses deux termes par un même diviseur commun.",
+      "answer": "carre",
+      "concept": "divide_both_terms",
+      "difficulty": 1,
+      "tags": ["Règle"],
+      "feedback": {
+        "correct": "C'est la règle, à condition que ce diviseur ne soit pas nul.",
+        "incorrect": "C'est exactement la règle : les deux termes, par un même diviseur commun non nul."
+      }
+    },
+    {
+      "id": "M2-ARI-D06-REV-06",
+      "order": 6,
+      "statement": "15/25 s'écrit plus simplement 3/5.",
+      "answer": "carre",
+      "concept": "irreducible_form",
+      "difficulty": 2,
+      "tags": ["Simplifier"],
+      "feedback": {
+        "correct": "15 ÷ 5 = 3 et 25 ÷ 5 = 5, et plus rien ne divise 3 et 5 ensemble.",
+        "incorrect": "En divisant les deux termes par 5 : 15/25 = 3/5."
+      }
+    }
+  ]
+}

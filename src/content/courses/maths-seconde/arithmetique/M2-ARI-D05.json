@@ -1,0 +1,802 @@
+{
+  "id": "M2-ARI-D05",
+  "chapterId": "M2-ARI",
+  "order": 5,
+  "title": "Le maximum sans dépasser",
+  "version": "1.0",
+  "targetDurationSec": [240, 420],
+  "difficulty": {
+    "level": 2,
+    "label": "Une limite à ne pas franchir"
+  },
+  "objective": "Je sais trouver le plus grand multiple d'un nombre qui tient sous une limite, et le prouver.",
+  "prerequisites": ["M2-ARI-D02"],
+  "detailedObjectives": [
+    "Traduire une limite (budget, hauteur, stock) par « a × q doit tenir sous b ».",
+    "Utiliser le quotient entier d'une division pour trouver le maximum.",
+    "Vérifier qu'un résultat est maximal en montrant que le multiple suivant dépasse.",
+    "Refuser l'arrondi au plus proche sous une contrainte.",
+    "Lire un algorithme en langage naturel et choisir la ligne qui calcule le résultat."
+  ],
+  "coverage": [
+    {
+      "mappingId": "BO26-M2-ARI-CAP-01",
+      "coverage": "introduced_and_practised"
+    },
+    {
+      "mappingId": "BO26-M2-ARI-ALG-02",
+      "coverage": "full"
+    }
+  ],
+  "misconceptionIds": [
+    "overshoots_the_bound",
+    "stops_below_the_max",
+    "rounds_instead_of_truncating",
+    "confuses_rest_with_result"
+  ],
+  "cards": [
+    {
+      "id": "M2-ARI-D05-C01",
+      "order": 1,
+      "type": "choice",
+      "beat": "together",
+      "objective": "entrer par une borne qu'on ne peut pas dépasser",
+      "text": {
+        "text": "Tu as 50 crédits sur ton jeu. Un pack coûte 7 crédits, et on ne peut pas être à découvert. Combien de packs au maximum ?",
+        "variants": {
+          "savage": "50 crédits en poche, un pack à 7, et pas de découvert possible. Tu en prends combien ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "8 packs.",
+          "feedback": {
+            "text": "8 packs coûtent 8 × 7 = 56 crédits, et tu n'en as que 50. La borne est dépassée : il faut redescendre.",
+            "variants": {
+              "savage": "8 × 7 = 56 et tu as 50. Paiement refusé. On redescend."
+            }
+          },
+          "misconceptionId": "overshoots_the_bound"
+        },
+        {
+          "id": "B",
+          "label": "7 packs.",
+          "correct": true,
+          "feedback": {
+            "text": "7 × 7 = 49, c'est dans ton budget, et 8 × 7 = 56 le dépasserait. 7 est donc le maximum ; il te reste 1 crédit.",
+            "variants": {
+              "savage": "7 × 7 = 49 : ça passe. 8 × 7 = 56 : ça casse. Maximum atteint, et 1 crédit qui traîne."
+            }
+          }
+        },
+        {
+          "id": "C",
+          "label": "6 packs.",
+          "feedback": {
+            "text": "6 packs coûtent 42 crédits : c'est possible, mais il t'en resterait 8, de quoi en prendre un de plus. On cherchait le maximum.",
+            "variants": {
+              "savage": "6 packs, 42 crédits, et 8 qui dorment : tu peux en prendre un autre. Maximum, on a dit."
+            }
+          },
+          "misconceptionId": "stops_below_the_max"
+        }
+      ],
+      "visual": {
+        "kind": "number-line",
+        "min": 0,
+        "max": 56,
+        "step": 7,
+        "marks": [49, 56],
+        "bound": 50,
+        "jumps": true,
+        "caption": "49 = 7 × 7 passe ; le multiple suivant, 56, dépasse 50",
+        "ariaLabel": "Droite graduée de 7 en 7 jusqu'à 56 : 49 et 56 sont mis en évidence, la limite est à 50, et un saut de 7 sépare 49 de 56."
+      },
+      "visualTiming": "after-answer"
+    },
+    {
+      "id": "M2-ARI-D05-C02",
+      "order": 2,
+      "type": "reveal",
+      "beat": "show",
+      "objective": "relier le maximum au quotient entier",
+      "text": {
+        "text": "La division te donne la réponse d'un coup : 50 = 7 × ==7== + 1. Le ==7== est le nombre de packs, le 1 est ce qui reste et ne sert à rien.",
+        "variants": {
+          "savage": "Une division et c'est réglé : 50 = 7 × ==7== + 1. Le 7, c'est tes packs. Le 1, c'est la monnaie qui dort."
+        }
+      }
+    },
+    {
+      "id": "M2-ARI-D05-C03",
+      "order": 3,
+      "type": "choice",
+      "beat": "together",
+      "objective": "traiter le cas où la borne est atteinte exactement",
+      "text": {
+        "text": "48 crédits, des packs à 8. Combien au maximum ?",
+        "variants": {
+          "savage": "48 crédits, packs à 8. Combien ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "6 packs, et il ne reste rien.",
+          "correct": true,
+          "feedback": {
+            "text": "48 = 8 × 6 + 0 : la borne est atteinte pile. Dépenser tout est autorisé, c'est dépasser qui ne l'est pas.",
+            "variants": {
+              "savage": "48 = 8 × 6 pile. Tout dépenser, c'est permis ; dépasser, non."
+            }
+          }
+        },
+        {
+          "id": "B",
+          "label": "5 packs, pour garder une marge.",
+          "feedback": {
+            "text": "Rien n'oblige à garder une marge : 6 packs coûtent exactement 48, soit tout ton budget. Le maximum est 6.",
+            "variants": {
+              "savage": "Personne ne t'a demandé d'épargner. 8 × 6 = 48, soit exactement ton budget."
+            }
+          },
+          "misconceptionId": "stops_below_the_max"
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D05-C04",
+      "order": 4,
+      "type": "reveal",
+      "beat": "show",
+      "objective": "poser la règle générale et sa vérification",
+      "text": {
+        "text": "La règle, pour une taille a et une limite b : on divise b par a, on garde le ==quotient entier q==, et le résultat est ==a × q==.\nPour vérifier : a × q doit tenir sous la limite, et a × (q + 1) doit la dépasser.",
+        "variants": {
+          "savage": "Règle générale, taille a, limite b : on divise, on garde le ==quotient entier q==, résultat ==a × q==.\nLe test qui ne ment pas : a × q passe, a × (q + 1) dépasse."
+        }
+      }
+    },
+    {
+      "id": "M2-ARI-D05-C05",
+      "order": 5,
+      "type": "choice",
+      "beat": "trap",
+      "objective": "refuser l'arrondi au plus proche",
+      "text": {
+        "text": "55 crédits, des packs à 7. La calculatrice affiche 55 ÷ 7 ≈ 7,857. Ton pote arrondit et annonce 8 packs. Il a raison ?",
+        "variants": {
+          "savage": "55 crédits, packs à 7, calculatrice : 7,857. Ton pote arrondit et annonce 8. Il a raison ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "Oui : 7,857 s'arrondit à 8.",
+          "feedback": {
+            "text": "Arrondir au plus proche fait dépasser : 8 × 7 = 56, pour 55 crédits disponibles. Ici on ne monte jamais, on descend au multiple d'en dessous.",
+            "variants": {
+              "savage": "Arrondir, c'est passer à la caisse avec 1 crédit de trop : 8 × 7 = 56 > 55. Sous une limite, on descend."
+            }
+          },
+          "misconceptionId": "rounds_instead_of_truncating"
+        },
+        {
+          "id": "B",
+          "label": "Non : 8 packs coûteraient 56, soit plus que 55.",
+          "correct": true,
+          "feedback": {
+            "text": "Exactement. On garde la partie entière, 7, sans jamais arrondir vers le haut : 55 = 7 × 7 + 6.",
+            "variants": {
+              "savage": "Voilà. On garde 7 et on ne monte jamais : 55 = 7 × 7 + 6."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D05-C06",
+      "order": 6,
+      "type": "reveal",
+      "beat": "show",
+      "objective": "nommer la troncature et son écriture en Python",
+      "text": {
+        "text": "Sous une limite, on ne monte jamais : on garde le nombre entier ==avant la virgule==. En Python, cette division-là s'écrit 55 ==//== 7, et elle vaut 7.",
+        "variants": {
+          "savage": "Sous une limite, on ne monte jamais : le nombre entier ==avant la virgule==, point. En Python ça s'écrit 55 ==//== 7, et ça vaut 7."
+        }
+      }
+    },
+    {
+      "id": "M2-ARI-D05-C07",
+      "order": 7,
+      "type": "choice",
+      "beat": "you",
+      "objective": "appliquer seul, hors contexte d'argent",
+      "text": {
+        "text": "100 bouteilles à ranger dans des cartons de 12, et on ne veut que des cartons pleins. Combien de cartons ?",
+        "variants": {
+          "savage": "100 bouteilles, cartons de 12, et uniquement des cartons pleins. Combien ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "8 cartons.",
+          "correct": true,
+          "feedback": {
+            "text": "100 = 12 × 8 + 4 : huit cartons pleins, et 4 bouteilles qui restent sur le côté. Un neuvième carton demanderait 108 bouteilles.",
+            "variants": {
+              "savage": "100 = 12 × 8 + 4. Huit cartons pleins, 4 bouteilles orphelines. Le neuvième réclamerait 108 bouteilles."
+            }
+          }
+        },
+        {
+          "id": "B",
+          "label": "9 cartons.",
+          "feedback": {
+            "text": "Le neuvième carton ne serait pas plein : 12 × 9 = 108, et tu n'as que 100 bouteilles. On s'arrête à 8.",
+            "variants": {
+              "savage": "Le neuvième carton serait à moitié vide : 12 × 9 = 108 pour 100 bouteilles."
+            }
+          },
+          "misconceptionId": "overshoots_the_bound"
+        }
+      ],
+      "visual": {
+        "kind": "number-line",
+        "min": 0,
+        "max": 108,
+        "step": 12,
+        "marks": [96, 108],
+        "bound": 100,
+        "jumps": true,
+        "caption": "96 = 12 × 8 passe ; 108 = 12 × 9 dépasse 100",
+        "ariaLabel": "Droite graduée de 12 en 12 jusqu'à 108 : 96 et 108 sont mis en évidence, la limite est à 100."
+      },
+      "visualTiming": "after-answer"
+    },
+    {
+      "id": "M2-ARI-D05-C08",
+      "order": 8,
+      "type": "choice",
+      "beat": "you",
+      "objective": "lire un algorithme et choisir la ligne qui calcule le résultat",
+      "text": {
+        "text": "Voici l'algorithme, écrit en langage naturel. Quelle ligne manque ?\na ← 12\nb ← 100\nq ← quotient entier de b par a\nrésultat ← ❓",
+        "variants": {
+          "savage": "L'algorithme, en langage naturel. Il manque la dernière ligne :\na ← 12\nb ← 100\nq ← quotient entier de b par a\nrésultat ← ❓"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "résultat ← a × q",
+          "correct": true,
+          "feedback": {
+            "text": "C'est bien a × q : 12 × 8 = 96, le plus grand multiple de 12 qui tienne sous 100. L'algorithme rend une quantité, pas un nombre de cartons.",
+            "variants": {
+              "savage": "a × q : 12 × 8 = 96. Le plus grand multiple de 12 sous 100, rendu en trois lignes."
+            }
+          }
+        },
+        {
+          "id": "B",
+          "label": "résultat ← b − a × q",
+          "feedback": {
+            "text": "b − a × q donne 100 − 96 = 4 : c'est le reste, ce qui ne rentre pas. Le résultat cherché est la quantité rangée, a × q.",
+            "variants": {
+              "savage": "100 − 96 = 4 : tu as calculé ce qui traîne par terre, pas ce qui est rangé."
+            }
+          },
+          "misconceptionId": "confuses_rest_with_result"
+        },
+        {
+          "id": "C",
+          "label": "résultat ← a × (q + 1)",
+          "feedback": {
+            "text": "a × (q + 1) vaut 108 : c'est justement le multiple qui dépasse. Il sert à vérifier, jamais de réponse.",
+            "variants": {
+              "savage": "108, soit celui qui dépasse. Il sert de contrôle, pas de réponse."
+            }
+          },
+          "misconceptionId": "overshoots_the_bound"
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D05-C09",
+      "order": 9,
+      "type": "choice",
+      "beat": "you",
+      "objective": "transférer à une contrainte d'encombrement",
+      "text": {
+        "text": "Une étagère mesure 180 cm de haut. Tes boîtes font 25 cm chacune, empilées. Combien peux-tu en mettre ?",
+        "variants": {
+          "savage": "Étagère de 180 cm, boîtes de 25 cm empilées. Tu montes à combien ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "7 boîtes.",
+          "correct": true,
+          "feedback": {
+            "text": "25 × 7 = 175 cm, ça tient dans 180 cm. Une de plus ferait 200 cm et dépasserait.",
+            "variants": {
+              "savage": "25 × 7 = 175 cm : ça rentre. Une de plus, 200 cm : ça déborde."
+            }
+          }
+        },
+        {
+          "id": "B",
+          "label": "8 boîtes.",
+          "feedback": {
+            "text": "25 × 8 = 200 cm, soit plus que les 180 cm disponibles. La dernière ne rentre pas.",
+            "variants": {
+              "savage": "25 × 8 = 200 cm pour 180 cm d'étagère. La dernière reste dehors."
+            }
+          },
+          "misconceptionId": "overshoots_the_bound"
+        },
+        {
+          "id": "C",
+          "label": "6 boîtes.",
+          "feedback": {
+            "text": "25 × 6 = 150 cm : ça tient, mais il reste assez de place pour une de plus. On cherchait le maximum.",
+            "variants": {
+              "savage": "150 cm, et de la place qui reste. Tu t'es arrêté trop tôt."
+            }
+          },
+          "misconceptionId": "stops_below_the_max"
+        }
+      ],
+      "variants": [
+        {
+          "id": "v2",
+          "text": {
+            "text": "Autre étagère : 150 cm de haut, des boîtes de 40 cm. Combien ?",
+            "variants": {
+              "savage": "Autre étagère : 150 cm, boîtes de 40 cm. Combien ?"
+            }
+          },
+          "choices": [
+            {
+              "id": "A",
+              "label": "3 boîtes.",
+              "correct": true,
+              "feedback": {
+                "text": "40 × 3 = 120 cm, ça tient dans 150 cm. Une de plus ferait 160 cm et dépasserait.",
+                "variants": {
+                  "savage": "40 × 3 = 120 cm : ça rentre. Une de plus, 160 cm : ça déborde."
+                }
+              }
+            },
+            {
+              "id": "B",
+              "label": "4 boîtes.",
+              "feedback": {
+                "text": "40 × 4 = 160 cm, soit plus que les 150 cm disponibles. La dernière ne rentre pas.",
+                "variants": {
+                  "savage": "40 × 4 = 160 cm pour 150 cm d'étagère. La dernière reste dehors."
+                }
+              },
+              "misconceptionId": "overshoots_the_bound"
+            },
+            {
+              "id": "C",
+              "label": "2 boîtes.",
+              "feedback": {
+                "text": "40 × 2 = 80 cm : ça tient, mais il reste assez de place pour une de plus. On cherchait le maximum.",
+                "variants": {
+                  "savage": "80 cm, et de la place qui reste. Tu t'es arrêté trop tôt."
+                }
+              },
+              "misconceptionId": "stops_below_the_max"
+            }
+          ]
+        },
+        {
+          "id": "v3",
+          "text": {
+            "text": "Troisième étagère : 200 cm de haut, des boîtes de 35 cm. Combien ?",
+            "variants": {
+              "savage": "Troisième étagère : 200 cm, boîtes de 35 cm. Combien ?"
+            }
+          },
+          "choices": [
+            {
+              "id": "A",
+              "label": "5 boîtes.",
+              "correct": true,
+              "feedback": {
+                "text": "35 × 5 = 175 cm, ça tient dans 200 cm. Une de plus ferait 210 cm et dépasserait.",
+                "variants": {
+                  "savage": "35 × 5 = 175 cm : ça rentre. Une de plus, 210 cm : ça déborde."
+                }
+              }
+            },
+            {
+              "id": "B",
+              "label": "6 boîtes.",
+              "feedback": {
+                "text": "35 × 6 = 210 cm, soit plus que les 200 cm disponibles. La dernière ne rentre pas.",
+                "variants": {
+                  "savage": "35 × 6 = 210 cm pour 200 cm d'étagère. La dernière reste dehors."
+                }
+              },
+              "misconceptionId": "overshoots_the_bound"
+            },
+            {
+              "id": "C",
+              "label": "4 boîtes.",
+              "feedback": {
+                "text": "35 × 4 = 140 cm : ça tient, mais il reste assez de place pour une de plus. On cherchait le maximum.",
+                "variants": {
+                  "savage": "140 cm, et de la place qui reste. Tu t'es arrêté trop tôt."
+                }
+              },
+              "misconceptionId": "stops_below_the_max"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D05-C10",
+      "order": 10,
+      "type": "multi-step-choice",
+      "objective": "valider : trouver le maximum, le prouver, puis transférer",
+      "text": {
+        "text": "Trois étapes, et les corrections arrivent après tes trois réponses.",
+        "variants": {
+          "savage": "Trois décisions, débrief ensuite. Personne ne te souffle la suivante."
+        }
+      },
+      "feedbackTiming": "after-all",
+      "steps": [
+        {
+          "id": "M2-ARI-D05-C10-V01-E01",
+          "question": {
+            "text": "90 crédits, des packs à 12. Combien de packs au maximum ?",
+            "variants": {
+              "savage": "90 crédits, packs à 12. Maximum ?"
+            }
+          },
+          "options": [
+            {
+              "id": "A",
+              "label": "7 packs.",
+              "correct": true,
+              "feedback": {
+                "text": "12 × 7 = 84, et 12 × 8 = 96 dépasserait 90. Le maximum est bien 7.",
+                "variants": {
+                  "savage": "12 × 7 = 84 : ça passe. 96 : ça casse."
+                }
+              }
+            },
+            {
+              "id": "B",
+              "label": "8 packs.",
+              "feedback": {
+                "text": "12 × 8 = 96, soit plus que 90. Le dernier pack ne peut pas être payé.",
+                "variants": {
+                  "savage": "96 pour 90 crédits : le dernier pack reste au magasin."
+                }
+              },
+              "misconceptionId": "overshoots_the_bound"
+            }
+          ],
+          "conceptId": "max_multiple_under_bound",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D05-C02",
+            "toCardId": "M2-ARI-D05-C02"
+          }
+        },
+        {
+          "id": "M2-ARI-D05-C10-V01-E02",
+          "discriminating": true,
+          "question": {
+            "text": "Quelle phrase prouve que 8 packs à 12 crédits sont impossibles avec 90 crédits ?",
+            "variants": {
+              "savage": "La phrase qui tue : pourquoi 8 packs sont impossibles avec 90 ?"
+            }
+          },
+          "options": [
+            {
+              "id": "A",
+              "label": "12 × 8 = 96, et 96 > 90.",
+              "correct": true,
+              "feedback": {
+                "text": "C'est la bonne preuve : on calcule le multiple suivant et on montre qu'il dépasse la limite. C'est exactement la vérification de la règle.",
+                "variants": {
+                  "savage": "Preuve en un calcul : le multiple suivant dépasse. C'est le test de la règle, rien d'autre."
+                }
+              }
+            },
+            {
+              "id": "B",
+              "label": "90 ÷ 12 n'est pas un nombre entier.",
+              "feedback": {
+                "text": "Ce n'est pas suffisant : 90 ÷ 12 n'est pas entier non plus quand la réponse est 7. Ce qui tranche, c'est que 96 dépasse 90.",
+                "variants": {
+                  "savage": "Pas suffisant : ce quotient n'est pas entier dans les deux cas. Ce qui tranche, c'est 96 > 90."
+                }
+              },
+              "misconceptionId": "rounds_instead_of_truncating"
+            }
+          ],
+          "conceptId": "no_rounding_up",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D05-C05",
+            "toCardId": "M2-ARI-D05-C06"
+          }
+        },
+        {
+          "id": "M2-ARI-D05-C10-V01-E03",
+          "question": {
+            "text": "Une étagère de 200 cm, des boîtes de 30 cm. Combien de boîtes ?",
+            "variants": {
+              "savage": "Étagère de 200 cm, boîtes de 30 cm. Combien ?"
+            }
+          },
+          "options": [
+            {
+              "id": "A",
+              "label": "6 boîtes.",
+              "correct": true,
+              "feedback": {
+                "text": "30 × 6 = 180 cm, et 30 × 7 = 210 cm dépasserait les 200 cm.",
+                "variants": {
+                  "savage": "180 cm : ça rentre. 210 cm : ça dépasse."
+                }
+              }
+            },
+            {
+              "id": "B",
+              "label": "7 boîtes.",
+              "feedback": {
+                "text": "30 × 7 = 210 cm, soit plus que 200 cm : la dernière boîte ne rentre pas.",
+                "variants": {
+                  "savage": "210 cm pour 200 cm : la dernière dort par terre."
+                }
+              },
+              "misconceptionId": "overshoots_the_bound"
+            },
+            {
+              "id": "C",
+              "label": "5 boîtes.",
+              "feedback": {
+                "text": "30 × 5 = 150 cm : il resterait de la place pour une boîte de plus. Le maximum est 6.",
+                "variants": {
+                  "savage": "150 cm, et de la place perdue au-dessus. Le maximum est 6."
+                }
+              },
+              "misconceptionId": "stops_below_the_max"
+            }
+          ],
+          "conceptId": "integer_quotient",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D05-C07",
+            "toCardId": "M2-ARI-D05-C08"
+          }
+        }
+      ],
+      "variants": [
+        {
+          "id": "v2",
+          "steps": [
+            {
+              "id": "M2-ARI-D05-C10-V02-E01",
+              "question": {
+                "text": "70 crédits, des packs à 9. Combien de packs au maximum ?",
+                "variants": {
+                  "savage": "70 crédits, packs à 9. Maximum ?"
+                }
+              },
+              "options": [
+                {
+                  "id": "A",
+                  "label": "7 packs.",
+                  "correct": true,
+                  "feedback": {
+                    "text": "9 × 7 = 63, et 9 × 8 = 72 dépasserait 70. Le maximum est bien 7.",
+                    "variants": {
+                      "savage": "9 × 7 = 63 : ça passe. 72 : ça casse."
+                    }
+                  }
+                },
+                {
+                  "id": "B",
+                  "label": "8 packs.",
+                  "feedback": {
+                    "text": "9 × 8 = 72, soit plus que 70. Le dernier pack ne peut pas être payé.",
+                    "variants": {
+                      "savage": "72 pour 70 crédits : le dernier pack reste au magasin."
+                    }
+                  },
+                  "misconceptionId": "overshoots_the_bound"
+                }
+              ],
+              "conceptId": "max_multiple_under_bound",
+              "remediation": {
+                "type": "replay",
+                "fromCardId": "M2-ARI-D05-C02",
+                "toCardId": "M2-ARI-D05-C02"
+              }
+            },
+            {
+              "id": "M2-ARI-D05-C10-V02-E02",
+              "discriminating": true,
+              "question": {
+                "text": "Quelle phrase prouve que 8 packs à 9 crédits sont impossibles avec 70 crédits ?",
+                "variants": {
+                  "savage": "La phrase qui tue : pourquoi 8 packs sont impossibles avec 70 ?"
+                }
+              },
+              "options": [
+                {
+                  "id": "A",
+                  "label": "9 × 8 = 72, et 72 > 70.",
+                  "correct": true,
+                  "feedback": {
+                    "text": "C'est la bonne preuve : on calcule le multiple suivant et on montre qu'il dépasse la limite. C'est exactement la vérification de la règle.",
+                    "variants": {
+                      "savage": "Preuve en un calcul : le multiple suivant dépasse. C'est le test de la règle, rien d'autre."
+                    }
+                  }
+                },
+                {
+                  "id": "B",
+                  "label": "70 ÷ 9 n'est pas un nombre entier.",
+                  "feedback": {
+                    "text": "Ce n'est pas suffisant : 70 ÷ 9 n'est pas entier non plus quand la réponse est 7. Ce qui tranche, c'est que 72 dépasse 70.",
+                    "variants": {
+                      "savage": "Pas suffisant : ce quotient n'est pas entier dans les deux cas. Ce qui tranche, c'est 72 > 70."
+                    }
+                  },
+                  "misconceptionId": "rounds_instead_of_truncating"
+                }
+              ],
+              "conceptId": "no_rounding_up",
+              "remediation": {
+                "type": "replay",
+                "fromCardId": "M2-ARI-D05-C05",
+                "toCardId": "M2-ARI-D05-C06"
+              }
+            },
+            {
+              "id": "M2-ARI-D05-C10-V02-E03",
+              "question": {
+                "text": "Une étagère de 140 cm, des boîtes de 40 cm. Combien de boîtes ?",
+                "variants": {
+                  "savage": "Étagère de 140 cm, boîtes de 40 cm. Combien ?"
+                }
+              },
+              "options": [
+                {
+                  "id": "A",
+                  "label": "3 boîtes.",
+                  "correct": true,
+                  "feedback": {
+                    "text": "40 × 3 = 120 cm, et 40 × 4 = 160 cm dépasserait les 140 cm.",
+                    "variants": {
+                      "savage": "120 cm : ça rentre. 160 cm : ça dépasse."
+                    }
+                  }
+                },
+                {
+                  "id": "B",
+                  "label": "4 boîtes.",
+                  "feedback": {
+                    "text": "40 × 4 = 160 cm, soit plus que 140 cm : la dernière boîte ne rentre pas.",
+                    "variants": {
+                      "savage": "160 cm pour 140 cm : la dernière dort par terre."
+                    }
+                  },
+                  "misconceptionId": "overshoots_the_bound"
+                },
+                {
+                  "id": "C",
+                  "label": "2 boîtes.",
+                  "feedback": {
+                    "text": "40 × 2 = 80 cm : il resterait de la place pour une boîte de plus. Le maximum est 3.",
+                    "variants": {
+                      "savage": "80 cm, et de la place perdue au-dessus. Le maximum est 3."
+                    }
+                  },
+                  "misconceptionId": "stops_below_the_max"
+                }
+              ],
+              "conceptId": "integer_quotient",
+              "remediation": {
+                "type": "replay",
+                "fromCardId": "M2-ARI-D05-C07",
+                "toCardId": "M2-ARI-D05-C08"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D05-C11",
+      "order": 11,
+      "type": "declic-summary",
+      "objective": "garder la méthode, sa vérification et le piège de l'arrondi",
+      "text": {
+        "text": "🔥 À garder\nLe plus grand multiple de a qui tient sous b : on divise b par a, on garde le ==quotient entier q==, et le résultat est ==a × q==.\nVérification : a × q tient, a × (q + 1) dépasse.\nEn Python, le quotient entier s'écrit b ==//== a.\n⚠️ Piège contrôle : jamais d'arrondi au plus proche. 55 ÷ 7 ≈ 7,857 donne 7 packs, pas 8 — 8 packs coûteraient 56.",
+        "variants": {
+          "savage": "🔥 Ce qu'on garde\nPlus grand multiple de a sous b : ==quotient entier q==, résultat ==a × q==.\nLe test : a × q tient, a × (q + 1) dépasse.\nPython : b ==//== a.\n⚠️ Piège contrôle : on n'arrondit jamais vers le haut. 7,857 donne 7, pas 8 — sinon la caisse refuse."
+        }
+      },
+      "actions": [
+        {
+          "id": "done",
+          "label": "J'ai capté 🔥",
+          "kind": "complete"
+        },
+        {
+          "id": "review",
+          "label": "Revoir le point qui me piège",
+          "kind": "menu"
+        }
+      ],
+      "menu": [
+        {
+          "id": "quotient",
+          "label": "Le quotient entier",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D05-C02",
+            "toCardId": "M2-ARI-D05-C03"
+          }
+        },
+        {
+          "id": "regle",
+          "label": "La règle et sa vérification",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D05-C04",
+            "toCardId": "M2-ARI-D05-C04"
+          }
+        },
+        {
+          "id": "arrondi",
+          "label": "Ne jamais arrondir vers le haut",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D05-C05",
+            "toCardId": "M2-ARI-D05-C06"
+          }
+        },
+        {
+          "id": "algo",
+          "label": "L'algorithme ligne par ligne",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D05-C07",
+            "toCardId": "M2-ARI-D05-C08"
+          }
+        }
+      ]
+    }
+  ],
+  "assessment": {
+    "cardId": "M2-ARI-D05-C10",
+    "understoodMinScore": 2,
+    "requireDiscriminatingStep": true,
+    "understoodMessage": "Deux étapes sur trois au moins, dont la preuve que le multiple suivant dépasse : la méthode est tenue. Le point restant, s'il y en a un, est noté plus bas.",
+    "needsReinforcementMessage": "La limite n'est pas encore tenue à tous les coups. On revoit le point qui coince, puis tu refais une série avec d'autres nombres.",
+    "followUpCount": 2
+  },
+  "mastery": {
+    "requiredDeferredSuccesses": 2,
+    "requiredCardRatio": 0.8
+  },
+  "deckId": "M2-ARI-D05-REV"
+}
