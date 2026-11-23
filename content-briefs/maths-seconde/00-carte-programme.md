@@ -78,16 +78,16 @@ cependant l'objet d'un enseignement explicite ».
 
 ### Arithmétique — `ARI`
 
-| id                    | exigence                                                                                                                                        |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `BO26-M2-ARI-CONT-01` | Notations ℕ et ℤ.                                                                                                                               |
-| `BO26-M2-ARI-CONT-02` | Définition des notions de multiple, de diviseur, de nombre pair, de nombre impair : a est multiple de b s'il existe un entier k tel que a = kb. |
-| `BO26-M2-ARI-CAP-01`  | Modéliser et résoudre des problèmes mobilisant les notions de multiple, de diviseur, de nombre pair, de nombre impair.                          |
-| `BO26-M2-ARI-CAP-02`  | Présenter les fractions sous forme irréductible.                                                                                                |
-| `BO26-M2-ARI-DEM-01`  | Pour une valeur numérique de a, la somme de deux multiples de a est multiple de a.                                                              |
-| `BO26-M2-ARI-DEM-02`  | Le carré d'un nombre impair est impair.                                                                                                         |
-| `BO26-M2-ARI-ALG-01`  | Déterminer si un entier naturel a est multiple d'un entier naturel b.                                                                           |
-| `BO26-M2-ARI-ALG-02`  | Pour des entiers a et b donnés, déterminer le plus grand multiple de a inférieur ou égal à b.                                                   |
+| id                    | exigence                                                                                                                                                                                                    |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `BO26-M2-ARI-CONT-01` | Notations ℕ et ℤ.                                                                                                                                                                                           |
+| `BO26-M2-ARI-CONT-02` | Définition des notions de multiple, de diviseur, de nombre pair, de nombre impair : a est multiple de b s'il existe un entier k tel que a = kb.                                                             |
+| `BO26-M2-ARI-CAP-01`  | Modéliser et résoudre des problèmes mobilisant les notions de multiple, de diviseur, de nombre pair, de nombre impair.                                                                                      |
+| `BO26-M2-ARI-CAP-02`  | Présenter les fractions sous forme irréductible. ⚠️ Dans `chapter.json`, `CAP-02` était déjà attribué à « problème de parité » : la capacité « fractions irréductibles » y porte donc `BO26-M2-ARI-CAP-03`. |
+| `BO26-M2-ARI-DEM-01`  | Pour une valeur numérique de a, la somme de deux multiples de a est multiple de a.                                                                                                                          |
+| `BO26-M2-ARI-DEM-02`  | Le carré d'un nombre impair est impair.                                                                                                                                                                     |
+| `BO26-M2-ARI-ALG-01`  | Déterminer si un entier naturel a est multiple d'un entier naturel b.                                                                                                                                       |
+| `BO26-M2-ARI-ALG-02`  | Pour des entiers a et b donnés, déterminer le plus grand multiple de a inférieur ou égal à b.                                                                                                               |
 
 > Le chapitre BRAISE `M2-ARI` a découpé le `CONT-02` officiel en cinq exigences distinctes
 > (`CONT-02` multiple, `CONT-03` diviseur, `CONT-04` pair, `CONT-05` impair). C'est un découpage
@@ -358,19 +358,19 @@ source** avant d'écrire du contenu dessus, plutôt qu'à ce tableau.
 Onze chapitres couvrent les quatre parties thématiques. Les trois parties transversales ne sont
 **pas** des chapitres — le programme l'interdit explicitement — elles se tissent dedans.
 
-| #   | chapitre BRAISE           | sections du programme                 | état                                          |
-| --- | ------------------------- | ------------------------------------- | --------------------------------------------- |
-| 1   | Arithmétique              | `ARI`                                 | **3 Déclics écrits sur 10 prévus** (`M2-ARI`) |
-| 2   | Nombres réels             | `REE`                                 | à écrire                                      |
-| 3   | Calcul et équations       | `ALG`                                 | à écrire                                      |
-| 4   | Vecteurs                  | `VEC`                                 | à écrire                                      |
-| 5   | Droites du plan           | `DRO`                                 | à écrire                                      |
-| 6   | Lire une fonction         | `FON`                                 | à écrire                                      |
-| 7   | Variations et extrémums   | `VEX`                                 | à écrire                                      |
-| 8   | Proportions et évolutions | `ICS` (proportions, évolution)        | à écrire                                      |
-| 9   | Statistiques              | `ICS` (série à une variable, classes) | à écrire                                      |
-| 10  | Croiser deux variables    | `CVQ`                                 | à écrire                                      |
-| 11  | Probabilités              | `PRB`                                 | à écrire                                      |
+| #   | chapitre BRAISE           | sections du programme                 | état                                                          |
+| --- | ------------------------- | ------------------------------------- | ------------------------------------------------------------- |
+| 1   | Arithmétique              | `ARI`                                 | **6 Déclics écrits sur 10 prévus** (`M2-ARI`) — porte le test |
+| 2   | Nombres réels             | `REE`                                 | à écrire                                                      |
+| 3   | Calcul et équations       | `ALG`                                 | à écrire                                                      |
+| 4   | Vecteurs                  | `VEC`                                 | à écrire                                                      |
+| 5   | Droites du plan           | `DRO`                                 | à écrire                                                      |
+| 6   | Lire une fonction         | `FON`                                 | à écrire                                                      |
+| 7   | Variations et extrémums   | `VEX`                                 | à écrire                                                      |
+| 8   | Proportions et évolutions | `ICS` (proportions, évolution)        | à écrire                                                      |
+| 9   | Statistiques              | `ICS` (série à une variable, classes) | à écrire                                                      |
+| 10  | Croiser deux variables    | `CVQ`                                 | à écrire                                                      |
+| 11  | Probabilités              | `PRB`                                 | à écrire                                                      |
 
 Le découpage de `ICS` en deux chapitres n'est pas dans le texte : c'est un choix de volume (la
 section est la plus chargée du programme) et de sens (une proportion et un écart type ne
@@ -382,7 +382,7 @@ L'ordre du programme n'est pas un ordre d'enseignement, et encore moins un ordre
 BRAISE, trois critères : ce qu'un élève de seconde rencontre tôt dans l'année, ce qui se raconte
 bien en Déclic, et ce que le moteur sait déjà afficher.
 
-1. **Finir Arithmétique** (D04 à D06). Le chapitre est commencé, c'est le moins cher.
+1. ~~Finir Arithmétique (D04 à D06)~~ — **fait le 23 novembre 2026.** Le chapitre tient six Déclics : multiples et diviseurs, parité, lots identiques, maximum sous une limite, fractions. Restent D07 et les trois derniers, qui sont les démonstrations et demandent des cartes que le moteur n'a pas.
 2. **Proportions et évolutions** (`ICS`). Raconte le réel sans effort — soldes, augmentations,
    pièges de pourcentages — et ne demande au moteur aucun type de carte nouveau.
 3. **Nombres réels** (`REE`). Intervalles et encadrements : visuellement très fort sur une droite
@@ -397,8 +397,9 @@ le moteur n'a pas. Écrire ces chapitres avant de construire ces cartes serait �
 (`APR-*`). BRAISE n'a aucune carte de code, et la règle « pas de saisie clavier dans Réviser »
 rend l'exercice difficile. Trois sorties : ne pas couvrir l'algorithmique et le dire, la couvrir
 en lecture seule (lire un programme et prédire ce qu'il affiche — ça, c'est tapable), ou
-construire une carte de code. Je recommande la deuxième : elle couvre `APR-VAR-CAP-05` et
-`APR-FON-CAP-01` sans clavier.
+construire une carte de code.
+
+**La deuxième a été essayée, et elle tient** : `M2-ARI-D05` fait lire un algorithme en langage naturel — avec la notation ← du programme — et fait choisir la ligne manquante entre trois candidates, dont le reste et le multiple qui dépasse. Aucun clavier, aucune carte nouvelle, et l'exigence `BO26-M2-ARI-ALG-02` est couverte. À reprendre tel quel pour les autres algorithmes du programme ; une carte de code ne devient nécessaire que pour faire _écrire_ du Python, ce que le texte demande aussi (`APR-VAR-CAP-02`) mais que rien n'oblige à couvrir pour un test.
 
 **Les automatismes sont un cadeau.** Le programme réclame un « entrainement régulier privilégiant
 l'activité mentale », « tout au long de l'année », sur des gestes courts. C'est exactement ce que
