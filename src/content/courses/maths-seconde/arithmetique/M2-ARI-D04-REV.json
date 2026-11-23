@@ -1,0 +1,106 @@
+{
+  "id": "M2-ARI-D04-REV",
+  "declicId": "M2-ARI-D04",
+  "chapterId": "M2-ARI",
+  "title": "Révision : des lots identiques",
+  "cards": [
+    {
+      "id": "M2-ARI-D04-REV-01",
+      "order": 1,
+      "statement": "Pour faire des lots identiques sans reste, le nombre de lots doit diviser chaque quantité.",
+      "answer": "carre",
+      "concept": "common_divisor_condition",
+      "difficulty": 1,
+      "tags": [
+        "Condition"
+      ],
+      "feedback": {
+        "correct": "C'est la condition de base : chaque quantité doit tomber juste.",
+        "incorrect": "Si le nombre de lots ne divise pas une quantité, il en reste, et les lots ne sont plus identiques."
+      }
+    },
+    {
+      "id": "M2-ARI-D04-REV-02",
+      "order": 2,
+      "statement": "Avec 12 stylos et 18 stickers, on peut faire 4 lots identiques sans reste.",
+      "answer": "intox",
+      "concept": "checks_both_quantities",
+      "difficulty": 2,
+      "tags": [
+        "Deux quantités"
+      ],
+      "feedback": {
+        "correct": "4 divise 12, mais 18 = 4 × 4 + 2 : deux stickers resteraient.",
+        "incorrect": "Les stylos tombent juste, pas les stickers : 18 = 4 × 4 + 2."
+      },
+      "correction": "Avec 12 et 18, les nombres de lots possibles sont 1, 2, 3 et 6.",
+      "misconceptionId": "checks_only_one_quantity"
+    },
+    {
+      "id": "M2-ARI-D04-REV-03",
+      "order": 3,
+      "statement": "Le nombre de lots doit être un multiple de chaque quantité.",
+      "answer": "intox",
+      "concept": "common_divisor_condition",
+      "difficulty": 2,
+      "tags": [
+        "Diviseur ou multiple"
+      ],
+      "feedback": {
+        "correct": "Un multiple serait plus grand que la quantité : des lots vides. On partage, donc on divise.",
+        "incorrect": "Un multiple de 12 vaut au moins 12 : 12 lots pour 12 stylos, puis 24, 36… On cherche un diviseur."
+      },
+      "correction": "Le nombre de lots doit être un diviseur de chaque quantité.",
+      "misconceptionId": "confuses_common_divisor_with_common_multiple"
+    },
+    {
+      "id": "M2-ARI-D04-REV-04",
+      "order": 4,
+      "statement": "Avec 20 bonbons et 30 chips, le plus grand nombre de sachets identiques est 10.",
+      "answer": "carre",
+      "concept": "max_common_divisor",
+      "difficulty": 2,
+      "tags": [
+        "Maximum"
+      ],
+      "feedback": {
+        "correct": "20 = 10 × 2 et 30 = 10 × 3, et rien de plus grand ne divise 20 et 30.",
+        "incorrect": "Les diviseurs communs de 20 et 30 sont 1, 2, 5 et 10 : le plus grand est 10."
+      }
+    },
+    {
+      "id": "M2-ARI-D04-REV-05",
+      "order": 5,
+      "statement": "Avec 20 bonbons et 30 chips, faire 5 sachets identiques est impossible.",
+      "answer": "intox",
+      "concept": "max_common_divisor",
+      "difficulty": 3,
+      "tags": [
+        "Plusieurs solutions"
+      ],
+      "feedback": {
+        "correct": "5 divise 20 et 30 : c'est possible, simplement ce n'est pas le maximum.",
+        "incorrect": "20 = 5 × 4 et 30 = 5 × 6 : 5 sachets conviennent. Ce n'est pas le plus grand, mais la question n'était pas là."
+      },
+      "correction": "5 sachets conviennent ; 10 est seulement le plus grand nombre possible.",
+      "misconceptionId": "stops_at_first_common_divisor"
+    },
+    {
+      "id": "M2-ARI-D04-REV-06",
+      "order": 6,
+      "statement": "Un nombre qui divise 36 divise forcément 24.",
+      "answer": "intox",
+      "concept": "checks_both_quantities",
+      "difficulty": 3,
+      "tags": [
+        "Deux quantités"
+      ],
+      "feedback": {
+        "correct": "9 divise 36, mais 24 = 9 × 2 + 6. Chaque quantité se vérifie séparément.",
+        "incorrect": "Contre-exemple : 9 divise 36, mais pas 24 (24 = 9 × 2 + 6)."
+      },
+      "correction": "Un diviseur de 36 ne divise pas forcément 24 : il faut le vérifier.",
+      "misconceptionId": "checks_only_one_quantity"
+    }
+  ]
+}

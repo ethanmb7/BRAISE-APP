@@ -1,0 +1,815 @@
+{
+  "id": "M2-ARI-D04",
+  "chapterId": "M2-ARI",
+  "order": 4,
+  "title": "Des lots vraiment identiques",
+  "version": "1.0",
+  "targetDurationSec": [
+    240,
+    420
+  ],
+  "difficulty": {
+    "level": 2,
+    "label": "Il faut tenir deux conditions à la fois"
+  },
+  "objective": "Je sais dire combien de lots identiques on peut faire avec plusieurs quantités, en cherchant un diviseur commun.",
+  "prerequisites": [
+    "M2-ARI-D02"
+  ],
+  "detailedObjectives": [
+    "Traduire « des lots identiques, sans reste » par une condition de divisibilité.",
+    "Vérifier la condition sur toutes les quantités, pas sur une seule.",
+    "Distinguer un diviseur commun d'un multiple commun.",
+    "Lister les diviseurs communs de deux ou trois quantités et en prendre le plus grand.",
+    "Justifier un refus en nommant la quantité qui ne tombe pas juste."
+  ],
+  "coverage": [
+    {
+      "mappingId": "BO26-M2-ARI-CAP-01",
+      "coverage": "introduced_and_practised"
+    },
+    {
+      "mappingId": "BO26-M2-ARI-CONT-03",
+      "coverage": "introduced_and_practised"
+    }
+  ],
+  "misconceptionIds": [
+    "accepts_leftover",
+    "checks_only_one_quantity",
+    "confuses_common_divisor_with_common_multiple",
+    "stops_at_first_common_divisor",
+    "compares_sizes_instead_of_divisibility"
+  ],
+  "cards": [
+    {
+      "id": "M2-ARI-D04-C01",
+      "order": 1,
+      "type": "choice",
+      "beat": "together",
+      "objective": "faire apparaître le reste comme le problème, avant toute règle",
+      "text": {
+        "text": "Stand de ton asso au forum du lycée : 12 stylos et 18 stickers à mettre dans des pochettes identiques, sans rien garder. Tu pars sur 5 pochettes. Ça tombe juste ?",
+        "variants": {
+          "savage": "12 stylos, 18 stickers, et l'envie d'en finir. Tu pars sur 5 pochettes identiques, sans rien garder. Ça tombe juste ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "Non : 12 stylos ne se partagent pas en 5 parts égales.",
+          "correct": true,
+          "feedback": {
+            "text": "12 = 5 × 2 + 2 : chaque pochette prend 2 stylos et il en reste 2 sur la table. Les pochettes ne sont plus identiques, ou alors il faut garder du matériel.",
+            "variants": {
+              "savage": "12 = 5 × 2 + 2. Deux stylos restent sur la table à te regarder. Des pochettes identiques, c'est sans reste."
+            }
+          }
+        },
+        {
+          "id": "B",
+          "label": "Oui : 2 stylos par pochette, et on garde ce qui reste.",
+          "feedback": {
+            "text": "Garder le reste, c'est abandonner la consigne : on voulait tout répartir. 12 = 5 × 2 + 2 montre que 5 pochettes ne conviennent pas.",
+            "variants": {
+              "savage": "« On garde le reste » est la phrase qui tue l'énoncé. On voulait tout répartir : 12 = 5 × 2 + 2, donc 5 pochettes, non."
+            }
+          },
+          "misconceptionId": "accepts_leftover"
+        }
+      ],
+      "visual": {
+        "kind": "groups",
+        "total": 12,
+        "shareAmong": 5,
+        "recipient": "📦",
+        "restLabel": "reste",
+        "caption": "12 = 5 × 2 + 2",
+        "ariaLabel": "12 stylos partagés entre 5 pochettes : 2 par pochette, et 2 stylos en reste."
+      },
+      "visualTiming": "after-answer"
+    },
+    {
+      "id": "M2-ARI-D04-C02",
+      "order": 2,
+      "type": "reveal",
+      "beat": "show",
+      "objective": "énoncer la condition : le nombre de lots divise chaque quantité",
+      "text": {
+        "text": "Pour faire n pochettes identiques sans reste, il faut que n ==divise 12== et que n ==divise 18==. Une seule des deux ne suffit pas : les deux doivent tomber juste.",
+        "variants": {
+          "savage": "La règle tient en une ligne : n doit ==diviser 12== et ==diviser 18==. Les deux. Une quantité qui tombe juste pendant que l'autre traîne un reste, ça ne compte pas."
+        }
+      }
+    },
+    {
+      "id": "M2-ARI-D04-C03",
+      "order": 3,
+      "type": "choice",
+      "beat": "together",
+      "objective": "éprouver la condition sur un nombre qui ne divise qu'une des deux quantités",
+      "text": {
+        "text": "Et 4 pochettes ?",
+        "variants": {
+          "savage": "Allez, 4 pochettes. Verdict ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "Oui : 12 = 4 × 3, donc c'est bon.",
+          "feedback": {
+            "text": "Les stylos tombent juste, mais pas les stickers : 18 = 4 × 4 + 2. Il faut vérifier les deux quantités, pas la première qui arrange.",
+            "variants": {
+              "savage": "Tu as vérifié les stylos et tu as arrêté là. 18 = 4 × 4 + 2 : deux stickers orphelins. Les deux quantités, toujours."
+            }
+          },
+          "misconceptionId": "checks_only_one_quantity"
+        },
+        {
+          "id": "B",
+          "label": "Non : 4 divise 12, mais pas 18.",
+          "correct": true,
+          "feedback": {
+            "text": "Exactement : 12 = 4 × 3 tombe juste, mais 18 = 4 × 4 + 2 laisse 2 stickers. Une seule des deux conditions est remplie, donc 4 ne convient pas.",
+            "variants": {
+              "savage": "Vu. 12 passe, 18 = 4 × 4 + 2 ne passe pas. Une condition sur deux, c'est zéro pochette identique."
+            }
+          }
+        }
+      ],
+      "visual": {
+        "kind": "groups",
+        "total": 18,
+        "shareAmong": 4,
+        "recipient": "📦",
+        "restLabel": "reste",
+        "caption": "18 = 4 × 4 + 2",
+        "ariaLabel": "18 stickers partagés entre 4 pochettes : 4 par pochette, et 2 stickers en reste."
+      },
+      "visualTiming": "after-answer"
+    },
+    {
+      "id": "M2-ARI-D04-C04",
+      "order": 4,
+      "type": "reveal",
+      "beat": "show",
+      "objective": "montrer les diviseurs communs comme l'ensemble des solutions",
+      "text": {
+        "text": "Les nombres qui divisent 12 : 1, 2, 3, 4, 6, 12. Ceux qui divisent 18 : 1, 2, 3, 6, 9, 18. Ceux qui font les deux : ==1, 2, 3 et 6==. Ce sont les seules tailles de lot possibles.",
+        "variants": {
+          "savage": "Diviseurs de 12 : 1, 2, 3, 4, 6, 12. Diviseurs de 18 : 1, 2, 3, 6, 9, 18. Dans les deux listes : ==1, 2, 3, 6==. En dehors de ces quatre-là, tu peux arrêter de chercher."
+        }
+      },
+      "visual": {
+        "kind": "number-line",
+        "min": 0,
+        "max": 20,
+        "step": 1,
+        "marks": [
+          1,
+          2,
+          3,
+          6
+        ],
+        "caption": "1, 2, 3, 6 : les diviseurs communs de 12 et 18",
+        "ariaLabel": "Droite graduée de 0 à 20 ; 1, 2, 3 et 6 sont mis en évidence."
+      }
+    },
+    {
+      "id": "M2-ARI-D04-C05",
+      "order": 5,
+      "type": "choice",
+      "beat": "trap",
+      "objective": "séparer « diviser » de « être un multiple de »",
+      "text": {
+        "text": "Un pote arrive et dit : « pour que ça tombe juste, le nombre de pochettes doit être un multiple de 12 et de 18 ». Il a raison ?",
+        "variants": {
+          "savage": "Un pote s'incruste : « le nombre de pochettes doit être un multiple de 12 et de 18 ». Il a raison ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "Oui, un multiple des deux.",
+          "feedback": {
+            "text": "Un multiple de 12 vaut au moins 12 : 36 pochettes pour 12 stylos, chacune serait vide. C'est l'inverse qu'il faut : le nombre de pochettes se partage le matériel, donc il le divise.",
+            "variants": {
+              "savage": "36 pochettes pour 12 stylos : il en reste 24 vides. Le nombre de pochettes divise le matériel, il ne le multiplie pas."
+            }
+          },
+          "misconceptionId": "confuses_common_divisor_with_common_multiple"
+        },
+        {
+          "id": "B",
+          "label": "Non : un diviseur de 12 et de 18.",
+          "correct": true,
+          "feedback": {
+            "text": "C'est ça : les pochettes se partagent le matériel, donc leur nombre divise chaque quantité. Un multiple, lui, serait plus grand que la quantité elle-même.",
+            "variants": {
+              "savage": "Exact. On partage, donc on divise. Un multiple de 12 dépasserait déjà le stock de stylos."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D04-C06",
+      "order": 6,
+      "type": "reveal",
+      "beat": "show",
+      "objective": "relier le plus grand diviseur commun au nombre maximal de lots",
+      "text": {
+        "text": "Le plus grand des quatre est ==6==. Six pochettes : 12 = 6 × 2 et 18 = 6 × 3, donc 2 stylos et 3 stickers dans chacune, et rien sur la table.",
+        "variants": {
+          "savage": "Le plus grand qui marche : ==6==. 12 = 6 × 2, 18 = 6 × 3 — 2 stylos et 3 stickers par pochette, table vide. Dossier clos."
+        }
+      },
+      "visual": {
+        "kind": "groups",
+        "total": 18,
+        "shareAmong": 6,
+        "recipient": "📦",
+        "caption": "18 = 6 × 3",
+        "ariaLabel": "18 stickers partagés entre 6 pochettes : 3 par pochette, sans reste."
+      }
+    },
+    {
+      "id": "M2-ARI-D04-C07",
+      "order": 7,
+      "type": "choice",
+      "beat": "you",
+      "objective": "chercher seul le plus grand diviseur commun dans une nouvelle situation",
+      "text": {
+        "text": "Autre stand : 20 bonbons et 30 chips, en sachets identiques, sans reste. Le plus grand nombre de sachets possible ?",
+        "variants": {
+          "savage": "Nouveau stand : 20 bonbons, 30 chips, sachets identiques, rien qui traîne. Tu montes jusqu'où ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "15 sachets.",
+          "feedback": {
+            "text": "15 divise bien 30, mais 20 = 15 × 1 + 5 : il resterait 5 bonbons. Les deux quantités doivent tomber juste.",
+            "variants": {
+              "savage": "15 passe sur les chips et se vautre sur les bonbons : 20 = 15 × 1 + 5. Les deux, toujours les deux."
+            }
+          },
+          "misconceptionId": "checks_only_one_quantity"
+        },
+        {
+          "id": "B",
+          "label": "10 sachets.",
+          "correct": true,
+          "feedback": {
+            "text": "20 = 10 × 2 et 30 = 10 × 3 : 2 bonbons et 3 chips par sachet, sans reste. Et 11 ou plus ne divise plus 20, donc 10 est bien le maximum.",
+            "variants": {
+              "savage": "20 = 10 × 2, 30 = 10 × 3. Deux bonbons, trois chips, table nette. Au-dessus de 10, plus rien ne divise 20."
+            }
+          }
+        },
+        {
+          "id": "C",
+          "label": "5 sachets.",
+          "feedback": {
+            "text": "5 marche — 20 = 5 × 4 et 30 = 5 × 6 — mais ce n'est pas le plus grand : 10 divise aussi les deux. La question demandait le maximum.",
+            "variants": {
+              "savage": "5 marche, oui. Mais on demandait le maximum, et 10 divise aussi les deux. Tu t'es arrêté au premier qui tombait juste."
+            }
+          },
+          "misconceptionId": "stops_at_first_common_divisor"
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D04-C08",
+      "order": 8,
+      "type": "choice",
+      "beat": "you",
+      "objective": "choisir une justification qui teste la divisibilité, pas la taille",
+      "text": {
+        "text": "Quelle phrase explique correctement pourquoi 15 sachets ne marchent pas ?",
+        "variants": {
+          "savage": "Et maintenant, la phrase qu'on écrit sur la copie : pourquoi 15 ne marche pas ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "Parce que 15 est plus grand que 10.",
+          "feedback": {
+            "text": "La taille n'est pas le critère : 12 est plus grand que 10 et divise pourtant 12. Ce qui disqualifie 15, c'est qu'il ne divise pas 20.",
+            "variants": {
+              "savage": "« Plus grand » n'est pas un argument : on teste la division, pas la pointure. 15 ne divise pas 20, voilà le vrai motif."
+            }
+          },
+          "misconceptionId": "compares_sizes_instead_of_divisibility"
+        },
+        {
+          "id": "B",
+          "label": "Parce que 15 ne divise pas 20.",
+          "correct": true,
+          "feedback": {
+            "text": "C'est la bonne raison, et elle se vérifie : 20 = 15 × 1 + 5. Une justification nomme la quantité qui ne tombe pas juste.",
+            "variants": {
+              "savage": "Nickel : 20 = 15 × 1 + 5. Une justification, ça nomme la quantité qui coince."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D04-C09",
+      "order": 9,
+      "type": "choice",
+      "beat": "you",
+      "objective": "transférer la condition à trois quantités",
+      "text": {
+        "text": "Tournoi inter-classes : 24 joueurs, 36 maillots et 60 gobelets à répartir en équipes identiques, sans reste. Le plus grand nombre d'équipes ?",
+        "variants": {
+          "savage": "Tournoi inter-classes : 24 joueurs, 36 maillots, 60 gobelets. Équipes identiques, rien qui traîne. Tu montes à combien ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "20 équipes.",
+          "feedback": {
+            "text": "20 divise 60, mais pas 24 : 24 = 20 × 1 + 4. Il faut un nombre qui divise les trois quantités, pas seulement celle qui arrange.",
+            "variants": {
+              "savage": "20 divise 60, mais pas 24 : 24 = 20 × 1 + 4. Les trois quantités, pas la plus sympa."
+            }
+          },
+          "misconceptionId": "checks_only_one_quantity"
+        },
+        {
+          "id": "B",
+          "label": "12 équipes.",
+          "correct": true,
+          "feedback": {
+            "text": "12 divise 24, 36 et 60 : chaque équipe reçoit la même chose et il ne reste rien. Et rien de plus grand ne divise les trois.",
+            "variants": {
+              "savage": "12 divise 24, 36 et 60. Même dotation pour tous, carton vide, et rien au-dessus ne tient."
+            }
+          }
+        },
+        {
+          "id": "C",
+          "label": "6 équipes.",
+          "feedback": {
+            "text": "6 divise bien les trois, mais ce n'est pas le plus grand : 12 aussi. La question demandait le maximum.",
+            "variants": {
+              "savage": "6 marche, mais 12 marche aussi et il est plus grand. On demandait le maximum."
+            }
+          },
+          "misconceptionId": "stops_at_first_common_divisor"
+        }
+      ],
+      "variants": [
+        {
+          "id": "v2",
+          "text": {
+            "text": "Autre tournoi : 18 joueurs, 30 maillots et 42 gobelets, en équipes identiques sans reste. Le plus grand nombre d'équipes ?",
+            "variants": {
+              "savage": "Autre tournoi : 18 joueurs, 30 maillots, 42 gobelets. Équipes identiques, sans reste. Maximum ?"
+            }
+          },
+          "choices": [
+            {
+              "id": "A",
+              "label": "14 équipes.",
+              "feedback": {
+                "text": "14 divise 42, mais pas 18 : 18 = 14 × 1 + 4. Il faut un nombre qui divise les trois quantités, pas seulement celle qui arrange.",
+                "variants": {
+                  "savage": "14 divise 42, mais pas 18 : 18 = 14 × 1 + 4. Les trois quantités, pas la plus sympa."
+                }
+              },
+              "misconceptionId": "checks_only_one_quantity"
+            },
+            {
+              "id": "B",
+              "label": "6 équipes.",
+              "correct": true,
+              "feedback": {
+                "text": "6 divise 18, 30 et 42 : chaque équipe reçoit la même chose et il ne reste rien. Et rien de plus grand ne divise les trois.",
+                "variants": {
+                  "savage": "6 divise 18, 30 et 42. Même dotation pour tous, carton vide, et rien au-dessus ne tient."
+                }
+              }
+            },
+            {
+              "id": "C",
+              "label": "3 équipes.",
+              "feedback": {
+                "text": "3 divise bien les trois, mais ce n'est pas le plus grand : 6 aussi. La question demandait le maximum.",
+                "variants": {
+                  "savage": "3 marche, mais 6 marche aussi et il est plus grand. On demandait le maximum."
+                }
+              },
+              "misconceptionId": "stops_at_first_common_divisor"
+            }
+          ]
+        },
+        {
+          "id": "v3",
+          "text": {
+            "text": "Troisième tournoi : 16 joueurs, 24 maillots et 40 gobelets, en équipes identiques sans reste. Le plus grand nombre d'équipes ?",
+            "variants": {
+              "savage": "Troisième tournoi : 16 joueurs, 24 maillots, 40 gobelets. Même règle. Maximum ?"
+            }
+          },
+          "choices": [
+            {
+              "id": "A",
+              "label": "5 équipes.",
+              "feedback": {
+                "text": "5 divise 40, mais pas 16 : 16 = 5 × 3 + 1. Il faut un nombre qui divise les trois quantités, pas seulement celle qui arrange.",
+                "variants": {
+                  "savage": "5 divise 40, mais pas 16 : 16 = 5 × 3 + 1. Les trois quantités, pas la plus sympa."
+                }
+              },
+              "misconceptionId": "checks_only_one_quantity"
+            },
+            {
+              "id": "B",
+              "label": "8 équipes.",
+              "correct": true,
+              "feedback": {
+                "text": "8 divise 16, 24 et 40 : chaque équipe reçoit la même chose et il ne reste rien. Et rien de plus grand ne divise les trois.",
+                "variants": {
+                  "savage": "8 divise 16, 24 et 40. Même dotation pour tous, carton vide, et rien au-dessus ne tient."
+                }
+              }
+            },
+            {
+              "id": "C",
+              "label": "4 équipes.",
+              "feedback": {
+                "text": "4 divise bien les trois, mais ce n'est pas le plus grand : 8 aussi. La question demandait le maximum.",
+                "variants": {
+                  "savage": "4 marche, mais 8 marche aussi et il est plus grand. On demandait le maximum."
+                }
+              },
+              "misconceptionId": "stops_at_first_common_divisor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D04-C10",
+      "order": 10,
+      "type": "multi-step-choice",
+      "objective": "valider : appliquer la condition, la justifier, puis chercher le maximum",
+      "text": {
+        "text": "Trois étapes. Tu réponds aux trois, et les corrections arrivent ensuite — comme ça, aucune ne te souffle la suivante.",
+        "variants": {
+          "savage": "Trois décisions, puis le débrief d'un coup. Personne ne te souffle la réponse d'après."
+        }
+      },
+      "feedbackTiming": "after-all",
+      "steps": [
+        {
+          "id": "M2-ARI-D04-C10-V01-E01",
+          "question": {
+            "text": "14 badges et 21 stickers, en lots identiques sans reste. 7 lots, ça tombe juste ?",
+            "variants": {
+              "savage": "14 badges, 21 stickers, lots identiques. 7 lots : ça passe ?"
+            }
+          },
+          "options": [
+            {
+              "id": "A",
+              "label": "Oui.",
+              "correct": true,
+              "feedback": {
+                "text": "14 = 7 × 2 et 21 = 7 × 3 : les deux quantités tombent juste, donc les lots sont identiques.",
+                "variants": {
+                  "savage": "14 = 7 × 2, 21 = 7 × 3. Les deux tombent juste, c'est validé."
+                }
+              }
+            },
+            {
+              "id": "B",
+              "label": "Non, il resterait des stickers.",
+              "feedback": {
+                "text": "21 = 7 × 3, sans reste. Les stickers tombent juste eux aussi : 7 lots conviennent.",
+                "variants": {
+                  "savage": "21 = 7 × 3, pile. Les stickers vont très bien, merci pour eux."
+                }
+              },
+              "misconceptionId": "accepts_leftover"
+            }
+          ],
+          "conceptId": "common_divisor_condition",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D04-C02",
+            "toCardId": "M2-ARI-D04-C02"
+          }
+        },
+        {
+          "id": "M2-ARI-D04-C10-V01-E02",
+          "discriminating": true,
+          "question": {
+            "text": "Toujours 14 badges et 21 stickers. Pourquoi 2 lots ne conviennent-ils pas ?",
+            "variants": {
+              "savage": "Toujours 14 et 21. Pourquoi 2 lots, non ?"
+            }
+          },
+          "options": [
+            {
+              "id": "A",
+              "label": "Parce que 2 divise 14, mais pas 21.",
+              "correct": true,
+              "feedback": {
+                "text": "Oui : 21 = 2 × 10 + 1. Une des deux quantités ne tombe pas juste, cela suffit à écarter 2.",
+                "variants": {
+                  "savage": "Oui : 21 = 2 × 10 + 1. Une quantité qui coince suffit à tout faire tomber."
+                }
+              }
+            },
+            {
+              "id": "B",
+              "label": "Ils conviennent : 14 = 2 × 7.",
+              "feedback": {
+                "text": "Cette égalité est vraie, mais elle ne parle que d'une quantité. 21 = 2 × 10 + 1 : l'autre ne tombe pas juste.",
+                "variants": {
+                  "savage": "Vraie égalité, mauvaise conclusion : tu n'as regardé qu'une quantité. 21 = 2 × 10 + 1."
+                }
+              },
+              "misconceptionId": "checks_only_one_quantity"
+            }
+          ],
+          "conceptId": "checks_both_quantities",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D04-C03",
+            "toCardId": "M2-ARI-D04-C04"
+          }
+        },
+        {
+          "id": "M2-ARI-D04-C10-V01-E03",
+          "question": {
+            "text": "30 cartes et 45 jetons, en lots identiques sans reste. Le plus grand nombre de lots ?",
+            "variants": {
+              "savage": "30 cartes, 45 jetons, lots identiques. Le maximum ?"
+            }
+          },
+          "options": [
+            {
+              "id": "A",
+              "label": "10 lots.",
+              "feedback": {
+                "text": "10 divise 45, mais 30 = 10 × 3 + 0. Il faut un nombre qui divise les deux.",
+                "variants": {
+                  "savage": "10 marche sur 45 et casse sur 30 : reste 0. Les deux, sinon rien."
+                }
+              },
+              "misconceptionId": "checks_only_one_quantity"
+            },
+            {
+              "id": "B",
+              "label": "15 lots.",
+              "correct": true,
+              "feedback": {
+                "text": "30 = 15 × 2 et 45 = 15 × 3 : les deux tombent juste, et rien de plus grand ne divise les deux.",
+                "variants": {
+                  "savage": "30 = 15 × 2, 45 = 15 × 3. Maximum atteint, rien au-dessus ne tient."
+                }
+              }
+            },
+            {
+              "id": "C",
+              "label": "5 lots.",
+              "feedback": {
+                "text": "5 divise les deux, mais 15 aussi, et il est plus grand. On cherchait le maximum.",
+                "variants": {
+                  "savage": "5 tombe juste, d'accord. Mais 15 aussi, et il est plus grand. Maximum, on a dit."
+                }
+              },
+              "misconceptionId": "stops_at_first_common_divisor"
+            }
+          ],
+          "conceptId": "max_common_divisor",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D04-C06",
+            "toCardId": "M2-ARI-D04-C07"
+          }
+        }
+      ],
+      "variants": [
+        {
+          "id": "v2",
+          "steps": [
+            {
+              "id": "M2-ARI-D04-C10-V02-E01",
+              "question": {
+                "text": "20 badges et 35 stickers, en lots identiques sans reste. 5 lots, ça tombe juste ?",
+                "variants": {
+                  "savage": "20 badges, 35 stickers, lots identiques. 5 lots : ça passe ?"
+                }
+              },
+              "options": [
+                {
+                  "id": "A",
+                  "label": "Oui.",
+                  "correct": true,
+                  "feedback": {
+                    "text": "20 = 5 × 4 et 35 = 5 × 7 : les deux quantités tombent juste, donc les lots sont identiques.",
+                    "variants": {
+                      "savage": "20 = 5 × 4, 35 = 5 × 7. Les deux tombent juste, c'est validé."
+                    }
+                  }
+                },
+                {
+                  "id": "B",
+                  "label": "Non, il resterait des stickers.",
+                  "feedback": {
+                    "text": "35 = 5 × 7, sans reste. Les stickers tombent juste eux aussi : 5 lots conviennent.",
+                    "variants": {
+                      "savage": "35 = 5 × 7, pile. Les stickers vont très bien, merci pour eux."
+                    }
+                  },
+                  "misconceptionId": "accepts_leftover"
+                }
+              ],
+              "conceptId": "common_divisor_condition",
+              "remediation": {
+                "type": "replay",
+                "fromCardId": "M2-ARI-D04-C02",
+                "toCardId": "M2-ARI-D04-C02"
+              }
+            },
+            {
+              "id": "M2-ARI-D04-C10-V02-E02",
+              "discriminating": true,
+              "question": {
+                "text": "Toujours 20 badges et 35 stickers. Pourquoi 4 lots ne conviennent-ils pas ?",
+                "variants": {
+                  "savage": "Toujours 20 et 35. Pourquoi 4 lots, non ?"
+                }
+              },
+              "options": [
+                {
+                  "id": "A",
+                  "label": "Parce que 4 divise 20, mais pas 35.",
+                  "correct": true,
+                  "feedback": {
+                    "text": "Oui : 35 = 4 × 8 + 3. Une des deux quantités ne tombe pas juste, cela suffit à écarter 4.",
+                    "variants": {
+                      "savage": "Oui : 35 = 4 × 8 + 3. Une quantité qui coince suffit à tout faire tomber."
+                    }
+                  }
+                },
+                {
+                  "id": "B",
+                  "label": "Ils conviennent : 20 = 4 × 5.",
+                  "feedback": {
+                    "text": "Cette égalité est vraie, mais elle ne parle que d'une quantité. 35 = 4 × 8 + 3 : l'autre ne tombe pas juste.",
+                    "variants": {
+                      "savage": "Vraie égalité, mauvaise conclusion : tu n'as regardé qu'une quantité. 35 = 4 × 8 + 3."
+                    }
+                  },
+                  "misconceptionId": "checks_only_one_quantity"
+                }
+              ],
+              "conceptId": "checks_both_quantities",
+              "remediation": {
+                "type": "replay",
+                "fromCardId": "M2-ARI-D04-C03",
+                "toCardId": "M2-ARI-D04-C04"
+              }
+            },
+            {
+              "id": "M2-ARI-D04-C10-V02-E03",
+              "question": {
+                "text": "24 cartes et 60 jetons, en lots identiques sans reste. Le plus grand nombre de lots ?",
+                "variants": {
+                  "savage": "24 cartes, 60 jetons, lots identiques. Le maximum ?"
+                }
+              },
+              "options": [
+                {
+                  "id": "A",
+                  "label": "8 lots.",
+                  "feedback": {
+                    "text": "8 divise 60, mais 24 = 8 × 3 + 0. Il faut un nombre qui divise les deux.",
+                    "variants": {
+                      "savage": "8 marche sur 60 et casse sur 24 : reste 0. Les deux, sinon rien."
+                    }
+                  },
+                  "misconceptionId": "checks_only_one_quantity"
+                },
+                {
+                  "id": "B",
+                  "label": "12 lots.",
+                  "correct": true,
+                  "feedback": {
+                    "text": "24 = 12 × 2 et 60 = 12 × 5 : les deux tombent juste, et rien de plus grand ne divise les deux.",
+                    "variants": {
+                      "savage": "24 = 12 × 2, 60 = 12 × 5. Maximum atteint, rien au-dessus ne tient."
+                    }
+                  }
+                },
+                {
+                  "id": "C",
+                  "label": "6 lots.",
+                  "feedback": {
+                    "text": "6 divise les deux, mais 12 aussi, et il est plus grand. On cherchait le maximum.",
+                    "variants": {
+                      "savage": "6 tombe juste, d'accord. Mais 12 aussi, et il est plus grand. Maximum, on a dit."
+                    }
+                  },
+                  "misconceptionId": "stops_at_first_common_divisor"
+                }
+              ],
+              "conceptId": "max_common_divisor",
+              "remediation": {
+                "type": "replay",
+                "fromCardId": "M2-ARI-D04-C06",
+                "toCardId": "M2-ARI-D04-C07"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D04-C11",
+      "order": 11,
+      "type": "declic-summary",
+      "objective": "garder la condition, la méthode et les deux pièges",
+      "text": {
+        "text": "🔥 À garder\nDes lots identiques sans reste : le nombre de lots doit ==diviser chaque quantité==.\nMéthode : liste les diviseurs de chaque quantité, garde ceux qui sont dans toutes les listes. Le plus grand donne le plus grand nombre de lots.\nAvec 12 et 18 : communs 1, 2, 3, 6 → au maximum 6 lots.\n⚠️ Piège contrôle : vérifier une seule quantité ne prouve rien, et un diviseur n'est pas un multiple — le nombre de lots est plus petit que les quantités, pas plus grand.",
+        "variants": {
+          "savage": "🔥 Ce qu'on garde\nLots identiques, zéro reste : le nombre de lots ==divise chaque quantité==.\nMéthode : les diviseurs de chaque quantité, puis ceux qui sont dans toutes les listes. Le plus grand gagne.\n12 et 18 : communs 1, 2, 3, 6 → 6 lots maximum.\n⚠️ Piège contrôle : une seule quantité vérifiée ne prouve rien, et diviseur ≠ multiple — on partage, donc on descend."
+        }
+      },
+      "actions": [
+        {
+          "id": "done",
+          "label": "J'ai capté 🔥",
+          "kind": "complete"
+        },
+        {
+          "id": "review",
+          "label": "Revoir le point qui me piège",
+          "kind": "menu"
+        }
+      ],
+      "menu": [
+        {
+          "id": "condition",
+          "label": "La condition : diviser les deux",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D04-C02",
+            "toCardId": "M2-ARI-D04-C03"
+          }
+        },
+        {
+          "id": "communs",
+          "label": "Trouver les diviseurs communs",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D04-C04",
+            "toCardId": "M2-ARI-D04-C04"
+          }
+        },
+        {
+          "id": "piege",
+          "label": "Diviseur ou multiple ?",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D04-C05",
+            "toCardId": "M2-ARI-D04-C06"
+          }
+        },
+        {
+          "id": "maximum",
+          "label": "Chercher le plus grand",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D04-C06",
+            "toCardId": "M2-ARI-D04-C07"
+          }
+        }
+      ]
+    }
+  ],
+  "assessment": {
+    "cardId": "M2-ARI-D04-C10",
+    "understoodMinScore": 2,
+    "requireDiscriminatingStep": true,
+    "understoodMessage": "Deux étapes sur trois au moins, dont celle qui demande de vérifier les deux quantités : la condition est comprise. S'il reste un point, il est noté plus bas.",
+    "needsReinforcementMessage": "Il manque encore un appui. On revoit le point qui coince, puis tu refais une série avec d'autres nombres.",
+    "followUpCount": 2
+  },
+  "mastery": {
+    "requiredDeferredSuccesses": 2,
+    "requiredCardRatio": 0.8
+  },
+  "deckId": "M2-ARI-D04-REV"
+}

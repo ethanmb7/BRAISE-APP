@@ -120,11 +120,10 @@ describe("the M2-ARI-D01 content", () => {
     expect(chapter.title).toBe("Arithmétique");
     expect(chapter.level).toBe("seconde");
     expect(courseChaptersOfSubject("maths").map((c) => c.id)).toContain("M2-ARI");
-    expect(declicsOfChapter(chapter).map((d) => d.id)).toEqual([
-      "M2-ARI-D01",
-      "M2-ARI-D02",
-      "M2-ARI-D03",
-    ]);
+    // Ce que ce test vérifie, c'est que le registre résout les Déclics du chapitre dans l'ordre
+    // déclaré — pas combien il y en a. Recopier la liste ici cassait le test à chaque ajout.
+    expect(declicsOfChapter(chapter).map((d) => d.id)).toEqual(chapter.declicIds);
+    expect(chapter.declicIds[0]).toBe("M2-ARI-D01");
   });
 
   it("carries its identity, objective and official source", () => {

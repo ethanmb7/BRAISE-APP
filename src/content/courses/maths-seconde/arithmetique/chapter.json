@@ -142,11 +142,28 @@
     {
       "id": "swaps_even_odd_forms",
       "label": "inverser les rôles des écritures 2k et 2k + 1"
+    },
+    {
+      "id": "accepts_leftover",
+      "label": "accepter un reste alors que les lots doivent être identiques et complets"
+    },
+    {
+      "id": "checks_only_one_quantity",
+      "label": "ne vérifier la divisibilité que sur une seule des quantités à répartir"
+    },
+    {
+      "id": "stops_at_first_common_divisor",
+      "label": "s’arrêter au premier diviseur commun trouvé au lieu de chercher le plus grand"
+    },
+    {
+      "id": "compares_sizes_instead_of_divisibility",
+      "label": "justifier par la taille d’un nombre au lieu de tester la divisibilité"
     }
   ],
   "declicIds": [
     "M2-ARI-D01",
     "M2-ARI-D02",
-    "M2-ARI-D03"
+    "M2-ARI-D03",
+    "M2-ARI-D04"
   ]
 }

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { FLASHCARDS } from "@/data";
 import { emptyDeclicProgress } from "@/lib/course/engine";
 import { emptyCourseProgress } from "@/lib/course/progressStore";
-import { getDeclic } from "@/lib/course/registry";
+import { declicsOfChapter, getCourseChapter, getDeclic } from "@/lib/course/registry";
 import type { CourseProgress, DeclicProgress } from "@/lib/course/types";
 import type { CardReview } from "@/types";
 import {
@@ -80,7 +80,10 @@ describe("buildLibrary", () => {
     const lib = buildLibrary("maths", fresh())!;
     const course = lib.entries.find((e) => e.source === "course")!;
     expect(course.hook).toBe("24 parts, 5 potes : ça tombe pile ?");
-    expect(course.dots).toEqual(["empty", "empty", "empty"]);
+    // Une pastille par Déclic du chapitre, quel que soit leur nombre : figer la liste ici faisait
+    // échouer ce test à chaque Déclic ajouté, pour une raison qui n'est pas celle qu'il teste.
+    const count = declicsOfChapter(getCourseChapter("M2-ARI")!).length;
+    expect(course.dots).toEqual(Array<string>(count).fill("empty"));
     expect(course.levelLabel).toBe("Seconde");
     expect(course.minutes).toBeGreaterThan(0);
   });
@@ -99,7 +102,8 @@ describe("buildLibrary", () => {
       },
     };
     const course = buildLibrary("maths", state)!.entries.find((e) => e.source === "course")!;
-    expect(course.dots).toEqual(["gold", "half", "empty"]);
+    const rest = declicsOfChapter(getCourseChapter("M2-ARI")!).length - 2;
+    expect(course.dots).toEqual(["gold", "half", ...Array<string>(rest).fill("empty")]);
     expect(course.status).toBe("in_progress");
   });
 
