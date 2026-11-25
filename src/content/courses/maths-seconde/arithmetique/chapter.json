@@ -70,6 +70,11 @@
       "type": "direct"
     },
     {
+      "id": "BO26-M2-ARI-ALG-01",
+      "requirement": "Déterminer si un entier naturel a est multiple d’un entier naturel b",
+      "type": "direct"
+    },
+    {
       "id": "BO26-M2-ARI-ALG-02",
       "type": "direct",
       "requirement": "Pour des entiers a et b donnés, déterminer le plus grand multiple de a inférieur ou égal à b"
@@ -200,7 +205,27 @@
     {
       "id": "stops_before_irreducible",
       "label": "s’arrêter avant l’écriture la plus simple"
+    },
+    {
+      "id": "needs_a_list_instead_of_a_rule",
+      "label": "croire qu’il faut la liste des cas au lieu d’un test qui marche pour tous"
+    },
+    {
+      "id": "inverts_the_test",
+      "label": "lire le test à l’envers : conclure « multiple » quand le reste n’est pas nul"
+    },
+    {
+      "id": "confuses_zero_dividend_with_zero_divisor",
+      "label": "confondre diviser zéro, qui est permis, et diviser par zéro, qui ne l’est pas"
     }
   ],
-  "declicIds": ["M2-ARI-D01", "M2-ARI-D02", "M2-ARI-D03", "M2-ARI-D04", "M2-ARI-D05", "M2-ARI-D06"]
+  "declicIds": [
+    "M2-ARI-D01",
+    "M2-ARI-D02",
+    "M2-ARI-D03",
+    "M2-ARI-D04",
+    "M2-ARI-D05",
+    "M2-ARI-D06",
+    "M2-ARI-D07"
+  ]
 }

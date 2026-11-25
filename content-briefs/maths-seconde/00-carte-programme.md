@@ -358,19 +358,19 @@ source** avant d'écrire du contenu dessus, plutôt qu'à ce tableau.
 Onze chapitres couvrent les quatre parties thématiques. Les trois parties transversales ne sont
 **pas** des chapitres — le programme l'interdit explicitement — elles se tissent dedans.
 
-| #   | chapitre BRAISE           | sections du programme                 | état                                                          |
-| --- | ------------------------- | ------------------------------------- | ------------------------------------------------------------- |
-| 1   | Arithmétique              | `ARI`                                 | **6 Déclics écrits sur 10 prévus** (`M2-ARI`) — porte le test |
-| 2   | Nombres réels             | `REE`                                 | à écrire                                                      |
-| 3   | Calcul et équations       | `ALG`                                 | à écrire                                                      |
-| 4   | Vecteurs                  | `VEC`                                 | à écrire                                                      |
-| 5   | Droites du plan           | `DRO`                                 | à écrire                                                      |
-| 6   | Lire une fonction         | `FON`                                 | à écrire                                                      |
-| 7   | Variations et extrémums   | `VEX`                                 | à écrire                                                      |
-| 8   | Proportions et évolutions | `ICS` (proportions, évolution)        | à écrire                                                      |
-| 9   | Statistiques              | `ICS` (série à une variable, classes) | à écrire                                                      |
-| 10  | Croiser deux variables    | `CVQ`                                 | à écrire                                                      |
-| 11  | Probabilités              | `PRB`                                 | à écrire                                                      |
+| #   | chapitre BRAISE           | sections du programme                 | état                                                  |
+| --- | ------------------------- | ------------------------------------- | ----------------------------------------------------- |
+| 1   | Arithmétique              | `ARI`                                 | **7 Déclics écrits sur 9** (`M2-ARI`) — porte le test |
+| 2   | Nombres réels             | `REE`                                 | à écrire                                              |
+| 3   | Calcul et équations       | `ALG`                                 | à écrire                                              |
+| 4   | Vecteurs                  | `VEC`                                 | à écrire                                              |
+| 5   | Droites du plan           | `DRO`                                 | à écrire                                              |
+| 6   | Lire une fonction         | `FON`                                 | à écrire                                              |
+| 7   | Variations et extrémums   | `VEX`                                 | à écrire                                              |
+| 8   | Proportions et évolutions | `ICS` (proportions, évolution)        | à écrire                                              |
+| 9   | Statistiques              | `ICS` (série à une variable, classes) | à écrire                                              |
+| 10  | Croiser deux variables    | `CVQ`                                 | à écrire                                              |
+| 11  | Probabilités              | `PRB`                                 | à écrire                                              |
 
 Le découpage de `ICS` en deux chapitres n'est pas dans le texte : c'est un choix de volume (la
 section est la plus chargée du programme) et de sens (une proportion et un écart type ne
@@ -382,7 +382,17 @@ L'ordre du programme n'est pas un ordre d'enseignement, et encore moins un ordre
 BRAISE, trois critères : ce qu'un élève de seconde rencontre tôt dans l'année, ce qui se raconte
 bien en Déclic, et ce que le moteur sait déjà afficher.
 
-1. ~~Finir Arithmétique (D04 à D06)~~ — **fait le 23 novembre 2026.** Le chapitre tient six Déclics : multiples et diviseurs, parité, lots identiques, maximum sous une limite, fractions. Restent D07 et les trois derniers, qui sont les démonstrations et demandent des cartes que le moteur n'a pas.
+1. ~~Finir Arithmétique (D04 à D07)~~ — **fait les 23 et 25 novembre 2026.** Le chapitre tient
+   sept Déclics : multiples et diviseurs, parité, lots identiques, maximum sous une limite,
+   fractions, et le test de multiplicité lu comme un algorithme (`ALG-01`).
+
+   Il n'en reste que **deux**, et non quatre : une fois les exigences relevées une à une, seules
+   `DEM-01` et `DEM-02` ne sont pas couvertes. Le chapitre fait donc neuf Déclics, pas dix — le
+   dixième annoncé plus haut n'avait aucune exigence derrière lui. Ces deux-là sont les
+   démonstrations, et elles demandent au moteur une carte qui sache conduire un raisonnement
+   (piste : remettre les étapes d'une preuve dans l'ordre, sans clavier). **À trancher avant
+   d'écrire les fiches**, sinon on écrit pour rien.
+
 2. **Proportions et évolutions** (`ICS`). Raconte le réel sans effort — soldes, augmentations,
    pièges de pourcentages — et ne demande au moteur aucun type de carte nouveau.
 3. **Nombres réels** (`REE`). Intervalles et encadrements : visuellement très fort sur une droite

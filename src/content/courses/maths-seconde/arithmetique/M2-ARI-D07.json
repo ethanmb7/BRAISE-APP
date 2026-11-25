@@ -1,0 +1,740 @@
+{
+  "id": "M2-ARI-D07",
+  "chapterId": "M2-ARI",
+  "order": 7,
+  "title": "Multiple ou pas : la question que pose la machine",
+  "version": "1.0",
+  "targetDurationSec": [240, 420],
+  "difficulty": {
+    "level": 2,
+    "label": "Un test, pas une liste"
+  },
+  "objective": "Je sais décider si un entier est un multiple d'un autre, et lire l'algorithme qui le décide.",
+  "prerequisites": ["M2-ARI-D02"],
+  "detailedObjectives": [
+    "Reformuler « a est un multiple de b » en « le reste de a divisé par b vaut 0 ».",
+    "Prouver qu'un nombre est un multiple en exhibant le facteur entier.",
+    "Refuser un quotient décimal comme preuve de multiplicité.",
+    "Tenir le sens de la relation : le multiple est le grand, le diviseur est le petit.",
+    "Lire un algorithme en langage naturel et dire ce qu'il répond.",
+    "Traiter zéro sans en faire une exception."
+  ],
+  "coverage": [
+    {
+      "mappingId": "BO26-M2-ARI-ALG-01",
+      "coverage": "full"
+    },
+    {
+      "mappingId": "BO26-M2-ARI-CONT-02",
+      "coverage": "introduced_and_practised"
+    },
+    {
+      "mappingId": "BO26-M2-ARI-CONT-03",
+      "coverage": "introduced_and_practised"
+    }
+  ],
+  "misconceptionIds": [
+    "needs_a_list_instead_of_a_rule",
+    "inverts_the_test",
+    "confuses_zero_dividend_with_zero_divisor",
+    "reverses_multiple_divisor_roles",
+    "accepts_non_integer_multiplier",
+    "excludes_zero_as_multiple",
+    "confuses_rest_with_result",
+    "rounds_instead_of_truncating",
+    "misses_divisors_in_list"
+  ],
+  "cards": [
+    {
+      "id": "M2-ARI-D07-C01",
+      "order": 1,
+      "type": "choice",
+      "beat": "together",
+      "objective": "entrer par une question à laquelle une machine doit savoir répondre",
+      "text": {
+        "text": "Ton jeu lâche une récompense tous les 15 niveaux. Tu arrives au niveau 90. Récompense ou pas ?",
+        "variants": {
+          "savage": "Récompense tous les 15 niveaux. Tu débarques au 90. Ça tombe ou pas ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "Oui : 90 = 15 × 6.",
+          "correct": true,
+          "feedback": {
+            "text": "90 est un multiple de 15 parce qu'il s'écrit 15 × 6, avec 6 entier. La récompense tombe.",
+            "variants": {
+              "savage": "15 × 6 = 90, pile. Récompense encaissée."
+            }
+          }
+        },
+        {
+          "id": "B",
+          "label": "Non : 90 ÷ 15 = 6, et 6 n'est pas un multiple de 15.",
+          "feedback": {
+            "text": "Le calcul est juste, mais la question porte sur 90, pas sur 6. C'est 90 qui est le multiple ; 15 est son diviseur.",
+            "variants": {
+              "savage": "Bon calcul, mauvais sujet : 90 est le multiple, 15 le diviseur. Pas l'inverse."
+            }
+          },
+          "misconceptionId": "reverses_multiple_divisor_roles"
+        },
+        {
+          "id": "C",
+          "label": "Impossible à dire sans la liste des niveaux à récompense.",
+          "feedback": {
+            "text": "Aucune liste n'est nécessaire, et c'est tout l'intérêt : une seule question suffit, et elle marche pour n'importe quel niveau.",
+            "variants": {
+              "savage": "Pas besoin de liste. Une seule question, et elle marche pour tous les niveaux."
+            }
+          },
+          "misconceptionId": "needs_a_list_instead_of_a_rule"
+        }
+      ],
+      "visual": {
+        "kind": "number-line",
+        "min": 0,
+        "max": 105,
+        "step": 15,
+        "marks": [90],
+        "caption": "Les récompenses tombent de 15 en 15 : 90 est un arrêt",
+        "ariaLabel": "Droite graduée de 15 en 15 jusqu'à 105, sur laquelle le niveau 90 est mis en évidence."
+      },
+      "visualTiming": "after-answer"
+    },
+    {
+      "id": "M2-ARI-D07-C02",
+      "order": 2,
+      "type": "reveal",
+      "beat": "show",
+      "objective": "ramener la question à un reste nul",
+      "text": {
+        "text": "Le jeu ne garde aucune liste. Il pose une seule question, toujours la même : est-ce que la division tombe pile ?\n90 divisé par 15 fait 6 et il ne reste ==rien==. Reste ==0==, donc multiple.",
+        "variants": {
+          "savage": "Zéro liste dans le jeu. Une question, toujours la même : la division tombe-t-elle pile ?\n90 ÷ 15 = 6, reste ==0==. Multiple."
+        }
+      }
+    },
+    {
+      "id": "M2-ARI-D07-C03",
+      "order": 3,
+      "type": "choice",
+      "beat": "together",
+      "objective": "appliquer le test quand la division ne tombe pas pile",
+      "text": {
+        "text": "Même jeu, récompense toujours tous les 15 niveaux. Tu es au niveau 100. Le jeu répond quoi ?",
+        "variants": {
+          "savage": "Même jeu, tous les 15 niveaux. Niveau 100. Verdict ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "Pas de récompense : 100 = 15 × 6 + 10.",
+          "correct": true,
+          "feedback": {
+            "text": "Il reste 10, et le reste n'est pas nul : 100 n'est pas un multiple de 15. Rien à ce niveau.",
+            "variants": {
+              "savage": "Reste 10. Pas nul, pas multiple, pas de récompense."
+            }
+          }
+        },
+        {
+          "id": "B",
+          "label": "Récompense : 100 ÷ 15 ≈ 6,67, la division se fait quand même.",
+          "feedback": {
+            "text": "Une division se calcule toujours, même quand elle ne tombe pas pile. Être un multiple demande un facteur entier, et 6,67 n'en est pas un.",
+            "variants": {
+              "savage": "Toute division se calcule. Mais 6,67 n'est pas entier, donc pas de multiple."
+            }
+          },
+          "misconceptionId": "accepts_non_integer_multiplier"
+        },
+        {
+          "id": "C",
+          "label": "Récompense : 15 × 7 = 105, c'est le plus proche.",
+          "feedback": {
+            "text": "105 est bien un multiple de 15, mais tu es au niveau 100. Être proche ne compte pas : ou le reste est nul, ou il ne l'est pas.",
+            "variants": {
+              "savage": "105 est un multiple. Toi tu es au 100. Le presque ne paie pas."
+            }
+          },
+          "misconceptionId": "rounds_instead_of_truncating"
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D07-C04",
+      "order": 4,
+      "type": "reveal",
+      "beat": "show",
+      "objective": "poser la règle générale et dire pourquoi c'est un test",
+      "text": {
+        "text": "La règle, pour n'importe quels entiers : a est un multiple de b quand le reste de a divisé par b vaut ==0==.\nUn test, pas une liste. C'est ce qui permet de répondre pour le niveau 90, le 100, ou le 7 412.",
+        "variants": {
+          "savage": "La règle, tous entiers confondus : a est multiple de b quand le reste de a par b vaut ==0==.\nUn test, pas une liste. D'où le niveau 7 412 traité comme le 90."
+        }
+      }
+    },
+    {
+      "id": "M2-ARI-D07-C05",
+      "order": 5,
+      "type": "choice",
+      "beat": "trap",
+      "objective": "tenir le sens : qui est le multiple, qui est le diviseur",
+      "text": {
+        "text": "84 = 12 × 7. Qu'est-ce qui est vrai ?",
+        "variants": {
+          "savage": "84 = 12 × 7. Qu'est-ce qui tient debout ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "84 est un multiple de 12, et aussi un multiple de 7.",
+          "correct": true,
+          "feedback": {
+            "text": "Une seule égalité dit deux choses : 84 est un multiple de 12, et 84 est un multiple de 7. 12 et 7 sont tous les deux ses diviseurs.",
+            "variants": {
+              "savage": "Une égalité, deux infos : 84 est multiple de 12 et de 7. Les deux sont ses diviseurs."
+            }
+          }
+        },
+        {
+          "id": "B",
+          "label": "12 est un multiple de 84.",
+          "feedback": {
+            "text": "C'est l'inverse : dans cette égalité, le multiple est le grand, 84, et 12 est son diviseur. Un multiple n'est jamais plus petit que son diviseur.",
+            "variants": {
+              "savage": "À l'envers. 84 est le multiple, 12 le diviseur. Jamais le petit qui est multiple du grand."
+            }
+          },
+          "misconceptionId": "reverses_multiple_divisor_roles"
+        },
+        {
+          "id": "C",
+          "label": "84 n'a qu'un seul diviseur ici : 12.",
+          "feedback": {
+            "text": "Le 7 compte autant : 84 = 7 × 12 est la même égalité lue dans l'autre sens. Elle donne deux diviseurs, pas un.",
+            "variants": {
+              "savage": "Et le 7 ? 84 = 7 × 12, même égalité. Deux diviseurs, pas un."
+            }
+          },
+          "misconceptionId": "misses_divisors_in_list"
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D07-C06",
+      "order": 6,
+      "type": "reveal",
+      "beat": "show",
+      "objective": "lire l'algorithme en entier et comprendre la flèche",
+      "text": {
+        "text": "Le même test, écrit comme un algorithme.\na ← 84\nb ← 12\nr ← reste de a par b\nsi r = 0 alors « multiple »\nsinon « pas multiple »\n\n← veut dire « prend la valeur ».",
+        "variants": {
+          "savage": "Le test, en algorithme.\na ← 84\nb ← 12\nr ← reste de a par b\nsi r = 0 alors « multiple »\nsinon « pas multiple »\n\n← veut dire « prend la valeur »."
+        }
+      }
+    },
+    {
+      "id": "M2-ARI-D07-C07",
+      "order": 7,
+      "type": "choice",
+      "beat": "you",
+      "objective": "lire un algorithme et dire ce qu'il répond",
+      "text": {
+        "text": "L'algorithme tourne tel quel, avec a ← 84 et b ← 12. Qu'est-ce qu'il répond ?",
+        "variants": {
+          "savage": "Il tourne avec a ← 84 et b ← 12. Il répond quoi ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "« multiple »",
+          "correct": true,
+          "feedback": {
+            "text": "84 = 12 × 7, donc le reste vaut 0 : la condition r = 0 est vraie, et c'est la ligne « multiple » qui sort.",
+            "variants": {
+              "savage": "84 = 12 × 7, reste 0. Condition vraie, « multiple » en sortie."
+            }
+          }
+        },
+        {
+          "id": "B",
+          "label": "« pas multiple »",
+          "feedback": {
+            "text": "Le reste de 84 par 12 vaut 0, pas autre chose. La condition r = 0 est donc vraie, et la ligne « sinon » n'est jamais atteinte.",
+            "variants": {
+              "savage": "Reste 0, condition vraie. La ligne « sinon » ne sert pas ici."
+            }
+          },
+          "misconceptionId": "inverts_the_test"
+        },
+        {
+          "id": "C",
+          "label": "« 0 »",
+          "feedback": {
+            "text": "0 est le reste, pas la réponse. Les deux dernières lignes rendent un mot, et c'est le test r = 0 qui choisit lequel.",
+            "variants": {
+              "savage": "0 est le reste, pas la sortie. L'algorithme rend un mot, choisi par le test."
+            }
+          },
+          "misconceptionId": "confuses_rest_with_result"
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D07-C08",
+      "order": 8,
+      "type": "choice",
+      "beat": "you",
+      "objective": "retrouver la ligne qui porte le test",
+      "text": {
+        "text": "Même algorithme, la ligne du test a disparu. Laquelle manque ?\na ← 100\nb ← 15\nr ← reste de a par b\nsi ❓ alors « multiple »\nsinon « pas multiple »",
+        "variants": {
+          "savage": "La ligne du test a sauté. Laquelle ?\na ← 100\nb ← 15\nr ← reste de a par b\nsi ❓ alors « multiple »\nsinon « pas multiple »"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "si r = 0",
+          "correct": true,
+          "feedback": {
+            "text": "C'est tout le test : le reste nul, et rien d'autre, décide si a est un multiple de b. Ici r vaut 10, donc « pas multiple ».",
+            "variants": {
+              "savage": "Le test, c'est ça : reste nul ou pas. Ici r = 10, donc « pas multiple »."
+            }
+          }
+        },
+        {
+          "id": "B",
+          "label": "si r > 0",
+          "feedback": {
+            "text": "Le test serait à l'envers : l'algorithme répondrait « multiple » pour 100 et 15, alors que le reste 10 dit exactement le contraire.",
+            "variants": {
+              "savage": "Test inversé : il crierait « multiple » pour 100 et 15. Avec un reste de 10. Non."
+            }
+          },
+          "misconceptionId": "inverts_the_test"
+        },
+        {
+          "id": "C",
+          "label": "si r = b",
+          "feedback": {
+            "text": "Un reste est toujours plus petit que b : s'il atteignait b, on pourrait enlever un b de plus. La condition r = b ne se produit jamais.",
+            "variants": {
+              "savage": "Un reste reste sous b, toujours. r = b n'arrive jamais : le test ne partirait pas une seule fois."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D07-C09",
+      "order": 9,
+      "type": "choice",
+      "beat": "you",
+      "objective": "tenir le cas limite de zéro sans faire d'exception",
+      "text": {
+        "text": "Dernier essai, et il est piégeux : a ← 0 et b ← 7. Que répond l'algorithme ?",
+        "variants": {
+          "savage": "Celui-là est piégeux : a ← 0, b ← 7. Sortie ?"
+        }
+      },
+      "choices": [
+        {
+          "id": "A",
+          "label": "« multiple »",
+          "correct": true,
+          "feedback": {
+            "text": "0 = 7 × 0, et 0 est un entier : le reste vaut 0, donc le test passe. Zéro est un multiple de 7, comme de n'importe quel entier.",
+            "variants": {
+              "savage": "0 = 7 × 0, reste 0. Zéro est multiple de tout le monde, 7 compris."
+            }
+          }
+        },
+        {
+          "id": "B",
+          "label": "« pas multiple »",
+          "feedback": {
+            "text": "Zéro est bien un multiple : 0 = 7 × 0, et le facteur 0 est un entier. Le reste vaut 0, donc l'algorithme répond « multiple » sans hésiter.",
+            "variants": {
+              "savage": "0 = 7 × 0, facteur entier, reste 0. L'algorithme répond « multiple »."
+            }
+          },
+          "misconceptionId": "excludes_zero_as_multiple"
+        },
+        {
+          "id": "C",
+          "label": "Rien : on ne peut pas diviser par 0.",
+          "feedback": {
+            "text": "C'est 0 qu'on divise, pas par 0 : 0 ÷ 7 est tout à fait permis et donne 0, reste 0. Diviser par 0 serait interdit, mais ce n'est pas ce qui arrive ici.",
+            "variants": {
+              "savage": "On divise 0 par 7, pas 7 par 0. 0 ÷ 7 = 0, reste 0. Rien d'interdit."
+            }
+          },
+          "misconceptionId": "confuses_zero_dividend_with_zero_divisor"
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D07-C10",
+      "order": 10,
+      "type": "multi-step-choice",
+      "objective": "valider : tester, prouver, puis lire l'algorithme",
+      "text": {
+        "text": "Trois étapes, et les corrections arrivent après tes trois réponses.",
+        "variants": {
+          "savage": "Trois décisions, débrief ensuite. Personne ne te souffle la suivante."
+        }
+      },
+      "feedbackTiming": "after-all",
+      "steps": [
+        {
+          "id": "M2-ARI-D07-C10-V01-E01",
+          "question": {
+            "text": "Est-ce que 92 est un multiple de 4 ?",
+            "variants": {
+              "savage": "92, multiple de 4 ?"
+            }
+          },
+          "options": [
+            {
+              "id": "A",
+              "label": "Oui : 92 = 4 × 23.",
+              "correct": true,
+              "feedback": {
+                "text": "4 × 23 = 92 exactement : le reste vaut 0, donc 92 est un multiple de 4.",
+                "variants": {
+                  "savage": "4 × 23 = 92, reste 0. Multiple."
+                }
+              }
+            },
+            {
+              "id": "B",
+              "label": "Non : 23 n'est pas un multiple de 4.",
+              "feedback": {
+                "text": "La question porte sur 92, pas sur 23. 92 est le multiple, 4 son diviseur, et 23 est juste le facteur qui le montre.",
+                "variants": {
+                  "savage": "On parle de 92, pas de 23. 92 est le multiple, 4 le diviseur."
+                }
+              },
+              "misconceptionId": "reverses_multiple_divisor_roles"
+            }
+          ],
+          "conceptId": "remainder_zero_test",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D07-C04",
+            "toCardId": "M2-ARI-D07-C04"
+          }
+        },
+        {
+          "id": "M2-ARI-D07-C10-V01-E02",
+          "discriminating": true,
+          "question": {
+            "text": "Quelle phrase prouve que 92 est un multiple de 4 ?",
+            "variants": {
+              "savage": "La phrase qui le prouve, pour 92 et 4 ?"
+            }
+          },
+          "options": [
+            {
+              "id": "A",
+              "label": "92 = 4 × 23, et 23 est un entier.",
+              "correct": true,
+              "feedback": {
+                "text": "C'est la définition même : il existe un entier k tel que 92 = k × 4. Ici k vaut 23, et c'est fini.",
+                "variants": {
+                  "savage": "La définition, mot pour mot : un entier k avec 92 = k × 4. Ici k = 23."
+                }
+              }
+            },
+            {
+              "id": "B",
+              "label": "92 ÷ 4 = 23, et cette division se calcule sans problème.",
+              "feedback": {
+                "text": "Une division se calcule toujours, même quand elle ne tombe pas pile. Ce qui prouve le multiple, c'est que le facteur trouvé est entier.",
+                "variants": {
+                  "savage": "Toute division se calcule. Ce qui compte, c'est que le facteur soit entier."
+                }
+              },
+              "misconceptionId": "accepts_non_integer_multiplier"
+            }
+          ],
+          "conceptId": "integer_factor_proof",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D07-C02",
+            "toCardId": "M2-ARI-D07-C03"
+          }
+        },
+        {
+          "id": "M2-ARI-D07-C10-V01-E03",
+          "question": {
+            "text": "L'algorithme tourne avec a ← 95 et b ← 4. Que répond-il ?",
+            "variants": {
+              "savage": "a ← 95, b ← 4. Sortie ?"
+            }
+          },
+          "options": [
+            {
+              "id": "A",
+              "label": "« pas multiple »",
+              "correct": true,
+              "feedback": {
+                "text": "95 = 4 × 23 + 3 : le reste vaut 3, pas 0. La condition r = 0 est fausse, donc c'est la ligne « sinon » qui sort.",
+                "variants": {
+                  "savage": "Reste 3, pas 0. Condition fausse, ligne « sinon »."
+                }
+              }
+            },
+            {
+              "id": "B",
+              "label": "« multiple »",
+              "feedback": {
+                "text": "Il faudrait un reste nul, et le reste de 95 par 4 vaut 3. L'algorithme ne passe donc pas par cette ligne.",
+                "variants": {
+                  "savage": "Reste de 95 par 4 : 3. Pas nul, pas cette ligne."
+                }
+              },
+              "misconceptionId": "inverts_the_test"
+            },
+            {
+              "id": "C",
+              "label": "« 3 »",
+              "feedback": {
+                "text": "3 est bien le reste, mais l'algorithme ne rend jamais un nombre : ses deux dernières lignes rendent un mot.",
+                "variants": {
+                  "savage": "3 est le reste, pas la sortie. L'algorithme rend un mot."
+                }
+              },
+              "misconceptionId": "confuses_rest_with_result"
+            }
+          ],
+          "conceptId": "reads_algorithm_output",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D07-C06",
+            "toCardId": "M2-ARI-D07-C07"
+          }
+        }
+      ],
+      "variants": [
+        {
+          "id": "v2",
+          "steps": [
+            {
+              "id": "M2-ARI-D07-C10-V02-E01",
+              "question": {
+                "text": "Est-ce que 78 est un multiple de 6 ?",
+                "variants": {
+                  "savage": "78, multiple de 6 ?"
+                }
+              },
+              "options": [
+                {
+                  "id": "A",
+                  "label": "Oui : 78 = 6 × 13.",
+                  "correct": true,
+                  "feedback": {
+                    "text": "6 × 13 = 78 exactement : le reste vaut 0, donc 78 est un multiple de 6.",
+                    "variants": {
+                      "savage": "6 × 13 = 78, reste 0. Multiple."
+                    }
+                  }
+                },
+                {
+                  "id": "B",
+                  "label": "Non : 13 n'est pas un multiple de 6.",
+                  "feedback": {
+                    "text": "La question porte sur 78, pas sur 13. 78 est le multiple, 6 son diviseur, et 13 est juste le facteur qui le montre.",
+                    "variants": {
+                      "savage": "On parle de 78, pas de 13. 78 est le multiple, 6 le diviseur."
+                    }
+                  },
+                  "misconceptionId": "reverses_multiple_divisor_roles"
+                }
+              ],
+              "conceptId": "remainder_zero_test",
+              "remediation": {
+                "type": "replay",
+                "fromCardId": "M2-ARI-D07-C04",
+                "toCardId": "M2-ARI-D07-C04"
+              }
+            },
+            {
+              "id": "M2-ARI-D07-C10-V02-E02",
+              "discriminating": true,
+              "question": {
+                "text": "Quelle phrase prouve que 78 est un multiple de 6 ?",
+                "variants": {
+                  "savage": "La phrase qui le prouve, pour 78 et 6 ?"
+                }
+              },
+              "options": [
+                {
+                  "id": "A",
+                  "label": "78 = 6 × 13, et 13 est un entier.",
+                  "correct": true,
+                  "feedback": {
+                    "text": "C'est la définition même : il existe un entier k tel que 78 = k × 6. Ici k vaut 13, et c'est fini.",
+                    "variants": {
+                      "savage": "La définition, mot pour mot : un entier k avec 78 = k × 6. Ici k = 13."
+                    }
+                  }
+                },
+                {
+                  "id": "B",
+                  "label": "78 ÷ 6 = 13, et cette division se calcule sans problème.",
+                  "feedback": {
+                    "text": "Une division se calcule toujours, même quand elle ne tombe pas pile. Ce qui prouve le multiple, c'est que le facteur trouvé est entier.",
+                    "variants": {
+                      "savage": "Toute division se calcule. Ce qui compte, c'est que le facteur soit entier."
+                    }
+                  },
+                  "misconceptionId": "accepts_non_integer_multiplier"
+                }
+              ],
+              "conceptId": "integer_factor_proof",
+              "remediation": {
+                "type": "replay",
+                "fromCardId": "M2-ARI-D07-C02",
+                "toCardId": "M2-ARI-D07-C03"
+              }
+            },
+            {
+              "id": "M2-ARI-D07-C10-V02-E03",
+              "question": {
+                "text": "L'algorithme tourne avec a ← 78 et b ← 5. Que répond-il ?",
+                "variants": {
+                  "savage": "a ← 78, b ← 5. Sortie ?"
+                }
+              },
+              "options": [
+                {
+                  "id": "A",
+                  "label": "« pas multiple »",
+                  "correct": true,
+                  "feedback": {
+                    "text": "78 = 5 × 15 + 3 : le reste vaut 3, pas 0. La condition r = 0 est fausse, donc c'est la ligne « sinon » qui sort.",
+                    "variants": {
+                      "savage": "Reste 3, pas 0. Condition fausse, ligne « sinon »."
+                    }
+                  }
+                },
+                {
+                  "id": "B",
+                  "label": "« multiple »",
+                  "feedback": {
+                    "text": "Il faudrait un reste nul, et le reste de 78 par 5 vaut 3. L'algorithme ne passe donc pas par cette ligne.",
+                    "variants": {
+                      "savage": "Reste de 78 par 5 : 3. Pas nul, pas cette ligne."
+                    }
+                  },
+                  "misconceptionId": "inverts_the_test"
+                },
+                {
+                  "id": "C",
+                  "label": "« 3 »",
+                  "feedback": {
+                    "text": "3 est bien le reste, mais l'algorithme ne rend jamais un nombre : ses deux dernières lignes rendent un mot.",
+                    "variants": {
+                      "savage": "3 est le reste, pas la sortie. L'algorithme rend un mot."
+                    }
+                  },
+                  "misconceptionId": "confuses_rest_with_result"
+                }
+              ],
+              "conceptId": "reads_algorithm_output",
+              "remediation": {
+                "type": "replay",
+                "fromCardId": "M2-ARI-D07-C06",
+                "toCardId": "M2-ARI-D07-C07"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M2-ARI-D07-C11",
+      "order": 11,
+      "type": "declic-summary",
+      "objective": "garder le test, l'écriture qui le prouve et le sens du mot multiple",
+      "text": {
+        "text": "🔥 À garder\na est un multiple de b quand le reste de a divisé par b vaut ==0==. Autrement dit : il existe un entier k tel que a = ==k × b==.\nL'algorithme tient en un test : r ← reste de a par b, puis ==si r = 0 alors « multiple », sinon « pas multiple »==.\n⚠️ Piège contrôle : le multiple est le grand, le diviseur est le petit. Et ==0 est un multiple de tous les entiers==.",
+        "variants": {
+          "savage": "🔥 Ce qu'on garde\na multiple de b ⟺ reste de a par b égal à ==0== ⟺ un entier k avec a = ==k × b==.\nL'algorithme : r ← reste de a par b, puis ==si r = 0 alors « multiple », sinon « pas multiple »==.\n⚠️ Piège contrôle : le multiple est le grand. Et ==0 est multiple de tout le monde==."
+        }
+      },
+      "actions": [
+        {
+          "id": "done",
+          "label": "J'ai capté 🔥",
+          "kind": "complete"
+        },
+        {
+          "id": "review",
+          "label": "Revoir le point qui me piège",
+          "kind": "menu"
+        }
+      ],
+      "menu": [
+        {
+          "id": "test",
+          "label": "La question que pose le jeu",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D07-C02",
+            "toCardId": "M2-ARI-D07-C02"
+          }
+        },
+        {
+          "id": "sens",
+          "label": "Multiple ou diviseur : qui est qui",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D07-C05",
+            "toCardId": "M2-ARI-D07-C05"
+          }
+        },
+        {
+          "id": "algo",
+          "label": "L'algorithme ligne par ligne",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D07-C06",
+            "toCardId": "M2-ARI-D07-C07"
+          }
+        },
+        {
+          "id": "zero",
+          "label": "Le cas de zéro",
+          "remediation": {
+            "type": "replay",
+            "fromCardId": "M2-ARI-D07-C09",
+            "toCardId": "M2-ARI-D07-C09"
+          }
+        }
+      ]
+    }
+  ],
+  "assessment": {
+    "cardId": "M2-ARI-D07-C10",
+    "understoodMinScore": 2,
+    "requireDiscriminatingStep": true,
+    "understoodMessage": "Deux étapes sur trois au moins, dont la preuve par le facteur entier : le test est tenu. Le point restant, s'il y en a un, est noté plus bas.",
+    "needsReinforcementMessage": "Le test n'est pas encore automatique. On revoit le point qui coince, puis tu refais une série avec d'autres nombres.",
+    "followUpCount": 2
+  },
+  "mastery": {
+    "requiredDeferredSuccesses": 2,
+    "requiredCardRatio": 0.8
+  },
+  "deckId": "M2-ARI-D07-REV"
+}

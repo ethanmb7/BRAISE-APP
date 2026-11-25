@@ -1,0 +1,92 @@
+{
+  "id": "M2-ARI-D07-REV",
+  "declicId": "M2-ARI-D07",
+  "chapterId": "M2-ARI",
+  "title": "Révision : multiple ou pas",
+  "cards": [
+    {
+      "id": "M2-ARI-D07-REV-01",
+      "order": 1,
+      "statement": "126 est un multiple de 9.",
+      "answer": "carre",
+      "concept": "remainder_zero_test",
+      "difficulty": 1,
+      "tags": ["Multiple"],
+      "feedback": {
+        "correct": "9 × 14 = 126 exactement : le reste vaut 0.",
+        "incorrect": "9 × 14 = 126 tombe pile, donc le reste est nul et 126 est bien un multiple de 9."
+      }
+    },
+    {
+      "id": "M2-ARI-D07-REV-02",
+      "order": 2,
+      "statement": "Dans 100 = 15 × 6 + 10, cela montre que 100 est un multiple de 15.",
+      "answer": "intox",
+      "concept": "remainder_zero_test",
+      "difficulty": 2,
+      "tags": ["Reste"],
+      "feedback": {
+        "correct": "Le reste vaut 10 : il faudrait 0 pour parler de multiple.",
+        "incorrect": "Le 10 à la fin est justement ce qui empêche : un multiple demande un reste nul."
+      },
+      "correction": "Cette égalité montre au contraire que 100 n'est pas un multiple de 15.",
+      "misconceptionId": "accepts_non_integer_multiplier"
+    },
+    {
+      "id": "M2-ARI-D07-REV-03",
+      "order": 3,
+      "statement": "Si 84 = 12 × 7, alors 12 est un multiple de 84.",
+      "answer": "intox",
+      "concept": "multiple_direction",
+      "difficulty": 2,
+      "tags": ["Sens"],
+      "feedback": {
+        "correct": "C'est l'inverse : le multiple est le grand, 84, et 12 est son diviseur.",
+        "incorrect": "L'égalité dit que 84 est le multiple de 12, pas que 12 est un multiple de 84."
+      },
+      "correction": "84 est un multiple de 12, et 12 est un diviseur de 84.",
+      "misconceptionId": "reverses_multiple_divisor_roles"
+    },
+    {
+      "id": "M2-ARI-D07-REV-04",
+      "order": 4,
+      "statement": "Pour prouver que 92 est un multiple de 4, il suffit d'écrire 92 = 4 × 23 avec 23 entier.",
+      "answer": "carre",
+      "concept": "integer_factor_proof",
+      "difficulty": 2,
+      "tags": ["Preuve"],
+      "feedback": {
+        "correct": "C'est exactement la définition : un entier k tel que a = k × b.",
+        "incorrect": "C'est bien la preuve attendue : il existe un entier, ici 23, tel que 92 = 23 × 4."
+      }
+    },
+    {
+      "id": "M2-ARI-D07-REV-05",
+      "order": 5,
+      "statement": "L'algorithme répond « multiple » quand le reste n'est pas nul.",
+      "answer": "intox",
+      "concept": "reads_algorithm_output",
+      "difficulty": 2,
+      "tags": ["Algorithme"],
+      "feedback": {
+        "correct": "Le test est si r = 0 : c'est le reste nul qui déclenche « multiple ».",
+        "incorrect": "Le test est écrit si r = 0, donc c'est bien le reste nul qui donne « multiple »."
+      },
+      "correction": "Il répond « multiple » quand le reste vaut 0.",
+      "misconceptionId": "inverts_the_test"
+    },
+    {
+      "id": "M2-ARI-D07-REV-06",
+      "order": 6,
+      "statement": "0 est un multiple de 7.",
+      "answer": "carre",
+      "concept": "remainder_zero_test",
+      "difficulty": 3,
+      "tags": ["Zéro"],
+      "feedback": {
+        "correct": "0 = 7 × 0, et 0 est un entier : le reste vaut 0.",
+        "incorrect": "0 = 7 × 0 avec un facteur entier : zéro est un multiple de tous les entiers."
+      }
+    }
+  ]
+}
