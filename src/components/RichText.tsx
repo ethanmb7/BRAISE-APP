@@ -7,7 +7,20 @@ import katex from "katex";
 //   **...**          -> emphasis on a key term
 //   ==...==          -> highlight under a key number/fact, the thing a student's eye should
 //                       land on first when scanning the card
-const TOKEN_SPLIT = /(\$\$[^$]+\$\$|\$[^$]+\$|\*\*[^*]+\*\*|==[^=]+==)/g;
+//
+// A highlight runs up to the next `==`, so it may contain a lone `=`: maths content highlights
+// whole equalities (`==a = kb==`), and a rule that stopped at the first `=` left the marks
+// unclosed and dragged the highlight onto the following paragraph.
+const HIGHLIGHT = String.raw`==(?:[^=]|=(?!=))+==`;
+const TOKEN_SPLIT = new RegExp(
+  String.raw`(\$\$[^$]+\$\$|\$[^$]+\$|\*\*[^*]+\*\*|${HIGHLIGHT})`,
+  "g",
+);
+
+/** The text cut into tokens: each marked-up run is its own piece, plain text is left whole. */
+export function splitRichText(text: string): string[] {
+  return text.split(TOKEN_SPLIT).filter((part) => part.length > 0);
+}
 
 type Props = {
   text: string;
@@ -18,7 +31,7 @@ type Props = {
 };
 
 export function RichText({ text, markClass = "neo-highlight", strongClass }: Props) {
-  const parts = useMemo(() => text.split(TOKEN_SPLIT).filter((part) => part.length > 0), [text]);
+  const parts = useMemo(() => splitRichText(text), [text]);
 
   return (
     <>
