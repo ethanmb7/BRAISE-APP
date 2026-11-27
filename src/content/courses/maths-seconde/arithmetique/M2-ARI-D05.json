@@ -264,9 +264,9 @@
       "beat": "you",
       "objective": "lire un algorithme et choisir la ligne qui calcule le résultat",
       "text": {
-        "text": "Voici l'algorithme, écrit en langage naturel. Quelle ligne manque ?\na ← 12\nb ← 100\nq ← quotient entier de b par a\nrésultat ← ❓",
+        "text": "L'algorithme, avec la division entière de tout à l'heure. Quelle ligne manque ?\na ← 12\nb ← 100\nq ← b // a\nrésultat ← ❓",
         "variants": {
-          "savage": "L'algorithme, en langage naturel. Il manque la dernière ligne :\na ← 12\nb ← 100\nq ← quotient entier de b par a\nrésultat ← ❓"
+          "savage": "L'algorithme, avec le // de tout à l'heure. Il manque la dernière ligne :\na ← 12\nb ← 100\nq ← b // a\nrésultat ← ❓"
         }
       },
       "choices": [

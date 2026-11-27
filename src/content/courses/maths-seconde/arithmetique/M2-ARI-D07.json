@@ -338,46 +338,136 @@
       "order": 9,
       "type": "choice",
       "beat": "you",
-      "objective": "tenir le cas limite de zéro sans faire d'exception",
+      "objective": "transférer hors de la machine, et tenir le cas de zéro sans en faire une exception",
       "text": {
-        "text": "Dernier essai, et il est piégeux : a ← 0 et b ← 7. Que répond l'algorithme ?",
+        "text": "Rien à voir avec un jeu : un bus part du terminus toutes les 12 minutes, à partir de 6 h 00 pile. Il est 6 h 00 tout juste. Y a-t-il un bus ?",
         "variants": {
-          "savage": "Celui-là est piégeux : a ← 0, b ← 7. Sortie ?"
+          "savage": "Autre décor : un bus toutes les 12 minutes à partir de 6 h 00. Il est 6 h 00 pile. Bus ou pas ?"
         }
       },
       "choices": [
         {
           "id": "A",
-          "label": "« multiple »",
+          "label": "Oui : 0 minute écoulée, et 0 = 12 × 0.",
           "correct": true,
           "feedback": {
-            "text": "0 = 7 × 0, et 0 est un entier : le reste vaut 0, donc le test passe. Zéro est un multiple de 7, comme de n'importe quel entier.",
+            "text": "Zéro est un multiple de 12, comme de n'importe quel entier : 0 = 12 × 0, et le facteur 0 est bien un entier. Le premier part à l'heure dite.",
             "variants": {
-              "savage": "0 = 7 × 0, reste 0. Zéro est multiple de tout le monde, 7 compris."
+              "savage": "0 = 12 × 0 : zéro est multiple de tout le monde. C'est bon."
             }
           }
         },
         {
           "id": "B",
-          "label": "« pas multiple »",
+          "label": "Non : le premier part à 6 h 12.",
           "feedback": {
-            "text": "Zéro est bien un multiple : 0 = 7 × 0, et le facteur 0 est un entier. Le reste vaut 0, donc l'algorithme répond « multiple » sans hésiter.",
+            "text": "L'énoncé dit « à partir de 6 h 00 » : le premier part à 6 h 00. Et côté nombres, 0 est bien un multiple de 12 — le test ne fait aucune exception pour lui.",
             "variants": {
-              "savage": "0 = 7 × 0, facteur entier, reste 0. L'algorithme répond « multiple »."
+              "savage": "« À partir de 6 h 00 » : il part à 6 h 00. Et 0 est multiple de 12, sans exception."
             }
           },
           "misconceptionId": "excludes_zero_as_multiple"
         },
         {
           "id": "C",
-          "label": "Rien : on ne peut pas diviser par 0.",
+          "label": "On ne peut pas savoir : 0 minute, ça ne se divise pas.",
           "feedback": {
-            "text": "C'est 0 qu'on divise, pas par 0 : 0 ÷ 7 est tout à fait permis et donne 0, reste 0. Diviser par 0 serait interdit, mais ce n'est pas ce qui arrive ici.",
+            "text": "C'est 0 qu'on divise, pas par 0 : 0 ÷ 12 est tout à fait permis et vaut 0, reste 0. Diviser par 0 serait interdit, mais ce n'est pas ce qui se passe ici.",
             "variants": {
-              "savage": "On divise 0 par 7, pas 7 par 0. 0 ÷ 7 = 0, reste 0. Rien d'interdit."
+              "savage": "On divise 0 par 12, pas 12 par 0. 0 ÷ 12 = 0, reste 0. Rien d'interdit."
             }
           },
           "misconceptionId": "confuses_zero_dividend_with_zero_divisor"
+        }
+      ],
+      "variants": [
+        {
+          "id": "v2",
+          "text": {
+            "text": "Une navette d'aéroport part toutes les 20 minutes, à partir de 4 h 00 pile. Il est 4 h 00 tout juste. Y a-t-il une navette ?",
+            "variants": {
+              "savage": "Navette toutes les 20 minutes à partir de 4 h 00. Il est 4 h 00 pile. Navette ou pas ?"
+            }
+          },
+          "choices": [
+            {
+              "id": "A",
+              "label": "Oui : 0 minute écoulée, et 0 = 20 × 0.",
+              "correct": true,
+              "feedback": {
+                "text": "Zéro est un multiple de 20, comme de n'importe quel entier : 0 = 20 × 0, et le facteur 0 est bien un entier. Le premier part à l'heure dite.",
+                "variants": {
+                  "savage": "0 = 20 × 0 : zéro est multiple de tout le monde. C'est bon."
+                }
+              }
+            },
+            {
+              "id": "B",
+              "label": "Non : le premier part à 4 h 20.",
+              "feedback": {
+                "text": "L'énoncé dit « à partir de 4 h 00 » : le premier part à 4 h 00. Et côté nombres, 0 est bien un multiple de 20 — le test ne fait aucune exception pour lui.",
+                "variants": {
+                  "savage": "« À partir de 4 h 00 » : il part à 4 h 00. Et 0 est multiple de 20, sans exception."
+                }
+              },
+              "misconceptionId": "excludes_zero_as_multiple"
+            },
+            {
+              "id": "C",
+              "label": "On ne peut pas savoir : 0 minute, ça ne se divise pas.",
+              "feedback": {
+                "text": "C'est 0 qu'on divise, pas par 0 : 0 ÷ 20 est tout à fait permis et vaut 0, reste 0. Diviser par 0 serait interdit, mais ce n'est pas ce qui se passe ici.",
+                "variants": {
+                  "savage": "On divise 0 par 20, pas 20 par 0. 0 ÷ 20 = 0, reste 0. Rien d'interdit."
+                }
+              },
+              "misconceptionId": "confuses_zero_dividend_with_zero_divisor"
+            }
+          ]
+        },
+        {
+          "id": "v3",
+          "text": {
+            "text": "Un tram passe toutes les 9 minutes, à partir de 5 h 45 pile. Il est 5 h 45 tout juste. Y a-t-il un tram ?",
+            "variants": {
+              "savage": "Tram toutes les 9 minutes à partir de 5 h 45. Il est 5 h 45 pile. Tram ou pas ?"
+            }
+          },
+          "choices": [
+            {
+              "id": "A",
+              "label": "Oui : 0 minute écoulée, et 0 = 9 × 0.",
+              "correct": true,
+              "feedback": {
+                "text": "Zéro est un multiple de 9, comme de n'importe quel entier : 0 = 9 × 0, et le facteur 0 est bien un entier. Le premier part à l'heure dite.",
+                "variants": {
+                  "savage": "0 = 9 × 0 : zéro est multiple de tout le monde. C'est bon."
+                }
+              }
+            },
+            {
+              "id": "B",
+              "label": "Non : le premier part à 5 h 54.",
+              "feedback": {
+                "text": "L'énoncé dit « à partir de 5 h 45 » : le premier part à 5 h 45. Et côté nombres, 0 est bien un multiple de 9 — le test ne fait aucune exception pour lui.",
+                "variants": {
+                  "savage": "« À partir de 5 h 45 » : il part à 5 h 45. Et 0 est multiple de 9, sans exception."
+                }
+              },
+              "misconceptionId": "excludes_zero_as_multiple"
+            },
+            {
+              "id": "C",
+              "label": "On ne peut pas savoir : 0 minute, ça ne se divise pas.",
+              "feedback": {
+                "text": "C'est 0 qu'on divise, pas par 0 : 0 ÷ 9 est tout à fait permis et vaut 0, reste 0. Diviser par 0 serait interdit, mais ce n'est pas ce qui se passe ici.",
+                "variants": {
+                  "savage": "On divise 0 par 9, pas 9 par 0. 0 ÷ 9 = 0, reste 0. Rien d'interdit."
+                }
+              },
+              "misconceptionId": "confuses_zero_dividend_with_zero_divisor"
+            }
+          ]
         }
       ]
     },
