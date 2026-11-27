@@ -8,6 +8,7 @@
     "check:conflicts": "node scripts/check-conflict-markers.mjs",
     "declic:check": "node scripts/check-declic-content.ts",
     "course:check": "node scripts/check-course-content.ts",
+    "declic:play": "node scripts/play-declic.mjs",
     "audit:contrast": "node scripts/audit-contrast.mjs",
     "prebuild": "npm run check:conflicts && npm run declic:check && npm run course:check",
     "dev": "vite dev",

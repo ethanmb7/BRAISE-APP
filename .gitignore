@@ -44,3 +44,6 @@ scratch-icons
 
 # Captures de fiches store (régénérées par `npm run store:shots`)
 store/captures
+
+# Planches-contact de Déclic (régénérées par `npm run declic:play`)
+store/declic
