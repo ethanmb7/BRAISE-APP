@@ -33,6 +33,22 @@ function textOf(t: Text): string {
   return typeof t === "string" ? t : t.text;
 }
 
+/** Un texte et toutes ses versions de ton : le ton `savage` est lu par des élèves lui aussi. */
+function allVoices(t: Text): string[] {
+  return typeof t === "string" ? [t] : [t.text, ...Object.values(t.variants ?? {})];
+}
+
+/** Les mots qu'aucune élève ne doit lire, dans aucun ton. La règle vaut partout, pas seulement
+ *  dans les deux messages d'évaluation où elle était vérifiée au début : un feedback de carte est
+ *  lu bien plus souvent qu'eux. */
+function checkWords(t: Text, where: string, err: (where: string, msg: string) => void) {
+  for (const voice of allVoices(t)) {
+    if (FORBIDDEN_WORDS.test(voice)) {
+      err(where, `emploie le mot « échec » : "${voice.trim().slice(0, 60)}"`);
+    }
+  }
+}
+
 /** Everything wrong with a chapter, its Déclics and their decks. Empty = valid. */
 export function validateChapter(
   chapter: ChapterDef,
@@ -188,6 +204,8 @@ function validateDeclic(
     if (!c.id.startsWith(`${deck.id}-`))
       err(where, `l'identifiant doit commencer par "${deck.id}-"`);
     if (!c.statement.trim()) err(where, "affirmation vide");
+    checkWords(c.statement, where, err);
+    if (c.correction) checkWords(c.correction, where, err);
     if (!c.concept.trim()) err(where, "concept manquant");
     if (c.answer !== "carre" && c.answer !== "intox") err(where, `réponse "${c.answer}" invalide`);
     if (c.answer === "intox" && !c.correction?.trim()) {
@@ -219,6 +237,7 @@ function checkFeedback(t: Text, where: string, err: (where: string, msg: string)
   else if (text.trim().length < MIN_FEEDBACK_CHARS) {
     err(where, `feedback trop court pour expliquer (${text.trim().length} caractères)`);
   }
+  checkWords(t, where, err);
 }
 
 function validateChoices(
@@ -326,6 +345,7 @@ function validateCard(
 ) {
   const where = at(card.id);
   if (!textOf(card.text).trim()) err(where, "texte vide");
+  checkWords(card.text, where, err);
   if (card.beat !== undefined && !BEATS.includes(card.beat))
     err(where, `temps "${card.beat}" inconnu (${BEATS.join(", ")})`);
   if (card.visualTiming !== undefined && !VISUAL_TIMINGS.includes(card.visualTiming))
