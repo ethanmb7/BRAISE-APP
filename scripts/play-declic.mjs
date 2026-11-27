@@ -76,27 +76,53 @@ const norm = (s) =>
     .trim();
 const loose = (s) => norm(s).replace(/[^\p{L}\p{N}]/gu, "");
 
-/** Les jeux de réponses que cette carte peut afficher : chaque version, chaque étape. */
+const asText = (t) => (t === undefined ? "" : typeof t === "string" ? t : t.text);
+
+/** Ce que cette carte peut afficher : chaque version, chaque étape, avec son énoncé. Les
+ *  libellés seuls ne suffisent pas — trois étapes d'une validation peuvent proposer « ℕ | ℤ |
+ *  Aucune » et attendre trois réponses différentes. */
 function answerSets(card) {
   if (card?.type === "choice") {
-    return [card, ...(card.variants ?? [])].map((v) => v.choices);
+    return [card, ...(card.variants ?? [])].map((v) => ({
+      options: v.choices,
+      ask: asText(v.text),
+      subject: "",
+    }));
   }
   if (card?.type === "multi-step-choice") {
     const versions = [{ steps: card.steps }, ...(card.variants ?? [])];
-    return versions.flatMap((v) => v.steps.map((s) => s.options));
+    return versions.flatMap((v) =>
+      v.steps.map((s) => ({
+        options: s.options,
+        ask: asText(s.question),
+        subject: s.subject ?? "",
+      })),
+    );
   }
   return [];
 }
 
 /** Quelle tuile cliquer, en reconnaissant d'abord la version affichée à son jeu de réponses.
  *  Retourne un index, ou une raison de ne pas pouvoir jouer. */
-function pick(card, shown) {
+function pick(card, shown, ask, subject) {
   const sets = answerSets(card);
   // La tuile affiche le libellé puis sa flèche : on compare par début de chaîne, pas à l'identique.
-  const match = (opts, eq) =>
-    opts.length === shown.length && opts.every((o, i) => eq(shown[i]).startsWith(eq(o.label)));
+  const match = (s, eq) =>
+    s.options.length === shown.length &&
+    s.options.every((o, i) => eq(shown[i]).startsWith(eq(o.label)));
   let found = sets.filter((o) => match(o, norm));
   if (found.length !== 1) found = sets.filter((o) => match(o, loose));
+  // Départager quand plusieurs jeux de réponses se ressemblent. Les trois étapes d'une validation
+  // peuvent proposer « ℕ | ℤ | Aucune » et n'afficher qu'un nombre pour les distinguer : on
+  // compare d'abord ce nombre, puis l'énoncé.
+  if (found.length > 1 && subject) {
+    const bySubject = found.filter((o) => o.subject && norm(o.subject) === norm(subject));
+    if (bySubject.length >= 1) found = bySubject;
+  }
+  if (found.length > 1 && ask) {
+    const byAsk = found.filter((o) => o.ask && loose(ask).includes(loose(o.ask)));
+    if (byAsk.length >= 1) found = byAsk;
+  }
   if (found.length === 0) {
     return {
       error:
@@ -106,7 +132,7 @@ function pick(card, shown) {
   }
   // Deux versions peuvent proposer les mêmes réponses — une étape de validation dont seul
   // l'énoncé change, par exemple. Ce n'est un problème que si elles n'attendent pas la même.
-  const indexes = [...new Set(found.map((o) => o.findIndex((x) => x.correct)))];
+  const indexes = [...new Set(found.map((o) => o.options.findIndex((x) => x.correct)))];
   if (indexes.length > 1) {
     return {
       error: `${found.length} versions du JSON affichent ces réponses, et n'attendent pas la même`,
@@ -330,6 +356,10 @@ try {
   let guard = 0;
   let lastIndex = -1;
   let shotsOnCard = 0;
+  // Un Déclic qui n'avance plus est une information, pas vingt captures de la même carte : on
+  // compare l'état d'une boucle à l'autre et on s'arrête dès qu'il ne bouge plus.
+  let lastSignature = "";
+  let stuck = 0;
 
   while (guard++ < total * 8) {
     await sleep(500);
@@ -345,16 +375,39 @@ try {
         c.querySelectorAll(".katex-mathml").forEach((m) => m.remove());
         return c.textContent.replace(/\\s+/g, " ").trim();
       };
+      const ask = [...document.querySelectorAll(".declic-bubble")]
+        .filter((e) => !e.classList.contains("declic-reply"))
+        .map(seen)
+        .join(" ");
+      const subjectEl = document.querySelector(".course-subject-value");
       return {
         index: counter ? Number(counter.trim().split("/")[0]) - 1 : -1,
+        ask,
+        subject: subjectEl ? seen(subjectEl) : "",
         labels: tiles.map(seen),
-        answered: tiles.some((e) => /Réponse attendue|Ta réponse/.test(e.textContent)),
+        // Une carte est répondue quand ses tuiles se désactivent. Se fier au texte « Réponse
+        // attendue » ne marche pas : quand une réponse est une image, ce statut passe par
+        // l'aria-label de la tuile et n'apparaît nulle part dans son texte.
+        answered: tiles.some((e) => e.disabled) || !!document.querySelector(".declic-reply"),
         cta: document.querySelector(".declic-cta:not([disabled])")?.textContent.trim() ?? null,
         inDeclic: !!document.querySelector(".declic-stage"),
       };
     })()`);
 
     if (!state.inDeclic) break; // le Déclic est terminé, l'app est revenue au chapitre
+
+    const signature = JSON.stringify([state.index, state.labels, state.answered, state.cta]);
+    stuck = signature === lastSignature ? stuck + 1 : 0;
+    lastSignature = signature;
+    if (stuck >= 3) {
+      findings.push({
+        carte: declic.cards[state.index]?.id ?? "?",
+        ecran: `${String(state.index + 1).padStart(2, "0")}`,
+        kind: "bloqué",
+        line: `l'écran ne change plus${state.cta ? ` (bouton « ${state.cta} » sans effet)` : ""}`,
+      });
+      break;
+    }
 
     if (state.index !== lastIndex) {
       lastIndex = state.index;
@@ -371,7 +424,7 @@ try {
     shotsOnCard++;
 
     if (state.labels.length && !state.answered) {
-      const chosen = pick(card, state.labels);
+      const chosen = pick(card, state.labels, state.ask, state.subject);
       if (chosen.error) {
         findings.push({
           carte: card?.id ?? "?",
