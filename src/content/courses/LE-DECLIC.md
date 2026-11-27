@@ -4,6 +4,10 @@
 forme, son contrat d'écran, son catalogue de cartes. Il existe pour qu'une centaine de Déclics ne
 soient pas une centaine d'inventions.
 
+`LA-METHODE.md` dit **pourquoi cette forme** : les effets mesurés sur lesquels chaque position
+repose, et les cinq corrections que les études imposent. Les deux décisions ouvertes (a) et (b)
+ci-dessous y sont tranchées.
+
 Rien ici n'est inventé pour l'occasion. La forme a convergé toute seule : **les Déclics D03, D04,
 D05, D06 et D07 ont exactement la même structure**, onze cartes dans le même ordre, écrits à des
 semaines d'intervalle sans que ce soit une consigne. Ce document la nomme, dit pourquoi chaque
@@ -69,7 +73,10 @@ Trois cycles _montre → fais_, puis trois cartes seule, puis la validation. Cha
 travail, et aucune n'est là pour faire du volume.
 
 **C01 — la situation qui marche.** Une scène concrète où la réponse attendue est atteignable sans
-rien connaître du cours. L'élève s'engage. C'est la carte qui décide si elle reste.
+rien connaître du cours. L'élève s'engage. C'est la carte qui décide si elle reste. Elle est la plus
+courte **à lire** du Déclic, pas la plus facile **à résoudre** : le bénéfice d'une question posée
+avant l'enseignement ne vient pas de la bonne réponse mais de ce qu'elle prépare à recevoir
+l'explication, et il grandit avec le temps (`LA-METHODE.md` §4).
 
 **C02 — ce qui vient de se passer.** Braise nomme ce que l'élève vient de faire. L'explication est
 _méritée_ : elle répond à une action, pas à une page blanche.
@@ -207,16 +214,19 @@ là parce que la notion y vit vraiment, pas pour faire jeune. Un contexte plaqu�
 
 ### Les cartes
 
-| Type                               | Rôle                                                      | État                                        |
-| ---------------------------------- | --------------------------------------------------------- | ------------------------------------------- |
-| `choice`                           | une question, deux à quatre réponses, un feedback chacune | ✅                                          |
-| `reveal`                           | Braise explique, un seul geste pour continuer             | ✅                                          |
-| `multi-step-choice`                | la validation, plusieurs étapes, un score                 | ✅                                          |
-| `declic-summary`                   | la dernière carte, avec son menu de rattrapage            | ✅                                          |
-| **preuve à remettre dans l'ordre** | les étapes d'une démonstration, mélangées                 | ❌ **bloque 10 exigences dans 7 chapitres** |
+| Type                                | Rôle                                                                                                     | État                                                                                                 |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `choice`                            | une question, deux à quatre réponses, un feedback chacune                                                | ✅                                                                                                   |
+| `reveal`                            | Braise explique, un seul geste pour continuer                                                            | ✅                                                                                                   |
+| `multi-step-choice`                 | la validation, plusieurs étapes, un score                                                                | ✅                                                                                                   |
+| `declic-summary`                    | la dernière carte, avec son menu de rattrapage                                                           | ✅                                                                                                   |
+| **preuve à remettre dans l'ordre**  | les étapes d'une démonstration, mélangées                                                                | ❌ **bloque 10 exigences dans 7 chapitres**                                                          |
+| **le tri** (entraînement entremêlé) | « c'est lequel ? » — reconnaître la notion parmi ses voisines, notions mélangées à l'échelle du chapitre | ❌ **le mécanisme le mieux mesuré du projet (d = 0,83) et le seul absent ; voir `LA-METHODE.md` §3** |
 
 Le format `.txt` historique portait aussi une carte **reformulation** (« dis-le avec tes mots »,
-une zone de saisie). Le format de cours ne l'a pas reprise. Décision ouverte, §7.
+une zone de saisie). Le format de cours ne l'a pas reprise, et **elle ne reviendra pas** : en maths,
+ajouter des invites d'auto-explication à un exemple résolu est un modérateur **négatif**
+(`LA-METHODE.md` §6b). Ce qu'elle cherchait à vérifier est le travail de C09 et de C10.
 
 ### Les images
 
@@ -285,23 +295,23 @@ Deux conséquences directes :
 
 ---
 
-## 7. Les décisions ouvertes
+## 7. Les décisions
 
-Trois, et aucune ne doit être tranchée en silence dans un Déclic.
+Il y en avait trois. Les études en ont tranché deux (`LA-METHODE.md` §6).
 
-**a) Le bouton sous la ligne de flottaison après une réponse (§3).** Mesuré sur treize cartes dans
-six Déclics sur sept. Raccourcir les cartes d'entrée réglera une partie du problème, mais pas le
-gabarit : rien ne garantira jamais que le geste suivant est atteignable. _Recommandation : faire
-venir le bouton à l'écran quand la réaction apparaît._ C'est le plus petit geste qui respecte la
-règle du pouce — mais il touche la sensation, donc il se décide en le voyant bouger, pas sur
-papier.
+**a) Le bouton sous la ligne de flottaison après une réponse (§3) — tranché : il vient à l'écran.**
+Mesuré sur treize cartes dans six Déclics sur sept. Et le bénéfice d'une question posée avant
+l'enseignement **diminue à mesure que le délai entre l'erreur et la correction augmente** : un
+feedback qu'il faut aller chercher en faisant défiler est un feedback retardé. La mesure et l'étude
+disent la même chose. Reste à l'implémenter — ça touche la sensation, donc ça se règle en le voyant
+bouger.
 
-**b) La carte reformulation.** Écrire une phrase avec ses mots est le test de compréhension le moins
-cher qui existe, et l'app sait déjà la stocker. Mais taper sur un téléphone est pénible, et la règle
-« pas de clavier » est acquise pour Réviser. _Recommandation : la garder pour le Déclic seulement,
-facultative, jamais bloquante, jamais notée_ — et la retirer pour de bon si les testeurs la sautent.
+**b) La carte reformulation — tranchée : retirée.** Deux raisons indépendantes, ce qui est le cas le
+plus confortable pour fermer une question : taper sur un téléphone est pénible, et en maths, ajouter
+des invites d'auto-explication à un exemple résolu fait **moins** bien que ne pas en ajouter.
 
-**c) Les Déclics sous licence d'un professeur.** Rien ne sera publié tant que le contenu de maths
+**c) Les Déclics sous licence d'un professeur** — toujours ouverte, et rien ne la remplace : les
+mécanismes mesurés disent comment présenter une idée juste, aucun ne détecte une idée fausse. Rien ne sera publié tant que le contenu de maths
 n'a pas été relu par quelqu'un dont c'est le métier. _Ce n'est pas une option de calendrier._
 
 ---
